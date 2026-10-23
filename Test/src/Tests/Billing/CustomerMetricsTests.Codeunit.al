@@ -6,6 +6,8 @@ codeunit 85496 "NPR Customer Metrics Tests"
     var
         _Assert: Codeunit Assert;
         _LibraryUtility: Codeunit "Library - Utility";
+        _LibraryPermissions: Codeunit "Library - Permissions";
+        _PlanIds: Codeunit "Plan Ids";
         _BusinessDateKeyTok: Label 'business_date', Locked = true;
 
     #region [Framework]
@@ -1181,16 +1183,252 @@ codeunit 85496 "NPR Customer Metrics Tests"
 
     #endregion
 
+    #region [BC licensed users]
+
+    [Test]
+    procedure TrySendMetric_TenantMetric_ClaimsTheBusinessDateAndSendsUnderTheSyncRowSystemId()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        MetricClaim: Record "NPR Customer Metric Claim";
+        MockSender: Codeunit "NPR Mock Cust. Metric Sender";
+        CustomerMetricsJQ: Codeunit "NPR Customer Metrics JQ";
+        CustomerMetric: Enum "NPR Customer Metric";
+        EventType: Enum "NPR Billing Event Type";
+        Metadata: JsonObject;
+        EventId: Guid;
+        Quantity: Decimal;
+        LicensedUsers: Decimal;
+        BusinessDate: Date;
+        ErrorText: Text;
+    begin
+        CreateUserInPlan(_PlanIds.GetPremiumPlanId());
+        LicensedUsers := CalculateBCLicensedUsers(Metadata);
+        BusinessDate := PrepareBusinessDate(180);
+        CustomerMetric := Enum::"NPR Customer Metric"::BCLicensedUsers;
+
+        _Assert.IsTrue(CustomerMetricsJQ.TrySendMetric(CustomerMetric, CustomerMetric, MockSender, BusinessDate, ErrorText), 'Sending the metric should succeed: ' + ErrorText);
+
+        _Assert.IsTrue(MetricClaim.Get(CustomerMetric, BusinessDate), 'The business date must be claimed for every company of the environment');
+        _Assert.IsTrue(MetricSync.Get(CustomerMetric, BusinessDate), 'A sync row must be stored for the metric and business date');
+        _Assert.AreEqual(1, MockSender.EventCount(), 'Exactly one event must be sent for the business date');
+        MockSender.GetEvent(1, EventId, EventType, Quantity, Metadata);
+        _Assert.AreEqual(MetricSync.SystemId, EventId, 'The event ID must be the SystemId of the sync row, so the event stays the same on a retry');
+        _Assert.AreEqual(Enum::"NPR Billing Event Type"::BC_LICENSED_USERS_COUNT.AsInteger(), EventType.AsInteger(), 'The event must be sent as BC_LICENSED_USERS_COUNT');
+        _Assert.AreEqual(LicensedUsers, Quantity, 'The event must carry the number of licensed users');
+        _Assert.AreEqual(Quantity, GetMetadataInteger(Metadata, 'premium_users') + GetMetadataInteger(Metadata, 'essentials_users') + GetMetadataInteger(Metadata, 'device_users'), 'The event must carry the split per license');
+    end;
+
+    [Test]
+    procedure TrySendMetric_TenantMetric_DateClaimedByAnotherCompany_StoresTheSyncRowWithoutSending()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        MockSender: Codeunit "NPR Mock Cust. Metric Sender";
+        CustomerMetricsJQ: Codeunit "NPR Customer Metrics JQ";
+        CustomerMetric: Enum "NPR Customer Metric";
+        BusinessDate: Date;
+        ErrorText: Text;
+    begin
+        BusinessDate := PrepareBusinessDate(181);
+        CustomerMetric := Enum::"NPR Customer Metric"::BCLicensedUsers;
+        ClaimForAnotherCompany(CustomerMetric, BusinessDate);
+
+        _Assert.IsTrue(CustomerMetricsJQ.TrySendMetric(CustomerMetric, CustomerMetric, MockSender, BusinessDate, ErrorText), 'A company that finds the business date claimed must end without an error: ' + ErrorText);
+
+        _Assert.AreEqual(0, MockSender.EventCount(), 'Only the company that claimed the business date may send the value');
+        _Assert.IsTrue(MetricSync.Get(CustomerMetric, BusinessDate), 'The sync row must be stored, so the company neither retries nor catches up the business date');
+    end;
+
+    [Test]
+    procedure TrySendMetric_TenantMetric_SenderFails_ReleasesTheClaim()
+    var
+        MetricClaim: Record "NPR Customer Metric Claim";
+        MockSender: Codeunit "NPR Mock Cust. Metric Sender";
+        CustomerMetricsJQ: Codeunit "NPR Customer Metrics JQ";
+        CustomerMetric: Enum "NPR Customer Metric";
+        BusinessDate: Date;
+        ErrorText: Text;
+    begin
+        BusinessDate := PrepareBusinessDate(182);
+        CustomerMetric := Enum::"NPR Customer Metric"::BCLicensedUsers;
+        MockSender.SetFailure('Simulated sender failure');
+
+        _Assert.IsFalse(CustomerMetricsJQ.TrySendMetric(CustomerMetric, CustomerMetric, MockSender, BusinessDate, ErrorText), 'A sender failure must be reported');
+        _Assert.IsFalse(MetricClaim.Get(CustomerMetric, BusinessDate), 'The claim must be rolled back with the failed run, so another company or the next run sends the business date');
+
+        MockSender.SetFailure('');
+        _Assert.IsTrue(CustomerMetricsJQ.TrySendMetric(CustomerMetric, CustomerMetric, MockSender, BusinessDate, ErrorText), 'The next run should succeed: ' + ErrorText);
+        _Assert.AreEqual(1, MockSender.EventCount(), 'The next run must claim the business date and send it once');
+    end;
+
+    [Test]
+    procedure TrySendMetric_CompanyMetric_IgnoresClaimsAndClaimsNothing()
+    var
+        MetricClaim: Record "NPR Customer Metric Claim";
+        MockMetric: Codeunit "NPR Mock Customer Metric";
+        MockSender: Codeunit "NPR Mock Cust. Metric Sender";
+        CustomerMetricsJQ: Codeunit "NPR Customer Metrics JQ";
+        BusinessDate: Date;
+        ErrorText: Text;
+    begin
+        BusinessDate := PrepareBusinessDate(184);
+        MockMetric.SetValue(1, '', '');
+        ClaimForAnotherCompany(Enum::"NPR Customer Metric"::ActivePOSUnits7D, BusinessDate - 1);
+
+        _Assert.IsTrue(CustomerMetricsJQ.TrySendMetric(Enum::"NPR Customer Metric"::ActivePOSUnits7D, MockMetric, MockSender, BusinessDate - 1, ErrorText), 'Sending the claimed date should succeed: ' + ErrorText);
+        _Assert.IsTrue(CustomerMetricsJQ.TrySendMetric(Enum::"NPR Customer Metric"::ActivePOSUnits7D, MockMetric, MockSender, BusinessDate, ErrorText), 'Sending the unclaimed date should succeed: ' + ErrorText);
+
+        _Assert.AreEqual(2, MockSender.EventCount(), 'Every company must send a company metric, whether or not its business date is claimed');
+        _Assert.IsFalse(MetricClaim.Get(Enum::"NPR Customer Metric"::ActivePOSUnits7D, BusinessDate), 'A company metric must not claim its business date, or the companies would wait on each other''s claims');
+    end;
+
+    [Test]
+    procedure SendMetric_TenantMetric_CatchesUpOnlyTheDatesNoOtherCompanyClaimed()
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        FirstRunSender: Codeunit "NPR Mock Cust. Metric Sender";
+        MockSender: Codeunit "NPR Mock Cust. Metric Sender";
+        CustomerMetricsJQ: Codeunit "NPR Customer Metrics JQ";
+        CustomerMetric: Enum "NPR Customer Metric";
+        EventType: Enum "NPR Billing Event Type";
+        Metadata: JsonObject;
+        EventId: Guid;
+        Quantity: Decimal;
+        LicensedUsers: Decimal;
+        Yesterday: Date;
+        ErrorText: Text;
+        FailedMetrics: Text;
+    begin
+        CreateUserInPlan(_PlanIds.GetPremiumPlanId());
+        LicensedUsers := CalculateBCLicensedUsers(Metadata);
+        Yesterday := PrepareBusinessDate(200);
+        CustomerMetric := Enum::"NPR Customer Metric"::BCLicensedUsers;
+        _Assert.IsTrue(CustomerMetricsJQ.TrySendMetric(CustomerMetric, CustomerMetric, FirstRunSender, Yesterday - 3, ErrorText), 'The first run should succeed: ' + ErrorText);
+        ClaimForAnotherCompany(CustomerMetric, Yesterday - 1);
+
+        CustomerMetricsJQ.SendMetric(CustomerMetric, CustomerMetric, MockSender, Yesterday, FailedMetrics);
+
+        _Assert.AreEqual('', FailedMetrics, 'A date another company claimed must not be reported as failed');
+        _Assert.AreEqual(2, MockSender.EventCount(), 'The run must send the missed date and yesterday, but not the date another company claimed');
+        AssertEventBusinessDate(MockSender, 1, Yesterday - 2);
+        AssertEventBusinessDate(MockSender, 2, Yesterday);
+        MockSender.GetEvent(1, EventId, EventType, Quantity, Metadata);
+        _Assert.AreEqual(LicensedUsers, Quantity, 'A missed date must be sent with the count at the time of the run, because users have no history');
+        _Assert.IsTrue(MetricSync.Get(CustomerMetric, Yesterday - 1), 'The date another company claimed must be stored, so it is not tried again');
+    end;
+
+    [Test]
+    procedure CustomerMetric_OnlyBCLicensedUsersIsATenantMetric()
+    var
+        CustomerMetric: Interface "NPR ICustomer Metric";
+        Ordinal: Integer;
+    begin
+        foreach Ordinal in Enum::"NPR Customer Metric".Ordinals() do begin
+            CustomerMetric := Enum::"NPR Customer Metric".FromInteger(Ordinal);
+            _Assert.AreEqual(Ordinal = Enum::"NPR Customer Metric"::BCLicensedUsers.AsInteger(), CustomerMetric is "NPR ICustomer Tenant Metric", 'Customer metric ' + Format(Ordinal) + ' may be sent by one company per environment only if its value is the same in every company');
+        end;
+    end;
+
+    [Test]
+    procedure CustomerMetric_BCLicensedUsers_IsSentAsBCLicensedUsersCount()
+    var
+        CustomerMetric: Interface "NPR ICustomer Metric";
+    begin
+        CustomerMetric := Enum::"NPR Customer Metric"::BCLicensedUsers;
+        _Assert.AreEqual(Enum::"NPR Billing Event Type"::BC_LICENSED_USERS_COUNT.AsInteger(), CustomerMetric.GetEventType().AsInteger(), 'BC Licensed Users must be sent as BC_LICENSED_USERS_COUNT');
+        _Assert.IsFalse(CustomerMetric.IsDelta(), 'BC Licensed Users is a full count, so missed dates must be caught up');
+    end;
+
+    [Test]
+    procedure BCLicensedUsers_CountsEnabledUsersWithAnEssentialsPremiumOrDevicePlan()
+    var
+        BaselineMetadata: JsonObject;
+        UserId: Guid;
+    begin
+        CalculateBCLicensedUsers(BaselineMetadata);
+
+        AssertNewUserWithPlanAdded(_PlanIds.GetPremiumPlanId(), BaselineMetadata, 1, 0, 0);
+        AssertNewUserWithPlanAdded(_PlanIds.GetPremiumISVPlanId(), BaselineMetadata, 1, 0, 0);
+        AssertNewUserWithPlanAdded(_PlanIds.GetEssentialPlanId(), BaselineMetadata, 0, 1, 0);
+        AssertNewUserWithPlanAdded(_PlanIds.GetEssentialISVPlanId(), BaselineMetadata, 0, 1, 0);
+        AssertNewUserWithPlanAdded(_PlanIds.GetEssentialAttachPlanId(), BaselineMetadata, 0, 1, 0);
+        AssertNewUserWithPlanAdded(_PlanIds.GetDevicePlanId(), BaselineMetadata, 0, 0, 1);
+        AssertNewUserWithPlanAdded(_PlanIds.GetDeviceISVPlanId(), BaselineMetadata, 0, 0, 1);
+
+        UserId := CreateUserInPlan(_PlanIds.GetTeamMemberPlanId());
+        _LibraryPermissions.AddUserToPlan(UserId, _PlanIds.GetBasicPlanId());
+        _LibraryPermissions.AddUserToPlan(UserId, _PlanIds.GetExternalAccountantPlanId());
+        _LibraryPermissions.AddUserToPlan(UserId, _PlanIds.GetPremiumPartnerSandboxPlanId());
+        _LibraryPermissions.AddUserToPlan(UserId, _PlanIds.GetViralSignupPlanId());
+        _LibraryPermissions.AddUserToPlan(UserId, _PlanIds.GetMicrosoft365PlanId());
+        _LibraryPermissions.AddUserToPlan(UserId, _PlanIds.GetDelegatedAdminPlanId());
+        AssertLicensedUsersAdded(BaselineMetadata, 0, 0, 0, 'A user with only team member, basic, accountant, partner sandbox, trial, Microsoft 365 or admin plans must not be counted');
+    end;
+
+    [Test]
+    procedure BCLicensedUsers_UserWithSeveralPlansCountsOnceUnderTheHighestLicense()
+    var
+        BaselineMetadata: JsonObject;
+        UserId: Guid;
+    begin
+        CalculateBCLicensedUsers(BaselineMetadata);
+
+        UserId := CreateUserInPlan(_PlanIds.GetDevicePlanId());
+        _LibraryPermissions.AddUserToPlan(UserId, _PlanIds.GetDeviceISVPlanId());
+        AssertLicensedUsersAdded(BaselineMetadata, 0, 0, 1, 'A user with both device plans must be counted once');
+
+        _LibraryPermissions.AddUserToPlan(UserId, _PlanIds.GetEssentialPlanId());
+        _LibraryPermissions.AddUserToPlan(UserId, _PlanIds.GetEssentialISVPlanId());
+        AssertLicensedUsersAdded(BaselineMetadata, 0, 1, 0, 'A user with device and essentials plans must be counted once, under essentials');
+
+        _LibraryPermissions.AddUserToPlan(UserId, _PlanIds.GetPremiumPlanId());
+        AssertLicensedUsersAdded(BaselineMetadata, 1, 0, 0, 'A user with device, essentials and premium plans must be counted once, under premium');
+    end;
+
+    [Test]
+    procedure BCLicensedUsers_CountsEachEnabledUserButNotADisabledOne()
+    var
+        User: Record User;
+        BaselineMetadata: JsonObject;
+    begin
+        CalculateBCLicensedUsers(BaselineMetadata);
+
+        User.Get(CreateUserInPlan(_PlanIds.GetPremiumPlanId()));
+        CreateUserInPlan(_PlanIds.GetPremiumPlanId());
+        AssertLicensedUsersAdded(BaselineMetadata, 2, 0, 0, 'Each enabled user with a plan must be counted');
+
+        User.State := User.State::Disabled;
+        User.Modify();
+        AssertLicensedUsersAdded(BaselineMetadata, 1, 0, 0, 'A disabled user cannot sign in, so the user must not be counted');
+    end;
+
+    [Test]
+    procedure BCLicensedUsers_PlanOfAUserMissingFromTheUserTableIsNotCounted()
+    var
+        BaselineMetadata: JsonObject;
+    begin
+        CalculateBCLicensedUsers(BaselineMetadata);
+
+        _LibraryPermissions.AddUserToPlan(CreateGuid(), _PlanIds.GetPremiumPlanId());
+
+        AssertLicensedUsersAdded(BaselineMetadata, 0, 0, 0, 'A plan whose user is missing from the User table must not be counted');
+    end;
+
+    #endregion
+
     #region [Helpers]
 
     local procedure PrepareBusinessDate(Offset: Integer) BusinessDate: Date
     var
         MetricSync: Record "NPR Customer Metric Sync";
+        MetricClaim: Record "NPR Customer Metric Claim";
     begin
         // A date the daily job never uses
         BusinessDate := DMY2Date(1, 1, 2000) + Offset;
         // The catch-up starts at the first sent date, so sync rows of other tests must not be left
         MetricSync.DeleteAll();
+        // Claims are shared by all companies, so only the dates the tests use are removed
+        MetricClaim.SetRange("Business Date", DMY2Date(1, 1, 2000), DMY2Date(31, 12, 2000));
+        MetricClaim.DeleteAll();
         // TrySendMetric can isolate a failing metric only when no write transaction is open
         Commit();
     end;
@@ -1580,6 +1818,68 @@ codeunit 85496 "NPR Customer Metrics Tests"
     begin
         if Checkpoint.FindLast() then
             exit(Checkpoint."Entry No.");
+    end;
+
+    local procedure ClaimForAnotherCompany(Metric: Enum "NPR Customer Metric"; BusinessDate: Date)
+    var
+        MetricClaim: Record "NPR Customer Metric Claim";
+    begin
+        MetricClaim.Metric := Metric;
+        MetricClaim."Business Date" := BusinessDate;
+        MetricClaim.Insert();
+        Commit();
+    end;
+
+    local procedure CalculateBCLicensedUsers(var Metadata: JsonObject) LicensedUsers: Decimal
+    var
+        MetricSync: Record "NPR Customer Metric Sync";
+        BCLicensedUsersMetric: Codeunit "NPR BC Licensed Users Metric";
+    begin
+        Clear(Metadata);
+        LicensedUsers := BCLicensedUsersMetric.Calculate(MetricSync, Metadata);
+        _Assert.AreEqual(LicensedUsers, GetMetadataInteger(Metadata, 'premium_users') + GetMetadataInteger(Metadata, 'essentials_users') + GetMetadataInteger(Metadata, 'device_users'), 'Each licensed user must be counted under one license, so the licenses add up to the count');
+    end;
+
+    local procedure AssertLicensedUsersAdded(BaselineMetadata: JsonObject; AddedPremium: Integer; AddedEssentials: Integer; AddedDevice: Integer; Reason: Text)
+    var
+        Metadata: JsonObject;
+    begin
+        CalculateBCLicensedUsers(Metadata);
+        _Assert.AreEqual(GetMetadataInteger(BaselineMetadata, 'premium_users') + AddedPremium, GetMetadataInteger(Metadata, 'premium_users'), Reason + ' (premium_users)');
+        _Assert.AreEqual(GetMetadataInteger(BaselineMetadata, 'essentials_users') + AddedEssentials, GetMetadataInteger(Metadata, 'essentials_users'), Reason + ' (essentials_users)');
+        _Assert.AreEqual(GetMetadataInteger(BaselineMetadata, 'device_users') + AddedDevice, GetMetadataInteger(Metadata, 'device_users'), Reason + ' (device_users)');
+    end;
+
+    local procedure CreateUserInPlan(PlanId: Guid): Guid
+    var
+        User: Record User;
+    begin
+        User."User Security ID" := CreateGuid();
+        User."User Name" := CopyStr(DelChr(Format(User."User Security ID"), '=', '{}-'), 1, MaxStrLen(User."User Name"));
+        // An external user, because the license of a test environment allows only a few full users
+        User."License Type" := User."License Type"::"External User";
+        User.Insert(true);
+        _LibraryPermissions.AddUserToPlan(User."User Security ID", PlanId);
+        exit(User."User Security ID");
+    end;
+
+    local procedure AssertNewUserWithPlanAdded(PlanId: Guid; BaselineMetadata: JsonObject; AddedPremium: Integer; AddedEssentials: Integer; AddedDevice: Integer)
+    var
+        User: Record User;
+    begin
+        User.Get(CreateUserInPlan(PlanId));
+        AssertLicensedUsersAdded(BaselineMetadata, AddedPremium, AddedEssentials, AddedDevice, 'A user with plan ' + Format(PlanId) + ' must be counted under its license');
+        // Takes the user out of the count again, so every plan is checked against the same baseline
+        User.State := User.State::Disabled;
+        User.Modify();
+    end;
+
+    local procedure GetMetadataInteger(Metadata: JsonObject; KeyName: Text): Integer
+    var
+        Token: JsonToken;
+    begin
+        _Assert.IsTrue(Metadata.Get(KeyName, Token), 'The metadata must carry ' + KeyName + ', also when it is 0');
+        exit(Token.AsValue().AsInteger());
     end;
 
     #endregion

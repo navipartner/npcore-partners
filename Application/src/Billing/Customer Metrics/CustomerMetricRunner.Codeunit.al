@@ -2,7 +2,8 @@ codeunit 6151257 "NPR Customer Metric Runner"
 {
     Access = Internal;
     Permissions =
-        TableData "NPR Customer Metric Sync" = RI;
+        TableData "NPR Customer Metric Sync" = RI,
+        TableData "NPR Customer Metric Claim" = I;
 
     var
         _Metric: Enum "NPR Customer Metric";
@@ -13,6 +14,7 @@ codeunit 6151257 "NPR Customer Metric Runner"
     trigger OnRun()
     var
         MetricSync: Record "NPR Customer Metric Sync";
+        MetricClaim: Record "NPR Customer Metric Claim";
         DateMetric: Interface "NPR ICustomer Date Metric";
         EntryMetric: Interface "NPR ICustomer Entry Metric";
         Metadata: JsonObject;
@@ -30,6 +32,16 @@ codeunit 6151257 "NPR Customer Metric Runner"
             EntryMetric.RegisterEvents(MetricSync, _Sender);
             InsertSyncRow(MetricSync);
             exit;
+        end;
+
+        if _MetricImplementation is "NPR ICustomer Tenant Metric" then begin
+            MetricClaim.Metric := _Metric;
+            MetricClaim."Business Date" := _BusinessDate;
+            // A plain read neither waits for nor reliably sees another company's uncommitted claim, so the insert alone decides which company sends
+            if not MetricClaim.Insert() then begin
+                InsertSyncRow(MetricSync);
+                exit;
+            end;
         end;
 
         DateMetric := _MetricImplementation as "NPR ICustomer Date Metric";

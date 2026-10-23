@@ -1,5 +1,6 @@
 /// <summary>
 /// For a date metric, the row's SystemId is the event ID of the value sent for the business date.
+/// For a tenant metric, only the company that claimed the business date sent a value.
 /// </summary>
 table 6059943 "NPR Customer Metric Sync"
 {

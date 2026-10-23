@@ -23,4 +23,9 @@ enum 6014660 "NPR Customer Metric" implements "NPR ICustomer Metric"
         Caption = 'POS Z-Report Revenue';
         Implementation = "NPR ICustomer Metric" = "NPR Z-Report Revenue Metric";
     }
+    value(5; BCLicensedUsers)
+    {
+        Caption = 'BC Licensed Users';
+        Implementation = "NPR ICustomer Metric" = "NPR BC Licensed Users Metric";
+    }
 }
