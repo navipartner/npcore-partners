@@ -454,7 +454,8 @@ codeunit 6185051 "NPR API Request"
         // reached. The value name is the same in every language; the caption that Format would
         // return is translated, which makes it useless as a key for a consumer.
         if FieldRef.IsEnum() then begin
-            JsonObj.Add(FieldName, FieldRef.GetEnumValueName(FieldRef.Value()));
+            IntegerValue := FieldRef.Value();
+            JsonObj.Add(FieldName, FieldRef.GetEnumValueNameFromOrdinalValue(IntegerValue));
             exit;
         end;
 

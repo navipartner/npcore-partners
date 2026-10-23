@@ -722,38 +722,103 @@ codeunit 85458 "NPR API BI Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure ReaderReturnsItemLedgerEntryTypeNames()
+    begin
+        // [SCENARIO] The inventory API reader resolves item ledger entry type names by their stored enum ordinals.
+        AssertItemLedgerEntryTypeName("Item Ledger Entry Type"::Purchase, 'Purchase');
+        AssertItemLedgerEntryTypeName("Item Ledger Entry Type"::Sale, 'Sale');
+        AssertItemLedgerEntryTypeName("Item Ledger Entry Type"::Transfer, 'Transfer');
+        AssertItemLedgerEntryTypeName("Item Ledger Entry Type"::"Assembly Consumption", 'Assembly Consumption');
+    end;
+
+    local procedure AssertItemLedgerEntryTypeName(EntryType: Enum "Item Ledger Entry Type"; ExpectedName: Text)
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry" temporary;
+        APIRequest: Codeunit "NPR API Request";
+        Fields: Dictionary of [Integer, Text];
+        Result: JsonObject;
+        DataArray: JsonArray;
+        RecordToken: JsonToken;
+    begin
+        // [GIVEN] A temporary item ledger entry with the specified entry type and its entryType field selected.
+        ItemLedgerEntry."Entry No." := 1;
+        ItemLedgerEntry."Entry Type" := EntryType;
+        ItemLedgerEntry.Insert();
+        Fields.Add(ItemLedgerEntry.FieldNo("Entry Type"), 'entryType');
+
+        // [WHEN] The shared reader used by the inventory endpoint serialises the entry.
+        Result := APIRequest.GetData(ItemLedgerEntry, Fields);
+
+        // [THEN] Exactly one entry is returned with the enum name corresponding to its stored ordinal.
+        Result.Get('data', RecordToken);
+        DataArray := RecordToken.AsArray();
+        Assert.AreEqual(1, DataArray.Count(), 'The ledger entry must be returned');
+        DataArray.Get(0, RecordToken);
+        Assert.AreEqual(ExpectedName, LibraryAPIBI.GetText(RecordToken.AsObject(), 'entryType'),
+            'The entry type must be resolved by its stored ordinal, not its position in the enum');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ReaderReturnsEnumExtensionNameForSparseOrdinal()
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry" temporary;
+        APIRequest: Codeunit "NPR API Request";
+        Fields: Dictionary of [Integer, Text];
+        Result: JsonObject;
+        DataArray: JsonArray;
+        RecordToken: JsonToken;
+    begin
+        // [SCENARIO] The shared reader resolves an enum extension value whose ordinal differs from its position.
+        // [GIVEN] A temporary item ledger entry with document type NPR Nivelation (ordinal 6014400).
+        ItemLedgerEntry."Entry No." := 1;
+        ItemLedgerEntry."Document Type" := "Item Ledger Document Type"::"NPR Nivelation";
+        ItemLedgerEntry.Insert();
+        Fields.Add(ItemLedgerEntry.FieldNo("Document Type"), 'documentType');
+
+        // [WHEN] The shared reader serialises the document type.
+        Result := APIRequest.GetData(ItemLedgerEntry, Fields);
+
+        // [THEN] Exactly one entry is returned with the extension value name resolved by its stored ordinal.
+        Result.Get('data', RecordToken);
+        DataArray := RecordToken.AsArray();
+        Assert.AreEqual(1, DataArray.Count(), 'The ledger entry must be returned');
+        DataArray.Get(0, RecordToken);
+        Assert.AreEqual('NPR Nivelation', LibraryAPIBI.GetText(RecordToken.AsObject(), 'documentType'),
+            'An enum extension value must be resolved by its stored ordinal, not its position in the enum');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ReaderReturnsTheStableValueNameForAnEnumField()
     var
-        BIAllowedTable: Record "NPR API BI Allowed Table";
+        BIAllowedTable: Record "NPR API BI Allowed Table" temporary;
         APIRequest: Codeunit "NPR API Request";
         Fields: Dictionary of [Integer, Text];
         Result: JsonObject;
         DataArray: JsonArray;
         RecordToken: JsonToken;
         PrincipalTypeValue: Text;
-        Records: Integer;
     begin
         // [SCENARIO] An enum field is serialised as its value name, which is the same in every language, and not as the translated caption, which is not safe to store or compare.
-        // [GIVEN] One record whose Principal Type is the value "NP API Key", a value whose caption is the different text "NaviPartner API Key"
-        LibraryAPIBI.ResetBIPrincipals();
-        LibraryAPIBI.AllowTable("NPR API BI Principal Type"::"NP API Key", CreateGuid(), Database::Item);
-        BIAllowedTable.FindLast();
-        BIAllowedTable.SetRecFilter();
+        // [GIVEN] A temporary record whose Principal Type is "NP API Key", with the different caption "NaviPartner API Key".
+        BIAllowedTable."Principal Type" := "NPR API BI Principal Type"::"NP API Key";
+        BIAllowedTable."Principal Id" := CreateGuid();
+        BIAllowedTable."Table No." := Database::Item;
+        BIAllowedTable.Insert();
         Fields.Add(BIAllowedTable.FieldNo("Principal Type"), 'principalType');
 
         // [WHEN] The shared reader serialises it
         Result := APIRequest.GetData(BIAllowedTable, Fields);
 
-        // [THEN] The property carries the value name, never the caption
+        // [THEN] Exactly one record is returned with the value name, never the caption.
         Result.Get('data', RecordToken);
         DataArray := RecordToken.AsArray();
-        foreach RecordToken in DataArray do begin
-            Records += 1;
-            PrincipalTypeValue := LibraryAPIBI.GetText(RecordToken.AsObject(), 'principalType');
-            Assert.AreEqual('NP API Key', PrincipalTypeValue, 'An enum field must carry the value name');
-            Assert.AreNotEqual('NaviPartner API Key', PrincipalTypeValue, 'An enum field must not carry the translated caption');
-        end;
-        Assert.AreEqual(1, Records, 'The record must be returned, otherwise nothing above was asserted');
+        Assert.AreEqual(1, DataArray.Count(), 'The record must be returned');
+        DataArray.Get(0, RecordToken);
+        PrincipalTypeValue := LibraryAPIBI.GetText(RecordToken.AsObject(), 'principalType');
+        Assert.AreEqual('NP API Key', PrincipalTypeValue, 'An enum field must carry the value name');
+        Assert.AreNotEqual('NaviPartner API Key', PrincipalTypeValue, 'An enum field must not carry the translated caption');
     end;
 
     [Test]
