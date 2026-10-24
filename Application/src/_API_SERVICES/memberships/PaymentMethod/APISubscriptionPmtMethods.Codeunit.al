@@ -60,45 +60,82 @@ codeunit 6185107 "NPR API SubscriptionPmtMethods"
     var
         MemberPaymentMethod: Record "NPR MM Member Payment Method";
         MembershipPmtMethodMap: Record "NPR MM MembershipPmtMethodMap";
-        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
         TempMemberPaymentMethod: Record "NPR MM Member Payment Method" temporary;
         Membership: Record "NPR MM Membership";
         Member: Record "NPR MM Member";
         UserAccount: Record "NPR UserAccount";
         Json: Codeunit "NPR Json Builder";
-        JsonHelper: Codeunit "NPR Json Helper";
-        PaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
-        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
-        EFTShopperRecognition: Record "NPR EFT Shopper Recognition";
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
         RequestBody: JsonToken;
         MembershipID: Text;
         PSPAsString: Text;
-        Default, IsModified : Boolean;
-        EntityType: Option Customer,Contact,Membership,UserAccount;
+        PayerAccountId: Guid;
+        PayerEmail: Text[80];
+        ErrorMessage: Text;
+        Default: Boolean;
     begin
         MembershipID := Request.Paths().Get(2);
         if MembershipID = '' then
             exit(Response.RespondBadRequest('Missing required path parameter: membershipId'));
 
         RequestBody := Request.BodyJson();
-        PSPAsString := JsonHelper.GetJText(RequestBody, 'paymentMethod.PSP', false);
-        if PSPAsString <> '' then
-            if not Enum::"NPR MM Subscription PSP".Names().Contains(PSPAsString) then
-                exit(Response.RespondResourceNotFound(StrSubstNo('PSP %1', PSPAsString)));
+        if not ValidatePSP(RequestBody, PSPAsString) then
+            exit(Response.RespondResourceNotFound(StrSubstNo('PSP %1', PSPAsString)));
+
+        if not ParsePayer(RequestBody, PayerAccountId, PayerEmail, ErrorMessage) then
+            exit(Response.RespondBadRequest(ErrorMessage));
 
         Membership.ReadIsolation := IsolationLevel::ReadCommitted;
         Membership.SetLoadFields("Entry No.", SystemId);
         if not Membership.GetBySystemId(MembershipID) then
             exit(Response.RespondResourceNotFound(StrSubstNo('Membership %1', MembershipID)));
 
-        if (not MembershipMgtInternal.GetFirstAdminMember(Membership."Entry No.", Member)) then
-            exit(Response.RespondBadRequest('Membership did not contain at least one admin member to assign card to.'));
+        if not IsNullGuid(PayerAccountId) then begin
+            UserAccount.ReadIsolation := IsolationLevel::ReadCommitted;
+            if not UserAccount.GetBySystemId(PayerAccountId) then
+                exit(Response.RespondResourceNotFound(StrSubstNo('User account with id "%1" could not be found', PayerAccountId)));
+        end else
+            if PayerEmail <> '' then
+                FindOrCreatePayerAccountByEmail(Membership."Entry No.", PayerEmail, UserAccount)
+            else begin
+                if not MembershipMgtInternal.GetFirstAdminMember(Membership."Entry No.", Member) then
+                    exit(Response.RespondBadRequest('Membership did not contain at least one admin member to assign card to.'));
 
-        if (not MembershipMgtInternal.GetUserAccountFromMember(Member, UserAccount)) then
-            MembershipMgtInternal.CreateUserAccountFromMember(Member, UserAccount);
+                if not MembershipMgtInternal.GetUserAccountFromMember(Member, UserAccount) then
+                    MembershipMgtInternal.CreateUserAccountFromMember(Member, UserAccount);
+            end;
 
+        ParsePaymentMethodInput(RequestBody, PSPAsString, TempMemberPaymentMethod);
+        FindOrCreatePaymentMethod(TempMemberPaymentMethod, UserAccount, MemberPaymentMethod);
+
+        Default := GetPaymentMethodDefault(RequestBody);
+        EnsureMembershipPaymentMethod(Membership, MemberPaymentMethod, Default, MembershipPmtMethodMap);
+        EnsureShopperRecognition(MemberPaymentMethod, UserAccount);
+
+        Json.StartObject('');
+        PaymentMethodAsJson(MemberPaymentMethod, 'paymentMethod', true, MembershipPmtMethodMap.Default, Json);
+        Json.EndObject();
+
+        exit(Response.RespondOK(Json));
+    end;
+
+    local procedure ValidatePSP(RequestBody: JsonToken; var PSPAsString: Text): Boolean
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+    begin
+        PSPAsString := JsonHelper.GetJText(RequestBody, 'paymentMethod.PSP', false);
+        if PSPAsString = '' then
+            exit(true);
+        exit(Enum::"NPR MM Subscription PSP".Names().Contains(PSPAsString));
+    end;
+
+    local procedure ParsePaymentMethodInput(RequestBody: JsonToken; PSPAsString: Text; var TempMemberPaymentMethod: Record "NPR MM Member Payment Method" temporary)
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+    begin
         if PSPAsString <> '' then
             TempMemberPaymentMethod.PSP := Enum::"NPR MM Subscription PSP".FromInteger(Enum::"NPR MM Subscription PSP".Ordinals().Get(Enum::"NPR MM Subscription PSP".Names().IndexOf(PSPAsString)));
+
         TempMemberPaymentMethod."Payment Brand" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.paymentBrand', false), 1, MaxStrLen(TempMemberPaymentMethod."Payment Brand"));
         TempMemberPaymentMethod."Payment Instrument Type" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.paymentInstrument', false), 1, MaxStrLen(TempMemberPaymentMethod."Payment Instrument Type"));
         TempMemberPaymentMethod."Masked PAN" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.maskedPAN', false), 1, MaxStrLen(TempMemberPaymentMethod."Masked PAN"));
@@ -107,72 +144,183 @@ codeunit 6185107 "NPR API SubscriptionPmtMethods"
         TempMemberPaymentMethod."Payment Method Alias" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.alias', false), 1, MaxStrLen(TempMemberPaymentMethod."Payment Method Alias"));
         TempMemberPaymentMethod."Shopper Reference" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.shopperReference', false), 1, MaxStrLen(TempMemberPaymentMethod."Shopper Reference"));
         TempMemberPaymentMethod."Payment Token" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.paymentToken', false), 1, MaxStrLen(TempMemberPaymentMethod."Payment Token"));
+    end;
 
+    local procedure FindOrCreatePaymentMethod(var TempMemberPaymentMethod: Record "NPR MM Member Payment Method" temporary; var UserAccount: Record "NPR UserAccount"; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
+    var
+        PaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
+    begin
         if PaymentMethodMgt.FindPaymentMethod(TempMemberPaymentMethod."Payment Token", TempMemberPaymentMethod."Shopper Reference", TempMemberPaymentMethod.PSP, UserAccount, MemberPaymentMethod) then begin
-            if MemberPaymentMethod."Payment Brand" <> TempMemberPaymentMethod."Payment Brand" then begin
-                MemberPaymentMethod."Payment Brand" := TempMemberPaymentMethod."Payment Brand";
-                IsModified := true;
-            end;
-
-            if MemberPaymentMethod."Payment Instrument Type" <> TempMemberPaymentMethod."Payment Instrument Type" then begin
-                MemberPaymentMethod."Payment Instrument Type" := TempMemberPaymentMethod."Payment Instrument Type";
-                IsModified := true;
-            end;
-
-            if (MemberPaymentMethod."Expiry Date" <> TempMemberPaymentMethod."Expiry Date") then begin
-                MemberPaymentMethod."Expiry Date" := TempMemberPaymentMethod."Expiry Date";
-                IsModified := true;
-            end;
-
-            if MemberPaymentMethod."Payment Method Alias" <> TempMemberPaymentMethod."Payment Method Alias" then begin
-                MemberPaymentMethod."Payment Method Alias" := TempMemberPaymentMethod."Payment Method Alias";
-                IsModified := true;
-            end;
-
-            if IsModified then
-                MemberPaymentMethod.Modify(true);
-        end else begin
-            Clear(MemberPaymentMethod);
-            MemberPaymentMethod.Init();
-            MemberPaymentMethod."Entry No." := 0;
-            MemberPaymentMethod."Table No." := UserAccount.RecordId().TableNo();
-            MemberPaymentMethod."BC Record ID" := UserAccount.RecordId();
-            MemberPaymentMethod."BC Record System ID" := UserAccount.SystemId;
-            MemberPaymentMethod.PSP := TempMemberPaymentMethod.PSP;
-            MemberPaymentMethod."Payment Brand" := TempMemberPaymentMethod."Payment Brand";
-            MemberPaymentMethod."Payment Instrument Type" := TempMemberPaymentMethod."Payment Instrument Type";
-            MemberPaymentMethod."Masked PAN" := TempMemberPaymentMethod."Masked PAN";
-            MemberPaymentMethod."PAN Last 4 Digits" := TempMemberPaymentMethod."PAN Last 4 Digits";
-            MemberPaymentMethod."Expiry Date" := TempMemberPaymentMethod."Expiry Date";
-            MemberPaymentMethod."Payment Method Alias" := TempMemberPaymentMethod."Payment Method Alias";
-            MemberPaymentMethod."Shopper Reference" := TempMemberPaymentMethod."Shopper Reference";
-            MemberPaymentMethod."Payment Token" := TempMemberPaymentMethod."Payment Token";
-            MemberPaymentMethod.Insert(true);
+            UpdatePaymentMethodFromInput(TempMemberPaymentMethod, MemberPaymentMethod);
+            exit;
         end;
 
-        Default := JsonHelper.GetJBoolean(RequestBody, 'paymentMethod.default', false);
-        if (MembershipPmtMethodMap.Get(MemberPaymentMethod.SystemId, Membership.SystemId)) then begin
-            if (MembershipPmtMethodMap.Default <> Default) then begin
+        InsertPaymentMethod(TempMemberPaymentMethod, UserAccount, MemberPaymentMethod);
+    end;
+
+    local procedure UpdatePaymentMethodFromInput(var TempMemberPaymentMethod: Record "NPR MM Member Payment Method" temporary; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
+    var
+        IsModified: Boolean;
+    begin
+        if MemberPaymentMethod."Payment Brand" <> TempMemberPaymentMethod."Payment Brand" then begin
+            MemberPaymentMethod."Payment Brand" := TempMemberPaymentMethod."Payment Brand";
+            IsModified := true;
+        end;
+
+        if MemberPaymentMethod."Payment Instrument Type" <> TempMemberPaymentMethod."Payment Instrument Type" then begin
+            MemberPaymentMethod."Payment Instrument Type" := TempMemberPaymentMethod."Payment Instrument Type";
+            IsModified := true;
+        end;
+
+        if MemberPaymentMethod."Expiry Date" <> TempMemberPaymentMethod."Expiry Date" then begin
+            MemberPaymentMethod."Expiry Date" := TempMemberPaymentMethod."Expiry Date";
+            IsModified := true;
+        end;
+
+        if MemberPaymentMethod."Payment Method Alias" <> TempMemberPaymentMethod."Payment Method Alias" then begin
+            MemberPaymentMethod."Payment Method Alias" := TempMemberPaymentMethod."Payment Method Alias";
+            IsModified := true;
+        end;
+
+        if IsModified then
+            MemberPaymentMethod.Modify(true);
+    end;
+
+    local procedure InsertPaymentMethod(var TempMemberPaymentMethod: Record "NPR MM Member Payment Method" temporary; var UserAccount: Record "NPR UserAccount"; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
+    begin
+        Clear(MemberPaymentMethod);
+        MemberPaymentMethod.Init();
+        MemberPaymentMethod."Entry No." := 0;
+        MemberPaymentMethod."Table No." := UserAccount.RecordId().TableNo();
+        MemberPaymentMethod."BC Record ID" := UserAccount.RecordId();
+        MemberPaymentMethod."BC Record System ID" := UserAccount.SystemId;
+        MemberPaymentMethod.PSP := TempMemberPaymentMethod.PSP;
+        MemberPaymentMethod."Payment Brand" := TempMemberPaymentMethod."Payment Brand";
+        MemberPaymentMethod."Payment Instrument Type" := TempMemberPaymentMethod."Payment Instrument Type";
+        MemberPaymentMethod."Masked PAN" := TempMemberPaymentMethod."Masked PAN";
+        MemberPaymentMethod."PAN Last 4 Digits" := TempMemberPaymentMethod."PAN Last 4 Digits";
+        MemberPaymentMethod."Expiry Date" := TempMemberPaymentMethod."Expiry Date";
+        MemberPaymentMethod."Payment Method Alias" := TempMemberPaymentMethod."Payment Method Alias";
+        MemberPaymentMethod."Shopper Reference" := TempMemberPaymentMethod."Shopper Reference";
+        MemberPaymentMethod."Payment Token" := TempMemberPaymentMethod."Payment Token";
+        MemberPaymentMethod.Insert(true);
+    end;
+
+    local procedure GetPaymentMethodDefault(RequestBody: JsonToken): Boolean
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+    begin
+        exit(JsonHelper.GetJBoolean(RequestBody, 'paymentMethod.default', false));
+    end;
+
+    local procedure EnsureMembershipPaymentMethod(var Membership: Record "NPR MM Membership"; var MemberPaymentMethod: Record "NPR MM Member Payment Method"; Default: Boolean; var MembershipPmtMethodMap: Record "NPR MM MembershipPmtMethodMap")
+    begin
+        if MembershipPmtMethodMap.Get(MemberPaymentMethod.SystemId, Membership.SystemId) then begin
+            if MembershipPmtMethodMap.Default <> Default then begin
                 MembershipPmtMethodMap.Validate(Default, Default);
                 MembershipPmtMethodMap.Modify(true);
             end;
-        end else begin
-            MembershipPmtMethodMap.Init();
-            MembershipPmtMethodMap.PaymentMethodId := MemberPaymentMethod.SystemId;
-            MembershipPmtMethodMap.MembershipId := Membership.SystemId;
-            MembershipPmtMethodMap.Status := MembershipPmtMethodMap.Status::Active;
-            MembershipPmtMethodMap.Validate(Default, Default);
-            MembershipPmtMethodMap.Insert();
+            exit;
         end;
 
-        if (MemberPaymentMethod."Shopper Reference" <> '') and (MemberPaymentMethod.PSP = MemberPaymentMethod.PSP::Adyen) then
-            EFTAdyenIntegration.GetCreateEFTShopperRecognition(Format(UserAccount.AccountNo), EntityType::UserAccount, EFTAdyenIntegration.CloudIntegrationType(), EFTShopperRecognition);
+        MembershipPmtMethodMap.Init();
+        MembershipPmtMethodMap.PaymentMethodId := MemberPaymentMethod.SystemId;
+        MembershipPmtMethodMap.MembershipId := Membership.SystemId;
+        MembershipPmtMethodMap.Status := MembershipPmtMethodMap.Status::Active;
+        MembershipPmtMethodMap.Validate(Default, Default);
+        MembershipPmtMethodMap.Insert();
+    end;
 
-        Json.StartObject('');
-        PaymentMethodAsJson(MemberPaymentMethod, 'paymentMethod', true, MembershipPmtMethodMap.Default, Json);
-        Json.EndObject();
+    local procedure EnsureShopperRecognition(var MemberPaymentMethod: Record "NPR MM Member Payment Method"; var UserAccount: Record "NPR UserAccount")
+    var
+        EFTShopperRecognition: Record "NPR EFT Shopper Recognition";
+        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
+        EntityType: Option Customer,Contact,Membership,UserAccount;
+    begin
+        if (MemberPaymentMethod."Shopper Reference" = '') or (MemberPaymentMethod.PSP <> MemberPaymentMethod.PSP::Adyen) then
+            exit;
 
-        exit(Response.RespondOK(Json));
+        EFTAdyenIntegration.GetCreateEFTShopperRecognition(Format(UserAccount.AccountNo), EntityType::UserAccount, EFTAdyenIntegration.CloudIntegrationType(), EFTShopperRecognition);
+    end;
+
+    local procedure ParsePayer(RequestBody: JsonToken; var PayerAccountId: Guid; var PayerEmail: Text[80]; var ErrorMessage: Text): Boolean
+    var
+        MailManagement: Codeunit "Mail Management";
+        AccountIdToken: JsonToken;
+        EmailToken: JsonToken;
+        AccountIdSent: Boolean;
+        EmailSent: Boolean;
+        TokenText: Text;
+        Tab: Text[1];
+        Nbsp: Text[1];
+    begin
+        AccountIdSent := GetNonNullToken(RequestBody, 'payerAccountId', AccountIdToken);
+        EmailSent := GetNonNullToken(RequestBody, 'payerEmail', EmailToken);
+        if AccountIdSent and EmailSent then begin
+            ErrorMessage := 'Only one of payerAccountId or payerEmail can be specified.';
+            exit(false);
+        end;
+
+        if AccountIdSent then begin
+            ErrorMessage := 'Malformed parameter: payerAccountId';
+            if not AccountIdToken.IsValue() then
+                exit(false);
+            TokenText := AccountIdToken.AsValue().AsText().Trim();
+            if TokenText = '' then
+                exit(false);
+            if not Evaluate(PayerAccountId, TokenText) then
+                exit(false);
+            if IsNullGuid(PayerAccountId) then
+                exit(false);
+        end;
+
+        if EmailSent then begin
+            ErrorMessage := 'Malformed parameter: payerEmail';
+            if not EmailToken.IsValue() then
+                exit(false);
+            TokenText := EmailToken.AsValue().AsText().Trim();
+            if TokenText = '' then
+                exit(false);
+            Tab[1] := 9;
+            Nbsp[1] := 160;
+            if DelChr(TokenText, '=', '<>()[]";:, ' + Tab + Nbsp) <> TokenText then
+                exit(false);
+            if StrLen(TokenText) > MaxStrLen(PayerEmail) then
+                exit(false);
+            if not MailManagement.CheckValidEmailAddress(TokenText) then
+                exit(false);
+            PayerEmail := CopyStr(TokenText.ToLower(), 1, MaxStrLen(PayerEmail));
+        end;
+
+        ErrorMessage := '';
+        exit(true);
+    end;
+
+    local procedure GetNonNullToken(RequestBody: JsonToken; TokenKey: Text; var Token: JsonToken): Boolean
+    begin
+        if not RequestBody.SelectToken(TokenKey, Token) then
+            exit(false);
+        if not Token.IsValue() then
+            exit(true);
+        exit(not Token.AsValue().IsNull());
+    end;
+
+    local procedure FindOrCreatePayerAccountByEmail(MembershipEntryNo: Integer; PayerEmail: Text[80]; var UserAccount: Record "NPR UserAccount")
+    var
+        Member: Record "NPR MM Member";
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        UserAccountMgtImpl: Codeunit "NPR UserAccountMgtImpl";
+    begin
+        if UserAccountMgtImpl.FindAccountByEmail(PayerEmail, UserAccount) then
+            exit;
+
+        if MembershipMgtInternal.GetFirstAdminMember(MembershipEntryNo, Member) then
+            if Member."E-Mail Address".Trim().ToLower() = PayerEmail then begin
+                MembershipMgtInternal.CreateUserAccountFromMember(Member, UserAccount);
+                exit;
+            end;
+
+        MembershipMgtInternal.CreatePaymentUserAccountFromEmail(PayerEmail, UserAccount);
     end;
 
     internal procedure UpdatePaymentMethod(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
