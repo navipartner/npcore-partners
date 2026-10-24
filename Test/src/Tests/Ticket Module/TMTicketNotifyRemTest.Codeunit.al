@@ -156,6 +156,7 @@ codeunit 85361 "NPR TM Ticket Notify Rem Test"
         TimeHelper: Codeunit "NPR TM TimeHelper";
         Assert: Codeunit "Assert";
         ProfileCode: Code[10];
+        NowAtService: DateTime;
         Expected: DateTime;
         Actual: DateTime;
     begin
@@ -175,7 +176,9 @@ codeunit 85361 "NPR TM Ticket Notify Rem Test"
         Assert.IsTrue(DetTicketAccessEntry.FindFirst(), 'Expected an INITIAL_ENTRY detail ticket access entry.');
 
         // [WHEN] The post admission notification is created
-        Expected := TimeHelper.GetLocalTimeForService() + (24 * 3600 * 1000);
+        NowAtService := TimeHelper.GetLocalTimeForService();
+        // A one day offset keeps the wall clock time, so across a DST change it is not 24 hours
+        Expected := CreateDateTime(CalcDate('<1D>', DT2Date(NowAtService)), DT2Time(NowAtService));
         NotifyParticpt.CreateOnAdmissionNotification(TicketAccessEntry, DetTicketAccessEntry, false);
 
         // [THEN] The pending notification is scheduled one day after the service local admission time
