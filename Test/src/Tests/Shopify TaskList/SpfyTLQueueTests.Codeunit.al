@@ -103,7 +103,7 @@ codeunit 85310 "NPR Spfy TL Queue Tests"
 
     local procedure LookbackAnchor(): DateTime
     begin
-        // Half past midnight: the dedup lookback floor is midnight of the previous calendar day, so a 25 h old row lies outside it on any date.
+        // Half past midnight: the dedup lookback floor is midnight of the previous calendar day; the elapsed time back to it varies across DST changes.
         exit(CreateDateTime(DT2Date(CurrentDateTime()), 003000T));
     end;
 
@@ -344,8 +344,8 @@ codeunit 85310 "NPR Spfy TL Queue Tests"
         _Lib.CreateItem(ItemAtFloor);
         _Lib.CreateItem(ItemBelowFloor);
 
-        // [WHEN] The queued task was logged 25 hours ago, outside the one-day lookback.
-        EnqueueItem(StoreCode, ItemOld, "NPR Spfy Task Op"::Modify, AtDateTime - Hours(25), 0DT, "NPR Spfy Reuse Delayed NC Task"::Any, AtDateTime, SpfyTask);
+        // [WHEN] The queued task was logged one hour before the lookback floor.
+        EnqueueItem(StoreCode, ItemOld, "NPR Spfy Task Op"::Modify, LookbackFloor(AtDateTime) - Hours(1), 0DT, "NPR Spfy Reuse Delayed NC Task"::Any, AtDateTime, SpfyTask);
         _Assert.IsTrue(EnqueueItem(StoreCode, ItemOld, "NPR Spfy Task Op"::Modify, 0DT, 0DT, "NPR Spfy Reuse Delayed NC Task"::Any, AtDateTime, SpfyTask), 'A task older than the lookback must not be reused');
         _Assert.AreEqual(2, TaskCountForItem(ItemOld."No."), 'A stale task must be left alone and a fresh one created');
 
