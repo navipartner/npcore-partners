@@ -254,10 +254,15 @@
                     field("NPR Synced with Shopify"; Rec.IsSyncedToShopify())
                     {
                         Caption = 'Synced with Shopify';
-                        ToolTip = 'Specifies whether the POS entry has been exported to a Shopify store';
+                        ToolTip = 'Specifies whether the POS entry has reached Shopify, as its own Shopify order or, for a return, as a refund on the original sale''s order. Choose the value to see its orders or refunds.';
                         ApplicationArea = NPRShopify;
                         Importance = Additional;
                         Editable = false;
+
+                        trigger OnDrillDown()
+                        begin
+                            Rec.ShowShopifySyncDetails();
+                        end;
                     }
                 }
 #endif

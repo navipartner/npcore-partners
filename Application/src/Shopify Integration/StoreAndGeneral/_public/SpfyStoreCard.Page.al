@@ -466,7 +466,7 @@ page 6184704 "NPR Spfy Store Card"
                     Caption = 'POS Customer Transactions';
                     field("BC Customer Transactions"; Rec."BC Customer Transactions")
                     {
-                        ToolTip = 'Specifies whether POS customer purchases should be sent to Shopify for customers who are synchronized between BC and Shopify.';
+                        ToolTip = 'Specifies whether POS customer purchases should be sent to Shopify for customers who are synchronized between BC and Shopify. Returns of sales sent to Shopify are sent as refunds.';
                         ApplicationArea = NPRShopify;
                         Enabled = _SalesOrderIntegrationIsEnabled;
 

@@ -5,7 +5,7 @@ report 6014570 "NPR Spfy Export POS Entries"
     Caption = 'Export POS Entries to Shopify';
     UsageCategory = None;
     ProcessingOnly = true;
-    Description = 'The batch job will initiate the export of customer POS sales transactions from Business Central to Shopify. The system will iterate through customers and their existing POS entries in Business Central and create transaction export requests for Shopify.';
+    Description = 'The batch job will initiate the export of customer POS sales transactions and POS returns from Business Central to Shopify. The system will iterate through customers and their existing POS entries in Business Central and create transaction export requests for Shopify. While the Shopify Task List queue is active, returns are included and sent as refunds on the Shopify order of the original POS sale; returns without such an order are reported and not sent.';
 
     dataset
     {
@@ -27,6 +27,7 @@ report 6014570 "NPR Spfy Export POS Entries"
 
             trigger OnPreDataItem()
             var
+                SpfyPOSEntryExportMgt: Codeunit "NPR Spfy POS Entry Export Mgt.";
                 WindowDialogLbl1: Label 'Requesting export of POS Entries to Shopify...\\';
                 WindowDialogLbl2: Label 'Customer No. #1##########\';
                 WindowDialogLbl3: Label 'Processing POS entries @2@@@@@@@@@@';
@@ -40,6 +41,7 @@ report 6014570 "NPR Spfy Export POS Entries"
                         WindowDialogLbl3);
 
                 SpfyStoreFilter := TempSpfyExportPointerBuffer.GetSpfyStoreFilter();
+                _IncludeReturns := SpfyPOSEntryExportMgt.ReturnsAreSupported();
             end;
 
             trigger OnAfterGetRecord()
@@ -70,7 +72,7 @@ report 6014570 "NPR Spfy Export POS Entries"
                     TotalRecNo := POSEntry.Count();
                 if POSEntry.FindSet() then
                     repeat
-                        SpfyPOSEntryExportMgt.ProcessPOSEntry(POSEntry, SpfyStoreCustomerLink, TempSpfyExportPointerBuffer);
+                        SpfyPOSEntryExportMgt.ProcessPOSEntry(POSEntry, SpfyStoreCustomerLink, TempSpfyExportPointerBuffer, _IncludeReturns);
 
                         if GuiAllowed() then begin
                             RecNo += 1;
@@ -90,7 +92,7 @@ report 6014570 "NPR Spfy Export POS Entries"
     trigger OnPreReport()
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
-        ConfirmQst: Label 'The batch job will initiate the export of customer POS sales transactions from Business Central to Shopify. The system will iterate through customers and their existing POS entries in Business Central and create transaction export requests for Shopify.';
+        ConfirmQst: Label 'The batch job will initiate the export of customer POS sales transactions and POS returns from Business Central to Shopify. The system will iterate through customers and their existing POS entries in Business Central and create transaction export requests for Shopify. While the Shopify Task List queue is active, returns are included and sent as refunds on the Shopify order of the original POS sale; returns without such an order are reported and not sent.';
     begin
         if not Confirm(ConfirmQst + '\' + SpfyIntegrationMgt.LongRunningProcessConfirmQst(), true) then
             CurrReport.Quit();
@@ -100,5 +102,6 @@ report 6014570 "NPR Spfy Export POS Entries"
         TempSpfyExportPointerBuffer: Record "NPR Spfy Export Pointer Buffer" temporary;
         Window: Dialog;
         SpfyStoreFilter: Text;
+        _IncludeReturns: Boolean;
 }
 #endif

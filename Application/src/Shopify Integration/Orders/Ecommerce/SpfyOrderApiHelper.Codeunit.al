@@ -764,7 +764,7 @@ codeunit 6248582 "NPR Spfy Order ApiHelper"
     [TryFunction]
     internal procedure GetReturnAndRefundList(var HasNext: Boolean; var ShopifyResponse: JsonToken; ShopifyStore: Record "NPR Spfy Store"; var OrdersArr: JsonArray; var Cursor: Text; QueryFilters: Text)
     var
-        ReturnAndRefundListRequest: Label 'query ($queryFilters: String!, $afterCursor: String) { orders(first: 100, after: $afterCursor, query: $queryFilters, sortKey:UPDATED_AT) { edges { node { id name updatedAt returns(first: 10, query: "status:CLOSED") { edges { node { id name status createdAt closedAt } } pageInfo { endCursor hasNextPage } } refunds(first: 50) { id createdAt return { id } } } } pageInfo { endCursor hasNextPage } } }', Locked = true;
+        ReturnAndRefundListRequest: Label 'query ($queryFilters: String!, $afterCursor: String) { orders(first: 100, after: $afterCursor, query: $queryFilters, sortKey:UPDATED_AT) { edges { node { id name sourceName updatedAt returns(first: 10, query: "status:CLOSED") { edges { node { id name status createdAt closedAt } } pageInfo { endCursor hasNextPage } } refunds(first: 50) { id createdAt return { id } } } } pageInfo { endCursor hasNextPage } } }', Locked = true;
     begin
         GetOrderListPage(ReturnAndRefundListRequest, HasNext, ShopifyResponse, ShopifyStore, OrdersArr, Cursor, QueryFilters);
     end;

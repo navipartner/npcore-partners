@@ -15,6 +15,7 @@ codeunit 85259 "NPR Spfy Mock GraphQL Client" implements "NPR Spfy IGraphQL Clie
         _Body: List of [Text];
         _Fail: List of [Boolean];
         _RecordedRequests: List of [Text];
+        _RecordedResendOnServerError: List of [Boolean];
         _AdvanceCursor: Boolean;
 
     /// <summary>Makes every response's endCursor token CURSOR1 unique per request, so paging advances instead of repeating a cursor.</summary>
@@ -64,10 +65,15 @@ codeunit 85259 "NPR Spfy Mock GraphQL Client" implements "NPR Spfy IGraphQL Clie
             Error(NoRequestBodyErr);
 
         NcTask."Data Output".CreateInStream(InStr, TextEncoding::UTF8);
-        exit(Execute(InStr, ShopifyResponse));
+        exit(Execute(InStr, true, ShopifyResponse));
     end;
 
     procedure ExecuteRequest(var SpfyTask: Record "NPR Spfy Task"; CheckIntegrationIsEnabled: Boolean; var ShopifyResponse: JsonToken): Boolean
+    begin
+        exit(ExecuteRequest(SpfyTask, CheckIntegrationIsEnabled, true, ShopifyResponse));
+    end;
+
+    procedure ExecuteRequest(var SpfyTask: Record "NPR Spfy Task"; CheckIntegrationIsEnabled: Boolean; ResendOnServerError: Boolean; var ShopifyResponse: JsonToken): Boolean
     var
         InStr: InStream;
         NoRequestBodyErr: Label 'Mock GraphQL client received a request with no body attached.', Locked = true;
@@ -76,10 +82,10 @@ codeunit 85259 "NPR Spfy Mock GraphQL Client" implements "NPR Spfy IGraphQL Clie
             Error(NoRequestBodyErr);
 
         SpfyTask."Data Output".CreateInStream(InStr, TextEncoding::UTF8);
-        exit(Execute(InStr, ShopifyResponse));
+        exit(Execute(InStr, ResendOnServerError, ShopifyResponse));
     end;
 
-    local procedure Execute(RequestStream: InStream; var ShopifyResponse: JsonToken): Boolean
+    local procedure Execute(RequestStream: InStream; ResendOnServerError: Boolean; var ShopifyResponse: JsonToken): Boolean
     var
         RequestJson: JsonObject;
         RequestText: Text;
@@ -90,6 +96,7 @@ codeunit 85259 "NPR Spfy Mock GraphQL Client" implements "NPR Spfy IGraphQL Clie
         RequestJson.ReadFrom(RequestStream);
         RequestJson.WriteTo(RequestText);
         _RecordedRequests.Add(RequestText);
+        _RecordedResendOnServerError.Add(ResendOnServerError);
 
         for i := 1 to _Match1.Count() do
             if IsMatch(RequestText, _Match1.Get(i), _Match2.Get(i)) then begin
@@ -136,6 +143,29 @@ codeunit 85259 "NPR Spfy Mock GraphQL Client" implements "NPR Spfy IGraphQL Clie
         foreach Request in _RecordedRequests do
             if Request.Contains(Pattern) then
                 MatchCount += 1;
+    end;
+
+    /// <summary>1-based position of the first recorded request whose body contains Pattern, or 0 if none.</summary>
+    procedure IndexOfRequestContaining(Pattern: Text): Integer
+    var
+        i: Integer;
+    begin
+        for i := 1 to _RecordedRequests.Count() do
+            if _RecordedRequests.Get(i).Contains(Pattern) then
+                exit(i);
+        exit(0);
+    end;
+
+    /// <summary>Whether the first recorded request whose body contains Pattern let the client resend it on a server error.</summary>
+    procedure ResendOnServerErrorFor(Pattern: Text): Boolean
+    var
+        i: Integer;
+        NoRequestErr: Label 'Mock GraphQL client recorded no request containing: %1', Comment = '%1 = pattern', Locked = true;
+    begin
+        i := IndexOfRequestContaining(Pattern);
+        if i = 0 then
+            Error(NoRequestErr, Pattern);
+        exit(_RecordedResendOnServerError.Get(i));
     end;
 
     /// <summary>First recorded request whose body contains Pattern, or '' if none.</summary>

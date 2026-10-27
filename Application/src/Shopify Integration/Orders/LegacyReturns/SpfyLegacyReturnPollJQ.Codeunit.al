@@ -74,6 +74,7 @@ codeunit 6151173 "NPR Spfy Legacy Return Poll JQ"
         OrderTkn: JsonToken;
         OrderNode: JsonToken;
         ReturnsEdges: JsonToken;
+        SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
         QueryFilters: Text;
         Cursor: Text;
         PreviousCursor: Text;
@@ -104,27 +105,30 @@ codeunit 6151173 "NPR Spfy Legacy Return Poll JQ"
                 Error(CursorStuckErr, ShopifyStore.Code, Cursor);
             foreach OrderTkn in OrdersArr do begin
                 OrderTkn.SelectToken('node', OrderNode);
-                OrderGID := _JsonHelper.GetJText(OrderNode, 'id', true);
-                if OrderNode.SelectToken('returns.edges', ReturnsEdges) then
-                    AddClosedReturns(ShopifyStore, OrderGID, ReturnsEdges.AsArray(), TempQueueRow);
-                if _JsonHelper.GetJBoolean(OrderNode, 'returns.pageInfo.hasNextPage', false) then begin
-                    ReturnsCursor := _JsonHelper.GetJText(OrderNode, 'returns.pageInfo.endCursor', false);
-                    MoreReturns := true;
-                    repeat
-                        PageCount += 1;
-                        if PageCount > 1000 then
-                            Error(TooManyPagesErr, ShopifyStore.TableCaption(), ShopifyStore.Code, 1000, ShopifyStore.FieldCaption("Return Poll Lookback (Days)"), ShopifyStore.FieldCaption("Get Returns Starting From"));
-                        PreviousReturnsCursor := ReturnsCursor;
-                        if not _SpfyOrderApiHelper.GetOrderReturns(ShopifyStore, OrderGID, ReturnsCursor, MoreReturns, ReturnsArr) then
-                            Error(GetLastErrorText());
-                        if MoreReturns and (ReturnsCursor = PreviousReturnsCursor) then
-                            Error(CursorStuckErr, ShopifyStore.Code, ReturnsCursor);
-                        AddClosedReturns(ShopifyStore, OrderGID, ReturnsArr, TempQueueRow);
-                    until not MoreReturns;
+                // Orders the POS sync created are never invoiced here, and their refunds mirror POS returns BC already holds.
+                if SpfyOrderMgt.EligibleSourceName(_JsonHelper.GetJText(OrderNode, 'sourceName', false)) then begin
+                    OrderGID := _JsonHelper.GetJText(OrderNode, 'id', true);
+                    if OrderNode.SelectToken('returns.edges', ReturnsEdges) then
+                        AddClosedReturns(ShopifyStore, OrderGID, ReturnsEdges.AsArray(), TempQueueRow);
+                    if _JsonHelper.GetJBoolean(OrderNode, 'returns.pageInfo.hasNextPage', false) then begin
+                        ReturnsCursor := _JsonHelper.GetJText(OrderNode, 'returns.pageInfo.endCursor', false);
+                        MoreReturns := true;
+                        repeat
+                            PageCount += 1;
+                            if PageCount > 1000 then
+                                Error(TooManyPagesErr, ShopifyStore.TableCaption(), ShopifyStore.Code, 1000, ShopifyStore.FieldCaption("Return Poll Lookback (Days)"), ShopifyStore.FieldCaption("Get Returns Starting From"));
+                            PreviousReturnsCursor := ReturnsCursor;
+                            if not _SpfyOrderApiHelper.GetOrderReturns(ShopifyStore, OrderGID, ReturnsCursor, MoreReturns, ReturnsArr) then
+                                Error(GetLastErrorText());
+                            if MoreReturns and (ReturnsCursor = PreviousReturnsCursor) then
+                                Error(CursorStuckErr, ShopifyStore.Code, ReturnsCursor);
+                            AddClosedReturns(ShopifyStore, OrderGID, ReturnsArr, TempQueueRow);
+                        until not MoreReturns;
+                    end;
+                    if OrderNode.SelectToken('refunds', RefundsToken) then
+                        if RefundsToken.IsArray() then
+                            AddRefundsWithoutReturn(ShopifyStore, OrderGID, _JsonHelper.GetJText(OrderNode, 'name', false), RefundsToken.AsArray(), TempQueueRow, TruncatedOrders);
                 end;
-                if OrderNode.SelectToken('refunds', RefundsToken) then
-                    if RefundsToken.IsArray() then
-                        AddRefundsWithoutReturn(ShopifyStore, OrderGID, _JsonHelper.GetJText(OrderNode, 'name', false), RefundsToken.AsArray(), TempQueueRow, TruncatedOrders);
             end;
         until not HasNext;
     end;

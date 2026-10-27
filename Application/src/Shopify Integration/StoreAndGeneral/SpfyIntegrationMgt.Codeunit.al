@@ -351,6 +351,35 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         exit(_ShopifyStore."Currency Blank for LCY");
     end;
 
+    /// <summary>The store's currency code, or the LCY code when the store has none.</summary>
+    procedure StoreCurrencyCode(ShopifyStoreCode: Code[20]): Code[10]
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        ShopifyStore.Get(ShopifyStoreCode);
+        if ShopifyStore."Currency Code" <> '' then
+            exit(ShopifyStore."Currency Code");
+        GeneralLedgerSetup.Get();
+        exit(GeneralLedgerSetup."LCY Code");
+    end;
+
+    /// <summary>The currency's amount rounding precision, the G/L setup's for a blank code or a currency without one, and 0.01 when neither is set.</summary>
+    procedure AmountRoundingPrecision(CurrencyCode: Code[10]): Decimal
+    var
+        Currency: Record Currency;
+        GeneralLedgerSetup: Record "General Ledger Setup";
+    begin
+        if CurrencyCode <> '' then
+            if Currency.Get(CurrencyCode) then
+                if Currency."Amount Rounding Precision" <> 0 then
+                    exit(Currency."Amount Rounding Precision");
+        GeneralLedgerSetup.Get();
+        if GeneralLedgerSetup."Amount Rounding Precision" <> 0 then
+            exit(GeneralLedgerSetup."Amount Rounding Precision");
+        exit(0.01);
+    end;
+
     procedure IsSendNegativeInventory(ShopifyStoreCode: Code[20]): Boolean
     begin
         GetStore(ShopifyStoreCode);

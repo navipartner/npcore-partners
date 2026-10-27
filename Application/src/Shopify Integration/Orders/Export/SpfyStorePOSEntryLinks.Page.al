@@ -51,6 +51,29 @@ page 6185127 "NPR Spfy Store-POS Entry Links"
         }
     }
 
+    actions
+    {
+        area(processing)
+        {
+            action(Refunds)
+            {
+                Caption = 'Refunds';
+                ToolTip = 'View the Shopify refunds created for the POS entry''s return lines in this store.';
+                ApplicationArea = NPRShopify;
+                Image = Return;
+
+                trigger OnAction()
+                var
+                    SpfyPOSEntryRefund: Record "NPR Spfy POS Entry Refund";
+                begin
+                    SpfyPOSEntryRefund.SetRange("Shopify Store Code", Rec.Code);
+                    SpfyPOSEntryRefund.SetRange("POS Entry No.", SpfyStorePOSEntryLink."POS Entry No.");
+                    Page.Run(Page::"NPR Spfy POS Entry Refunds", SpfyPOSEntryRefund);
+                end;
+            }
+        }
+    }
+
     trigger OnAfterGetRecord()
     begin
         SpfyStorePOSEntryLink."Shopify Store Code" := Rec.Code;

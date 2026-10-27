@@ -29,10 +29,15 @@ codeunit 85511 "NPR Library Spfy Legacy Refund"
     /// One order in the poll response with the given return edges and refunds list.
     /// </summary>
     procedure RefundListResponse(OrderGid: Text; OrderName: Text; ReturnEdgesJson: Text; RefundsJson: Text): Text
-    var
-        RefundListTok: Label '{"data":{"orders":{"edges":[{"node":{"id":"%1","name":"%2","updatedAt":"2026-09-20T10:00:00Z","returns":{"edges":[%3],"pageInfo":{"endCursor":null,"hasNextPage":false}},"refunds":[%4]}}],"pageInfo":{"endCursor":null,"hasNextPage":false}}}}', Locked = true;
     begin
-        exit(StrSubstNo(RefundListTok, OrderGid, OrderName, ReturnEdgesJson, RefundsJson));
+        exit(RefundListResponse(OrderGid, OrderName, 'web', ReturnEdgesJson, RefundsJson));
+    end;
+
+    procedure RefundListResponse(OrderGid: Text; OrderName: Text; SourceName: Text; ReturnEdgesJson: Text; RefundsJson: Text): Text
+    var
+        RefundListTok: Label '{"data":{"orders":{"edges":[{"node":{"id":"%1","name":"%2","sourceName":"%3","updatedAt":"2026-09-20T10:00:00Z","returns":{"edges":[%4],"pageInfo":{"endCursor":null,"hasNextPage":false}},"refunds":[%5]}}],"pageInfo":{"endCursor":null,"hasNextPage":false}}}}', Locked = true;
+    begin
+        exit(StrSubstNo(RefundListTok, OrderGid, OrderName, SourceName, ReturnEdgesJson, RefundsJson));
     end;
 
     procedure RefundListItemJson(RefundId: Text; CreatedAt: Text; ReturnGid: Text): Text

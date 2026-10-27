@@ -765,6 +765,7 @@ table 6150810 "NPR Spfy Store"
     var
         SpfyAllowedFinStatus: Record "NPR Spfy Allowed Fin. Status";
         SpfyDataSyncPointer: Record "NPR Spfy Data Sync. Pointer";
+        SpfyPOSEntryRefund: Record "NPR Spfy POS Entry Refund";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyTaskJQSetup: Codeunit "NPR Spfy Task JQ Setup";
         SpfyTaskQueue: Codeunit "NPR Spfy Task Queue";
@@ -783,6 +784,9 @@ table 6150810 "NPR Spfy Store"
         SpfyAssignedIDMgt.RemoveAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID");
         SpfyTaskJQSetup.CancelTaskProcessingJobQueue(Rec.Code);
         SpfyTaskQueue.DeleteAllForStore(Rec.Code);
+        SpfyPOSEntryRefund.SetRange("Shopify Store Code", Rec.Code);
+        if not SpfyPOSEntryRefund.IsEmpty() then
+            SpfyPOSEntryRefund.DeleteAll();
 
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
         // BC23+ ecommerce JQs are monitored (not NP-protected); the refresher would otherwise heal a

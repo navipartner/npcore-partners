@@ -735,6 +735,7 @@
 #if not (BC17 or BC18 or BC19 or BC20)
         ShopifyStore: Record "NPR Spfy Store";
         TempSpfyStorePOSEntryLink: Record "NPR Spfy Store-POS Entry Link" temporary;
+        SpfyPOSEntryRefund: Record "NPR Spfy POS Entry Refund";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
 #endif
     begin
@@ -776,6 +777,9 @@
                 TempSpfyStorePOSEntryLink."Shopify Store Code" := ShopifyStore.Code;
                 SpfyAssignedIDMgt.RemoveAssignedShopifyID(TempSpfyStorePOSEntryLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
             until ShopifyStore.Next() = 0;
+        SpfyPOSEntryRefund.SetRange("POS Entry No.", Rec."Entry No.");
+        if not SpfyPOSEntryRefund.IsEmpty() then
+            SpfyPOSEntryRefund.DeleteAll();
 #endif
     end;
 
@@ -825,6 +829,30 @@
 
 #if not (BC17 or BC18 or BC19 or BC20)
     internal procedure IsSyncedToShopify(): Boolean
+    begin
+        if HasShopifyOrder() then
+            exit(true);
+        // A return-only entry reaches Shopify as a refund on the original sale's order, not as an order of its own.
+        exit(HasShopifyRefunds());
+    end;
+
+    /// <summary>Shows the entry's Shopify order links, or the refunds of a return that has no Shopify order of its own.</summary>
+    internal procedure ShowShopifySyncDetails()
+    var
+        SpfyPOSEntryRefund: Record "NPR Spfy POS Entry Refund";
+        SpfyStorePOSEntryLinks: Page "NPR Spfy Store-POS Entry Links";
+    begin
+        if not HasShopifyOrder() then
+            if HasShopifyRefunds() then begin
+                SpfyPOSEntryRefund.SetRange("POS Entry No.", "Entry No.");
+                Page.Run(Page::"NPR Spfy POS Entry Refunds", SpfyPOSEntryRefund);
+                exit;
+            end;
+        SpfyStorePOSEntryLinks.SetPOSEntry("Entry No.");
+        SpfyStorePOSEntryLinks.Run();
+    end;
+
+    local procedure HasShopifyOrder(): Boolean
     var
         ShopifyStore: Record "NPR Spfy Store";
     begin
@@ -834,6 +862,16 @@
                 if GetShopifyID(ShopifyStore.Code) <> '' then
                     exit(true);
             until ShopifyStore.Next() = 0;
+    end;
+
+    local procedure HasShopifyRefunds(): Boolean
+    var
+        SpfyPOSEntryRefund: Record "NPR Spfy POS Entry Refund";
+    begin
+        if "Entry No." = 0 then
+            exit(false);
+        SpfyPOSEntryRefund.SetRange("POS Entry No.", "Entry No.");
+        exit(not SpfyPOSEntryRefund.IsEmpty());
     end;
 
     internal procedure GetShopifyID(ShopifyStoreCode: Code[20]): Text[30]

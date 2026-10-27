@@ -519,6 +519,34 @@ codeunit 85510 "NPR Spfy Legacy Refund Tests"
     end;
 
     [Test]
+    procedure PollJQ_RefundWithoutAReturnOnAPosSourcedOrder_IsNotQueued()
+    var
+        QueueRow: Record "NPR Spfy NC Return Queue";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SpfyLegacyReturnPollJQ: Codeunit "NPR Spfy Legacy Return Poll JQ";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        CustomerNo: Code[20];
+        LocationCode: Code[10];
+    begin
+        // [SCENARIO] A refund on an order the POS sync created (source name NPRetailPOS) is not queued: such an order is never invoiced in Business Central, and the refund mirrors a POS return that BC already holds.
+        // [GIVEN] A legacy-path store with no queued rows
+        _ReturnLib.SetupLegacyReturnStore(StoreCode, Sku, CustomerNo, LocationCode);
+        QueueRow.SetRange("Shopify Store Code", StoreCode);
+        QueueRow.DeleteAll();
+
+        // [GIVEN] Shopify lists one POS-sourced order carrying a refund without a return
+        MockClient.AddResponse('sortKey:UPDATED_AT', 'refunds(first: 50) { id createdAt', _Lib.RefundListResponse('gid://shopify/Order/2301014', '#2301014', 'NPRetailPOS', '', _Lib.RefundListItemJson('2301914', '2026-09-20T10:00:00Z', '')));
+        SpfyLegacyReturnPollJQ.SetGraphQLClient(MockClient);
+
+        // [WHEN] The poll runs
+        SpfyLegacyReturnPollJQ.PollAllStores();
+
+        // [THEN] No row was queued for the store
+        _Assert.AreEqual(0, QueueRow.Count(), 'A refund on a POS-sourced order is never queued.');
+    end;
+
+    [Test]
     procedure PollJQ_OrderWithAReturnAndARefund_QueuesOneRowEach()
     var
         QueueRow: Record "NPR Spfy NC Return Queue";

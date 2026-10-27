@@ -15,9 +15,11 @@ codeunit 6248585 "NPR Spfy POS Entry Export Mgt."
     internal procedure ProcessOutstandingPOSEntries(var POSEntry: Record "NPR POS Entry"; var SpfyExportPointerBuffer: Record "NPR Spfy Export Pointer Buffer")
     var
         SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+        IncludeReturns: Boolean;
     begin
         if SpfyExportPointerBuffer.IsEmpty() then
             exit;
+        IncludeReturns := ReturnsAreSupported();
 
         SpfyStoreCustomerLink.SetCurrentKey("Sync. to this Store");
         SpfyStoreCustomerLink.SetRange("Sync. to this Store", true);
@@ -27,36 +29,60 @@ codeunit 6248585 "NPR Spfy POS Entry Export Mgt."
         if POSEntry.FindSet() then
             repeat
                 SpfyStoreCustomerLink.SetRange("No.", POSEntry."Customer No.");
-                ProcessPOSEntry(POSEntry, SpfyStoreCustomerLink, SpfyExportPointerBuffer);
+                ProcessPOSEntry(POSEntry, SpfyStoreCustomerLink, SpfyExportPointerBuffer, IncludeReturns);
             until POSEntry.Next() = 0;
     end;
 
     internal procedure ProcessPOSEntry(POSEntry: Record "NPR POS Entry"; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; var SpfyExportPointerBuffer: Record "NPR Spfy Export Pointer Buffer") TaskCreated: Boolean
+    begin
+        exit(ProcessPOSEntry(POSEntry, SpfyStoreCustomerLink, SpfyExportPointerBuffer, ReturnsAreSupported()));
+    end;
+
+    // The scheduler passes every POS entry of the row-version window through here, so the line queries come last.
+    internal procedure ProcessPOSEntry(POSEntry: Record "NPR POS Entry"; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; var SpfyExportPointerBuffer: Record "NPR Spfy Export Pointer Buffer"; IncludeReturns: Boolean) TaskCreated: Boolean
     var
         TempSpfyStorePOSEntryLink: Record "NPR Spfy Store-POS Entry Link" temporary;
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        HasSaleLines: Boolean;
     begin
-        if not IsEligibleForSync(POSEntry) then
+        if not HeaderIsEligibleForSync(POSEntry) then
+            exit;
+        if not SpfyStoreCustomerLink.FindSet() then
+            exit;
+        if not LinesAreEligibleForSync(POSEntry, IncludeReturns, HasSaleLines) then
             exit;
 
-        if SpfyStoreCustomerLink.FindSet() then
-            repeat
-                if SpfyExportPointerBuffer.Get(SpfyStoreCustomerLink."Shopify Store Code") then begin
-                    if ((SpfyExportPointerBuffer."Cut-Off Date" = 0D) or (POSEntry."Entry Date" >= SpfyExportPointerBuffer."Cut-Off Date")) and
-                       (POSEntry.SystemRowVersion > SpfyExportPointerBuffer."Cut-Off POS Entry Row Version")
-                    then begin
-                        TempSpfyStorePOSEntryLink."POS Entry No." := POSEntry."Entry No.";
-                        TempSpfyStorePOSEntryLink."Shopify Store Code" := SpfyStoreCustomerLink."Shopify Store Code";
-                        if SpfyAssignedIDMgt.GetAssignedShopifyID(TempSpfyStorePOSEntryLink.RecordId(), "NPR Spfy ID Type"::"Entry ID") = '' then  //not yet sent to Shopify
+        repeat
+            if SpfyExportPointerBuffer.Get(SpfyStoreCustomerLink."Shopify Store Code") then begin
+                if ((SpfyExportPointerBuffer."Cut-Off Date" = 0D) or (POSEntry."Entry Date" >= SpfyExportPointerBuffer."Cut-Off Date")) and
+                   (POSEntry.SystemRowVersion > SpfyExportPointerBuffer."Cut-Off POS Entry Row Version")
+                then begin
+                    TempSpfyStorePOSEntryLink."POS Entry No." := POSEntry."Entry No.";
+                    TempSpfyStorePOSEntryLink."Shopify Store Code" := SpfyStoreCustomerLink."Shopify Store Code";
+                    if SpfyAssignedIDMgt.GetAssignedShopifyID(TempSpfyStorePOSEntryLink.RecordId(), "NPR Spfy ID Type"::"Entry ID") = '' then  //not yet sent to Shopify
+                        if not ReturnOnlyEntryAlreadyQueued(POSEntry, HasSaleLines, SpfyStoreCustomerLink."Shopify Store Code") then
                             TaskCreated := SchedulePOSEntrySync(POSEntry, SpfyStoreCustomerLink."Shopify Store Code") or TaskCreated;
-                    end;
-
-                    if POSEntry.SystemRowVersion > SpfyExportPointerBuffer."New Last POS Entry Row Version" then begin
-                        SpfyExportPointerBuffer."New Last POS Entry Row Version" := POSEntry.SystemRowVersion;
-                        SpfyExportPointerBuffer.Modify();
-                    end;
                 end;
-            until SpfyStoreCustomerLink.Next() = 0;
+
+                if POSEntry.SystemRowVersion > SpfyExportPointerBuffer."New Last POS Entry Row Version" then begin
+                    SpfyExportPointerBuffer."New Last POS Entry Row Version" := POSEntry.SystemRowVersion;
+                    SpfyExportPointerBuffer.Modify();
+                end;
+            end;
+        until SpfyStoreCustomerLink.Next() = 0;
+    end;
+
+    // A return-only entry never gets a Shopify order of its own, so its task, in any state and while the task is kept, is what marks it as handled; Send Again or Requeue reruns it.
+    local procedure ReturnOnlyEntryAlreadyQueued(POSEntry: Record "NPR POS Entry"; HasSaleLines: Boolean; ShopifyStoreCode: Code[20]): Boolean
+    var
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        if HasSaleLines then
+            exit(false);
+        SpfyTask.SetRange("Table No.", Database::"NPR POS Entry");
+        SpfyTask.SetRange("Store Code", ShopifyStoreCode);
+        SpfyTask.SetRange("Record Value", Format(POSEntry."Entry No."));
+        exit(not SpfyTask.IsEmpty());
     end;
 
     local procedure SchedulePOSEntrySync(POSEntry: Record "NPR POS Entry"; ShopifyStoreCode: Code[20]) TaskCreated: Boolean
@@ -76,12 +102,46 @@ codeunit 6248585 "NPR Spfy POS Entry Export Mgt."
 
     internal procedure IsEligibleForSync(POSEntry: Record "NPR POS Entry"): Boolean
     begin
-        exit(
-            not POSEntry."System Entry" and
-            (POSEntry."Customer No." <> '') and
-            (POSEntry."Entry Type" in [POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale"]) and
-            (POSEntry."Amount Excl. Tax" > 0)  //returns are not supported yet
-        );
+        exit(IsEligibleForSync(POSEntry, false));
+    end;
+
+    internal procedure IsEligibleForSync(POSEntry: Record "NPR POS Entry"; IncludeReturns: Boolean): Boolean
+    var
+        HasSaleLines: Boolean;
+    begin
+        if not HeaderIsEligibleForSync(POSEntry) then
+            exit(false);
+        exit(LinesAreEligibleForSync(POSEntry, IncludeReturns, HasSaleLines));
+    end;
+
+    local procedure HeaderIsEligibleForSync(POSEntry: Record "NPR POS Entry"): Boolean
+    begin
+        if POSEntry."System Entry" or (POSEntry."Customer No." = '') then
+            exit(false);
+        exit(POSEntry."Entry Type" in [POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale"]);
+    end;
+
+    // HasSaleLines tells whether the entry gets a Shopify order of its own; without returns every eligible entry does.
+    local procedure LinesAreEligibleForSync(POSEntry: Record "NPR POS Entry"; IncludeReturns: Boolean; var HasSaleLines: Boolean): Boolean
+    var
+        ReturnResolver: Codeunit "NPR Spfy POS Return Resolver";
+    begin
+        if not IncludeReturns then begin
+            HasSaleLines := true;
+            exit(POSEntry."Amount Excl. Tax" > 0);  // the rule the frozen Nc Task sender was built against
+        end;
+        HasSaleLines := ReturnResolver.HasSaleLines(POSEntry);
+        if HasSaleLines then
+            exit(true);
+        exit(ReturnResolver.HasReturnLines(POSEntry));
+    end;
+
+    // Returns ride on the Task List queue only; the frozen Nc Task sender never receives them.
+    internal procedure ReturnsAreSupported(): Boolean
+    var
+        SpfyTaskListFeature: Codeunit "NPR Spfy Task List Feature";
+    begin
+        exit(SpfyTaskListFeature.IsFeatureEnabled());
     end;
 
     /// <summary>

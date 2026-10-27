@@ -78,12 +78,19 @@ codeunit 6184924 "NPR Spfy Communication Handler"
 
     [TryFunction]
     procedure ExecuteShopifyGraphQLRequest(var SpfyTask: Record "NPR Spfy Task"; CheckIntegrationIsEnabled: Boolean; var ShopifyResponse: JsonToken)
+    begin
+        ExecuteShopifyGraphQLRequest(SpfyTask, CheckIntegrationIsEnabled, true, ShopifyResponse);
+    end;
+
+    /// <summary>With ResendOnServerError false, a 5xx answer is not sent again, because Shopify may already have applied the mutation; the caller's next attempt decides.</summary>
+    [TryFunction]
+    procedure ExecuteShopifyGraphQLRequest(var SpfyTask: Record "NPR Spfy Task"; CheckIntegrationIsEnabled: Boolean; ResendOnServerError: Boolean; var ShopifyResponse: JsonToken)
     var
         ResponseText: Text;
         Url: Text;
     begin
         Url := GetShopifyUrl(SpfyTask."Store Code", CheckIntegrationIsEnabled) + 'graphql.json';
-        ResponseText := SendShopifyRequest(SpfyTask, Enum::"Http Request Type"::POST, Url);
+        ResponseText := SendShopifyRequest(SpfyTask, Enum::"Http Request Type"::POST, Url, ResendOnServerError);
         ShopifyResponse.ReadFrom(ResponseText);
     end;
 
@@ -210,11 +217,11 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         ResponseText := SendShopifyRequest(NcTask, RestMethod, Url, NextLink);
     end;
 
-    local procedure SendShopifyRequest(var SpfyTask: Record "NPR Spfy Task"; RestMethod: Enum "Http Request Type"; Url: Text) ResponseText: Text
+    local procedure SendShopifyRequest(var SpfyTask: Record "NPR Spfy Task"; RestMethod: Enum "Http Request Type"; Url: Text; ResendOnServerError: Boolean) ResponseText: Text
     var
         NextLink: Text;
     begin
-        ResponseText := SendShopifyRequest(SpfyTask, RestMethod, Url, NextLink);
+        ResponseText := SendShopifyRequest(SpfyTask, RestMethod, Url, ResendOnServerError, NextLink);
     end;
 
     local procedure SendShopifyRequest(var NcTask: Record "NPR Nc Task"; RestMethod: Enum "Http Request Type"; Url: Text; var NextLink: Text) ResponseText: Text
@@ -223,9 +230,9 @@ codeunit 6184924 "NPR Spfy Communication Handler"
             Error(GetLastErrorText());
     end;
 
-    local procedure SendShopifyRequest(var SpfyTask: Record "NPR Spfy Task"; RestMethod: Enum "Http Request Type"; Url: Text; var NextLink: Text) ResponseText: Text
+    local procedure SendShopifyRequest(var SpfyTask: Record "NPR Spfy Task"; RestMethod: Enum "Http Request Type"; Url: Text; ResendOnServerError: Boolean; var NextLink: Text) ResponseText: Text
     begin
-        if not TrySendShopifyRequest(SpfyTask, RestMethod, Url, NextLink, ResponseText) then
+        if not TrySendShopifyRequest(SpfyTask, RestMethod, Url, ResendOnServerError, NextLink, ResponseText) then
             Error(GetLastErrorText());
     end;
 
@@ -266,7 +273,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
                     TreatAsSuccess(NcTask, ResponseMsg):
                         Retry := false;
                     else
-                        Retry := ResponseAllowsRetries(ResponseMsg);
+                        Retry := ResponseAllowsRetries(ResponseMsg, true);
                 end;
         until Success or not Retry;
 
@@ -290,7 +297,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
     end;
 
     [TryFunction]
-    local procedure TrySendShopifyRequest(var SpfyTask: Record "NPR Spfy Task"; RestMethod: Enum "Http Request Type"; Url: Text; var NextLink: Text; var ResponseText: Text)
+    local procedure TrySendShopifyRequest(var SpfyTask: Record "NPR Spfy Task"; RestMethod: Enum "Http Request Type"; Url: Text; ResendOnServerError: Boolean; var NextLink: Text; var ResponseText: Text)
     var
         Client: HttpClient;
         RequestMsg: HttpRequestMessage;
@@ -326,7 +333,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
                     TreatAsSuccess(SpfyTask, ResponseMsg):
                         Retry := false;
                     else
-                        Retry := ResponseAllowsRetries(ResponseMsg);
+                        Retry := ResponseAllowsRetries(ResponseMsg, ResendOnServerError);
                 end;
         until Success or not Retry;
 
@@ -423,7 +430,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         CopyStream(OutStr, InStr);
     end;
 
-    local procedure ResponseAllowsRetries(ResponseMsg: HttpResponseMessage): Boolean
+    local procedure ResponseAllowsRetries(ResponseMsg: HttpResponseMessage; ResendOnServerError: Boolean): Boolean
     var
         Values: array[1] of Text;
         BucketPerc: Decimal;
@@ -448,7 +455,11 @@ codeunit 6184924 "NPR Spfy Communication Handler"
                 end;
 
             500 .. 599:  //Internal Shopify errors
-                WaitTime := 5000;
+                begin
+                    if not ResendOnServerError then
+                        exit(false);  //Shopify may have applied the request before failing
+                    WaitTime := 5000;
+                end;
 
             else begin
                 WaitTime := -1;
@@ -563,8 +574,10 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         AlreadyCapturedTok: Label 'The authorized transaction has already been captured', Locked = true;
         AlreadyDisabledTok: Label 'Gift card is disabled', Locked = true;
     begin
-        if not ResponseJToken.ReadFrom(ResponseText) then
+        if not ResponseJToken.ReadFrom(ResponseText) then begin
+            ErrorTxt := FailedResponseText(ResponseMsg, ResponseText);
             exit(false);
+        end;
         SpfyIntegrationEvents.OnTreatErroneousResponseAsSuccess(NcTask, ResponseMsg, ResponseJToken, ErrorTxt, IsSuccess, Handled);
         if not Handled then
             case true of
@@ -577,7 +590,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
                         IsSuccess := ErrorJToken.AsValue().AsText() = AlreadyDisabledTok;
             end;
         if not IsSuccess and (ErrorTxt = '') then
-            ErrorTxt := StrSubstNo('%1: %2\%3', ResponseMsg.HttpStatusCode(), ResponseMsg.ReasonPhrase(), ResponseText);
+            ErrorTxt := FailedResponseText(ResponseMsg, ResponseText);
         exit(IsSuccess);
     end;
 
@@ -590,8 +603,10 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         SpfyTaskAlreadyCapturedTok: Label 'The authorized transaction has already been captured', Locked = true;
         SpfyTaskAlreadyDisabledTok: Label 'Gift card is disabled', Locked = true;
     begin
-        if not ResponseJToken.ReadFrom(ResponseText) then
+        if not ResponseJToken.ReadFrom(ResponseText) then begin
+            ErrorTxt := FailedResponseText(ResponseMsg, ResponseText);
             exit(false);
+        end;
         SpfyIntegrationEvents.OnTreatErroneousSpfyTaskResponseAsSuccess(SpfyTask, ResponseMsg, ResponseJToken, ErrorTxt, IsSuccess, Handled);
         if not Handled then
             case true of
@@ -604,8 +619,14 @@ codeunit 6184924 "NPR Spfy Communication Handler"
                         IsSuccess := ErrorJToken.AsValue().AsText() = SpfyTaskAlreadyDisabledTok;
             end;
         if not IsSuccess and (ErrorTxt = '') then
-            ErrorTxt := StrSubstNo('%1: %2\%3', ResponseMsg.HttpStatusCode(), ResponseMsg.ReasonPhrase(), ResponseText);
+            ErrorTxt := FailedResponseText(ResponseMsg, ResponseText);
         exit(IsSuccess);
+    end;
+
+    // Also for a body that is not JSON, such as a gateway's HTML error page, so a failed request never raises an empty error.
+    local procedure FailedResponseText(ResponseMsg: HttpResponseMessage; ResponseText: Text): Text
+    begin
+        exit(StrSubstNo('%1: %2\%3', ResponseMsg.HttpStatusCode(), ResponseMsg.ReasonPhrase(), ResponseText));
     end;
 
     local procedure ParseNextLink(Link: Text) NextLink: Text

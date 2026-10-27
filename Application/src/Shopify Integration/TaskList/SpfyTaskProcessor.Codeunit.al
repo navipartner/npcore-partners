@@ -566,6 +566,8 @@ codeunit 6151214 "NPR Spfy Task Processor"
     end;
 
     local procedure PreconditionIsMet(var SpfyTask: Record "NPR Spfy Task"; AllowLiveLookup: Boolean; EnqueueActivation: Boolean; var SourceRecRef: RecordRef; var WaitingReasonTxt: Text; var LookupErrorText: Text): Boolean
+    var
+        WaitingForOriginalPOSSaleLbl: Label 'Awaiting the original POS sale''s Shopify order';
     begin
         WaitingReasonTxt := '';
         LookupErrorText := '';
@@ -603,8 +605,23 @@ codeunit 6151214 "NPR Spfy Task Processor"
                     WaitingReasonTxt := _WaitingForGiftCardLbl;
                     exit(VoucherBalancePreconditionIsMet(SpfyTask));
                 end;
+            Database::"NPR POS Entry":
+                begin
+                    WaitingReasonTxt := WaitingForOriginalPOSSaleLbl;
+                    exit(not POSEntryHasPendingReturnLines(SourceRecRef, SpfyTask."Store Code"));
+                end;
         end;
         exit(true);
+    end;
+
+    local procedure POSEntryHasPendingReturnLines(var SourceRecRef: RecordRef; ShopifyStoreCode: Code[20]): Boolean
+    var
+        POSEntry: Record "NPR POS Entry";
+        ReturnResolver: Codeunit "NPR Spfy POS Return Resolver";
+    begin
+        // The caller always runs SourceHasVanished first, which either exits or leaves the ref set.
+        SourceRecRef.SetTable(POSEntry);
+        exit(ReturnResolver.HasPendingLines(POSEntry, ShopifyStoreCode));
     end;
 
     local procedure ParentProductExistsInShopify(var SpfyTask: Record "NPR Spfy Task"; AllowLiveLookup: Boolean; var LookupErrorText: Text): Boolean

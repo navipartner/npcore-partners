@@ -699,8 +699,6 @@ codeunit 6151148 "NPR Spfy Legacy Return API"
 
     internal procedure AmountRoundingPrecision(ShopifyStoreCode: Code[20]; PresentmentCurrencyCode: Text): Decimal
     var
-        Currency: Record Currency;
-        GeneralLedgerSetup: Record "General Ledger Setup";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
         CurrencyCode: Code[10];
@@ -708,14 +706,7 @@ codeunit 6151148 "NPR Spfy Legacy Return API"
     begin
         // Resolved as for the Return Order header, so the shares round like its lines.
         CurrencyCode := SpfyPaymentGatewayHdlr.TranslateCurrencyCode(PresentmentCurrencyCode, SpfyIntegrationMgt.CurrencyBlankForLCY(ShopifyStoreCode), CurrencyIsLCY);
-        if CurrencyCode <> '' then
-            if Currency.Get(CurrencyCode) then
-                if Currency."Amount Rounding Precision" <> 0 then
-                    exit(Currency."Amount Rounding Precision");
-        GeneralLedgerSetup.Get();
-        if GeneralLedgerSetup."Amount Rounding Precision" <> 0 then
-            exit(GeneralLedgerSetup."Amount Rounding Precision");
-        exit(0.01);
+        exit(SpfyIntegrationMgt.AmountRoundingPrecision(CurrencyCode));
     end;
 
     local procedure ParseRefundTransactions(ReturnId: Text[30]; ReturnToken: JsonToken; var TempRefundTxnBuffer: Record "NPR Spfy Legacy Refund Txn Buf" temporary) PendingCount: Integer

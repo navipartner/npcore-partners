@@ -14,5 +14,10 @@ interface "NPR Spfy IGraphQL Client"
     procedure ExecuteRequest(var NcTask: Record "NPR Nc Task"; CheckIntegrationIsEnabled: Boolean; var ShopifyResponse: JsonToken): Boolean
 
     procedure ExecuteRequest(var SpfyTask: Record "NPR Spfy Task"; CheckIntegrationIsEnabled: Boolean; var ShopifyResponse: JsonToken): Boolean
+
+    /// <summary>
+    /// As above; with ResendOnServerError false a 5xx answer is not sent again, for a mutation Shopify may already have applied.
+    /// </summary>
+    procedure ExecuteRequest(var SpfyTask: Record "NPR Spfy Task"; CheckIntegrationIsEnabled: Boolean; ResendOnServerError: Boolean; var ShopifyResponse: JsonToken): Boolean
 }
 #endif
