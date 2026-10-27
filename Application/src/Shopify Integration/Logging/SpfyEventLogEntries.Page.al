@@ -1,4 +1,3 @@
-#if not BC17
 page 6184903 "NPR Spfy Event Log Entries"
 {
     Extensible = false;
@@ -8,34 +7,22 @@ page 6184903 "NPR Spfy Event Log Entries"
     UsageCategory = Lists;
     Editable = false;
     ApplicationArea = NPRShopify;
+    SourceTableView = sorting("Entry No.") order(descending);
+
     layout
     {
         area(Content)
         {
             repeater(General)
             {
+                FreezeColumn = "Document Name";
                 Editable = false;
                 field("Entry No."; Rec."Entry No.")
                 {
                     ToolTip = 'Specifies a unique entry number, assigned by the system to this record according to an automatically maintained number series.';
                     ApplicationArea = NPRShopify;
+                    Visible = false;
                 }
-                field(Type; Rec.Type)
-                {
-                    ToolTip = 'Specifies the type of the event.';
-                    ApplicationArea = NPRShopify;
-                }
-                field("Store Code"; Rec."Store Code")
-                {
-                    ToolTip = 'Specifies the Shopify store code the event is registered for.';
-                    ApplicationArea = NPRShopify;
-                }
-                field("Shopify ID"; Rec."Shopify ID")
-                {
-                    ToolTip = 'Specifies the unique identifier for the event in Shopify.';
-                    ApplicationArea = NPRShopify;
-                }
-#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
                 field("Document Type"; Rec."Document Type")
                 {
                     ToolTip = 'Specifies the Document Type.';
@@ -46,68 +33,104 @@ page 6184903 "NPR Spfy Event Log Entries"
                     ToolTip = 'Specifies the Document Name assigned in Shopify.';
                     ApplicationArea = NPRShopifyEcommerce;
                 }
-#endif
-                field("Registered At"; Rec.SystemCreatedAt)
-                {
-                    Caption = 'Registered At';
-                    ToolTip = 'Specifies the date and time the event was registered in Business Central.';
-                    ApplicationArea = NPRShopify;
-                }
                 field("Event Date-Time"; Rec."Event Date-Time")
                 {
                     ToolTip = 'Specifies the date and time of the event in Shopify.';
                     ApplicationArea = NPRShopify;
                 }
-                field("Amount (PCY)"; Rec."Amount (PCY)")
+                field("Document Status"; Rec."Document Status")
                 {
-                    ToolTip = 'Specifies the amount in the presentment currency.';
-                    ApplicationArea = NPRShopify;
+                    ToolTip = 'Specifies whether the document is open, closed, or cancelled in Shopify.';
+                    ApplicationArea = NPRShopifyEcommerce;
+                    StyleExpr = _DocStatusStyle;
                 }
-                field("Presentment Currency Code"; Rec."Presentment Currency Code")
-                {
-                    ToolTip = 'Specifies the presentment currency code.';
-                    ApplicationArea = NPRShopify;
-                }
-                field("Amount (SCY)"; Rec."Amount (SCY)")
-                {
-                    ToolTip = 'Specifies the amount in the store currency.';
-                    ApplicationArea = NPRShopify;
-                }
-                field("Store Currency Code"; Rec."Store Currency Code")
-                {
-                    ToolTip = 'Specifies the store currency code.';
-                    ApplicationArea = NPRShopify;
-                }
-                field("Amount (LCY)"; Rec."Amount (LCY)")
-                {
-                    ToolTip = 'Specifies the amount in the local currency.';
-                    ApplicationArea = NPRShopify;
-                }
-#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
                 field("Processing Status"; Rec."Processing Status")
                 {
                     ToolTip = 'Specifies the Processing Status of Event Log Entry.';
                     ApplicationArea = NPRShopifyEcommerce;
+                    StyleExpr = _ProcStatusStyle;
                 }
-                field("Document Status"; Rec."Document Status")
+                field("Shopify ID"; Rec."Shopify ID")
                 {
-                    ToolTip = 'Specified whether the document is open, closed, or cancelled in Shopify.';
-                    ApplicationArea = NPRShopifyEcommerce;
+                    ToolTip = 'Specifies the unique identifier for the event in Shopify.';
+                    ApplicationArea = NPRShopify;
+                }
+                field("Store Code"; Rec."Store Code")
+                {
+                    ToolTip = 'Specifies the Shopify store code the event is registered for.';
+                    ApplicationArea = NPRShopify;
+                }
+                field(Type; Rec.Type)
+                {
+                    ToolTip = 'Specifies the type of the event.';
+                    ApplicationArea = NPRShopify;
+                    Visible = false;
                 }
                 field("Last Error Message"; Rec."Last Error Message")
                 {
                     ToolTip = 'Specifies the last error message that occurred during processing.';
                     ApplicationArea = NPRShopifyEcommerce;
+                    StyleExpr = _ErrorStyle;
+                    Width = 40;
+                    Visible = false;
                 }
-#endif
+                field("Process Retry Count"; Rec."Process Retry Count")
+                {
+                    ToolTip = 'Specifies how many times processing of this entry has been retried.';
+                    ApplicationArea = NPRShopifyEcommerce;
+                    StyleExpr = _ProcStatusStyle;
+                    Visible = false;
+                }
+                field("Bucket Id"; Rec."Bucket Id")
+                {
+                    ToolTip = 'Specifies the bucket identifier assigned when the event log entry is created. It is used by Job Queues to group and process entries.';
+                    ApplicationArea = NPRShopifyEcommerce;
+                    Visible = false;
+                }
+                field("Registered At"; Rec.SystemCreatedAt)
+                {
+                    Caption = 'Registered At';
+                    ToolTip = 'Specifies the date and time the event was registered in Business Central.';
+                    ApplicationArea = NPRShopify;
+                    Visible = false;
+                }
+                field("Amount (PCY)"; Rec."Amount (PCY)")
+                {
+                    ToolTip = 'Specifies the amount in the presentment currency.';
+                    ApplicationArea = NPRShopify;
+                    Visible = false;
+                }
+                field("Presentment Currency Code"; Rec."Presentment Currency Code")
+                {
+                    ToolTip = 'Specifies the Presentment currency code.';
+                    ApplicationArea = NPRShopify;
+                    Visible = false;
+                }
+                field("Amount (SCY)"; Rec."Amount (SCY)")
+                {
+                    ToolTip = 'Specifies the amount in the store currency.';
+                    ApplicationArea = NPRShopify;
+                    Visible = false;
+                }
+                field("Store Currency Code"; Rec."Store Currency Code")
+                {
+                    ToolTip = 'Specifies the store currency code.';
+                    ApplicationArea = NPRShopify;
+                    Visible = false;
+                }
+                field("Amount (LCY)"; Rec."Amount (LCY)")
+                {
+                    ToolTip = 'Specifies the amount in the local currency.';
+                    ApplicationArea = NPRShopify;
+                    Visible = false;
+                }
             }
         }
-#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
         area(factboxes)
         {
             part(LogEntryFactBox; "NPR Spfy Event Log FactBox")
             {
-                Caption = 'Processing Information';
+                Caption = 'Details';
                 ApplicationArea = NPRShopifyEcommerce;
                 SubPageLink = "Entry No." = field("Entry No.");
                 UpdatePropagation = Both;
@@ -117,8 +140,8 @@ page 6184903 "NPR Spfy Event Log Entries"
                 ApplicationArea = NPRShopifyEcommerce;
             }
         }
-#endif
     }
+
     actions
     {
         area(Navigation)
@@ -129,18 +152,11 @@ page 6184903 "NPR Spfy Event Log Entries"
                 ToolTip = 'Show related Business Central documents for the current Shopify event log entry.';
                 ApplicationArea = NPRShopify;
                 Image = Navigate;
-#if BC18 or BC19 or BC20
-                Promoted = true;
-                PromotedIsBig = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
-#endif
                 trigger OnAction()
                 begin
                     Rec.ShowRelatedEntities();
                 end;
             }
-#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
             action(Store)
             {
                 Caption = 'Shopify Store';
@@ -155,9 +171,31 @@ page 6184903 "NPR Spfy Event Log Entries"
                     Page.Run(Page::"NPR Spfy Store Card", SpfyStore);
                 end;
             }
-#endif
+            action(ShowOrderData)
+            {
+                Caption = 'Order Data';
+                ToolTip = 'Show the order details that were downloaded from Shopify for this entry.';
+                ApplicationArea = NPRShopifyEcommerce;
+                Image = XMLFile;
+                trigger OnAction()
+                begin
+                    ShowDownloadedOrderData();
+                end;
+            }
+            action(OrderHistory)
+            {
+                Caption = 'Order History';
+                ToolTip = 'Show all event log entries of the same Shopify document, including cancelled ones, newest first.';
+                ApplicationArea = NPRShopifyEcommerce;
+                Image = History;
+                trigger OnAction()
+                var
+                    SpfyEventLogMgt: Codeunit "NPR Spfy Event Log Mgt.";
+                begin
+                    SpfyEventLogMgt.ShowOrderHistory(Rec);
+                end;
+            }
         }
-#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
         area(Processing)
         {
             action(ProcessLogEntries)
@@ -186,7 +224,7 @@ page 6184903 "NPR Spfy Event Log Entries"
             action(ResetRetryCount)
             {
                 Caption = 'Reset Retry Count';
-                ToolTip = 'Reset Retry Count to zero.';
+                ToolTip = 'Sets the retry counter back to zero for the selected entries that have used up all their automatic processing attempts, so the job queue tries to process them again. Entries that still have retries left are not changed. This does not process the entries right away - use Process Document for that.';
                 ApplicationArea = NPRShopifyEcommerce;
                 Image = Restore;
                 trigger OnAction()
@@ -203,26 +241,84 @@ page 6184903 "NPR Spfy Event Log Entries"
                 end;
             }
         }
-#endif
-#if not (BC18 or BC19 or BC20)
         area(Promoted)
         {
-            actionref(RelatedEntries_Promoted; RelatedEntries) { }
-#if not BC21 and not BC22
             actionref(ProcessLogEntries_Promoted; ProcessLogEntries) { }
-            actionref(GetOrderFromShopify_Promoted; GetOrderFromShopify) { }
-#endif
+            group(Category_Category9)
+            {
+                Caption = 'Process';
+                ShowAs = Standard;
+
+                actionref(GetOrderFromShopify_Promoted; GetOrderFromShopify) { }
+            }
+            group(Category_Errors)
+            {
+                Caption = 'Errors';
+
+                actionref(ResetRetryCount_Promoted; ResetRetryCount) { }
+            }
+            group(Category_Navigate)
+            {
+                Caption = 'Navigate';
+                ShowAs = Standard;
+
+                actionref(RelatedEntries_Promoted; RelatedEntries) { }
+                actionref(Store_Promoted; Store) { }
+                actionref(ShowOrderData_Promoted; ShowOrderData) { }
+                actionref(OrderHistory_Promoted; OrderHistory) { }
+            }
         }
-#endif
     }
 
-#if not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    views
+    {
+        view(ErrorsFirst)
+        {
+            Caption = 'Errors';
+            Filters = where("Processing Status" = const(Error));
+            OrderBy = descending("Entry No.");
+        }
+        view(NotProcessed)
+        {
+            Caption = 'Not processed';
+            Filters = where("Processing Status" = filter(<> Processed));
+            OrderBy = descending("Entry No.");
+        }
+        view(Postponed)
+        {
+            Caption = 'Postponed';
+            Filters = where("Processing Status" = const(Postponed));
+            OrderBy = descending("Entry No.");
+        }
+    }
+
     var
         _EntryCanBeDownloadedAgain: Boolean;
+        _DocStatusStyle: Text;
+        _ErrorStyle: Text;
+        _ProcStatusStyle: Text;
 
     trigger OnAfterGetCurrRecord()
     begin
         _EntryCanBeDownloadedAgain := Rec."Processing Status" <> Rec."Processing Status"::Processed;
+    end;
+
+    trigger OnAfterGetRecord()
+    var
+        SpfyEventLogMgt: Codeunit "NPR Spfy Event Log Mgt.";
+    begin
+        _ProcStatusStyle := SpfyEventLogMgt.GetLogEntryStatusStyle(Rec);
+
+        if Rec."Processing Status" in [Rec."Processing Status"::Error, Rec."Processing Status"::Postponed] then
+            _ErrorStyle := 'Attention'
+        else
+            _ErrorStyle := 'Standard';
+
+
+        if Rec."Document Status" = Rec."Document Status"::Open then
+            _DocStatusStyle := 'Standard'
+        else
+            _DocStatusStyle := 'Subordinate';
     end;
 
     local procedure GetSelectedOrdersFromShopify()
@@ -250,28 +346,27 @@ page 6184903 "NPR Spfy Event Log Entries"
     var
         EntriesToProcess: Record "NPR Spfy Event Log Entry";
         SelectedEntries: Record "NPR Spfy Event Log Entry";
-        SpfyAPIOrderProcessor: Codeunit "NPR Spfy Event Log DocProcessr";
         SpfyEventLogMgt: Codeunit "NPR Spfy Event Log Mgt.";
-        PostponedCount: Integer;
-        OperationFinishedErrMsg: Label 'Operation completed with Errors.';
-        OperationFinishedSuccessMsg: Label 'Operation completed.';
-        OperationPostponedMsg: Label 'Operation completed, but %1 of the selected entries could not be imported yet and were postponed. They are waiting for related processing to finish and will be picked up again automatically.', Comment = '%1 = number of postponed entries';
     begin
         CurrPage.SetSelectionFilter(SelectedEntries);
         SpfyEventLogMgt.ExpandSelectionToSiblings(SelectedEntries, EntriesToProcess);
-
-        case true of
-            not SpfyAPIOrderProcessor.ProcessLogEntries(EntriesToProcess, PostponedCount):
-                Message(OperationFinishedErrMsg);
-            PostponedCount > 0:
-                Message(OperationPostponedMsg, PostponedCount);
-            else
-                Message(OperationFinishedSuccessMsg);
-        end;
+        SpfyEventLogMgt.ProcessAndReport(EntriesToProcess);
 
         if Rec.Get(Rec."Entry No.") then;
         CurrPage.Update(false);
     end;
-#endif
+
+    local procedure ShowDownloadedOrderData()
+    var
+        SpfyOrderDataViewer: Page "NPR Spfy Order Data Viewer";
+        OrderDataNotDownloadedMsg: Label 'The order details have not been downloaded from Shopify yet.';
+    begin
+        Rec.CalcFields("Order Data");
+        if not Rec."Order Data".HasValue() then begin
+            Message(OrderDataNotDownloadedMsg);
+            exit;
+        end;
+        SpfyOrderDataViewer.SetRecord(Rec);
+        SpfyOrderDataViewer.RunModal();
+    end;
 }
-#endif

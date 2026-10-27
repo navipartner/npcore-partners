@@ -214,33 +214,11 @@ codeunit 6248621 "NPR Spfy Event Log Mgt."
         End;
     end;
 
-    internal procedure GetLogEntryErrorInformationStyle(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry") StyleText: Text
-    begin
-        Case SpfyEventLogEntry."Processing Status" of
-            SpfyEventLogEntry."Processing Status"::Error:
-                StyleText := 'Unfavorable';
-        End;
-    end;
-
-    internal procedure GetMaxRetryStyleText(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry") StyleText: Text
-    begin
-        if MaxRetryLimitReached(SpfyEventLogEntry) then
-            StyleText := 'Unfavorable';
-    end;
-
     internal procedure MaxRetryLimitReached(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"): Boolean
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
     begin
         exit(SpfyEventLogEntry."Process Retry Count" >= SpfyIntegrationMgt.GetMaxDocRetryCount());
-    end;
-
-    internal procedure GetEcommerceErrorStyleText(EcommerceErrorText: Text) StyleText: Text
-    begin
-        if EcommerceErrorText <> '' then
-            StyleText := 'Unfavorable'
-        else
-            StyleText := 'Standard';
     end;
 
     internal procedure GetOrderData(Rec: Record "NPR Spfy Event Log Entry"): Text
@@ -320,6 +298,45 @@ codeunit 6248621 "NPR Spfy Event Log Mgt."
             until SelectedEntries.Next() = 0;
 
         ExpandedEntries.MarkedOnly(true);
+    end;
+
+    internal procedure SetOrderHistoryFilter(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"; var OrderEvents: Record "NPR Spfy Event Log Entry")
+    begin
+        OrderEvents.Reset();
+        OrderEvents.SetCurrentKey("Entry No.");
+        OrderEvents.SetRange(Type, SpfyEventLogEntry.Type);
+        OrderEvents.SetRange("Store Code", SpfyEventLogEntry."Store Code");
+        OrderEvents.SetRange("Shopify ID", SpfyEventLogEntry."Shopify ID");
+        OrderEvents.SetRange("Document Type", SpfyEventLogEntry."Document Type");
+    end;
+
+    internal procedure ShowOrderHistory(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry")
+    var
+        OrderEvents: Record "NPR Spfy Event Log Entry";
+    begin
+        if SpfyEventLogEntry."Shopify ID" = '' then
+            exit;
+        SetOrderHistoryFilter(SpfyEventLogEntry, OrderEvents);
+        OrderEvents.Ascending(false);
+        Page.Run(Page::"NPR Spfy Event Log Entries", OrderEvents);
+    end;
+
+    internal procedure ProcessAndReport(var EntriesToProcess: Record "NPR Spfy Event Log Entry")
+    var
+        SpfyEventLogDocProcessr: Codeunit "NPR Spfy Event Log DocProcessr";
+        PostponedCount: Integer;
+        OperationFinishedErrMsg: Label 'Operation completed with Errors.';
+        OperationFinishedSuccessMsg: Label 'Operation completed.';
+        OperationPostponedMsg: Label 'Operation completed, but %1 of the selected entries could not be imported yet and were postponed. They are waiting for related processing to finish and will be picked up again automatically.', Comment = '%1 = number of postponed entries';
+    begin
+        case true of
+            not SpfyEventLogDocProcessr.ProcessLogEntries(EntriesToProcess, PostponedCount):
+                Message(OperationFinishedErrMsg);
+            PostponedCount > 0:
+                Message(OperationPostponedMsg, PostponedCount);
+            else
+                Message(OperationFinishedSuccessMsg);
+        end;
     end;
 
     internal procedure MarkEntryCreatedOutSideEcommerceFlow(var LogEntry: Record "NPR Spfy Event Log Entry"; OrderTkn: JsonToken)

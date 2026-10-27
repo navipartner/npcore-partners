@@ -534,14 +534,6 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
         Error(CreatedDocumentNoRefErrorLbl);
     end;
 
-    internal procedure EcomStatusOnDrillDown(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry")
-    var
-        EcomSalesHeader: Record "NPR Ecom Sales Header";
-    begin
-        if GetCreatedEcommerceDoc(SpfyEventLogEntry, EcomSalesHeader) then
-            Page.Run(0, EcomSalesHeader);
-    end;
-
     internal procedure EcommerceDocCreated(var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"): Boolean
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
@@ -556,41 +548,6 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
         EcomSalesHeader.SetRange("External No.", SpfyEventLogEntry."Shopify ID");
         EcomSalesHeader.SetRange("Document Type", MapSpfyDocumentTypeToEcommerce(SpfyEventLogEntry."Document Type"));
         exit(EcomSalesHeader.FindFirst());
-    end;
-
-    internal procedure GetEcommerceDocumentError(EcomSalesHeader: Record "NPR Ecom Sales Header") ErrorText: text
-    var
-        TextBuilder: TextBuilder;
-        PostingErr: Boolean;
-        ErrorExistMsg: Label 'There are errors during the processing of the Ecommerce document:';
-        OpenCardMsg: Label 'Please open the Ecommerce Document %1 card to view more information.', Comment = '%1=Ecommerce Sales Header No.';
-        PostingVIErr: Label 'Posting of the virtual item was unsuccessful. Please review the sales order.';
-    begin
-        PostingErr := (EcomSalesHeader."Virtual Items Exist" and (EcomSalesHeader."Posting Status" = EcomSalesHeader."Posting Status"::Pending));
-
-        if (EcomSalesHeader."Last Error Message" = '') and (EcomSalesHeader."Last Capture Error Message" = '') then
-            if not PostingErr then
-                exit;
-
-        TextBuilder.Clear();
-        TextBuilder.AppendLine(ErrorExistMsg);
-        if EcomSalesHeader."Last Error Message" <> '' then begin
-            TextBuilder.AppendLine('');
-            TextBuilder.AppendLine(EcomSalesHeader."Last Error Message");
-        end;
-        if EcomSalesHeader."Last Capture Error Message" <> '' then begin
-            TextBuilder.AppendLine('');
-            TextBuilder.AppendLine(EcomSalesHeader."Last Capture Error Message")
-        end;
-        if PostingErr then begin
-            TextBuilder.AppendLine('');
-            TextBuilder.AppendLine(PostingVIErr);
-        end;
-        if TextBuilder.Length() = 0 then
-            exit;
-        TextBuilder.AppendLine('');
-        TextBuilder.AppendLine(StrSubstNo(OpenCardMsg, EcomSalesHeader."External No."));
-        ErrorText := TextBuilder.ToText();
     end;
 
     var

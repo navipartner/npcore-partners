@@ -13,6 +13,8 @@ codeunit 85389 "NPR Spfy Order Import Tests"
         _AlterationItemNoLbl: Label 'T-SPFY-MMALTER', Locked = true;
         _MembershipIdLbl: Label '{6F9619FF-8B86-D011-B42D-00CF4FC964FF}', Locked = true;
         _OptionIdLbl: Label '{9A1C0E52-4A6D-4B2E-9C1E-2F0E5A7B3D41}', Locked = true;
+        _MessageCount: Integer;
+        _LastMessageText: Text;
 
     [Test]
     procedure GiftCardSearchBoundUsesCreatedAtNotUpdatedAt()
@@ -3102,6 +3104,100 @@ codeunit 85389 "NPR Spfy Order Import Tests"
     end;
 
     [Test]
+    [HandlerFunctions('CapturingMessageHandler')]
+    procedure ProcessAndReport_PostponedEntry_ShowsPostponedMessage()
+    var
+        ClosedEntry: Record "NPR Spfy Event Log Entry";
+        OpenEntry: Record "NPR Spfy Event Log Entry";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyEventLogMgt: Codeunit "NPR Spfy Event Log Mgt.";
+        StoreCode: Code[20];
+        ShopifyId: Text[30];
+        OperationPostponedMsg: Label 'Operation completed, but %1 of the selected entries could not be imported yet and were postponed. They are waiting for related processing to finish and will be picked up again automatically.', Locked = true;
+    begin
+        // [SCENARIO] Processing selected entries from the log page tells the operator how many were postponed,
+        // instead of reporting a plain success when nothing was imported.
+        _MessageCount := 0;
+        _LastMessageText := '';
+        StoreCode := 'SPFYPOSTR';
+        ShopifyId := '920000000203';
+        LibrarySpfyImport.CreateStore(StoreCode);
+
+        // [GIVEN] a Closed entry with an unprocessed Open sibling, so the Closed entry postpones itself
+        LibrarySpfyImport.InsertOrderLogEntry(OpenEntry, StoreCode, ShopifyId, "NPR SpfyEventLogDocType"::Order, "NPR SpfyAPIDocumentStatus"::Open, CurrentDateTime());
+        LibrarySpfyImport.InsertOrderLogEntry(ClosedEntry, StoreCode, ShopifyId, "NPR SpfyEventLogDocType"::Order, "NPR SpfyAPIDocumentStatus"::Closed, CurrentDateTime());
+        ClosedEntry.SetRecFilter();
+        Commit(); // processing reads the result of Codeunit.Run, which the platform only allows outside a write transaction
+
+        // [WHEN] only the Closed entry is processed and reported
+        SpfyEventLogMgt.ProcessAndReport(ClosedEntry);
+
+        // [THEN] exactly one message is shown, and it reports the postponement
+        _Assert.AreEqual(1, _MessageCount, 'Exactly one message must be shown.');
+        _Assert.AreEqual(StrSubstNo(OperationPostponedMsg, 1), _LastMessageText, 'A postponed entry must be reported as postponed, not as a plain success.');
+
+        LibrarySpfyImport.CleanupCommittedLogEntries(StoreCode, ShopifyId);
+    end;
+
+    [Test]
+    [HandlerFunctions('CapturingMessageHandler')]
+    procedure ProcessAndReport_FailedAndPostponedEntries_ShowsErrorMessage()
+    var
+        FailedEntry: Record "NPR Spfy Event Log Entry";
+        ClosedEntry: Record "NPR Spfy Event Log Entry";
+        OpenEntry: Record "NPR Spfy Event Log Entry";
+        EntriesToProcess: Record "NPR Spfy Event Log Entry";
+        UpdatedEntry: Record "NPR Spfy Event Log Entry";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyEventLogMgt: Codeunit "NPR Spfy Event Log Mgt.";
+        FailedStoreCode: Code[20];
+        PostponedStoreCode: Code[20];
+        Sku: Code[20];
+        ItemNo: Code[20];
+        FailedShopifyId: Text[30];
+        PostponedShopifyId: Text[30];
+        OperationFinishedErrMsg: Label 'Operation completed with Errors.', Locked = true;
+    begin
+        // [SCENARIO] When one selected entry fails and another is postponed, the operator is told about the error.
+        // A postponement must not hide a failure.
+        _MessageCount := 0;
+        _LastMessageText := '';
+
+        // [GIVEN] a first-import Cancelled entry, which fails because it has nothing to process
+        FailedShopifyId := '920000000204';
+        LibrarySpfyImport.SetupSimpleItemOrder(FailedStoreCode, Sku, ItemNo);
+        LibrarySpfyImport.InitLogEntry(FailedEntry, FailedStoreCode, FailedShopifyId);
+        FailedEntry."Document Status" := FailedEntry."Document Status"::Cancelled;
+        FailedEntry.Modify();
+
+        // [GIVEN] a Closed entry with an unprocessed Open sibling, which postpones itself
+        PostponedStoreCode := 'SPFYPOSTE';
+        PostponedShopifyId := '920000000205';
+        LibrarySpfyImport.CreateStore(PostponedStoreCode);
+        LibrarySpfyImport.InsertOrderLogEntry(OpenEntry, PostponedStoreCode, PostponedShopifyId, "NPR SpfyEventLogDocType"::Order, "NPR SpfyAPIDocumentStatus"::Open, CurrentDateTime());
+        LibrarySpfyImport.InsertOrderLogEntry(ClosedEntry, PostponedStoreCode, PostponedShopifyId, "NPR SpfyEventLogDocType"::Order, "NPR SpfyAPIDocumentStatus"::Closed, CurrentDateTime());
+
+        EntriesToProcess.SetFilter("Entry No.", '%1|%2', FailedEntry."Entry No.", ClosedEntry."Entry No.");
+        Commit(); // processing reads the result of Codeunit.Run, which the platform only allows outside a write transaction
+
+        // [WHEN] the failed entry and the Closed entry are processed and reported together
+        SpfyEventLogMgt.ProcessAndReport(EntriesToProcess);
+
+        // [THEN] both outcomes happened: one entry failed and the other postponed itself
+        UpdatedEntry.Get(FailedEntry."Entry No.");
+        _Assert.AreEqual(UpdatedEntry."Processing Status"::Error, UpdatedEntry."Processing Status", 'The Cancelled entry must have failed.');
+        UpdatedEntry.Get(ClosedEntry."Entry No.");
+        _Assert.AreEqual(UpdatedEntry."Processing Status"::Postponed, UpdatedEntry."Processing Status", 'The Closed entry must have postponed itself waiting for its sibling.');
+
+        // [THEN] exactly one message is shown, and it reports the error
+        _Assert.AreEqual(1, _MessageCount, 'Exactly one message must be shown.');
+        _Assert.AreEqual(OperationFinishedErrMsg, _LastMessageText, 'An error must be reported even when another entry was postponed.');
+
+        LibrarySpfyImport.CleanupCommittedLogEntries(FailedStoreCode, FailedShopifyId);
+        LibrarySpfyImport.CleanupCommittedLogEntries(PostponedStoreCode, PostponedShopifyId);
+    end;
+
+    [Test]
     procedure IsShopifyDocument_DiscriminatesOnDocumentSource()
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
@@ -5174,6 +5270,13 @@ codeunit 85389 "NPR Spfy Order Import Tests"
         // Swallows the "N failed log entries were given a fresh start" message. Rewinding the import marker discards
         // the stored order data of the store's failed entries, and telling the operator how many were touched is
         // deliberate - so every test that rewinds a marker over failed entries has to handle the message.
+    end;
+
+    [MessageHandler]
+    procedure CapturingMessageHandler(Msg: Text[1024])
+    begin
+        _MessageCount += 1;
+        _LastMessageText := Msg;
     end;
 
     local procedure LastOrdersImportedAt(StoreCode: Code[20]): DateTime

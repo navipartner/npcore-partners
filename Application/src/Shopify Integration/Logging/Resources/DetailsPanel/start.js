@@ -1,0 +1,1 @@
+NprSpfyDetails.init();
