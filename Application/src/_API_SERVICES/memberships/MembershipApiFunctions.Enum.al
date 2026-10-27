@@ -125,6 +125,11 @@ enum 6059827 "NPR MembershipApiFunctions"
         Caption = 'Process pushed member signup';
     }
 
+    value(311; UPDATE_MEMBER_FIELD)
+    {
+        Caption = 'Complete a member field update';
+    }
+
     value(320; GET_CARD_USING_ID)
     {
         Caption = 'Get card using card id';

@@ -45,7 +45,7 @@ codeunit 6150743 "NPR MMMembershipRestApi"
     begin
         if not GetRemoteCardWithDetails(NPRRemoteEndpointSetup, ForeignMemberCardNumber, NotValidReason, Response) then
             exit(false);
-        IsValid := ValidateMemberResponse(NPRRemoteEndpointSetup, Prefix, ForeignMembershipNumber, IncludeMemberImage, Response, RemoteInfoCapture);
+        IsValid := ValidateMemberResponse(NPRRemoteEndpointSetup, Prefix, ForeignMembershipNumber, IncludeMemberImage, Response, RemoteInfoCapture, TempRequestMemberFieldUpdate);
         exit(IsValid);
     end;
 
@@ -121,11 +121,23 @@ codeunit 6150743 "NPR MMMembershipRestApi"
 
     end;
 
-    // Currently no api endpoint for update member fields
-    // internal procedure UpdateMemberFieldWorker(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; var RequestMemberFieldUpdate: Record "NPR MM Request Member Update"; var NotValidReason: Text) IsValid: Boolean
-    // var
-    // begin
-    // end;
+    internal procedure UpdateMemberFieldWorker(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; var RequestMemberFieldUpdate: Record "NPR MM Request Member Update"; var NotValidReason: Text): Boolean
+    var
+        Request: JsonObject;
+        ResponseMessage: HttpResponseMessage;
+        ErrorText: Text;
+    begin
+        Request.Add('entryNo', RequestMemberFieldUpdate."Remote Entry No.");
+        Request.Add('currentValue', RequestMemberFieldUpdate."Current Value");
+        Request.Add('newValue', RequestMemberFieldUpdate."New Value");
+        if WebServiceApi(NPRRemoteEndpointSetup, 'POST', '/membership/member/fieldUpdate', NotValidReason, Request, ResponseMessage) then
+            exit(true);
+
+        ErrorText := GetErrorResponseMessage(ResponseMessage);
+        if ErrorText <> '' then
+            NotValidReason := StrSubstNo('%1\\%2', ErrorText, NotValidReason);
+        exit(false);
+    end;
 
     internal procedure SearchMemberWorker(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; var MembershipInfo: Record "NPR MM Member Info Capture"; var TmpSearchResult: Record "NPR MM Member Info Capture" temporary; var NotValidReason: Text) IsValid: Boolean
     var
@@ -422,7 +434,7 @@ codeunit 6150743 "NPR MMMembershipRestApi"
         exit(true);
     end;
 
-    local procedure ValidateMemberResponse(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; Prefix: Code[10]; ForeignMembershipNumber: Code[20]; IncludeMemberImage: Boolean; Response: JsonObject; var RemoteInfoCapture: Record "NPR MM Member Info Capture"): Boolean
+    internal procedure ValidateMemberResponse(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; Prefix: Code[10]; ForeignMembershipNumber: Code[20]; IncludeMemberImage: Boolean; Response: JsonObject; var RemoteInfoCapture: Record "NPR MM Member Info Capture"; var TempRequestMemberFieldUpdate: Record "NPR MM Request Member Update" temporary): Boolean
     var
         CountryRegion: Record "Country/Region";
         JsonHelper: Codeunit "NPR Json Helper";
@@ -457,7 +469,31 @@ codeunit 6150743 "NPR MMMembershipRestApi"
             if JsonHelper.GetJBoolean(Response.AsToken(), 'card.member.hasPicture', false) then
                 GetMemberImage(NPRRemoteEndpointSetup, JsonHelper.GetJText(Response.AsToken(), 'card.member.memberId', false), RemoteInfoCapture);
 
+        ReadPendingFieldUpdates(Response, TempRequestMemberFieldUpdate);
         exit(true);
+    end;
+
+    local procedure ReadPendingFieldUpdates(Response: JsonObject; var TempRequestMemberFieldUpdate: Record "NPR MM Request Member Update" temporary)
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+        Updates: JsonToken;
+        Update: JsonToken;
+    begin
+        if not JsonHelper.GetJsonToken(Response.AsToken(), 'card.member.pendingFieldUpdates', Updates) then
+            exit;
+        if not Updates.IsArray() then
+            exit;
+
+        foreach Update in Updates.AsArray() do begin
+            TempRequestMemberFieldUpdate.Init();
+            TempRequestMemberFieldUpdate."Entry No." := TempRequestMemberFieldUpdate.Count() + 1;
+            TempRequestMemberFieldUpdate."Remote Entry No." := JsonHelper.GetJInteger(Update, 'entryNo', true);
+            TempRequestMemberFieldUpdate."Field No." := JsonHelper.GetJInteger(Update, 'fieldNo', true);
+            TempRequestMemberFieldUpdate.Caption := CopyStr(JsonHelper.GetJText(Update, 'caption', false), 1, MaxStrLen(TempRequestMemberFieldUpdate.Caption));
+            TempRequestMemberFieldUpdate."Current Value" := CopyStr(JsonHelper.GetJText(Update, 'currentValue', false), 1, MaxStrLen(TempRequestMemberFieldUpdate."Current Value"));
+            TempRequestMemberFieldUpdate."Request Datetime" := CurrentDateTime();
+            TempRequestMemberFieldUpdate.Insert();
+        end;
     end;
 
     local procedure ValidatePointBalanceResponse(Response: JsonObject; var PointBalance: Integer): Boolean

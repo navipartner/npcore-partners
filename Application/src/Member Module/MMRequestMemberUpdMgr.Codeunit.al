@@ -48,7 +48,7 @@
                 FldRef.Type::Option:
                     begin
                         Evaluate(OptionType, CopyStr(NewValue, 1, 10), 9);
-                        FldRef.Value := DateType;
+                        FldRef.Value := OptionType;
                     end;
             end;
             RecRef.SetTable(Member);
@@ -148,6 +148,7 @@
         MembershipRole: Record "NPR MM Membership Role";
         Membership: Record "NPR MM Membership";
         Member2: Record "NPR MM Member";
+        InvalidEmailCharacters: Text[80];
         NOT_BLANK: Label 'Value cannot be blank.';
         INVALID_VALUE: Label 'The %1 is invalid.';
     begin
@@ -163,11 +164,11 @@
             Error(INVALID_VALUE, Member.FieldCaption("E-Mail Address"));
 
         // strict check is 0-9, a-z, A-Z, and ~!$%^&*_=+}{'?-.
-        EMail := DelChr(EMail, '<=>', '0123456789');
-        EMail := DelChr(EMail, '<=>', 'abcdefghijklmnopqrstuvwxyz');
-        EMail := DelChr(EMail, '<=>', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
-        EMail := DelChr(EMail, '<=>', '~!$%^&*_=+}{?-.@');
-        ValidEmail := StrLen(EMail) = 0;
+        InvalidEmailCharacters := DelChr(EMail, '<=>', '0123456789');
+        InvalidEmailCharacters := DelChr(InvalidEmailCharacters, '<=>', 'abcdefghijklmnopqrstuvwxyz');
+        InvalidEmailCharacters := DelChr(InvalidEmailCharacters, '<=>', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        InvalidEmailCharacters := DelChr(InvalidEmailCharacters, '<=>', '~!$%^&*_=+}{?-.@');
+        ValidEmail := StrLen(InvalidEmailCharacters) = 0;
         if (not ValidEmail) then
             Error(INVALID_VALUE, Member.FieldCaption("E-Mail Address"));
 

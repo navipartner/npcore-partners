@@ -141,6 +141,9 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
             exit(Handle(_ApiFunction::REGRET_MEMBERSHIP, Request));
 
 
+        if Request.Match('POST', '/membership/member/fieldUpdate') then
+            exit(Handle(_ApiFunction::UPDATE_MEMBER_FIELD, Request));
+
         if (Request.Match('POST', '/membership/member/:memberId/block')) then
             exit(Handle(_ApiFunction::BLOCK_MEMBER, Request));
 

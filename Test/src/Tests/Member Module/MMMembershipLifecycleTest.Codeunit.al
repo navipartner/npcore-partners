@@ -1867,6 +1867,398 @@ codeunit 85240 "NPR MMMembershipLifecycleTest"
         Assert.IsTrue(MemberChangeLogCount(UnblockedMemberEntryNo, 0) > 0, 'Unblocked member change log must be left intact by the cleanup.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestMemberIncludesPendingUpdates()
+    var
+        Member: Record "NPR MM Member";
+        OtherMember: Record "NPR MM Member";
+        PendingUpdate: Record "NPR MM Request Member Update";
+        MemberApiAgent: Codeunit "NPR MemberApiAgent";
+        JsonBuilder: Codeunit "NPR Json Builder";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        Updates: JsonToken;
+        Update: JsonToken;
+        Value: JsonToken;
+        PendingEntryNo: Integer;
+    begin
+        // [SCENARIO] A member's REST response includes only their pending field-update requests.
+        // [GIVEN] Synthetic serialization fixtures; no membership setup or external services.
+        Member."External Member No." := 'CORE2228-MEMBER';
+        Member.Insert();
+        OtherMember.Insert();
+        PendingUpdate."Member Entry No." := Member."Entry No.";
+        PendingUpdate."Field No." := Member.FieldNo("First Name");
+        PendingUpdate.Caption := 'First Name';
+        PendingUpdate."Current Value" := 'Before';
+        PendingUpdate.Insert();
+        PendingEntryNo := PendingUpdate."Entry No.";
+        PendingUpdate."Entry No." := 0;
+        PendingUpdate.Handled := true;
+        PendingUpdate.Insert();
+        PendingUpdate."Entry No." := 0;
+        PendingUpdate.Handled := false;
+        PendingUpdate."Member Entry No." := OtherMember."Entry No.";
+        PendingUpdate.Insert();
+
+        // [WHEN] The same member DTO used by the card-details endpoint is serialized.
+        JsonBuilder.Initialize().StartObject();
+        MemberApiAgent.MemberDTO(JsonBuilder, Member);
+        Response := JsonBuilder.EndObject().Build();
+
+        // [THEN] The pending request keeps its server ID and field metadata.
+        Assert.IsTrue(Response.Get('pendingFieldUpdates', Updates), 'REST must include pending field updates.');
+        Assert.AreEqual(1, Updates.AsArray().Count(), 'Handled requests and other members must be excluded.');
+        Updates.AsArray().Get(0, Update);
+        Update.AsObject().Get('entryNo', Value);
+        Assert.AreEqual(PendingEntryNo, Value.AsValue().AsInteger(), 'The server entry number must be preserved.');
+        Update.AsObject().Get('fieldNo', Value);
+        Assert.AreEqual(Member.FieldNo("First Name"), Value.AsValue().AsInteger(), 'The member field number must be preserved.');
+        Update.AsObject().Get('caption', Value);
+        Assert.AreEqual('First Name', Value.AsValue().AsText(), 'The field caption must be preserved.');
+        Update.AsObject().Get('currentValue', Value);
+        Assert.AreEqual('Before', Value.AsValue().AsText(), 'The current value must be preserved.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestMemberMapsPendingUpdates()
+    var
+        TempUpdates: Record "NPR MM Request Member Update" temporary;
+        TempInfo: Record "NPR MM Member Info Capture" temporary;
+        Endpoint: Record "NPR MM NPR Remote Endp. Setup" temporary;
+        RestApi: Codeunit "NPR MMMembershipRestApi";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+    begin
+        // [SCENARIO] A remote POS receives all pending field-update requests when retrieving member details through REST.
+        // [GIVEN] Two pending requests in an in-memory response, with no endpoint configured.
+        Response := RemoteMemberResponse(true);
+
+        // [WHEN] Member details are read without fetching an image or making an HTTP call.
+        Assert.IsTrue(RestApi.ValidateMemberResponse(Endpoint, 'T-', 'MEMBERSHIP', false, Response, TempInfo, TempUpdates), 'Member response should be valid.');
+
+        // [THEN] Every request is available, unhandled, with the original server ID and values.
+        Assert.AreEqual(2, TempUpdates.Count(), 'Both pending requests must reach the local buffer.');
+        TempUpdates.FindFirst();
+        Assert.AreEqual(7101, TempUpdates."Remote Entry No.", 'Keep the server ID for completing the request.');
+        Assert.AreEqual(10, TempUpdates."Field No.", 'Keep the requested field number.');
+        Assert.AreEqual('First Name', TempUpdates.Caption, 'Keep the requested caption.');
+        Assert.AreEqual('Before', TempUpdates."Current Value", 'Keep the current value.');
+        Assert.IsFalse(TempUpdates.Handled, 'New requests must be unhandled.');
+        Assert.AreNotEqual(0DT, TempUpdates."Request Datetime", 'Set the local request timestamp as SOAP does.');
+        Assert.AreEqual(1, TempUpdates.Next(), 'The second request must have a distinct local entry number.');
+        Assert.AreEqual(7102, TempUpdates."Remote Entry No.", 'Keep the second server ID.');
+        Assert.AreEqual('', TempUpdates."Current Value", 'Empty current values must be accepted.');
+        Assert.AreEqual('T-MEMBER', TempInfo."External Member No", 'Existing member mapping must be preserved.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestMemberAcceptsLegacyResponse()
+    var
+        TempUpdates: Record "NPR MM Request Member Update" temporary;
+        TempInfo: Record "NPR MM Member Info Capture" temporary;
+        Endpoint: Record "NPR MM NPR Remote Endp. Setup" temporary;
+        RestApi: Codeunit "NPR MMMembershipRestApi";
+        Assert: Codeunit Assert;
+    begin
+        // [GIVEN] An older server response without the optional pending-field property.
+        // [WHEN] The response is read entirely in memory.
+        Assert.IsTrue(RestApi.ValidateMemberResponse(Endpoint, '', 'MEMBERSHIP', false, RemoteMemberResponse(false), TempInfo, TempUpdates), 'Older servers must remain compatible.');
+        // [THEN] Member data is accepted and no field request is invented.
+        Assert.IsTrue(TempUpdates.IsEmpty(), 'A legacy response has no pending requests.');
+        Assert.AreEqual('MEMBER', TempInfo."External Member No", 'Member mapping must still work.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestMemberRejectsWrongMembership()
+    var
+        TempUpdates: Record "NPR MM Request Member Update" temporary;
+        TempInfo: Record "NPR MM Member Info Capture" temporary;
+        Endpoint: Record "NPR MM NPR Remote Endp. Setup" temporary;
+        RestApi: Codeunit "NPR MMMembershipRestApi";
+        Assert: Codeunit Assert;
+    begin
+        // [GIVEN] Pending requests belonging to a different membership.
+        // [WHEN] The response is validated for the expected membership.
+        Assert.IsFalse(RestApi.ValidateMemberResponse(Endpoint, '', 'OTHER', false, RemoteMemberResponse(true), TempInfo, TempUpdates), 'A different membership must be rejected.');
+        // [THEN] No update requests from the rejected response reach the local buffer.
+        Assert.IsTrue(TempUpdates.IsEmpty(), 'Rejected member data must not introduce requests.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestFieldUpdateChangesMemberAndHandlesRequest()
+    var
+        Member: Record "NPR MM Member";
+        PendingUpdate: Record "NPR MM Request Member Update";
+        MemberApiAgent: Codeunit "NPR MemberApiAgent";
+        JsonBuilder: Codeunit "NPR Json Builder";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        Updates: JsonToken;
+    begin
+        // [SCENARIO] Confirming a pending field update through REST changes the member and removes the pending prompt.
+        // [GIVEN] A local member with a pending first-name update.
+        CreatePendingRestFieldUpdate(Member, PendingUpdate);
+
+        // [WHEN] A remote POS confirms the update through the REST route.
+        AssertRestFieldUpdateStatus(CompleteRestFieldUpdate(PendingUpdate."Entry No.", 'Before', 'After'), 200);
+
+        // [THEN] The value and request completion are saved together.
+        Member.Get(Member."Entry No.");
+        PendingUpdate.Get(PendingUpdate."Entry No.");
+        Assert.AreEqual('After', Member."First Name", 'REST must apply the confirmed field value.');
+        Assert.IsTrue(PendingUpdate.Handled, 'REST must complete the original request.');
+        Assert.AreEqual('After', PendingUpdate."New Value", 'The request must retain the confirmed value.');
+        Assert.AreNotEqual(0DT, PendingUpdate."Response Datetime", 'The request must record when it was completed.');
+
+        // [THEN] Subsequent member details no longer offer the completed update.
+        JsonBuilder.Initialize().StartObject();
+        MemberApiAgent.MemberDTO(JsonBuilder, Member);
+        Response := JsonBuilder.EndObject().Build();
+        Response.Get('pendingFieldUpdates', Updates);
+        Assert.AreEqual(0, Updates.AsArray().Count(), 'A completed request must not prompt again.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestFieldUpdateAcceptsUnchangedValue()
+    var
+        Member: Record "NPR MM Member";
+        PendingUpdate: Record "NPR MM Request Member Update";
+        Assert: Codeunit Assert;
+    begin
+        // [SCENARIO] Confirming the existing value still completes the pending request.
+        // [GIVEN] A pending request whose current value is accepted by the cashier.
+        CreatePendingRestFieldUpdate(Member, PendingUpdate);
+
+        // [WHEN] The same value is confirmed through REST.
+        AssertRestFieldUpdateStatus(CompleteRestFieldUpdate(PendingUpdate."Entry No.", 'Before', 'Before'), 200);
+
+        // [THEN] The request is handled without changing the member value.
+        Member.Get(Member."Entry No.");
+        PendingUpdate.Get(PendingUpdate."Entry No.");
+        Assert.AreEqual('Before', Member."First Name", 'Accepting the current value must preserve it.');
+        Assert.IsTrue(PendingUpdate.Handled, 'Accepting the current value must complete the request.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestFieldUpdateAcceptsEmptyValue()
+    var
+        Member: Record "NPR MM Member";
+        PendingUpdate: Record "NPR MM Request Member Update";
+        Assert: Codeunit Assert;
+    begin
+        // [SCENARIO] A member field can be cleared when confirming its pending update.
+        // [GIVEN] A pending first-name update with a nonempty current value.
+        CreatePendingRestFieldUpdate(Member, PendingUpdate);
+
+        // [WHEN] An empty new value is explicitly supplied through REST.
+        AssertRestFieldUpdateStatus(CompleteRestFieldUpdate(PendingUpdate."Entry No.", 'Before', ''), 200);
+
+        // [THEN] The field is cleared and the request is completed.
+        Member.Get(Member."Entry No.");
+        PendingUpdate.Get(PendingUpdate."Entry No.");
+        Assert.AreEqual('', Member."First Name", 'An explicitly empty value must be accepted.');
+        Assert.IsTrue(PendingUpdate.Handled, 'Clearing the value must complete the request.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestFieldUpdateRetryKeepsCompletedValue()
+    var
+        Member: Record "NPR MM Member";
+        PendingUpdate: Record "NPR MM Request Member Update";
+        Assert: Codeunit Assert;
+    begin
+        // [SCENARIO] Retrying an already completed field update does not apply it again.
+        // [GIVEN] A request already confirmed through REST.
+        CreatePendingRestFieldUpdate(Member, PendingUpdate);
+        AssertRestFieldUpdateStatus(CompleteRestFieldUpdate(PendingUpdate."Entry No.", 'Before', 'After'), 200);
+
+        // [WHEN] The same request is sent again with a different new value.
+        AssertRestFieldUpdateStatus(CompleteRestFieldUpdate(PendingUpdate."Entry No.", 'Before', 'Retry'), 200);
+
+        // [THEN] The original completion and member value are preserved.
+        Member.Get(Member."Entry No.");
+        PendingUpdate.Get(PendingUpdate."Entry No.");
+        Assert.AreEqual('After', Member."First Name", 'A retry must not overwrite the confirmed value.');
+        Assert.AreEqual('After', PendingUpdate."New Value", 'A retry must not overwrite the completed request.');
+        Assert.IsTrue(PendingUpdate.Handled, 'The request must remain completed.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestFieldUpdateRejectsUnknownRequest()
+    var
+        Member: Record "NPR MM Member";
+        PendingUpdate: Record "NPR MM Request Member Update";
+        EntryNo: Integer;
+    begin
+        // [SCENARIO] An unknown field-update request is rejected instead of reporting success.
+        // [GIVEN] A request that no longer exists.
+        CreatePendingRestFieldUpdate(Member, PendingUpdate);
+        EntryNo := PendingUpdate."Entry No.";
+        PendingUpdate.Delete();
+
+        // [WHEN] Its completion is submitted through REST.
+        // [THEN] The route reports that the request was not found.
+        AssertRestFieldUpdateStatus(CompleteRestFieldUpdate(EntryNo, 'Before', 'After'), 404);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestFieldUpdateRejectsMissingNewValue()
+    var
+        Member: Record "NPR MM Member";
+        PendingUpdate: Record "NPR MM Request Member Update";
+        Assert: Codeunit Assert;
+        Body: JsonObject;
+    begin
+        // [SCENARIO] An incomplete REST body cannot accidentally clear a field or complete its request.
+        // [GIVEN] A pending update and a request body without a new value.
+        CreatePendingRestFieldUpdate(Member, PendingUpdate);
+        Body.Add('entryNo', PendingUpdate."Entry No.");
+        Body.Add('currentValue', 'Before');
+
+        // [WHEN] The incomplete body is submitted.
+        AssertRestFieldUpdateStatus(InvokeApi('POST', 'membership/member/fieldUpdate', Body), 400);
+
+        // [THEN] Both the member value and pending request are unchanged.
+        Member.Get(Member."Entry No.");
+        PendingUpdate.Get(PendingUpdate."Entry No.");
+        Assert.AreEqual('Before', Member."First Name", 'Invalid input must not change the member.');
+        Assert.IsFalse(PendingUpdate.Handled, 'Invalid input must leave the request pending.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestFieldUpdatePreservesValidEmail()
+    var
+        Member: Record "NPR MM Member";
+        OtherMember: Record "NPR MM Member";
+        PendingUpdate: Record "NPR MM Request Member Update";
+        Assert: Codeunit Assert;
+    begin
+        // [GIVEN] Email must be unique, and another member in the community has no email.
+        CreatePendingRestEmailUpdate(Member, OtherMember, PendingUpdate);
+
+        // [WHEN] A unique email is confirmed through REST.
+        AssertRestFieldUpdateStatus(CompleteRestFieldUpdate(PendingUpdate."Entry No.", 'before@example.com', 'AFTER@example.com'), 200);
+
+        // [THEN] Validation preserves the email and completes the request.
+        Member.Get(Member."Entry No.");
+        PendingUpdate.Get(PendingUpdate."Entry No.");
+        Assert.AreEqual('after@example.com', Member."E-Mail Address", 'Validation must preserve and lowercase the confirmed email.');
+        Assert.IsTrue(PendingUpdate.Handled, 'A unique email must complete the request.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestFieldUpdateRejectsDuplicateEmail()
+    var
+        Member: Record "NPR MM Member";
+        OtherMember: Record "NPR MM Member";
+        PendingUpdate: Record "NPR MM Request Member Update";
+        Assert: Codeunit Assert;
+    begin
+        // [GIVEN] Another member in the same community already uses the requested email.
+        CreatePendingRestEmailUpdate(Member, OtherMember, PendingUpdate);
+        OtherMember."E-Mail Address" := 'after@example.com';
+        OtherMember.Modify();
+
+        // [WHEN] The duplicate email is confirmed through REST.
+        AssertRestFieldUpdateStatus(CompleteRestFieldUpdate(PendingUpdate."Entry No.", 'before@example.com', 'after@example.com'), 400);
+
+        // [THEN] The original email and pending request are preserved.
+        Member.Get(Member."Entry No.");
+        PendingUpdate.Get(PendingUpdate."Entry No.");
+        Assert.AreEqual('before@example.com', Member."E-Mail Address", 'A duplicate email must not change the member.');
+        Assert.IsFalse(PendingUpdate.Handled, 'A rejected email must leave the request pending.');
+        Assert.AreEqual('', PendingUpdate."New Value", 'A rejected email must not be recorded as confirmed.');
+    end;
+
+    local procedure CreatePendingRestEmailUpdate(var Member: Record "NPR MM Member"; var OtherMember: Record "NPR MM Member"; var PendingUpdate: Record "NPR MM Request Member Update")
+    var
+        MemberCommunity: Record "NPR MM Member Community";
+        Membership: Record "NPR MM Membership";
+        MembershipRole: Record "NPR MM Membership Role";
+    begin
+        CreatePendingRestFieldUpdate(Member, PendingUpdate);
+        Member."E-Mail Address" := 'before@example.com';
+        Member.Modify();
+        PendingUpdate."Field No." := Member.FieldNo("E-Mail Address");
+        PendingUpdate."Current Value" := Member."E-Mail Address";
+        PendingUpdate.Modify();
+        OtherMember.Insert();
+
+        MemberCommunity.Code := CopyStr(DelChr(Format(CreateGuid()), '=', '{}-'), 1, MaxStrLen(MemberCommunity.Code));
+        MemberCommunity."Member Unique Identity" := MemberCommunity."Member Unique Identity"::EMAIL;
+        MemberCommunity.Insert();
+        Membership."Community Code" := MemberCommunity.Code;
+        Membership.Insert();
+        MembershipRole."Membership Entry No." := Membership."Entry No.";
+        MembershipRole."Member Entry No." := Member."Entry No.";
+        MembershipRole.Insert();
+        MembershipRole."Member Entry No." := OtherMember."Entry No.";
+        MembershipRole.Insert();
+    end;
+
+    local procedure CreatePendingRestFieldUpdate(var Member: Record "NPR MM Member"; var PendingUpdate: Record "NPR MM Request Member Update")
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+    begin
+        LibraryNPRetailAPI.CreateAPIPermission(UserSecurityId(), CompanyName(), 'NPR API Membership');
+        Member."First Name" := 'Before';
+        Member.Insert();
+        PendingUpdate."Member Entry No." := Member."Entry No.";
+        PendingUpdate."Field No." := Member.FieldNo("First Name");
+        PendingUpdate."Current Value" := Member."First Name";
+        PendingUpdate.Insert();
+    end;
+
+    local procedure CompleteRestFieldUpdate(EntryNo: Integer; CurrentValue: Text; NewValue: Text): JsonObject
+    var
+        Body: JsonObject;
+    begin
+        Body.Add('entryNo', EntryNo);
+        Body.Add('currentValue', CurrentValue);
+        Body.Add('newValue', NewValue);
+        exit(InvokeApi('POST', 'membership/member/fieldUpdate', Body));
+    end;
+
+    local procedure AssertRestFieldUpdateStatus(Response: JsonObject; ExpectedStatusCode: Integer)
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+        Assert: Codeunit Assert;
+    begin
+        Assert.AreEqual(ExpectedStatusCode, JsonHelper.GetJInteger(Response.AsToken(), 'statusCode', true), 'Unexpected field-update response status.');
+    end;
+
+    local procedure RemoteMemberResponse(IncludeUpdates: Boolean) Response: JsonObject
+    var
+        Member: JsonObject;
+        Membership: JsonObject;
+        Card: JsonObject;
+        Updates: JsonArray;
+    begin
+        Member.Add('memberNumber', 'MEMBER');
+        Member.Add('firstName', 'Before');
+        if IncludeUpdates then begin
+            Updates.ReadFrom('[{"entryNo":7101,"fieldNo":10,"caption":"First Name","currentValue":"Before"},{"entryNo":7102,"fieldNo":20,"caption":"Last Name","currentValue":""}]');
+            Member.Add('pendingFieldUpdates', Updates);
+        end;
+        Membership.Add('membershipNumber', 'MEMBERSHIP');
+        Card.Add('member', Member);
+        Card.Add('membership', Membership);
+        Response.Add('card', Card);
+    end;
+
     local procedure ResetMemberChangeLog(MemberEntryNo: Integer)
     var
         MemberChangeLog: Record "NPR MM Member Change Log";

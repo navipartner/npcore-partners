@@ -388,6 +388,53 @@ codeunit 6248220 "NPR MemberApiAgent"
 
     end;
 
+    internal procedure UpdateMemberField(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        RequestMemberUpdate: Record "NPR MM Request Member Update";
+        Member: Record "NPR MM Member";
+        RequestMemberUpdMgr: Codeunit "NPR MM Request Member Upd Mgr";
+        EntryNo: Integer;
+        CurrentValue: Text[200];
+        NewValue: Text[200];
+        ResponseBody: JsonObject;
+        InvalidRequestLbl: Label 'The request must contain entryNo, currentValue and newValue, with values no longer than %1 characters.', Comment = '%1 = maximum field-update value length; entryNo, currentValue and newValue are JSON property names and must not be translated';
+        RemoteRequestLbl: Label 'Only local %1 records can be completed through this endpoint.', Comment = '%1 = field-update request table caption';
+    begin
+        if not TryReadMemberFieldUpdateRequest(Request.BodyJson(), EntryNo, CurrentValue, NewValue) then
+            exit(Response.RespondBadRequest(StrSubstNo(InvalidRequestLbl, MaxStrLen(NewValue))));
+
+        if not RequestMemberUpdate.Get(EntryNo) then
+            exit(Response.RespondResourceNotFound(RequestMemberUpdate.TableCaption()));
+        if not Member.Get(RequestMemberUpdate."Member Entry No.") then
+            exit(Response.RespondResourceNotFound(Member.TableCaption()));
+        if RequestMemberUpdate."Remote Entry No." <> 0 then
+            exit(Response.RespondBadRequest(StrSubstNo(RemoteRequestLbl, RequestMemberUpdate.TableCaption())));
+
+        RequestMemberUpdMgr.UpdateMemberField(EntryNo, CurrentValue, NewValue, 0);
+        RequestMemberUpdate.Get(EntryNo);
+        ResponseBody.Add('entryNo', EntryNo);
+        ResponseBody.Add('handled', RequestMemberUpdate.Handled);
+        exit(Response.RespondOK(ResponseBody));
+    end;
+
+    [TryFunction]
+    local procedure TryReadMemberFieldUpdateRequest(Body: JsonToken; var EntryNo: Integer; var CurrentValue: Text[200]; var NewValue: Text[200])
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+        Value: JsonToken;
+        ValueTooLongLbl: Label 'The value must not exceed %1 characters.', Comment = '%1 = maximum field-update value length';
+    begin
+        EntryNo := JsonHelper.GetJInteger(Body, 'entryNo', true);
+        Body.AsObject().Get('currentValue', Value);
+        if StrLen(Value.AsValue().AsText()) > MaxStrLen(CurrentValue) then
+            Error(ValueTooLongLbl, MaxStrLen(CurrentValue));
+        CurrentValue := CopyStr(Value.AsValue().AsText(), 1, MaxStrLen(CurrentValue));
+        Body.AsObject().Get('newValue', Value);
+        if StrLen(Value.AsValue().AsText()) > MaxStrLen(NewValue) then
+            Error(ValueTooLongLbl, MaxStrLen(NewValue));
+        NewValue := CopyStr(Value.AsValue().AsText(), 1, MaxStrLen(NewValue));
+    end;
+
     internal procedure GetMemberNotes(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         Member: Record "NPR MM Member";
@@ -793,7 +840,30 @@ codeunit 6248220 "NPR MemberApiAgent"
             .AddProperty('hasNotes', Member.HasLinks())
             .AddProperty('preferredLanguage', Member.PreferredLanguageCode)
             .AddProperty('storeCode', Member."Store Code")
+            .AddArray(PendingFieldUpdatesDTO(ResponseJson, Member."Entry No."))
             .AddArray(MemberAttributes.MemberAttributesDTO(ResponseJson, Member."Entry No."));
+        exit(ResponseJson);
+    end;
+
+    local procedure PendingFieldUpdatesDTO(ResponseJson: Codeunit "NPR JSON Builder"; MemberEntryNo: Integer): Codeunit "NPR JSON Builder"
+    var
+        RequestMemberUpdate: Record "NPR MM Request Member Update";
+    begin
+        ResponseJson.StartArray('pendingFieldUpdates');
+        RequestMemberUpdate.SetCurrentKey("Member Entry No.");
+        RequestMemberUpdate.SetRange("Member Entry No.", MemberEntryNo);
+        RequestMemberUpdate.SetRange(Handled, false);
+        RequestMemberUpdate.SetRange("Remote Entry No.", 0);
+        if RequestMemberUpdate.FindSet() then
+            repeat
+                ResponseJson.StartObject()
+                    .AddProperty('entryNo', RequestMemberUpdate."Entry No.")
+                    .AddProperty('fieldNo', RequestMemberUpdate."Field No.")
+                    .AddProperty('caption', RequestMemberUpdate.Caption)
+                    .AddProperty('currentValue', RequestMemberUpdate."Current Value")
+                    .EndObject();
+            until RequestMemberUpdate.Next() = 0;
+        ResponseJson.EndArray();
         exit(ResponseJson);
     end;
 

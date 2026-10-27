@@ -472,8 +472,11 @@ codeunit 6060147 "NPR MM NPR Membership"
 
     local procedure UpdateMemberFieldWorker(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; var RequestMemberFieldUpdate: Record "NPR MM Request Member Update"; var NotValidReason: Text): Boolean
     var
+        MMMembershipRestApi: Codeunit "NPR MMMembershipRestApi";
         MMMembershipSoapApi: Codeunit "NPR MMMembershipSoapApi";
     begin
+        if NPRRemoteEndpointSetup."Rest Api Endpoint URI" <> '' then
+            exit(MMMembershipRestApi.UpdateMemberFieldWorker(NPRRemoteEndpointSetup, RequestMemberFieldUpdate, NotValidReason));
         exit(MMMembershipSoapApi.UpdateMemberFieldWorker(NPRRemoteEndpointSetup, RequestMemberFieldUpdate, NotValidReason));
     end;
 

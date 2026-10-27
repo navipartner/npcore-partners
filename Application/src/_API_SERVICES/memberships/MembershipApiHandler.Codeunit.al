@@ -109,6 +109,9 @@ codeunit 6185122 "NPR MembershipApiHandler"
             _ApiFunction::UPDATE_MEMBER:
                 _Response := MemberApiAgent.UpdateMember(_Request);
 
+            _ApiFunction::UPDATE_MEMBER_FIELD:
+                _Response := MemberApiAgent.UpdateMemberField(_Request);
+
             _ApiFunction::GET_MEMBER_NOTES:
                 _Response := MemberApiAgent.GetMemberNotes(_Request);
 
