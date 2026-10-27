@@ -108,6 +108,65 @@ codeunit 6248585 "NPR Spfy POS Entry Export Mgt."
             Title := JoinDescriptions(Format(POSEntrySalesLine.Type), POSEntrySalesLine."No.");
     end;
 
+    /// <summary>
+    /// The Shopify line items a POS entry sales line is sent as. Shopify has no line discount input and takes whole-number quantities,
+    /// so the unit price is the line amount after discount divided by the quantity, on the VAT basis given by TaxesIncluded.
+    /// When that does not divide evenly at the amount rounding precision, the units are split into two line items one rounding step
+    /// apart, so the line items still add up to the line amount exactly. The line's tax is shared out in proportion to the units.
+    /// </summary>
+    internal procedure GetLineItemSplit(POSEntrySalesLine: Record "NPR POS Entry Sales Line"; TaxesIncluded: Boolean; var Quantities: List of [Integer]; var UnitPrices: List of [Decimal]; var TaxAmounts: List of [Decimal])
+    var
+        GLSetup: Record "General Ledger Setup";
+        LineAmount: Decimal;
+        TaxAmount: Decimal;
+        UnitPrice: Decimal;
+        TaxAmountAtUnitPrice: Decimal;
+        RoundingPrecision: Decimal;
+        Units: Integer;
+        UnitsAtHigherPrice: Integer;
+    begin
+        Clear(Quantities);
+        Clear(UnitPrices);
+        Clear(TaxAmounts);
+
+        TaxAmount := POSEntrySalesLine."Amount Incl. VAT" - POSEntrySalesLine."Amount Excl. VAT";
+        if TaxesIncluded then
+            LineAmount := POSEntrySalesLine."Amount Incl. VAT"
+        else
+            LineAmount := POSEntrySalesLine."Amount Excl. VAT";
+        Units := Round(POSEntrySalesLine.Quantity, 1, '>');
+        if Units <= 1 then begin
+            Quantities.Add(1);
+            UnitPrices.Add(LineAmount);
+            TaxAmounts.Add(TaxAmount);
+            exit;
+        end;
+
+        if GLSetup.Get() then
+            RoundingPrecision := GLSetup."Amount Rounding Precision";
+        if RoundingPrecision <= 0 then
+            RoundingPrecision := 0.01;
+        UnitPrice := Round(LineAmount / Units, RoundingPrecision, '<');
+        // Round '<' rounds toward zero, so for a negative amount the remainder is negative too.
+        UnitsAtHigherPrice := Round(Abs(LineAmount - UnitPrice * Units) / RoundingPrecision, 1);
+        if UnitsAtHigherPrice >= Units then
+            UnitsAtHigherPrice := Units - 1;
+        if UnitsAtHigherPrice <= 0 then begin
+            Quantities.Add(Units);
+            UnitPrices.Add(UnitPrice);
+            TaxAmounts.Add(TaxAmount);
+            exit;
+        end;
+
+        TaxAmountAtUnitPrice := Round(TaxAmount * (Units - UnitsAtHigherPrice) / Units, RoundingPrecision);
+        Quantities.Add(Units - UnitsAtHigherPrice);
+        UnitPrices.Add(UnitPrice);
+        TaxAmounts.Add(TaxAmountAtUnitPrice);
+        Quantities.Add(UnitsAtHigherPrice);
+        UnitPrices.Add((LineAmount - UnitPrice * (Units - UnitsAtHigherPrice)) / UnitsAtHigherPrice);
+        TaxAmounts.Add(TaxAmount - TaxAmountAtUnitPrice);
+    end;
+
     local procedure JoinDescriptions(Description: Text; Description2: Text): Text
     begin
         if Description2 = '' then

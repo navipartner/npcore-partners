@@ -150,14 +150,16 @@ codeunit 6151486 "NPR Spfy Task Send POS Entry"
     var
         CurrExchRate: Record "Currency Exchange Rate";
         TempConsolidatedPOSEntryPaymentLine: Record "NPR POS Entry Payment Line" temporary;
-        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         SpfyPOSEntryExportMgt: Codeunit "NPR Spfy POS Entry Export Mgt.";
         JsonBuilder: Codeunit "NPR Json Builder";
-        ShopifyVariantID: Text[30];
+        LineItemQuantities: List of [Integer];
+        LineItemUnitPrices: List of [Decimal];
+        LineItemTaxAmounts: List of [Decimal];
         PresentmentMoneyCurrCode: Code[3];
         ShopMoneyCurrCode: Code[3];
         ShopMoneyAmount: Decimal;
         POSEntryProcessedAt: DateTime;
+        LineItemIndex: Integer;
     begin
         GetGLSetup();
         if SpfyStore."Currency Code" = '' then
@@ -198,53 +200,10 @@ codeunit 6151486 "NPR Spfy Task Send POS Entry"
         JsonBuilder.StartArray('lineItems');
         if POSEntrySalesLine.FindSet() then
             repeat
-                JsonBuilder.StartObject();  //line item
-                if POSEntrySalesLine.Type = POSEntrySalesLine.Type::Item then begin
-                    ShopifyVariantID := SpfyItemMgt.GetAssignedShopifyVariantID(POSEntrySalesLine."No.", POSEntrySalesLine."Variant Code", SpfyStore."Code", true);
-                    if ShopifyVariantID <> '' then
-                        JsonBuilder.AddProperty('variantId', 'gid://shopify/ProductVariant/' + ShopifyVariantID);
-                    JsonBuilder.AddProperty('sku', SpfyItemMgt.GetProductVariantSku(POSEntrySalesLine."No.", POSEntrySalesLine."Variant Code"));
-                end;
-                JsonBuilder.AddProperty('title', SpfyPOSEntryExportMgt.GetLineItemTitle(POSEntrySalesLine));
-                JsonBuilder.AddProperty('giftCard', false); //We cannot set this to true (or base it on POSEntrySalesLine.Type::Voucher), because Shopify will create duplicate gift cards
-                JsonBuilder.AddProperty('quantity', ToInt(POSEntrySalesLine.Quantity));  //Shopify expects quantity as integer
-
-                JsonBuilder.StartObject('priceSet');
-                if PresentmentMoneyCurrCode <> '' then begin
-                    JsonBuilder.StartObject('presentmentMoney');
-                    JsonBuilder.AddProperty('amount', POSEntrySalesLine."Unit Price");
-                    JsonBuilder.AddProperty('currencyCode', PresentmentMoneyCurrCode);
-                    JsonBuilder.EndObject();  //presentmentMoney
-                    ShopMoneyAmount := CurrExchRate.ExchangeAmount(POSEntrySalesLine."Unit Price", POSEntry."Currency Code", SpfyStore."Currency Code", POSEntry."Entry Date");
-                end else
-                    ShopMoneyAmount := POSEntrySalesLine."Unit Price";
-                JsonBuilder.StartObject('shopMoney');
-                JsonBuilder.AddProperty('amount', ShopMoneyAmount);
-                JsonBuilder.AddProperty('currencyCode', ShopMoneyCurrCode);
-                JsonBuilder.EndObject();  //shopMoney
-                JsonBuilder.EndObject();  //priceSet
-
-                JsonBuilder.StartArray('taxLines');
-                JsonBuilder.StartObject();  //taxLine
-                JsonBuilder.StartObject('priceSet');
-                if PresentmentMoneyCurrCode <> '' then begin
-                    JsonBuilder.StartObject('presentmentMoney');
-                    JsonBuilder.AddProperty('amount', POSEntrySalesLine."Amount Incl. VAT" - POSEntrySalesLine."Amount Excl. VAT");
-                    JsonBuilder.AddProperty('currencyCode', PresentmentMoneyCurrCode);
-                    JsonBuilder.EndObject();  //presentmentMoney
-                    ShopMoneyAmount := CurrExchRate.ExchangeAmount(POSEntrySalesLine."Amount Incl. VAT" - POSEntrySalesLine."Amount Excl. VAT", POSEntry."Currency Code", SpfyStore."Currency Code", POSEntry."Entry Date");
-                end else
-                    ShopMoneyAmount := POSEntrySalesLine."Amount Incl. VAT" - POSEntrySalesLine."Amount Excl. VAT";
-                JsonBuilder.StartObject('shopMoney');
-                JsonBuilder.AddProperty('amount', ShopMoneyAmount);
-                JsonBuilder.AddProperty('currencyCode', ShopMoneyCurrCode);
-                JsonBuilder.EndObject();  //shopMoney
-                JsonBuilder.EndObject();  //priceSet (taxLine)
-                JsonBuilder.AddProperty('rate', POSEntrySalesLine."VAT %" / 100);
-                JsonBuilder.AddProperty('title', Format(POSEntrySalesLine."VAT Calculation Type"));
-                JsonBuilder.EndObject();  //taxLine
-                JsonBuilder.EndArray();  //taxLines
-                JsonBuilder.EndObject();  //line item
+                SpfyPOSEntryExportMgt.GetLineItemSplit(POSEntrySalesLine, POSEntry."Prices Including VAT", LineItemQuantities, LineItemUnitPrices, LineItemTaxAmounts);
+                for LineItemIndex := 1 to LineItemQuantities.Count() do
+                    AddLineItem(JsonBuilder, SpfyStore, POSEntry, POSEntrySalesLine, PresentmentMoneyCurrCode, ShopMoneyCurrCode,
+                        LineItemQuantities.Get(LineItemIndex), LineItemUnitPrices.Get(LineItemIndex), LineItemTaxAmounts.Get(LineItemIndex));
             until POSEntrySalesLine.Next() = 0;
         JsonBuilder.EndArray();  //lineItems
 
@@ -295,6 +254,63 @@ codeunit 6151486 "NPR Spfy Task Send POS Entry"
         exit(JsonBuilder.Build());
     end;
 
+    local procedure AddLineItem(var JsonBuilder: Codeunit "NPR Json Builder"; SpfyStore: Record "NPR Spfy Store"; POSEntry: Record "NPR POS Entry"; POSEntrySalesLine: Record "NPR POS Entry Sales Line"; PresentmentMoneyCurrCode: Code[3]; ShopMoneyCurrCode: Code[3]; Quantity: Integer; UnitPrice: Decimal; TaxAmount: Decimal)
+    var
+        CurrExchRate: Record "Currency Exchange Rate";
+        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        SpfyPOSEntryExportMgt: Codeunit "NPR Spfy POS Entry Export Mgt.";
+        ShopifyVariantID: Text[30];
+        ShopMoneyAmount: Decimal;
+    begin
+        JsonBuilder.StartObject();  //line item
+        if POSEntrySalesLine.Type = POSEntrySalesLine.Type::Item then begin
+            ShopifyVariantID := SpfyItemMgt.GetAssignedShopifyVariantID(POSEntrySalesLine."No.", POSEntrySalesLine."Variant Code", SpfyStore."Code", true);
+            if ShopifyVariantID <> '' then
+                JsonBuilder.AddProperty('variantId', 'gid://shopify/ProductVariant/' + ShopifyVariantID);
+            JsonBuilder.AddProperty('sku', SpfyItemMgt.GetProductVariantSku(POSEntrySalesLine."No.", POSEntrySalesLine."Variant Code"));
+        end;
+        JsonBuilder.AddProperty('title', SpfyPOSEntryExportMgt.GetLineItemTitle(POSEntrySalesLine));
+        JsonBuilder.AddProperty('giftCard', false); //We cannot set this to true (or base it on POSEntrySalesLine.Type::Voucher), because Shopify will create duplicate gift cards
+        JsonBuilder.AddProperty('quantity', Quantity);  //Shopify expects quantity as integer
+
+        JsonBuilder.StartObject('priceSet');
+        if PresentmentMoneyCurrCode <> '' then begin
+            JsonBuilder.StartObject('presentmentMoney');
+            JsonBuilder.AddProperty('amount', UnitPrice);
+            JsonBuilder.AddProperty('currencyCode', PresentmentMoneyCurrCode);
+            JsonBuilder.EndObject();  //presentmentMoney
+            ShopMoneyAmount := CurrExchRate.ExchangeAmount(UnitPrice, POSEntry."Currency Code", SpfyStore."Currency Code", POSEntry."Entry Date");
+        end else
+            ShopMoneyAmount := UnitPrice;
+        JsonBuilder.StartObject('shopMoney');
+        JsonBuilder.AddProperty('amount', ShopMoneyAmount);
+        JsonBuilder.AddProperty('currencyCode', ShopMoneyCurrCode);
+        JsonBuilder.EndObject();  //shopMoney
+        JsonBuilder.EndObject();  //priceSet
+
+        JsonBuilder.StartArray('taxLines');
+        JsonBuilder.StartObject();  //taxLine
+        JsonBuilder.StartObject('priceSet');
+        if PresentmentMoneyCurrCode <> '' then begin
+            JsonBuilder.StartObject('presentmentMoney');
+            JsonBuilder.AddProperty('amount', TaxAmount);
+            JsonBuilder.AddProperty('currencyCode', PresentmentMoneyCurrCode);
+            JsonBuilder.EndObject();  //presentmentMoney
+            ShopMoneyAmount := CurrExchRate.ExchangeAmount(TaxAmount, POSEntry."Currency Code", SpfyStore."Currency Code", POSEntry."Entry Date");
+        end else
+            ShopMoneyAmount := TaxAmount;
+        JsonBuilder.StartObject('shopMoney');
+        JsonBuilder.AddProperty('amount', ShopMoneyAmount);
+        JsonBuilder.AddProperty('currencyCode', ShopMoneyCurrCode);
+        JsonBuilder.EndObject();  //shopMoney
+        JsonBuilder.EndObject();  //priceSet (taxLine)
+        JsonBuilder.AddProperty('rate', POSEntrySalesLine."VAT %" / 100);
+        JsonBuilder.AddProperty('title', Format(POSEntrySalesLine."VAT Calculation Type"));
+        JsonBuilder.EndObject();  //taxLine
+        JsonBuilder.EndArray();  //taxLines
+        JsonBuilder.EndObject();  //line item
+    end;
+
     local procedure SummarizePaymentLines(var POSEntryPaymentLine: Record "NPR POS Entry Payment Line"; var ConsolidatedPOSEntryPaymentLine: Record "NPR POS Entry Payment Line")
     begin
         if not ConsolidatedPOSEntryPaymentLine.IsTemporary() then
@@ -324,13 +340,6 @@ codeunit 6151486 "NPR Spfy Task Send POS Entry"
         _GLSetupRetrieved := true;
         if not _GLSetup.Get() then
             _GLSetup.Init();
-    end;
-
-    local procedure ToInt(Quantity: Decimal): Integer
-    begin
-        if Quantity < 0 then
-            exit(Round(Quantity, 1, '<'));
-        exit(Round(Quantity, 1, '>'));
     end;
 
     local procedure NpRetailPOS_SourceName(): Text

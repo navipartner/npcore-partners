@@ -236,6 +236,83 @@ codeunit 85395 "NPR Spfy TL Order Tests"
         exit(Title.AsValue().AsText());
     end;
 
+    /// <summary>The line items of the orderCreate request the mock client received.</summary>
+    local procedure SentLineItems(var MockClient: Codeunit "NPR Spfy Mock GraphQL Client"): JsonArray
+    var
+        Request: JsonObject;
+        LineItems: JsonToken;
+    begin
+        Request.ReadFrom(MockClient.GetRequestContaining(_OrderCreateTok));
+        Request.SelectToken('variables.order.lineItems', LineItems);
+        exit(LineItems.AsArray());
+    end;
+
+    local procedure AssertLineItem(LineItems: JsonArray; Index: Integer; ExpectedQuantity: Integer; ExpectedUnitPrice: Decimal; ExpectedTaxAmount: Decimal)
+    var
+        LineItem: JsonToken;
+        Value: JsonToken;
+        LineItemValueMsg: Label '%1 of line item %2', Locked = true;
+    begin
+        LineItems.Get(Index, LineItem);
+        LineItem.SelectToken('quantity', Value);
+        _Assert.AreEqual(ExpectedQuantity, Value.AsValue().AsInteger(), StrSubstNo(LineItemValueMsg, 'Quantity', Index));
+        LineItem.SelectToken('priceSet.shopMoney.amount', Value);
+        _Assert.AreEqual(ExpectedUnitPrice, Value.AsValue().AsDecimal(), StrSubstNo(LineItemValueMsg, 'Unit price', Index));
+        LineItem.SelectToken('taxLines[0].priceSet.shopMoney.amount', Value);
+        _Assert.AreEqual(ExpectedTaxAmount, Value.AsValue().AsDecimal(), StrSubstNo(LineItemValueMsg, 'Tax amount', Index));
+    end;
+
+    local procedure SetLineAmounts(var POSEntrySalesLine: Record "NPR POS Entry Sales Line"; Quantity: Decimal; UnitPrice: Decimal; LineDiscountPct: Decimal; AmountExclVAT: Decimal; AmountInclVAT: Decimal)
+    begin
+        POSEntrySalesLine.Quantity := Quantity;
+        POSEntrySalesLine."Unit Price" := UnitPrice;
+        POSEntrySalesLine."Line Discount %" := LineDiscountPct;
+        POSEntrySalesLine."VAT %" := 25;
+        POSEntrySalesLine."Amount Excl. VAT" := AmountExclVAT;
+        POSEntrySalesLine."Amount Incl. VAT" := AmountInclVAT;
+        POSEntrySalesLine.Modify(false);
+    end;
+
+    local procedure AssertSplitPart(Quantities: List of [Integer]; UnitPrices: List of [Decimal]; TaxAmounts: List of [Decimal]; Index: Integer; ExpectedQuantity: Integer; ExpectedUnitPrice: Decimal; ExpectedTaxAmount: Decimal)
+    var
+        PartValueMsg: Label '%1 of part %2', Locked = true;
+    begin
+        _Assert.AreEqual(ExpectedQuantity, Quantities.Get(Index), StrSubstNo(PartValueMsg, 'Quantity', Index));
+        _Assert.AreEqual(ExpectedUnitPrice, UnitPrices.Get(Index), StrSubstNo(PartValueMsg, 'Unit price', Index));
+        _Assert.AreEqual(ExpectedTaxAmount, TaxAmounts.Get(Index), StrSubstNo(PartValueMsg, 'Tax amount', Index));
+    end;
+
+    /// <summary>A sales line that is never inserted: GetLineItemSplit reads only its quantity and amounts.</summary>
+    local procedure InitSalesLine(var POSEntrySalesLine: Record "NPR POS Entry Sales Line"; Quantity: Decimal; AmountExclVAT: Decimal; AmountInclVAT: Decimal)
+    begin
+        POSEntrySalesLine.Init();
+        POSEntrySalesLine.Type := POSEntrySalesLine.Type::Item;
+        POSEntrySalesLine.Quantity := Quantity;
+        POSEntrySalesLine."VAT %" := 25;
+        POSEntrySalesLine."Amount Excl. VAT" := AmountExclVAT;
+        POSEntrySalesLine."Amount Incl. VAT" := AmountInclVAT;
+    end;
+
+    local procedure SetPricesIncludingVAT(POSEntryNo: Integer; PricesIncludingVAT: Boolean)
+    var
+        POSEntry: Record "NPR POS Entry";
+    begin
+        POSEntry.Get(POSEntryNo);
+        POSEntry."Prices Including VAT" := PricesIncludingVAT;
+        POSEntry.Modify(false);
+    end;
+
+    local procedure SetAmountRoundingPrecision(Precision: Decimal)
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+    begin
+        GeneralLedgerSetup.Get();
+        if GeneralLedgerSetup."Amount Rounding Precision" = Precision then
+            exit;
+        GeneralLedgerSetup."Amount Rounding Precision" := Precision;
+        GeneralLedgerSetup.Modify(false);
+    end;
+
     local procedure CreateNpCsDocument(SalesOrderNo: Code[20]) NpCsDocument: Record "NPR NpCs Document"
     begin
         NpCsDocument.Init();
@@ -1177,6 +1254,202 @@ codeunit 85395 "NPR Spfy TL Order Tests"
 
         // [THEN] The line item title is the line type caption followed by the item number.
         _Assert.AreEqual(StrSubstNo('%1 %2', Format(POSEntrySalesLine.Type::Item), Item."No."), SentLineItemTitle(MockClient), 'A line without any description must get the type and number as its line item title');
+    end;
+
+    [Test]
+    procedure GivenDiscountedLineWithPricesExclVAT_WhenPOSEntrySiblingRuns_ThenLineItemPriceIsTheDiscountedPriceExclVAT()
+    var
+        Item: Record Item;
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        SpfyTask: Record "NPR Spfy Task";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SendPOSEntry: Codeunit "NPR Spfy Task Send POS Entry";
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+    begin
+        // [SCENARIO] A discounted line on a POS entry with prices excl. VAT is sent at its discounted unit price excl. VAT, so the Shopify line total matches the POS entry and not the price before discount.
+        Initialize();
+        StoreCode := CreateOrderStore();
+
+        // [GIVEN] A POS entry with prices excl. VAT and one line of 2 units at 480 with a 20% discount: 768 excl. VAT, 960 incl. VAT.
+        _Lib.CreateItem(Item);
+        TaskEntryNo := CreateSendablePOSEntryTask(StoreCode, Item."No.", '', POSEntrySalesLine);
+        SetPricesIncludingVAT(POSEntrySalesLine."POS Entry No.", false);
+        SetLineAmounts(POSEntrySalesLine, 2, 480, 20, 768, 960);
+        MockOrderCreated(MockClient);
+
+        // [WHEN] The POS entry sibling runs.
+        GetTask(TaskEntryNo, SpfyTask);
+        SendPOSEntry.SetGraphQLClient(MockClient);
+        SendPOSEntry.Run(SpfyTask);
+
+        // [THEN] One line item of 2 units at 384 (768 / 2) carrying the line's tax of 192.
+        _Assert.AreEqual(1, SentLineItems(MockClient).Count(), 'An evenly divisible line must be sent as one line item');
+        AssertLineItem(SentLineItems(MockClient), 0, 2, 384, 192);
+    end;
+
+    [Test]
+    procedure GivenDiscountedLineWithPricesInclVAT_WhenPOSEntrySiblingRuns_ThenLineItemPriceIsTheDiscountedPriceInclVAT()
+    var
+        Item: Record Item;
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        SpfyTask: Record "NPR Spfy Task";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SendPOSEntry: Codeunit "NPR Spfy Task Send POS Entry";
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+    begin
+        // [SCENARIO] A discounted line on a POS entry with prices incl. VAT is sent at its discounted unit price incl. VAT, matching the taxesIncluded flag of the order.
+        Initialize();
+        StoreCode := CreateOrderStore();
+
+        // [GIVEN] A POS entry with prices incl. VAT and one line of 2 units at 600 with a 20% discount: 768 excl. VAT, 960 incl. VAT.
+        _Lib.CreateItem(Item);
+        TaskEntryNo := CreateSendablePOSEntryTask(StoreCode, Item."No.", '', POSEntrySalesLine);
+        SetPricesIncludingVAT(POSEntrySalesLine."POS Entry No.", true);
+        SetLineAmounts(POSEntrySalesLine, 2, 600, 20, 768, 960);
+        MockOrderCreated(MockClient);
+
+        // [WHEN] The POS entry sibling runs.
+        GetTask(TaskEntryNo, SpfyTask);
+        SendPOSEntry.SetGraphQLClient(MockClient);
+        SendPOSEntry.Run(SpfyTask);
+
+        // [THEN] One line item of 2 units at 480 (960 / 2) carrying the line's tax of 192.
+        _Assert.AreEqual(1, SentLineItems(MockClient).Count(), 'An evenly divisible line must be sent as one line item');
+        AssertLineItem(SentLineItems(MockClient), 0, 2, 480, 192);
+    end;
+
+    [Test]
+    procedure GivenDiscountedLineNotDivisibleByQuantity_WhenPOSEntrySiblingRuns_ThenTwoLineItemsAddUpToTheLineAmount()
+    var
+        Item: Record Item;
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        SpfyTask: Record "NPR Spfy Task";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SendPOSEntry: Codeunit "NPR Spfy Task Send POS Entry";
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+    begin
+        // [SCENARIO] A discounted line whose amount does not divide evenly by its quantity is sent as two line items one cent apart, so the Shopify line total is exactly the POS entry line amount.
+        Initialize();
+        StoreCode := CreateOrderStore();
+
+        // [GIVEN] Amounts rounded to 0.01 and a POS entry with prices excl. VAT whose line is 3 units at 72 with a 100 incl. VAT discount: 136 excl. VAT, 170 incl. VAT.
+        SetAmountRoundingPrecision(0.01);
+        _Lib.CreateItem(Item);
+        TaskEntryNo := CreateSendablePOSEntryTask(StoreCode, Item."No.", '', POSEntrySalesLine);
+        SetPricesIncludingVAT(POSEntrySalesLine."POS Entry No.", false);
+        SetLineAmounts(POSEntrySalesLine, 3, 72, 37.04, 136, 170);
+        MockOrderCreated(MockClient);
+
+        // [WHEN] The POS entry sibling runs.
+        GetTask(TaskEntryNo, SpfyTask);
+        SendPOSEntry.SetGraphQLClient(MockClient);
+        SendPOSEntry.Run(SpfyTask);
+
+        // [THEN] 2 units at 45.33 and 1 unit at 45.34 (90.66 + 45.34 = 136), with the tax of 34 shared 22.67 / 11.33.
+        _Assert.AreEqual(2, SentLineItems(MockClient).Count(), 'A line that does not divide evenly must be sent as two line items');
+        AssertLineItem(SentLineItems(MockClient), 0, 2, 45.33, 22.67);
+        AssertLineItem(SentLineItems(MockClient), 1, 1, 45.34, 11.33);
+    end;
+
+    [Test]
+    procedure GivenAmountLeavingTwoUnitsAtTheHigherPrice_WhenSplit_ThenTheyCarryTheRemainderBetweenThem()
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        SpfyPOSEntryExportMgt: Codeunit "NPR Spfy POS Entry Export Mgt.";
+        Quantities: List of [Integer];
+        UnitPrices: List of [Decimal];
+        TaxAmounts: List of [Decimal];
+    begin
+        // [SCENARIO] A line whose amount leaves two cents over after dividing by its quantity is split into one unit at the lower price and two units at the higher price, adding up to the line amount.
+        Initialize();
+
+        // [GIVEN] Amounts rounded to 0.01 and a line of 3 units for 100.01 excl. VAT, 125.01 incl. VAT.
+        SetAmountRoundingPrecision(0.01);
+        InitSalesLine(POSEntrySalesLine, 3, 100.01, 125.01);
+
+        // [WHEN] The line is split on the excl. VAT basis.
+        SpfyPOSEntryExportMgt.GetLineItemSplit(POSEntrySalesLine, false, Quantities, UnitPrices, TaxAmounts);
+
+        // [THEN] 1 unit at 33.33 and 2 units at 33.34 (33.33 + 66.68 = 100.01), with the tax of 25.00 shared 8.33 / 16.67.
+        _Assert.AreEqual(2, Quantities.Count(), 'The line must be split into two parts');
+        AssertSplitPart(Quantities, UnitPrices, TaxAmounts, 1, 1, 33.33, 8.33);
+        AssertSplitPart(Quantities, UnitPrices, TaxAmounts, 2, 2, 33.34, 16.67);
+    end;
+
+    [Test]
+    procedure GivenNegativeAmountNotDivisibleByQuantity_WhenSplit_ThenTheLineItemsAddUpToTheLineAmount()
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        SpfyPOSEntryExportMgt: Codeunit "NPR Spfy POS Entry Export Mgt.";
+        Quantities: List of [Integer];
+        UnitPrices: List of [Decimal];
+        TaxAmounts: List of [Decimal];
+    begin
+        // [SCENARIO] A line with a positive quantity and a negative amount that does not divide evenly is split one cent apart and still adds up to its amount.
+        Initialize();
+
+        // [GIVEN] Amounts rounded to 0.01 and a line of 3 units for -10.00 excl. VAT, -12.50 incl. VAT.
+        SetAmountRoundingPrecision(0.01);
+        InitSalesLine(POSEntrySalesLine, 3, -10, -12.5);
+
+        // [WHEN] The line is split on the excl. VAT basis.
+        SpfyPOSEntryExportMgt.GetLineItemSplit(POSEntrySalesLine, false, Quantities, UnitPrices, TaxAmounts);
+
+        // [THEN] 2 units at -3.33 and 1 unit at -3.34 (-6.66 - 3.34 = -10.00), with the tax of -2.50 shared -1.67 / -0.83.
+        _Assert.AreEqual(2, Quantities.Count(), 'The line must be split into two parts');
+        AssertSplitPart(Quantities, UnitPrices, TaxAmounts, 1, 2, -3.33, -1.67);
+        AssertSplitPart(Quantities, UnitPrices, TaxAmounts, 2, 1, -3.34, -0.83);
+    end;
+
+    [Test]
+    procedure GivenQuantityBelowOne_WhenSplit_ThenOneLineItemCarriesTheWholeLineAmount()
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        SpfyPOSEntryExportMgt: Codeunit "NPR Spfy POS Entry Export Mgt.";
+        Quantities: List of [Integer];
+        UnitPrices: List of [Decimal];
+        TaxAmounts: List of [Decimal];
+    begin
+        // [SCENARIO] A weighed line of less than one unit goes to Shopify as one unit priced at the whole line amount, not at the unit price.
+        Initialize();
+
+        // [GIVEN] A line of 0.5 units for 50.00 excl. VAT, 62.50 incl. VAT.
+        InitSalesLine(POSEntrySalesLine, 0.5, 50, 62.5);
+
+        // [WHEN] The line is split on the incl. VAT basis.
+        SpfyPOSEntryExportMgt.GetLineItemSplit(POSEntrySalesLine, true, Quantities, UnitPrices, TaxAmounts);
+
+        // [THEN] One unit at 62.50 carrying the tax of 12.50.
+        _Assert.AreEqual(1, Quantities.Count(), 'A line below one unit must be one part');
+        AssertSplitPart(Quantities, UnitPrices, TaxAmounts, 1, 1, 62.5, 12.5);
+    end;
+
+    [Test]
+    procedure GivenFractionalQuantityAboveOne_WhenSplit_ThenTheWholeUnitsAddUpToTheLineAmount()
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        SpfyPOSEntryExportMgt: Codeunit "NPR Spfy POS Entry Export Mgt.";
+        Quantities: List of [Integer];
+        UnitPrices: List of [Decimal];
+        TaxAmounts: List of [Decimal];
+    begin
+        // [SCENARIO] A weighed line of 2.5 units goes to Shopify as 3 whole units whose prices add up to the line amount.
+        Initialize();
+
+        // [GIVEN] Amounts rounded to 0.01 and a line of 2.5 units for 100.00 excl. VAT, 125.00 incl. VAT.
+        SetAmountRoundingPrecision(0.01);
+        InitSalesLine(POSEntrySalesLine, 2.5, 100, 125);
+
+        // [WHEN] The line is split on the excl. VAT basis.
+        SpfyPOSEntryExportMgt.GetLineItemSplit(POSEntrySalesLine, false, Quantities, UnitPrices, TaxAmounts);
+
+        // [THEN] 2 units at 33.33 and 1 unit at 33.34 (66.66 + 33.34 = 100.00), with the tax of 25.00 shared 16.67 / 8.33.
+        _Assert.AreEqual(2, Quantities.Count(), 'The line must be split into two parts');
+        AssertSplitPart(Quantities, UnitPrices, TaxAmounts, 1, 2, 33.33, 16.67);
+        AssertSplitPart(Quantities, UnitPrices, TaxAmounts, 2, 1, 33.34, 8.33);
     end;
     #endregion
 }
