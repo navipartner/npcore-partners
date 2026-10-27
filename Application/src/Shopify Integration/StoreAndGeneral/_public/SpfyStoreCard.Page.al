@@ -770,6 +770,22 @@ page 6184704 "NPR Spfy Store Card"
                 RunObject = page "NPR Spfy Legacy Return Queue";
                 RunPageLink = "Shopify Store Code" = field(Code);
             }
+            action(WebhookSubscriptions)
+            {
+                Caption = 'Webhook Subscriptions';
+                ToolTip = 'View the webhook subscriptions Shopify holds for this store next to the ones Business Central registered, and see which of them do not match.';
+                ApplicationArea = NPRShopify;
+                Image = CheckList;
+                Visible = _HasAzureADConnection;
+
+                trigger OnAction()
+                var
+                    SpfyWebhookSubscriptions: Page "NPR Spfy Webhook Subscriptions";
+                begin
+                    SpfyWebhookSubscriptions.SetShopifyStore(Rec.Code);
+                    SpfyWebhookSubscriptions.Run();
+                end;
+            }
         }
         area(Reporting)
         {

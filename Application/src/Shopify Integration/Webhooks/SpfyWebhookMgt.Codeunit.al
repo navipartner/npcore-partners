@@ -4,7 +4,30 @@ codeunit 6184942 "NPR Spfy Webhook Mgt."
     Access = Internal;
 
     var
+        _GraphQLClient: Interface "NPR Spfy IGraphQL Client";
+        _GraphQLClientSet: Boolean;
+        _CurrentTenantId: Text;
+        _CurrentEnvironmentName: Text;
+        _CurrentCompanyName: Text;
+        _CurrentDestinationSet: Boolean;
         ServiceNameTok: Label 'ShopifyWebhook', Locked = true, MaxLength = 240;
+
+    internal procedure SetGraphQLClient(GraphQLClient: Interface "NPR Spfy IGraphQL Client")
+    begin
+        _GraphQLClient := GraphQLClient;
+        _GraphQLClientSet := true;
+    end;
+
+    local procedure GetGraphQLClient(): Interface "NPR Spfy IGraphQL Client"
+    var
+        DefaultGraphQLClient: Codeunit "NPR Spfy GraphQL Client";
+    begin
+        if not _GraphQLClientSet then begin
+            _GraphQLClient := DefaultGraphQLClient;
+            _GraphQLClientSet := true;
+        end;
+        exit(_GraphQLClient);
+    end;
 
     internal procedure ToggleWebhook(ShopifyStoreCode: Code[20]; Topic: Enum "NPR Spfy Webhook Topic"; Enable: Boolean) WebhookSubscrEntryNo: Integer
     var
@@ -31,20 +54,18 @@ codeunit 6184942 "NPR Spfy Webhook Mgt."
     local procedure EnableWebhook(ShopifyStoreCode: Code[20]; Topic: Enum "NPR Spfy Webhook Topic"; IncludeFields: List of [Text]) WebhookSubscrEntryNo: Integer
     var
         SpfyWebhookSubscription: Record "NPR Spfy Webhook Subscription";
-        TempSpfyWebhookSubscription: Record "NPR Spfy Webhook Subscription" temporary;
-        Topics: List of [Enum "NPR Spfy Webhook Topic"];
+        CleanupErrorText: Text;
+        KeptElsewhere: List of [Text];
         WebhookRegistrationFailedErr: Label 'Failed to register webhook with Shopify. The following error occurred: %1', Comment = '%1 - Error message returned by Shopify';
+        WebhookCleanupFailedErr: Label 'Could not remove this company''s existing webhook subscriptions from Shopify before registering a new one. The following error occurred: %1', Comment = '%1 - Error message returned by Shopify';
     begin
+        // A leftover subscription with the same address would make Shopify refuse the new one, so a failed cleanup stops here with its own reason.
+        if not RemoveSubscriptionsDeliveringHere(ShopifyStoreCode, Topic, CleanupErrorText, KeptElsewhere) then
+            Error(WebhookCleanupFailedErr, CleanupErrorText);
         FilterWebhookSubscription(ShopifyStoreCode, Topic, SpfyWebhookSubscription);
         if not SpfyWebhookSubscription.IsEmpty() then
             SpfyWebhookSubscription.DeleteAll();
-
-        Topics.Add(Topic);
-        if GetWebhookSubscriptionsFromShopify(ShopifyStoreCode, Topics, TempSpfyWebhookSubscription) then
-            if TempSpfyWebhookSubscription.FindSet() then
-                repeat
-                    RemoveWebhookSubscriptionFromShopify(ShopifyStoreCode, TempSpfyWebhookSubscription."Webhook ID");
-                until TempSpfyWebhookSubscription.Next() = 0;
+        ReportSubscriptionsKeptElsewhere(Topic, KeptElsewhere);
 
         ClearLastError();
         WebhookSubscrEntryNo := RegisterWebhookAtShopify(ShopifyStoreCode, Topic, IncludeFields);
@@ -52,91 +73,208 @@ codeunit 6184942 "NPR Spfy Webhook Mgt."
             Error(WebhookRegistrationFailedErr, GetLastErrorText());
     end;
 
-    local procedure DisableWebhook(ShopifyStoreCode: Code[20]; Topic: Enum "NPR Spfy Webhook Topic")
+    internal procedure DisableWebhook(ShopifyStoreCode: Code[20]; Topic: Enum "NPR Spfy Webhook Topic")
     var
         SpfyWebhookSubscription: Record "NPR Spfy Webhook Subscription";
-        WebhookDeleteRequestFailedErr: Label 'The system was unable to delete the webhook from Shopify. Shopify returned the following error: "%1".\You may want to take this up with Shopify directly. Shopify Webhook ID: %2', Comment = '%1 - Shopify request error message, %2 - Shopify webhook ID';
+        CleanupErrorText: Text;
+        KeptElsewhere: List of [Text];
+        WebhookRemovalFailedMsg: Label 'The system was unable to remove the webhook subscriptions for this company from Shopify. Shopify returned the following error: "%1".\You can check what Shopify still holds with the Webhook Subscriptions action on the Shopify Store card.', Comment = '%1 - Shopify request error message';
     begin
+        if not RemoveSubscriptionsDeliveringHere(ShopifyStoreCode, Topic, CleanupErrorText, KeptElsewhere) then
+            Message(WebhookRemovalFailedMsg, CleanupErrorText);
         FilterWebhookSubscription(ShopifyStoreCode, Topic, SpfyWebhookSubscription);
-        if SpfyWebhookSubscription.IsEmpty() then
-            exit;
-#if not (BC18 or BC19 or BC20 or BC21)
-        SpfyWebhookSubscription.ReadIsolation := IsolationLevel::UpdLock;
-#else
-        SpfyWebhookSubscription.LockTable();
-#endif
-        SpfyWebhookSubscription.FindFirst();
-        if SpfyWebhookSubscription."Webhook ID" <> '' then
-            if not RemoveWebhookSubscriptionFromShopify(ShopifyStoreCode, SpfyWebhookSubscription."Webhook ID") then
-                Message(WebhookDeleteRequestFailedErr, GetLastErrorText(), SpfyWebhookSubscription."Webhook ID");
-        SpfyWebhookSubscription.Delete();
+        if not SpfyWebhookSubscription.IsEmpty() then
+            SpfyWebhookSubscription.DeleteAll();
+        ReportSubscriptionsKeptElsewhere(Topic, KeptElsewhere);
     end;
 
-    local procedure GetWebhookSubscriptionsFromShopify(ShopifyStoreCode: Code[20]; Topics: List of [Enum "NPR Spfy Webhook Topic"]; var SpfyWebhookSubscription: Record "NPR Spfy Webhook Subscription"): Boolean
+    /// <summary>
+    /// Deletes the topic's Shopify subscriptions that deliver to this tenant, environment and company, whether or not this company has a record of them.
+    /// Nothing that delivers elsewhere is ever deleted, not even a subscription this company has a record of: an environment restored or copied
+    /// with "Skip environment cleanup" keeps the source environment's records, and from here that cannot be told apart from a company or environment rename.
+    /// Recorded subscriptions that deliver elsewhere are returned in KeptElsewhere (as their destination) so the caller can tell the user.
+    /// Returns false if Shopify could not be read or a delete failed, with the first reason in ErrorText.
+    /// </summary>
+    internal procedure RemoveSubscriptionsDeliveringHere(ShopifyStoreCode: Code[20]; Topic: Enum "NPR Spfy Webhook Topic"; var ErrorText: Text; var KeptElsewhere: List of [Text]) AllRemoved: Boolean
     var
-        SpfyWebhookSubscription2: Record "NPR Spfy Webhook Subscription";
+        SpfyWebhookSubscription: Record "NPR Spfy Webhook Subscription";
         JsonHelper: Codeunit "NPR Json Helper";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
-        SpfyWebhookNotifParser: Codeunit "NPR Spfy Webhook Notif. Parser";
-        ShopifyResponse: JsonToken;
         ShopifyWebhook: JsonToken;
-        WebhookSubscriptions: JsonToken;
-        Cursor: Text;
-        LastEntryNo: Integer;
+        WebhookSubscriptionNodes: JsonArray;
+        Topics: List of [Enum "NPR Spfy Webhook Topic"];
+        RecordedWebhookIds: List of [Text];
+        ShopifyAddress: Text;
+        WebhookId: Text;
     begin
-        if not SpfyWebhookSubscription.IsTemporary() then
-            SpfyIntegrationMgt.FunctionCallOnNonTempVarErr(StrSubstNo('[Codeunit::NPR Spfy Webhook Mgt.(%1)].%2', Codeunit::"NPR Spfy Webhook Mgt.", 'GetWebhookSubscriptionsFromShopify'));
-        SpfyWebhookSubscription.Reset();
-        if SpfyWebhookSubscription.FindLast() then
-            LastEntryNo := SpfyWebhookSubscription."Entry No.";
+        ErrorText := '';
+        Clear(KeptElsewhere);
+        Topics.Add(Topic);
+        if not TryGetWebhookSubscriptionNodes(ShopifyStoreCode, Topics, true, WebhookSubscriptionNodes) then begin
+            ErrorText := GetLastErrorText();
+            exit(false);
+        end;
 
-        repeat
-            Clear(ShopifyResponse);
-            if not GetWebhookSubscriptionNextPageFromShopify(ShopifyStoreCode, Topics, Cursor, ShopifyResponse) then
-                exit(false);
-            if ShopifyResponse.SelectToken('data.webhookSubscriptions.edges', WebhookSubscriptions) then
-                if WebhookSubscriptions.IsArray() then
-                    foreach ShopifyWebhook in WebhookSubscriptions.AsArray() do begin
-                        Clear(SpfyWebhookSubscription2);
-#pragma warning disable AA0139
-                        SpfyWebhookSubscription2."Webhook ID" := SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(ShopifyWebhook, 'node.id', false), '/');
-#pragma warning restore AA0139
-                        if SpfyWebhookSubscription2."Webhook ID" <> '' then
-                            if SpfyWebhookNotifParser.TryParseTopic(JsonHelper.GetJText(ShopifyWebhook, 'node.topic', false), SpfyWebhookSubscription2.Topic) then begin
-                                SpfyWebhookSubscription.SetRange("Store Code", ShopifyStoreCode);
-                                SpfyWebhookSubscription.SetRange(Topic, SpfyWebhookSubscription2.Topic);
-                                SpfyWebhookSubscription.SetRange("Webhook ID", SpfyWebhookSubscription2."Webhook ID");
-                                if SpfyWebhookSubscription.IsEmpty() then begin
-                                    SpfyWebhookSubscription.Init();
-                                    SpfyWebhookSubscription."Entry No." := LastEntryNo + 1;
-                                    SpfyWebhookSubscription."Store Code" := ShopifyStoreCode;
-                                    SpfyWebhookSubscription.Topic := SpfyWebhookSubscription2.Topic;
-                                    SpfyWebhookSubscription."Webhook ID" := SpfyWebhookSubscription2."Webhook ID";
-#pragma warning disable AA0139
-                                    SpfyWebhookSubscription."Api Version" := JsonHelper.GetJText(ShopifyWebhook, 'node.apiVersion.displayName', MaxStrLen(SpfyWebhookSubscription."Api Version"), false);
-                                    SpfyWebhookSubscription.Address := JsonHelper.GetJText(ShopifyWebhook, 'node.uri', MaxStrLen(SpfyWebhookSubscription.Address), false);
-#pragma warning restore AA0139
-                                    SpfyWebhookSubscription.Insert();
-                                    LastEntryNo := SpfyWebhookSubscription."Entry No.";
-                                end;
-                            end;
-                    end;
-            Cursor := JsonHelper.GetJText(ShopifyResponse, 'data.webhookSubscriptions.pageInfo.endCursor', false);
-        until not JsonHelper.GetJBoolean(ShopifyResponse, 'data.webhookSubscriptions.pageInfo.hasNextPage', false) or (Cursor = '');
-        SpfyWebhookSubscription.Reset();
-        exit(not SpfyWebhookSubscription.IsEmpty());
+        FilterWebhookSubscription(ShopifyStoreCode, Topic, SpfyWebhookSubscription);
+        SpfyWebhookSubscription.SetLoadFields("Webhook ID");
+        if SpfyWebhookSubscription.FindSet() then
+            repeat
+                RecordedWebhookIds.Add(SpfyWebhookSubscription."Webhook ID");
+            until SpfyWebhookSubscription.Next() = 0;
+
+        AllRemoved := true;
+        foreach ShopifyWebhook in WebhookSubscriptionNodes do
+            if JsonHelper.GetJText(ShopifyWebhook, 'topic', false) = SpfyWebhookTopicName(Topic, true) then begin
+                WebhookId := SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(ShopifyWebhook, 'id', false), '/');
+                ShopifyAddress := JsonHelper.GetJText(ShopifyWebhook, 'uri', false);
+                if WebhookId <> '' then
+                    if DeliversToCurrentCompany(ShopifyAddress) then begin
+                        if not RemoveWebhookSubscriptionFromShopify(ShopifyStoreCode, CopyStr(WebhookId, 1, 50)) then begin
+                            if AllRemoved then
+                                ErrorText := GetLastErrorText();
+                            AllRemoved := false;
+                        end;
+                    end else
+                        if RecordedWebhookIds.Contains(WebhookId) then
+                            KeptElsewhere.Add(DescribeDestination(ShopifyAddress));
+            end;
     end;
 
-    local procedure GetWebhookSubscriptionNextPageFromShopify(ShopifyStoreCode: Code[20]; Topics: List of [Enum "NPR Spfy Webhook Topic"]; Cursor: Text; var ShopifyResponse: JsonToken): Boolean
+    /// <summary>
+    /// Deletes one subscription in Shopify on an explicit user request, wherever it delivers, and drops this company's record of it.
+    /// Returns false with Shopify's reason in ErrorText if the delete failed; the record is then kept.
+    /// </summary>
+    internal procedure DeleteSubscriptionInShopify(ShopifyStoreCode: Code[20]; WebhookId: Text[50]; var ErrorText: Text): Boolean
+    var
+        SpfyWebhookSubscription: Record "NPR Spfy Webhook Subscription";
+    begin
+        ErrorText := '';
+        if not RemoveWebhookSubscriptionFromShopify(ShopifyStoreCode, WebhookId) then begin
+            ErrorText := GetLastErrorText();
+            exit(false);
+        end;
+        SpfyWebhookSubscription.SetRange("Store Code", ShopifyStoreCode);
+        SpfyWebhookSubscription.SetRange("Webhook ID", WebhookId);
+        if not SpfyWebhookSubscription.IsEmpty() then
+            SpfyWebhookSubscription.DeleteAll();
+        exit(true);
+    end;
+
+    /// <summary>Destination of a notification address for messages to the user: environment and company, or the masked address if it is not a Business Central one.</summary>
+    internal procedure DescribeDestination(NotificationUrl: Text): Text
+    var
+        TenantId: Text;
+        EnvironmentName: Text;
+        DestinationCompanyName: Text;
+        DestinationTok: Label '%1 / %2', Locked = true;
+    begin
+        if ParseNotificationUrl(NotificationUrl, TenantId, EnvironmentName, DestinationCompanyName) then
+            exit(StrSubstNo(DestinationTok, EnvironmentName, DestinationCompanyName));
+        exit(MaskNotificationUrl(NotificationUrl));
+    end;
+
+    local procedure ReportSubscriptionsKeptElsewhere(Topic: Enum "NPR Spfy Webhook Topic"; KeptElsewhere: List of [Text])
+    var
+        Destination: Text;
+        Destinations: Text;
+        KeptElsewhereMsg: Label 'This company had a record of a %1 webhook subscription that Shopify delivers to another environment or company (%2). The record was dropped, but the subscription was left in Shopify because it belongs there. If that environment or company no longer exists, delete it with the Webhook Subscriptions action on the Shopify Store card.', Comment = '%1 - Webhook topic, %2 - Environment / company the subscription delivers to';
+    begin
+        if KeptElsewhere.Count() = 0 then
+            exit;
+        foreach Destination in KeptElsewhere do
+            if Destinations = '' then
+                Destinations := Destination
+            else
+                Destinations += ', ' + Destination;
+        Message(KeptElsewhereMsg, TopicName(Topic), Destinations);
+    end;
+
+    /// <summary>Overrides the tenant, environment and company that count as "this company". Defaults to the current session.</summary>
+    internal procedure SetCurrentDestination(TenantId: Text; EnvironmentName: Text; CompanyNameParam: Text)
+    begin
+        _CurrentTenantId := TenantId;
+        _CurrentEnvironmentName := EnvironmentName;
+        _CurrentCompanyName := CompanyNameParam;
+        _CurrentDestinationSet := true;
+    end;
+
+    internal procedure DeliversToCurrentCompany(NotificationUrl: Text): Boolean
+    var
+        TenantId: Text;
+        EnvironmentName: Text;
+        DestinationCompanyName: Text;
+    begin
+        if not ParseNotificationUrl(NotificationUrl, TenantId, EnvironmentName, DestinationCompanyName) then
+            exit(false);
+        exit(IsCurrentDestination(TenantId, EnvironmentName, DestinationCompanyName));
+    end;
+
+    internal procedure IsCurrentDestination(TenantId: Text; EnvironmentName: Text; DestinationCompanyName: Text): Boolean
+    var
+        AzureADTenant: Codeunit "Azure AD Tenant";
+        EnvironmentInformation: Codeunit "Environment Information";
+    begin
+        if not _CurrentDestinationSet then
+            SetCurrentDestination(AzureADTenant.GetAadTenantId(), EnvironmentInformation.GetEnvironmentName(), CompanyName());
+        if DestinationCompanyName = '' then
+            exit(false);
+        exit(
+            (LowerCase(TenantId) = LowerCase(_CurrentTenantId)) and
+            (LowerCase(EnvironmentName) = LowerCase(_CurrentEnvironmentName)) and
+            (LowerCase(DestinationCompanyName) = LowerCase(_CurrentCompanyName)));
+    end;
+
+    /// <summary>
+    /// Reads every webhook subscription the store's access token can see, across all topics and pages, without requiring the integration to be enabled.
+    /// Returns false when Shopify could not be read; the reason is then available via GetLastErrorText().
+    /// </summary>
+    internal procedure GetAllWebhookSubscriptionNodes(ShopifyStoreCode: Code[20]; var WebhookSubscriptionNodes: JsonArray): Boolean
+    var
+        AllTopics: List of [Enum "NPR Spfy Webhook Topic"];
+    begin
+        exit(TryGetWebhookSubscriptionNodes(ShopifyStoreCode, AllTopics, false, WebhookSubscriptionNodes));
+    end;
+
+    [TryFunction]
+    local procedure TryGetWebhookSubscriptionNodes(ShopifyStoreCode: Code[20]; Topics: List of [Enum "NPR Spfy Webhook Topic"]; CheckIntegrationIsEnabled: Boolean; var WebhookSubscriptionNodes: JsonArray)
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+        ShopifyResponse: JsonToken;
+        ShopifyWebhook: JsonToken;
+        SubscriptionConnection: JsonToken;
+        WebhookSubscriptions: JsonToken;
+        Cursor: Text;
+        ConnectionFound: Boolean;
+        NoSubscriptionListErr: Label 'Shopify did not return the list of webhook subscriptions. %1', Comment = '%1 - Error message returned by Shopify';
+    begin
+        WebhookSubscriptionNodes.ReadFrom('[]');
+        repeat
+            Clear(ShopifyResponse);
+            if not GetWebhookSubscriptionNextPageFromShopify(ShopifyStoreCode, Topics, CheckIntegrationIsEnabled, Cursor, ShopifyResponse) then
+                Error(GetLastErrorText());
+            // A response without the connection (e.g. GraphQL errors only) must not read as "Shopify has no subscriptions".
+            ConnectionFound := ShopifyResponse.SelectToken('data.webhookSubscriptions', SubscriptionConnection);
+            if ConnectionFound then
+                ConnectionFound := SubscriptionConnection.IsObject();
+            if not ConnectionFound then
+                Error(NoSubscriptionListErr, JsonHelper.GetJText(ShopifyResponse, 'errors[0].message', false));
+            if ShopifyResponse.SelectToken('data.webhookSubscriptions.edges', WebhookSubscriptions) then
+                if WebhookSubscriptions.IsArray() then
+                    foreach ShopifyWebhook in WebhookSubscriptions.AsArray() do
+                        WebhookSubscriptionNodes.Add(JsonHelper.GetJsonToken(ShopifyWebhook, 'node'));
+            Cursor := JsonHelper.GetJText(ShopifyResponse, 'data.webhookSubscriptions.pageInfo.endCursor', false);
+        until not JsonHelper.GetJBoolean(ShopifyResponse, 'data.webhookSubscriptions.pageInfo.hasNextPage', false) or (Cursor = '');
+    end;
+
+    local procedure GetWebhookSubscriptionNextPageFromShopify(ShopifyStoreCode: Code[20]; Topics: List of [Enum "NPR Spfy Webhook Topic"]; CheckIntegrationIsEnabled: Boolean; Cursor: Text; var ShopifyResponse: JsonToken): Boolean
     var
         NcTask: Record "NPR Nc Task";
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         QueryStream: OutStream;
     begin
         NcTask."Store Code" := ShopifyStoreCode;
         NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         ShopifyWebhookSubscriptionsRequestQuery(Topics, Cursor, QueryStream);
-        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse));
+        exit(GetGraphQLClient().ExecuteRequest(NcTask, CheckIntegrationIsEnabled, ShopifyResponse));
     end;
 
     local procedure ShopifyWebhookSubscriptionsRequestQuery(Topics: List of [Enum "NPR Spfy Webhook Topic"]; Cursor: Text; var QueryStream: OutStream)
@@ -144,9 +282,11 @@ codeunit 6184942 "NPR Spfy Webhook Mgt."
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         RequestJson: JsonObject;
         VariablesJson: JsonObject;
-        QueryTok: Label 'query($topics: [WebhookSubscriptionTopic!], $afterCursor: String) {webhookSubscriptions(first: 50, after: $afterCursor, topics : $topics, format : JSON){edges{node{id apiVersion{displayName supported} topic uri}} pageInfo{endCursor hasNextPage}}}', Locked = true;
+        QueryTok: Label 'query($topics: [WebhookSubscriptionTopic!], $afterCursor: String) {webhookSubscriptions(first: 50, after: $afterCursor, topics : $topics, format : JSON){edges{node{id apiVersion{displayName supported} topic uri createdAt}} pageInfo{endCursor hasNextPage}}}', Locked = true;
     begin
-        VariablesJson.Add('topics', TopicsToJsonArray(Topics));
+        // Without topics the variable is left out, so Shopify applies no topic filter and returns every topic.
+        if Topics.Count() > 0 then
+            VariablesJson.Add('topics', TopicsToJsonArray(Topics));
         SpfyCommunicationHandler.AddGraphQLCursor(VariablesJson, Cursor);
 
         RequestJson.Add('query', QueryTok);
@@ -165,7 +305,7 @@ codeunit 6184942 "NPR Spfy Webhook Mgt."
         NcTask."Store Code" := ShopifyStoreCode;
         NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         ShopifyWebhookSubscriptionDeleteQuery(WebhookID, QueryStream);
-        if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse) then
+        if not GetGraphQLClient().ExecuteRequest(NcTask, true, ShopifyResponse) then
             exit(false);
         if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse, ResponseDataItemUserErrors) then begin
             if ThrowFirstUserError(ResponseDataItemUserErrors) then;
@@ -243,7 +383,7 @@ codeunit 6184942 "NPR Spfy Webhook Mgt."
         NcTask."Store Code" := ShopifyStoreCode;
         NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         ShopifyWebhookSubscriptionCreateQuery(Topic, IncludeFields, QueryStream);
-        if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse) then
+        if not GetGraphQLClient().ExecuteRequest(NcTask, true, ShopifyResponse) then
             exit(0);
         if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse, ResponseDataItemUserErrors) then begin
             if ThrowFirstUserError(ResponseDataItemUserErrors) then;
@@ -349,6 +489,103 @@ codeunit 6184942 "NPR Spfy Webhook Mgt."
                 AzureKeyVaultMgt.GetAzureKeyVaultSecret(KeyNameLbl),
                 UrlEncode(CompanyName()))
             );
+    end;
+
+    /// <summary>
+    /// Reads the tenant, environment and company a notification URL built by GetNotificationUrl() delivers to.
+    /// Returns false for any other address.
+    /// </summary>
+    internal procedure ParseNotificationUrl(NotificationUrl: Text; var TenantId: Text; var EnvironmentName: Text; var DestinationCompanyName: Text): Boolean
+    var
+        TypeHelper: Codeunit "Type Helper";
+        PathSegments: List of [Text];
+        QueryParameter: Text;
+        PathPart: Text;
+        QueryPart: Text;
+        Position: Integer;
+        NotificationUrlPathTok: Label '/api/ShopifyCloud/', Locked = true;
+        CompanyNameParamTok: Label 'companyname=', Locked = true;
+    begin
+        TenantId := '';
+        EnvironmentName := '';
+        DestinationCompanyName := '';
+        Position := LowerCase(NotificationUrl).IndexOf(LowerCase(NotificationUrlPathTok));
+        if Position = 0 then
+            exit(false);
+        SplitUrl(CopyStr(NotificationUrl, Position + StrLen(NotificationUrlPathTok)), PathPart, QueryPart);
+        PathSegments := PathPart.Split('/');
+        if PathSegments.Count() < 2 then
+            exit(false);
+        TenantId := PathSegments.Get(1);
+        EnvironmentName := PathSegments.Get(2);
+        foreach QueryParameter in QueryPart.Split('&') do
+            if LowerCase(QueryParameter).StartsWith(CompanyNameParamTok) then begin
+                DestinationCompanyName := CopyStr(QueryParameter, StrLen(CompanyNameParamTok) + 1);
+                TypeHelper.UrlDecode(DestinationCompanyName);
+            end;
+        exit((TenantId <> '') and (EnvironmentName <> '') and (DestinationCompanyName <> ''));
+    end;
+
+    /// <summary>Replaces the Azure Function key ("code" query parameter) in a notification URL, so the URL can be shown to users.</summary>
+    internal procedure MaskNotificationUrl(NotificationUrl: Text) MaskedUrl: Text
+    var
+        QueryParameter: Text;
+        PathPart: Text;
+        QueryPart: Text;
+        Separator: Text;
+        CodeParamTok: Label 'code=', Locked = true;
+        MaskedCodeParamTok: Label 'code=***', Locked = true;
+    begin
+        SplitUrl(NotificationUrl, PathPart, QueryPart);
+        if QueryPart = '' then
+            exit(NotificationUrl);
+        MaskedUrl := PathPart;
+        Separator := '?';
+        foreach QueryParameter in QueryPart.Split('&') do begin
+            if LowerCase(QueryParameter).StartsWith(CodeParamTok) then
+                MaskedUrl += Separator + MaskedCodeParamTok
+            else
+                MaskedUrl += Separator + QueryParameter;
+            Separator := '&';
+        end;
+    end;
+
+    local procedure SplitUrl(Url: Text; var PathPart: Text; var QueryPart: Text)
+    var
+        Position: Integer;
+    begin
+        Position := Url.IndexOf('?');
+        if Position = 0 then begin
+            PathPart := Url;
+            QueryPart := '';
+            exit;
+        end;
+        PathPart := CopyStr(Url, 1, Position - 1);
+        QueryPart := CopyStr(Url, Position + 1);
+    end;
+
+    /// <summary>Maps a GraphQL webhook topic (e.g. CUSTOMERS_UPDATE) to the topic enum. Returns false for topics the enum does not know.</summary>
+    internal procedure FindTopicByGraphQLName(GraphQLTopicName: Text; var Topic: Enum "NPR Spfy Webhook Topic"): Boolean
+    var
+        CandidateTopic: Enum "NPR Spfy Webhook Topic";
+        Ordinal: Integer;
+    begin
+        if GraphQLTopicName = '' then
+            exit(false);
+        foreach Ordinal in Enum::"NPR Spfy Webhook Topic".Ordinals() do begin
+            CandidateTopic := Enum::"NPR Spfy Webhook Topic".FromInteger(Ordinal);
+            if SpfyWebhookTopicName(CandidateTopic, true) = GraphQLTopicName then begin
+                Topic := CandidateTopic;
+                exit(true);
+            end;
+        end;
+        exit(false);
+    end;
+
+    /// <summary>Topic as Shopify names it in notifications (e.g. customers/update).</summary>
+    internal procedure TopicName(Topic: Enum "NPR Spfy Webhook Topic"): Text
+    begin
+        exit(SpfyWebhookTopicName(Topic, false));
     end;
 
     local procedure UrlEncode(Value: Text): Text
