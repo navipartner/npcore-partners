@@ -48,6 +48,7 @@ codeunit 6248377 "NPR NPEmailMemberDataProvider" implements "NPR IDynamicTemplat
         JObject.Add('membership_external_no', Entry."External Membership No.");
         JObject.Add('membership_valid_from', Entry."Membership Valid From");
         JObject.Add('membership_valid_from_formatted', DataProviderHelper.FormatToTextFromLanguage(Entry."Membership Valid From", Entry.PreferredLanguageCode));
+        JObject.Add('membership_valid_from_localized', FormatDateFromLanguage(Entry."Membership Valid From", Entry.PreferredLanguageCode));
         JObject.Add('membership_valid_until', Entry."Membership Valid Until");
         JObject.Add('membership_valid_until_formatted', DataProviderHelper.FormatToTextFromLanguage(Entry."Membership Valid Until", Entry.PreferredLanguageCode));
         JObject.Add('membership_consecutive_from', Entry."Membership Consecutive From");
@@ -81,6 +82,7 @@ codeunit 6248377 "NPR NPEmailMemberDataProvider" implements "NPR IDynamicTemplat
 
     procedure GenerateContentExample(): JsonObject
     var
+        TypeHelper: Codeunit "Type Helper";
         JObject, CustomJObject : JsonObject;
     begin
         JObject.Add('coupon_reference_no', 'COUPON1234');
@@ -112,6 +114,7 @@ codeunit 6248377 "NPR NPEmailMemberDataProvider" implements "NPR IDynamicTemplat
         JObject.Add('membership_external_no', 'MS123456789');
         JObject.Add('membership_valid_from', 20250101D);
         JObject.Add('membership_valid_from_formatted', Format(20250101D, 0, '<Standard Format,0>'));
+        JObject.Add('membership_valid_from_localized', TypeHelper.FormatDate(20250101D, GlobalLanguage()));
         JObject.Add('membership_valid_until', 20251130D);
         JObject.Add('membership_valid_until_formatted', Format(20251130D, 0, '<Standard Format,0>'));
         JObject.Add('membership_consecutive_from', 20240101D);
@@ -148,6 +151,28 @@ codeunit 6248377 "NPR NPEmailMemberDataProvider" implements "NPR IDynamicTemplat
             exit;
 
         NpDesignerManifestFacade.GetManifestUrl(ManifestId, Url);
+    end;
+
+    local procedure FormatDateFromLanguage(DateToFormat: Date; LanguageCode: Code[10]) FormattedDate: Text
+    var
+        Language: Codeunit Language;
+        DataProviderHelper: Codeunit "NPR DynTemplateDataProvHelper";
+        LanguageId: Integer;
+    begin
+        LanguageId := Language.GetLanguageId(LanguageCode);
+        if (DateToFormat <> 0D) and (LanguageId <> 0) then
+            if TryFormatDate(DateToFormat, LanguageId, FormattedDate) then
+                exit(FormattedDate);
+
+        exit(DataProviderHelper.FormatToTextFromLanguage(DateToFormat, LanguageCode));
+    end;
+
+    [TryFunction]
+    local procedure TryFormatDate(DateToFormat: Date; LanguageId: Integer; var FormattedDate: Text)
+    var
+        TypeHelper: Codeunit "Type Helper";
+    begin
+        FormattedDate := TypeHelper.FormatDate(DateToFormat, LanguageId);
     end;
 
     procedure AddAttachments(var EmailItem: Record "Email Item"; RecRef: RecordRef)
