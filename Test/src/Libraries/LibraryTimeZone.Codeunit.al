@@ -53,17 +53,21 @@ codeunit 85383 "NPR Library - Time Zone"
     procedure AssertDateTimePartsInTimeZoneRange(ActualDate: Date; ActualTime: Time; FromUtc: DateTime; ToUtc: DateTime; Context: Text)
     var
         Assert: Codeunit Assert;
-        ActualLocalDateTime: DateTime;
         FromLocalDateTime: DateTime;
         ToLocalDateTime: DateTime;
     begin
-        ActualLocalDateTime := CreateDateTime(ActualDate, ActualTime);
-        FromLocalDateTime := GetExpectedLocalWallClockDateTime(FromUtc);
+        FromLocalDateTime := GetExpectedLocalWallClockDateTime(FromUtc) - 1000;
         ToLocalDateTime := GetExpectedLocalWallClockDateTime(ToUtc) + 1000;
 
+        // Compare date and time parts directly. CreateDateTime on the actual parts would resolve a repeated DST hour to the wrong occurrence.
         Assert.IsTrue(
-            (ActualLocalDateTime >= FromLocalDateTime) and (ActualLocalDateTime <= ToLocalDateTime),
-            StrSubstNo('%1 was %2, expected between %3 and %4.', Context, Format(ActualLocalDateTime, 0, 9), Format(FromLocalDateTime, 0, 9), Format(ToLocalDateTime, 0, 9)));
+            IsAtOrAfter(ActualDate, ActualTime, DT2Date(FromLocalDateTime), DT2Time(FromLocalDateTime)) and IsAtOrAfter(DT2Date(ToLocalDateTime), DT2Time(ToLocalDateTime), ActualDate, ActualTime),
+            StrSubstNo('%1 was %2, expected between %3 and %4.', Context, Format(ActualDate, 0, 9) + ' ' + Format(ActualTime, 0, 9), Format(DT2Date(FromLocalDateTime), 0, 9) + ' ' + Format(DT2Time(FromLocalDateTime), 0, 9), Format(DT2Date(ToLocalDateTime), 0, 9) + ' ' + Format(DT2Time(ToLocalDateTime), 0, 9)));
+    end;
+
+    local procedure IsAtOrAfter(Date1: Date; Time1: Time; Date2: Date; Time2: Time): Boolean
+    begin
+        exit((Date1 > Date2) or ((Date1 = Date2) and (Time1 >= Time2)));
     end;
 
     procedure AssertTimeInTimeZoneRange(ActualTime: Time; FromUtc: DateTime; ToUtc: DateTime; Context: Text)

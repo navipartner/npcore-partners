@@ -674,6 +674,9 @@ codeunit 6151183 "NPR Spfy Task Queue"
             SpfyTask."Last Processing Duration" := 0
         else
             SpfyTask."Last Processing Duration" := (SpfyTask."Last Processing Completed at" - SpfyTask."Last Processing Started at") / 1000;
+        // SQL rounds the stored start, so it can be a few milliseconds later than the completion time.
+        if SpfyTask."Last Processing Duration" < 0 then
+            SpfyTask."Last Processing Duration" := 0;
     end;
 
     local procedure ClearClaim(var SpfyTask: Record "NPR Spfy Task")

@@ -663,7 +663,6 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         Assert: Codeunit "Assert";
         SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
-        RetailVoucherTests: Codeunit "NPR Retail Voucher Tests";
         POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
         SalesDocumentExportMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
         VoucherAmount: Decimal;
@@ -672,7 +671,8 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
 
         // [Given] Initialization data
         InitializeData();
-        VoucherAmount := RetailVoucherTests.GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+        // A fixed amount keeps the invoice total equal to the voucher amount. With 25% VAT, some random amounts round to 0.01 more on the invoice.
+        VoucherAmount := 1000;
         ChangeGLAccount25VAT(_VoucherTypeDefault."Account No.");
 
         // [Given] Active POS session & sale

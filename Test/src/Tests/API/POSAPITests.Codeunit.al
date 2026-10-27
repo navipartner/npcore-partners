@@ -3956,7 +3956,8 @@ codeunit 85157 "NPR POS API Tests"
         EFTTransactionRequest.SetRange("Sales ID", POSSale.SystemId);
         EFTTransactionRequest.FindFirst();
         Assert.AreNotEqual(0D, EFTTransactionRequest."Transaction Date", 'Even a failed attempt should have a transaction date');
-        Assert.IsTrue((EFTTransactionRequest.Started >= BeforeRequest) and (EFTTransactionRequest.Started <= AfterRequest), 'The recording timestamp should fall within the API call');
+        // SQL rounds the stored Started value by a few milliseconds, so allow one second on each side.
+        Assert.IsTrue((EFTTransactionRequest.Started >= BeforeRequest - 1000) and (EFTTransactionRequest.Started <= AfterRequest + 1000), 'The recording timestamp should fall within the API call');
         Assert.AreEqual(EFTTransactionRequest.Started, EFTTransactionRequest.Finished, 'An externally processed attempt should use one recording timestamp');
         LibraryTimeZone.AssertDateTimePartsInTimeZoneRange(EFTTransactionRequest."Transaction Date", EFTTransactionRequest."Transaction Time", BeforeRequest, AfterRequest, 'External EFT recording time');
         EFTReceipt.SetRange("EFT Trans. Request Entry No.", EFTTransactionRequest."Entry No.");

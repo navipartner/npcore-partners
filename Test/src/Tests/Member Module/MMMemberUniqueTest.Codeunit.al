@@ -325,15 +325,18 @@ codeunit 85296 "NPR MM Member Unique Test"
     begin
         // [SCENARIO] The TTL/steal is a CROSS-session mechanism - same-session bypasses it via re-entrancy, so it must
         // be exercised with two different session ids. A different session within the TTL is rejected (holder still
-        // live); past the TTL it steals the stale orphan. SystemCreatedAt can't be aged (platform overwrites it on
-        // write), so the TTL is injected: TtlMs = 10 min => still live => reject; TtlMs = 0 => stale => steal.
+        // live); past the TTL it steals the stale orphan.
+        // SystemCreatedAt cannot be backdated, so a negative TTL makes any existing claim stale. A TTL of 0 is not enough because SQL can store SystemCreatedAt a few milliseconds later than the current time.
         Token := 'UNIQ-TEST|STALE|' + Format(CreateGuid());
         HolderSession := 1001;
         OtherSession := 2002;
 
+        // [GIVEN] A claim held by session 1001
         Assert.IsTrue(Claim.Acquire(Token, HolderSession), 'First acquire should succeed.');
+        // [WHEN] Session 2002 acquires it with a 10-minute TTL, then with a negative TTL
         Assert.IsFalse(Claim.Acquire(Token, OtherSession, 10 * 60 * 1000), 'Another session within the TTL must be rejected, not stolen.');
-        Assert.IsTrue(Claim.Acquire(Token, OtherSession, 0), 'Another session past the TTL must steal the stale lock.');
+        // [THEN] The first attempt is rejected and the second steals the claim
+        Assert.IsTrue(Claim.Acquire(Token, OtherSession, -60 * 1000), 'Another session past the TTL must steal the stale lock.');
 
         Claim.Release(Token);
     end;

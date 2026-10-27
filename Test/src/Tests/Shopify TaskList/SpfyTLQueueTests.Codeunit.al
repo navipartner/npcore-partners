@@ -636,6 +636,62 @@ codeunit 85310 "NPR Spfy TL Queue Tests"
         _Assert.IsTrue(SpfyTask."Completed At" > CycleStart, 'The completion stamp must be real time, not the cycle time');
         SpfyTaskRunContext.ClearCycleTime();
     end;
+
+    [Test]
+    procedure GivenAStoredStartAfterCompletionTime_WhenATaskIsCompleted_ThenProcessingDurationIsZero()
+    var
+        Item: Record Item;
+        SpfyTask: Record "NPR Spfy Task";
+        SpfyTaskQueue: Codeunit "NPR Spfy Task Queue";
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] Processing duration is never negative when the stored start is later than the completion time
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        _Lib.CreateItem(Item);
+
+        // [GIVEN] A claimed task whose stored start time is one minute in the future
+        _Assert.IsTrue(EnqueueItemAny(StoreCode, Item, "NPR Spfy Task Op"::Modify, CurrentDateTime(), SpfyTask), 'The task must be enqueued');
+        _Assert.IsTrue(SpfyTaskQueue.ClaimSingle(SpfyTask), 'The task must be claimable');
+        SpfyTask.Get(SpfyTask."Entry No.");
+        SpfyTask."Last Processing Started at" := CurrentDateTime() + 60000;
+        SpfyTask.Modify(false);
+
+        // [WHEN] The task is completed
+        SpfyTaskQueue.CompleteSingle(SpfyTask, true, '');
+
+        // [THEN] The processing duration is 0
+        SpfyTask.Get(SpfyTask."Entry No.");
+        _Assert.AreEqual(0, SpfyTask."Last Processing Duration", 'The processing duration must be 0 when the stored start is later than the completion time');
+    end;
+
+    [Test]
+    procedure GivenAStoredStartBeforeCompletionTime_WhenATaskIsCompleted_ThenProcessingDurationIsPositive()
+    var
+        Item: Record Item;
+        SpfyTask: Record "NPR Spfy Task";
+        SpfyTaskQueue: Codeunit "NPR Spfy Task Queue";
+        StoreCode: Code[20];
+    begin
+        // [SCENARIO] The duration clamp leaves a normal positive processing duration unchanged
+        Initialize();
+        StoreCode := _Lib.CreateStore(true, false, false, false, false);
+        _Lib.CreateItem(Item);
+
+        // [GIVEN] A claimed task whose stored start time is one minute in the past
+        _Assert.IsTrue(EnqueueItemAny(StoreCode, Item, "NPR Spfy Task Op"::Modify, CurrentDateTime(), SpfyTask), 'The task must be enqueued');
+        _Assert.IsTrue(SpfyTaskQueue.ClaimSingle(SpfyTask), 'The task must be claimable');
+        SpfyTask.Get(SpfyTask."Entry No.");
+        SpfyTask."Last Processing Started at" := CurrentDateTime() - 60000;
+        SpfyTask.Modify(false);
+
+        // [WHEN] The task is completed
+        SpfyTaskQueue.CompleteSingle(SpfyTask, true, '');
+
+        // [THEN] The processing duration is about 60 seconds
+        SpfyTask.Get(SpfyTask."Entry No.");
+        _Assert.IsTrue((SpfyTask."Last Processing Duration" >= 59) and (SpfyTask."Last Processing Duration" <= 120), 'The processing duration must be the elapsed time in seconds');
+    end;
     #endregion
 
     #region Batch outcome hand-back

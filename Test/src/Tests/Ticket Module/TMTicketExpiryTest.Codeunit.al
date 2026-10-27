@@ -9,6 +9,7 @@ codeunit 85392 "NPR TM TicketExpiryTest"
         _NextRideItemNo: Code[20];
         _EntryAndRideItemNo: Code[20];
         CutOffMode: Option None,Minutes,DateOnlyYesterday,BlankDate;
+        _SweepStartedAt: DateTime;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
@@ -772,6 +773,7 @@ codeunit 85392 "NPR TM TicketExpiryTest"
         // The refusal tests assume enforce mode; the observe-mode test switches it off and back on itself
         SetPrePaymentEnforcement(true);
         DrainExpiryBacklog();
+        Clear(_SweepStartedAt);
         Commit();
     end;
 
@@ -809,6 +811,7 @@ codeunit 85392 "NPR TM TicketExpiryTest"
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
+        _SweepStartedAt := CurrentDateTime();
         TicketRequestManager.ExpireReservationRequests();
     end;
 
@@ -1320,15 +1323,20 @@ codeunit 85392 "NPR TM TicketExpiryTest"
         MinDT: DateTime;
         MaxDT: DateTime;
     begin
+        if (_SweepStartedAt = 0DT) then
+            Error('AssertKeptAlive requires a preceding RunExpiry in the same test.');
         AssertAllRowsHaveStatus(Token, 'REGISTERED', Context);
-        EndOfDay := CreateDateTime(CalcDate('<+1D>', Today()), 0T);
-        MinDT := CurrentDateTime() + (20 * 60 * 1000);
-        MaxDT := CurrentDateTime() + (30 * 60 * 1000);
+        // Bounds come from the sweep start, so a midnight between the sweep and this check does not move them to the next day.
+        EndOfDay := CreateDateTime(CalcDate('<+1D>', DT2Date(_SweepStartedAt)), 0T);
+        MinDT := _SweepStartedAt + (20 * 60 * 1000);
+        MaxDT := _SweepStartedAt + (30 * 60 * 1000);
+        // Production caps the stamp at service midnight using a clock without milliseconds, so the stamp can land up to a second after midnight.
         if (MaxDT > EndOfDay) then
-            MaxDT := EndOfDay;
+            MaxDT := EndOfDay + 2000;
         if (MinDT > EndOfDay) then
             MinDT := EndOfDay - 60000;
         AssertRetentionStampBetween(Token, MinDT, MaxDT, Context);
+        Clear(_SweepStartedAt);
     end;
 
     local procedure StampReceiptWithOpenSale(Token: Text[100]; ReceiptNo: Code[20])

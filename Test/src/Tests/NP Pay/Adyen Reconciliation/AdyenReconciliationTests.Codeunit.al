@@ -3141,7 +3141,8 @@ codeunit 85154 "NPR Adyen Reconciliation Tests"
         SetCell(TempExcelBuf, RowNo, 25, '0');
         SetCell(TempExcelBuf, RowNo, 26, '0');
         SetCell(TempExcelBuf, RowNo, 27, FormatDecimal(FeeAmount));
-        SetCell(TempExcelBuf, RowNo, 28, FormatDateTimeIso(CurrentDateTime()));
+        // Midday keeps the posting date on Today() after the import subtracts the Amsterdam offset, at any time the test runs.
+        SetCell(TempExcelBuf, RowNo, 28, FormatDateTimeIso(CreateDateTime(Today(), 120000T)));
     end;
 
     local procedure WriteFeeRow(var TempExcelBuf: Record "Excel Buffer" temporary; RowNo: Integer; BatchNumber: Integer; MerchantOrderRef: Text; FeeAmount: Decimal)
@@ -3176,7 +3177,8 @@ codeunit 85154 "NPR Adyen Reconciliation Tests"
         SetCell(TempExcelBuf, RowNo, 25, '0');
         SetCell(TempExcelBuf, RowNo, 26, '0');
         SetCell(TempExcelBuf, RowNo, 27, FormatDecimal(FeeAmount));
-        SetCell(TempExcelBuf, RowNo, 28, FormatDateTimeIso(CurrentDateTime()));
+        // Midday keeps the posting date on Today() after the import subtracts the Amsterdam offset, at any time the test runs.
+        SetCell(TempExcelBuf, RowNo, 28, FormatDateTimeIso(CreateDateTime(Today(), 120000T)));
     end;
 
     local procedure BuildTwoJournalWebhookRequest(var AFRecWebhookRequest: Record "NPR AF Rec. Webhook Request"; BatchNumber: Integer; PSPReference: Code[16]; FirstType: Text; FirstDebit: Decimal; FirstCredit: Decimal; SecondType: Text; SecondDebit: Decimal; SecondCredit: Decimal)
@@ -3283,7 +3285,8 @@ codeunit 85154 "NPR Adyen Reconciliation Tests"
         SetCell(TempExcelBuf, RowNo, 25, '0');
         SetCell(TempExcelBuf, RowNo, 26, '0');
         SetCell(TempExcelBuf, RowNo, 27, '0');
-        SetCell(TempExcelBuf, RowNo, 28, FormatDateTimeIso(CurrentDateTime()));
+        // Midday keeps the posting date on Today() after the import subtracts the Amsterdam offset, at any time the test runs.
+        SetCell(TempExcelBuf, RowNo, 28, FormatDateTimeIso(CreateDateTime(Today(), 120000T)));
     end;
 
     local procedure SetCell(var TempExcelBuf: Record "Excel Buffer" temporary; RowNo: Integer; ColNo: Integer; CellValue: Text)
