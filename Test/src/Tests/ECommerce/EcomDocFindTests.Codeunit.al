@@ -1675,7 +1675,7 @@ codeunit 85422 "NPR Ecom Doc Find Tests"
 
     local procedure FindWithParams(QueryParams: Dictionary of [Text, Text]) Response: Codeunit "NPR API Response"
     var
-        ApiAgent: Codeunit "NPR EcomSalesDocApiAgentV2";
+        FindV3: Codeunit "NPR EcomSalesDocFindV3";
         Request: Codeunit "NPR API Request";
         EmptyBody: JsonToken;
         Headers: Dictionary of [Text, Text];
@@ -1687,7 +1687,7 @@ codeunit 85422 "NPR Ecom Doc Find Tests"
         PathSegments.Add('ecommerce');
         PathSegments.Add('documents');
         Request.Init("Http Method"::GET, '/ecommerce/documents', PathSegments, QueryParams, Headers, EmptyBody);
-        Response := ApiAgent.FindIncomingEcomDocumentsByEmail(Request);
+        Response := FindV3.FindIncomingEcomDocumentsByEmail(Request);
     end;
 
     // Decodes the way the proxy does before handing values to AL: form-style, so a bare '+' is a space and '%2B' is a plus.
@@ -1707,11 +1707,11 @@ codeunit 85422 "NPR Ecom Doc Find Tests"
 
     local procedure GetById(DocumentId: Guid) Response: Codeunit "NPR API Response"
     var
-        ApiAgent: Codeunit "NPR EcomSalesDocApiAgentV2";
+        GetV3: Codeunit "NPR EcomSalesDocGetV3";
         Request: Codeunit "NPR API Request";
     begin
         InitGetByIdRequest(DocumentId, Request);
-        Response := ApiAgent.GetIncomingEcomDocumentById(Request);
+        Response := GetV3.GetIncomingEcomDocumentById(Request);
     end;
 
     local procedure GetByIdOnPreviousApiVersion(DocumentId: Guid) Response: Codeunit "NPR API Response"

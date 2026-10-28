@@ -7,6 +7,7 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
         _IsInitialized: Boolean;
         _MemberModuleLib: Codeunit "NPR Library - Member Module";
         _LibEcommerce: Codeunit "NPR Library Ecommerce";
+        _LibDocApi: Codeunit "NPR Library Ecom Doc Api";
         _MemberApiLib: Codeunit "NPR Library - Member XML API";
         _LibPOSMasterData: Codeunit "NPR Library - POS Master Data";
         _Assert: Codeunit Assert;
@@ -1422,19 +1423,7 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         EcomSalesLine: Record "NPR Ecom Sales Line";
-        Membership: Record "NPR MM Membership";
         EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
-        ApiAgent: Codeunit "NPR EcomSalesDocApiAgentV2";
-        RootObject: JsonObject;
-        LineObject: JsonObject;
-        AssetObject: JsonObject;
-        LinesArray: JsonArray;
-        AssetsArray: JsonArray;
-        JToken: JsonToken;
-        LineToken: JsonToken;
-        AssetToken: JsonToken;
-        AssetId: Guid;
-        AssetCount: Integer;
     begin
         // [Scenario] A processed qty=1 create-membership line issues a membership + link row. The GET
         // response must emit it under salesDocumentLines[].issuedAssets[], and the emitted id must
@@ -1446,34 +1435,54 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
         Commit();
         EcomCreateMMShipImpl.Process(EcomSalesLine);
 
-        RootObject.ReadFrom(ApiAgent.GetSalesDocumentJsonObject(EcomSalesHeader).BuildAsText());
+        // [When] the document is read back as Get V2 and as Get V3 build it
+        // [Then] each version has exactly one line with exactly one issued asset, the membership
+        AssertOneIssuedMembership(_LibDocApi.GetSalesDocumentTextV2(EcomSalesHeader), '(Get V2)');
+        AssertOneIssuedMembership(_LibDocApi.GetSalesDocumentTextV3(EcomSalesHeader), '(Get V3)');
+    end;
+
+    local procedure AssertOneIssuedMembership(DocumentText: Text; Context: Text)
+    var
+        Membership: Record "NPR MM Membership";
+        RootObject: JsonObject;
+        LineObject: JsonObject;
+        AssetObject: JsonObject;
+        LinesArray: JsonArray;
+        AssetsArray: JsonArray;
+        JToken: JsonToken;
+        LineToken: JsonToken;
+        AssetToken: JsonToken;
+        AssetId: Guid;
+        AssetCount: Integer;
+    begin
+        RootObject.ReadFrom(DocumentText);
 
         RootObject.Get('salesDocumentLines', JToken);
         LinesArray := JToken.AsArray();
-        _Assert.AreEqual(1, LinesArray.Count(), 'Expected exactly one sales document line.');
+        _Assert.AreEqual(1, LinesArray.Count(), 'Expected exactly one sales document line. ' + Context);
 
         LinesArray.Get(0, LineToken);
         LineObject := LineToken.AsObject();
         LineObject.Get('issuedAssets', JToken);
         AssetsArray := JToken.AsArray();
-        _Assert.AreEqual(1, AssetsArray.Count(), 'Expected exactly one issued asset for the qty=1 membership line.');
+        _Assert.AreEqual(1, AssetsArray.Count(), 'Expected exactly one issued asset for the qty=1 membership line. ' + Context);
 
         foreach AssetToken in AssetsArray do begin
             AssetObject := AssetToken.AsObject();
 
             AssetObject.Get('type', JToken);
-            _Assert.AreEqual('membership', JToken.AsValue().AsText(), 'Issued asset type should be membership.');
+            _Assert.AreEqual('membership', JToken.AsValue().AsText(), 'Issued asset type should be membership. ' + Context);
 
             AssetObject.Get('id', JToken);
-            _Assert.IsTrue(Evaluate(AssetId, JToken.AsValue().AsText()), 'issuedAssets id must be a valid Guid.');
+            _Assert.IsTrue(Evaluate(AssetId, JToken.AsValue().AsText()), 'issuedAssets id must be a valid Guid. ' + Context);
 
-            _Assert.IsTrue(Membership.GetBySystemId(AssetId), 'GetBySystemId must resolve the emitted issuedAssets id to a real membership.');
+            _Assert.IsTrue(Membership.GetBySystemId(AssetId), 'GetBySystemId must resolve the emitted issuedAssets id to a real membership. ' + Context);
             AssetObject.Get('referenceNo', JToken);
-            _Assert.AreEqual(Membership."External Membership No.", JToken.AsValue().AsText(), 'issuedAssets referenceNo must match the resolved membership.');
+            _Assert.AreEqual(Membership."External Membership No.", JToken.AsValue().AsText(), 'issuedAssets referenceNo must match the resolved membership. ' + Context);
 
             AssetCount += 1;
         end;
-        _Assert.AreEqual(1, AssetCount, 'Exactly one issued asset should have been asserted.');
+        _Assert.AreEqual(1, AssetCount, 'Exactly one issued asset should have been asserted. ' + Context);
     end;
 
     [Test]
@@ -1486,27 +1495,9 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
         VoucherLine: Record "NPR Ecom Sales Line";
         CouponLine: Record "NPR Ecom Sales Line";
         MembershipLine: Record "NPR Ecom Sales Line";
-        NpRvVoucher: Record "NPR NpRv Voucher";
-        NpDcCoupon: Record "NPR NpDc Coupon";
-        Membership: Record "NPR MM Membership";
         VchrImpl: Codeunit "NPR EcomCreateVchrImpl";
         CouponImpl: Codeunit "NPR EcomCreateCouponImpl";
         EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
-        ApiAgent: Codeunit "NPR EcomSalesDocApiAgentV2";
-        RootObject: JsonObject;
-        LineObject: JsonObject;
-        AssetObject: JsonObject;
-        LinesArray: JsonArray;
-        AssetsArray: JsonArray;
-        JToken: JsonToken;
-        LineToken: JsonToken;
-        VoucherLineId: Text;
-        CouponLineId: Text;
-        MembershipLineId: Text;
-        LineIdText: Text;
-        AssetType: Text;
-        AssetId: Guid;
-        AssetsSeen: Integer;
     begin
         // [Scenario] One document carries a voucher line, a coupon line, and a membership line. After each is
         // processed, the GET response must group issued assets correctly per line: the voucher line exposes
@@ -1526,14 +1517,40 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
         CouponImpl.Process(CouponLine);
         EcomCreateMMShipImpl.Process(MembershipLine);
 
+        // [When] the document is read back as Get V2 and as Get V3 build it
+        // [Then] in each version every line exposes exactly its own issued asset
+        AssertEachLineHasOwnAsset(_LibDocApi.GetSalesDocumentTextV2(EcomSalesHeader), VoucherLine, CouponLine, MembershipLine, '(Get V2)');
+        AssertEachLineHasOwnAsset(_LibDocApi.GetSalesDocumentTextV3(EcomSalesHeader), VoucherLine, CouponLine, MembershipLine, '(Get V3)');
+    end;
+
+    local procedure AssertEachLineHasOwnAsset(DocumentText: Text; VoucherLine: Record "NPR Ecom Sales Line"; CouponLine: Record "NPR Ecom Sales Line"; MembershipLine: Record "NPR Ecom Sales Line"; Context: Text)
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpDcCoupon: Record "NPR NpDc Coupon";
+        Membership: Record "NPR MM Membership";
+        RootObject: JsonObject;
+        LineObject: JsonObject;
+        AssetObject: JsonObject;
+        LinesArray: JsonArray;
+        AssetsArray: JsonArray;
+        JToken: JsonToken;
+        LineToken: JsonToken;
+        VoucherLineId: Text;
+        CouponLineId: Text;
+        MembershipLineId: Text;
+        LineIdText: Text;
+        AssetType: Text;
+        AssetId: Guid;
+        AssetsSeen: Integer;
+    begin
         VoucherLineId := Format(VoucherLine.SystemId, 0, 4).ToLower();
         CouponLineId := Format(CouponLine.SystemId, 0, 4).ToLower();
         MembershipLineId := Format(MembershipLine.SystemId, 0, 4).ToLower();
 
-        RootObject.ReadFrom(ApiAgent.GetSalesDocumentJsonObject(EcomSalesHeader).BuildAsText());
+        RootObject.ReadFrom(DocumentText);
         RootObject.Get('salesDocumentLines', JToken);
         LinesArray := JToken.AsArray();
-        _Assert.AreEqual(3, LinesArray.Count(), 'Expected exactly three sales document lines.');
+        _Assert.AreEqual(3, LinesArray.Count(), 'Expected exactly three sales document lines. ' + Context);
 
         foreach LineToken in LinesArray do begin
             LineObject := LineToken.AsObject();
@@ -1541,32 +1558,32 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
             LineIdText := JToken.AsValue().AsText();
             LineObject.Get('issuedAssets', JToken);
             AssetsArray := JToken.AsArray();
-            _Assert.AreEqual(1, AssetsArray.Count(), StrSubstNo('Each asset-issuing line must expose exactly one issued asset. Line %1', LineIdText));
+            _Assert.AreEqual(1, AssetsArray.Count(), StrSubstNo('Each asset-issuing line must expose exactly one issued asset. Line %1 %2', LineIdText, Context));
 
             AssetsArray.Get(0, JToken);
             AssetObject := JToken.AsObject();
             AssetObject.Get('type', JToken);
             AssetType := JToken.AsValue().AsText();
             AssetObject.Get('id', JToken);
-            _Assert.IsTrue(Evaluate(AssetId, JToken.AsValue().AsText()), 'issuedAssets id must be a valid Guid.');
+            _Assert.IsTrue(Evaluate(AssetId, JToken.AsValue().AsText()), 'issuedAssets id must be a valid Guid. ' + Context);
 
             if LineIdText = VoucherLineId then begin
-                _Assert.AreEqual('voucher', AssetType, 'Voucher line must expose a voucher asset.');
-                _Assert.IsTrue(NpRvVoucher.GetBySystemId(AssetId), 'Voucher issuedAssets id must resolve to a real voucher.');
+                _Assert.AreEqual('voucher', AssetType, 'Voucher line must expose a voucher asset. ' + Context);
+                _Assert.IsTrue(NpRvVoucher.GetBySystemId(AssetId), 'Voucher issuedAssets id must resolve to a real voucher. ' + Context);
             end else
                 if LineIdText = CouponLineId then begin
-                    _Assert.AreEqual('coupon', AssetType, 'Coupon line must expose a coupon asset.');
-                    _Assert.IsTrue(NpDcCoupon.GetBySystemId(AssetId), 'Coupon issuedAssets id must resolve to a real coupon.');
+                    _Assert.AreEqual('coupon', AssetType, 'Coupon line must expose a coupon asset. ' + Context);
+                    _Assert.IsTrue(NpDcCoupon.GetBySystemId(AssetId), 'Coupon issuedAssets id must resolve to a real coupon. ' + Context);
                 end else
                     if LineIdText = MembershipLineId then begin
-                        _Assert.AreEqual('membership', AssetType, 'Membership line must expose a membership asset.');
-                        _Assert.IsTrue(Membership.GetBySystemId(AssetId), 'Membership issuedAssets id must resolve to a real membership.');
+                        _Assert.AreEqual('membership', AssetType, 'Membership line must expose a membership asset. ' + Context);
+                        _Assert.IsTrue(Membership.GetBySystemId(AssetId), 'Membership issuedAssets id must resolve to a real membership. ' + Context);
                     end else
-                        Error('Unexpected sales document line id in response: %1', LineIdText);
+                        Error('Unexpected sales document line id in response: %1 %2', LineIdText, Context);
 
             AssetsSeen += 1;
         end;
-        _Assert.AreEqual(3, AssetsSeen, 'All three lines must have been asserted.');
+        _Assert.AreEqual(3, AssetsSeen, 'All three lines must have been asserted. ' + Context);
     end;
 
     local procedure CreateCapturedVoucherLine(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; VoucherTypeCode: Code[20]; Qty: Decimal; UnitPrice: Decimal)

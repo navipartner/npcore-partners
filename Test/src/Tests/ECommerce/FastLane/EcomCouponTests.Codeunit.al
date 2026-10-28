@@ -7,6 +7,7 @@ codeunit 85243 "NPR Ecom Coupon Tests"
         _Assert: Codeunit "Assert";
         _LibCoupon: Codeunit "NPR Library Coupon";
         _LibEcom: Codeunit "NPR Library Ecommerce";
+        _LibDocApi: Codeunit "NPR Library Ecom Doc Api";
         _LibInventory: Codeunit "NPR Library - Inventory";
 
     #region CheckIfLineCanBeProcessed — tested via EcomCreateCouponImpl.Process()
@@ -356,9 +357,28 @@ codeunit 85243 "NPR Ecom Coupon Tests"
         CouponType: Record "NPR NpDc Coupon Type";
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         EcomSalesLine: Record "NPR Ecom Sales Line";
-        NpDcCoupon: Record "NPR NpDc Coupon";
         CouponImpl: Codeunit "NPR EcomCreateCouponImpl";
-        ApiAgent: Codeunit "NPR EcomSalesDocApiAgentV2";
+    begin
+        // [Scenario] A processed qty=1 coupon line issues a coupon + link row. The GET response must emit
+        // that coupon under salesDocumentLines[].issuedAssets[], and the emitted id must round-trip:
+        // GetBySystemId resolves it to a real coupon whose referenceNo matches. Guards the hoisted per-doc
+        // coupon link buffer path (LoadDocCouponLinks + the in-memory per-line filter) end-to-end.
+        _LibEcom.CreateEcomSalesHeader(EcomSalesHeader);
+        CreateCapturedCouponLine(EcomSalesLine, EcomSalesHeader, _LibEcom.CreateEcomCouponItem(CouponType), 1, 100);
+        CouponImpl.Process(EcomSalesLine);
+
+        // [When] the document is read back as Get V2 and as Get V3 build it
+        // [Then] each version has exactly one line with exactly one issued asset, the coupon
+        AssertOneIssuedCoupon(_LibDocApi.GetSalesDocumentTextV2(EcomSalesHeader), '(Get V2)');
+        AssertOneIssuedCoupon(_LibDocApi.GetSalesDocumentTextV3(EcomSalesHeader), '(Get V3)');
+    end;
+    #endregion
+
+    #region Helpers
+
+    local procedure AssertOneIssuedCoupon(DocumentText: Text; Context: Text)
+    var
+        NpDcCoupon: Record "NPR NpDc Coupon";
         RootObject: JsonObject;
         LineObject: JsonObject;
         AssetObject: JsonObject;
@@ -370,46 +390,34 @@ codeunit 85243 "NPR Ecom Coupon Tests"
         AssetId: Guid;
         AssetCount: Integer;
     begin
-        // [Scenario] A processed qty=1 coupon line issues a coupon + link row. The GET response must emit
-        // that coupon under salesDocumentLines[].issuedAssets[], and the emitted id must round-trip:
-        // GetBySystemId resolves it to a real coupon whose referenceNo matches. Guards the hoisted per-doc
-        // coupon link buffer path (LoadDocCouponLinks + the in-memory per-line filter) end-to-end.
-        _LibEcom.CreateEcomSalesHeader(EcomSalesHeader);
-        CreateCapturedCouponLine(EcomSalesLine, EcomSalesHeader, _LibEcom.CreateEcomCouponItem(CouponType), 1, 100);
-        CouponImpl.Process(EcomSalesLine);
-
-        RootObject.ReadFrom(ApiAgent.GetSalesDocumentJsonObject(EcomSalesHeader).BuildAsText());
-
+        RootObject.ReadFrom(DocumentText);
         RootObject.Get('salesDocumentLines', JToken);
         LinesArray := JToken.AsArray();
-        _Assert.AreEqual(1, LinesArray.Count(), 'Expected exactly one sales document line.');
+        _Assert.AreEqual(1, LinesArray.Count(), 'Expected exactly one sales document line. ' + Context);
 
         LinesArray.Get(0, LineToken);
         LineObject := LineToken.AsObject();
         LineObject.Get('issuedAssets', JToken);
         AssetsArray := JToken.AsArray();
-        _Assert.AreEqual(1, AssetsArray.Count(), 'Expected exactly one issued asset for the qty=1 coupon line.');
+        _Assert.AreEqual(1, AssetsArray.Count(), 'Expected exactly one issued asset for the qty=1 coupon line. ' + Context);
 
         foreach AssetToken in AssetsArray do begin
             AssetObject := AssetToken.AsObject();
 
             AssetObject.Get('type', JToken);
-            _Assert.AreEqual('coupon', JToken.AsValue().AsText(), 'Issued asset type should be coupon.');
+            _Assert.AreEqual('coupon', JToken.AsValue().AsText(), 'Issued asset type should be coupon. ' + Context);
 
             AssetObject.Get('id', JToken);
-            _Assert.IsTrue(Evaluate(AssetId, JToken.AsValue().AsText()), 'issuedAssets id must be a valid Guid.');
+            _Assert.IsTrue(Evaluate(AssetId, JToken.AsValue().AsText()), 'issuedAssets id must be a valid Guid. ' + Context);
 
-            _Assert.IsTrue(NpDcCoupon.GetBySystemId(AssetId), 'GetBySystemId must resolve the emitted issuedAssets id to a real coupon.');
+            _Assert.IsTrue(NpDcCoupon.GetBySystemId(AssetId), 'GetBySystemId must resolve the emitted issuedAssets id to a real coupon. ' + Context);
             AssetObject.Get('referenceNo', JToken);
-            _Assert.AreEqual(NpDcCoupon."Reference No.", JToken.AsValue().AsText(), 'issuedAssets referenceNo must match the resolved coupon.');
+            _Assert.AreEqual(NpDcCoupon."Reference No.", JToken.AsValue().AsText(), 'issuedAssets referenceNo must match the resolved coupon. ' + Context);
 
             AssetCount += 1;
         end;
-        _Assert.AreEqual(1, AssetCount, 'Exactly one issued asset should have been asserted.');
+        _Assert.AreEqual(1, AssetCount, 'Exactly one issued asset should have been asserted. ' + Context);
     end;
-    #endregion
-
-    #region Helpers
 
     local procedure CreateCapturedCouponLine(var EcomSalesLine: Record "NPR Ecom Sales Line"; EcomSalesHeader: Record "NPR Ecom Sales Header"; ItemNo: Code[20]; Qty: Decimal; UnitPrice: Decimal)
     begin
