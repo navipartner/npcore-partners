@@ -136,6 +136,14 @@ page 6150768 "NPR SI POS Audit Log Aux. Info"
                 }
             }
         }
+        area(FactBoxes)
+        {
+            part(PaymentLines; "NPR POS Entry Paym. FactBox")
+            {
+                ApplicationArea = NPRSIFiscal;
+                SubPageLink = "POS Entry No." = field("POS Entry No.");
+            }
+        }
     }
 
     actions

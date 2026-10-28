@@ -5,6 +5,7 @@ codeunit 85167 "NPR POS Act SI Aud Look Tests"
     var
         _Item: Record Item;
         _POSPaymentMethod: Record "NPR POS Payment Method";
+        _POSPaymentMethod2: Record "NPR POS Payment Method";
         _POSUnit: Record "NPR POS Unit";
         _Salesperson: Record "Salesperson/Purchaser";
         _Assert: Codeunit Assert;
@@ -107,6 +108,44 @@ codeunit 85167 "NPR POS Act SI Aud Look Tests"
         UnbindSubscription(LibrarySIFiscal);
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SIAuditLogFactBoxShowsAllPaymentLinesOfSelectedEntry()
+    var
+        SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
+        LibrarySIFiscal: Codeunit "NPR Library SI Fiscal";
+        SIPOSAuditLogAuxInfoPage: TestPage "NPR SI POS Audit Log Aux. Info";
+        POSEntryNo: Integer;
+    begin
+        // [Scenario] Audit log factbox lists every payment line of the selected POS entry
+        // [Given] POS and SI audit setup
+        BindSubscription(LibrarySIFiscal);
+
+        InitializeData();
+
+        // [When] Ending a sale paid with two different payment methods
+        POSEntryNo := DoItemSaleWithTwoPayments(4, 6);
+
+        // [Then] The factbox shows both payment lines with their amounts
+        SIPOSAuditLogAuxInfo.SetRange("Audit Entry Type", SIPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry");
+        SIPOSAuditLogAuxInfo.SetRange("POS Entry No.", POSEntryNo);
+        SIPOSAuditLogAuxInfo.FindFirst();
+
+        SIPOSAuditLogAuxInfoPage.OpenView();
+        SIPOSAuditLogAuxInfoPage.GoToRecord(SIPOSAuditLogAuxInfo);
+        _Assert.IsTrue(SIPOSAuditLogAuxInfoPage.PaymentLines.First(), 'First payment line expected in factbox.');
+        SIPOSAuditLogAuxInfoPage.PaymentLines."POS Payment Method Code".AssertEquals(_POSPaymentMethod.Code);
+        SIPOSAuditLogAuxInfoPage.PaymentLines."Amount (LCY)".AssertEquals(4);
+        _Assert.IsTrue(SIPOSAuditLogAuxInfoPage.PaymentLines.Next(), 'Second payment line expected in factbox.');
+        SIPOSAuditLogAuxInfoPage.PaymentLines."POS Payment Method Code".AssertEquals(_POSPaymentMethod2.Code);
+        SIPOSAuditLogAuxInfoPage.PaymentLines."Amount (LCY)".AssertEquals(6);
+        _Assert.IsFalse(SIPOSAuditLogAuxInfoPage.PaymentLines.Next(), 'Only two payment lines expected in factbox.');
+        SIPOSAuditLogAuxInfoPage.Close();
+
+        // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit
+        UnbindSubscription(LibrarySIFiscal);
+    end;
+
     internal procedure InitializeData()
     var
         VoucherType: Record "NPR NpRv Voucher Type";
@@ -138,6 +177,7 @@ codeunit 85167 "NPR POS Act SI Aud Look Tests"
             LibrarySIFiscal.CreatePOSStore(_POSStore, POSPostingProfile);
             NPRLibraryPOSMasterData.CreatePOSUnit(GetTestPOSUnitNo(), _POSUnit, _POSStore.Code, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreatePOSPaymentMethod(_POSPaymentMethod, _POSPaymentMethod."Processing Type"::CASH, '', false);
+            NPRLibraryPOSMasterData.CreatePOSPaymentMethod(_POSPaymentMethod2, _POSPaymentMethod2."Processing Type"::CASH, '', false);
             NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(_Item, _POSUnit, _POSStore);
             NPRLibraryPOSMasterData.CreateSalespersonForPOSUsage(_Salesperson);
 
@@ -179,6 +219,27 @@ codeunit 85167 "NPR POS Act SI Aud Look Tests"
         POSSaleWrapper.GetCurrentSale(POSSaleRecord);
         NPRLibraryPOSMock.CreateItemLine(_POSSession, _Item."No.", 1);
         if not (NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, _Item."Unit Price", '')) then
+            Error('Sale did not end as expected');
+        POSEntry.SetRange("Document No.", POSSaleRecord."Sales Ticket No.");
+        POSEntry.FindFirst();
+        _POSSession.ClearAll();
+        Clear(_POSSession);
+        exit(POSEntry."Entry No.");
+    end;
+
+    local procedure DoItemSaleWithTwoPayments(FirstAmount: Decimal; SecondAmount: Decimal): Integer
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSSaleRecord: Record "NPR POS Sale";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleWrapper: Codeunit "NPR POS Sale";
+    begin
+        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, _Salesperson, POSSaleWrapper);
+        POSSaleWrapper.GetCurrentSale(POSSaleRecord);
+        NPRLibraryPOSMock.CreateItemLine(_POSSession, _Item."No.", 1);
+        if NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, FirstAmount, '') then
+            Error('Sale ended after partial payment');
+        if not (NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod2.Code, SecondAmount, '')) then
             Error('Sale did not end as expected');
         POSEntry.SetRange("Document No.", POSSaleRecord."Sales Ticket No.");
         POSEntry.FindFirst();
