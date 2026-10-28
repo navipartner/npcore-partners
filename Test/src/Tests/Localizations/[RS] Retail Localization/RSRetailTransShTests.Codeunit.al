@@ -137,4 +137,43 @@ codeunit 85305 "NPR RS Retail Trans. Sh Tests"
         Assert.AreNearlyEqual(-2000, Lib.GetGLAccountBalance(Lib.GlobalVATAcc()) - VATBefore, 0.01, 'Undo must re-add PDV for a retail->retail shipment');
         Assert.AreNearlyEqual(-4000, Lib.GetGLAccountBalance(Lib.GlobalMarginAcc()) - MarginBefore, 0.01, 'Undo must re-add RUC for a retail->retail shipment');
     end;
+
+    [Test]
+    procedure TransferShipment_MarkupFails_ShipmentNotPosted()
+    var
+        Lib: Codeunit "NPR Library - RS Retail Loc.";
+        LibraryInventory: Codeunit "Library - Inventory";
+        Item: Record Item;
+        Retail: Record Location;
+        Whse: Record Location;
+        Transit: Record Location;
+        TransferHeader: Record "Transfer Header";
+        TransferLine: Record "Transfer Line";
+        TransferShptHeader: Record "Transfer Shipment Header";
+        ItemLedgerEntry: Record "Item Ledger Entry";
+    begin
+        // [SCENARIO] COM-1222: when the RS markup reversal errors, the shipment must roll back with it - not stay posted without the markup
+        // [GIVEN] Retail stock, then the item's retail price at the source location is removed so the markup reversal cannot be calculated
+        Lib.InitializeSetup();
+        Lib.CreateRetailLocation(Retail);
+        Lib.CreateWholesaleLocation(Whse);
+        Lib.CreateInTransitLocation(Transit);
+        Lib.CreateRetailItem(Item, 600, 1200, false, Retail.Code);
+        Lib.PostRetailPurchaseInvoice(Item."No.", Retail.Code, 10, 600);
+        Lib.RemoveRetailPrice(Item."No.", Retail.Code);
+
+        // [WHEN] Shipping 10 pcs retail -> wholesale (ship only, the standard UI path that commits before OnAfterTransferOrderPostShipment)
+        LibraryInventory.CreateTransferHeader(TransferHeader, Retail.Code, Whse.Code, Transit.Code);
+        LibraryInventory.CreateTransferLine(TransferHeader, TransferLine, Item."No.", 10);
+        asserterror LibraryInventory.PostTransferHeader(TransferHeader, true, false);
+
+        // [THEN] The posting failed on the missing price
+        Assert.ExpectedError(StrSubstNo('Price for the Item %1 has not been found in any Price Lists for Location %2', Item."No.", Retail.Code));
+        // [THEN] Nothing of the shipment survived: no posted shipment, no shipment ILEs
+        TransferShptHeader.SetRange("Transfer Order No.", TransferHeader."No.");
+        Assert.RecordIsEmpty(TransferShptHeader);
+        ItemLedgerEntry.SetRange("Item No.", Item."No.");
+        ItemLedgerEntry.SetRange("Document Type", ItemLedgerEntry."Document Type"::"Transfer Shipment");
+        Assert.RecordIsEmpty(ItemLedgerEntry);
+    end;
 }

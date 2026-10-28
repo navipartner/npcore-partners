@@ -276,6 +276,20 @@
         PriceListHeader.Status := PriceListHeader.Status::Active;
         PriceListHeader.Modify();
     end;
+
+    internal procedure RemoveRetailPrice(ItemNo: Code[20]; LocationCode: Code[10])
+    var
+        PriceListHeader: Record "Price List Header";
+        PriceListLine: Record "Price List Line";
+    begin
+        PriceListHeader.SetRange("NPR Location Code", LocationCode);
+        if PriceListHeader.FindSet() then
+            repeat
+                PriceListLine.SetRange("Price List Code", PriceListHeader.Code);
+                PriceListLine.SetRange("Asset No.", ItemNo);
+                PriceListLine.DeleteAll();
+            until PriceListHeader.Next() = 0;
+    end;
     #endregion
 
     #region Purchase posting

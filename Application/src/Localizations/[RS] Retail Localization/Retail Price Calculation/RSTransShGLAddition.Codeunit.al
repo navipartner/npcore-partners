@@ -10,8 +10,8 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
 
     #region Eventsubscribers - RS Transfer Shipment Posting Behaviour
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"TransferOrder-Post Shipment", 'OnAfterTransferOrderPostShipment', '', false, false)]
-    local procedure OnAfterTransferOrderPostShipment(var TransferHeader: Record "Transfer Header"; var TransferShipmentHeader: Record "Transfer Shipment Header")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"TransferOrder-Post Shipment", 'OnRunOnBeforeCommit', '', false, false)]
+    local procedure OnRunOnBeforeCommit(var TransferHeader: Record "Transfer Header"; var TransferShipmentHeader: Record "Transfer Shipment Header")
     begin
         _CurrentShptNo := TransferShipmentHeader."No.";
         PostRetailCalculationEntries(TransferHeader);
