@@ -8,6 +8,7 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
     var
         _Assert: Codeunit "Assert";
         _LibEcom: Codeunit "NPR Library Ecommerce";
+        _LibDocApi: Codeunit "NPR Library Ecom Doc Api";
         _LibraryDimension: Codeunit "Library - Dimension";
         _LibraryRandom: Codeunit "Library - Random";
         _SubscriberDimSetID: Integer;
@@ -218,14 +219,6 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
     var
         DimensionValue: Record "Dimension Value";
         EcomSalesHeader: Record "NPR Ecom Sales Header";
-        ApiAgent: Codeunit "NPR EcomSalesDocApiAgentV2";
-        JsonBuilder: Codeunit "NPR Json Builder";
-        DocJson: JsonObject;
-        LinesToken: JsonToken;
-        LineToken: JsonToken;
-        DimsToken: JsonToken;
-        DimToken: JsonToken;
-        ValueToken: JsonToken;
         HeaderDims: JsonArray;
         LineDims: JsonArray;
     begin
@@ -235,17 +228,28 @@ codeunit 85345 "NPR Ecom Sales Doc Dim Tests"
         LineDims.Add(DimJson(DimensionValue."Dimension Code", DimensionValue.Code));
         _LibEcom.InsertEcomDocumentWithDimensions(NextExternalNo(), 'order', _LibEcom.CreateItem(), '', HeaderDims, LineDims, EcomSalesHeader);
 
-        // [When] the document is serialized for the API response
-        JsonBuilder := ApiAgent.GetSalesDocumentJsonObject(EcomSalesHeader);
-        DocJson := JsonBuilder.Build();
+        // [When] the document is serialized for the API response by Get V2 and by Get V3
+        // [Then] in each version the line object carries the dimension back out
+        AssertLineDimensionEmitted(_LibDocApi.GetSalesDocumentTextV2(EcomSalesHeader), DimensionValue.Code, '(Get V2)');
+        AssertLineDimensionEmitted(_LibDocApi.GetSalesDocumentTextV3(EcomSalesHeader), DimensionValue.Code, '(Get V3)');
+    end;
 
-        // [Then] the line object carries the dimension back out
-        _Assert.IsTrue(DocJson.Get('salesDocumentLines', LinesToken), 'Document JSON must contain salesDocumentLines');
+    local procedure AssertLineDimensionEmitted(DocumentText: Text; DimensionValueCode: Code[20]; Context: Text)
+    var
+        DocJson: JsonObject;
+        LinesToken: JsonToken;
+        LineToken: JsonToken;
+        DimsToken: JsonToken;
+        DimToken: JsonToken;
+        ValueToken: JsonToken;
+    begin
+        DocJson.ReadFrom(DocumentText);
+        _Assert.IsTrue(DocJson.Get('salesDocumentLines', LinesToken), 'Document JSON must contain salesDocumentLines ' + Context);
         LinesToken.AsArray().Get(0, LineToken);
-        _Assert.IsTrue(LineToken.AsObject().Get('dimensions', DimsToken), 'Line JSON must contain dimensions array');
+        _Assert.IsTrue(LineToken.AsObject().Get('dimensions', DimsToken), 'Line JSON must contain dimensions array ' + Context);
         DimsToken.AsArray().Get(0, DimToken);
         DimToken.AsObject().Get('valueCode', ValueToken);
-        _Assert.AreEqual(DimensionValue.Code, ValueToken.AsValue().AsText(), 'Emitted line dimension valueCode mismatch');
+        _Assert.AreEqual(DimensionValueCode, ValueToken.AsValue().AsText(), 'Emitted line dimension valueCode mismatch ' + Context);
     end;
 
     [Test]
