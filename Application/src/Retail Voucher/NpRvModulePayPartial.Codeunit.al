@@ -58,6 +58,8 @@
             AmountUsedByPreviousVouchers := GetVoucherAmountBeforeLine(SalesHeader, NpRvSalesLine."Document Line No.");
             if MagentoPaymentLine."Requested Amount" = 0 then
                 MagentoPaymentLine."Requested Amount" := MagentoPaymentLine.Amount;
+            if MagentoPaymentLine."Requested Amt. (Store Curr.)" = 0 then
+                MagentoPaymentLine."Requested Amt. (Store Curr.)" := MagentoPaymentLine."Amount (Store Currency)";
             // Always use Requested Amount (original value) to calculate how much we can use from this voucher
             if AmountUsedByPreviousVouchers >= TotalAmtInclVat then
                 AmountNeededFromThisVoucher := 0
@@ -67,11 +69,11 @@
                 AmountNeededFromThisVoucher := MagentoPaymentLine."Requested Amount";
 
             if MagentoPaymentLine.Amount <> AmountNeededFromThisVoucher then begin
-                MagentoPaymentLine.Amount := AmountNeededFromThisVoucher;
+                MagentoPaymentLine.SetAmountKeepingStoreCurrency(AmountNeededFromThisVoucher);
                 MagentoPaymentLine.Modify(true);
             end;
         end else begin
-            MagentoPaymentLine.Amount -= ReturnAmount;
+            MagentoPaymentLine.SetAmountKeepingStoreCurrency(MagentoPaymentLine.Amount - ReturnAmount);
             MagentoPaymentLine.Modify(true);
         end;
 

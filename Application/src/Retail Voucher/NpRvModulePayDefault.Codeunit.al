@@ -111,7 +111,7 @@
             if (Precalculated and (MagentoPaymentLine.Amount <> AvailableAmount)) or
                (not Precalculated and (Abs(MagentoPaymentLine.Amount - AvailableAmount) > NpRvVoucherMgt.AllowedCurrencyConversionRoundingDifference()))
             then begin
-                MagentoPaymentLine.Amount := AvailableAmount;
+                MagentoPaymentLine.SetAmountKeepingStoreCurrency(AvailableAmount, AvailableAmountLCY);
                 MagentoPaymentLine.Modify(true);
             end;
             if NpRvSalesLine.Amount <> MagentoPaymentLine.Amount then begin
@@ -335,7 +335,11 @@
         MagentoPaymentLineNew."External Reference No." := SalesHeader."NPR External Order No.";
         MagentoPaymentLineNew."Payment Type" := MagentoPaymentLineNew."Payment Type"::Voucher;
         MagentoPaymentLineNew."No." := TempNpRvVoucher."Reference No.";
-        MagentoPaymentLineNew.Amount := ReturnAmount;
+        // The return voucher takes the refunded payment's store currency amount for what it returns.
+        MagentoPaymentLineNew."Store Currency Code" := MagentoPaymentLine."Store Currency Code";
+        MagentoPaymentLineNew."Amount (Store Currency)" := MagentoPaymentLine."Amount (Store Currency)";
+        MagentoPaymentLineNew.Amount := MagentoPaymentLine.Amount;
+        MagentoPaymentLineNew.SetAmountKeepingStoreCurrency(ReturnAmount);
         MagentoPaymentLineNew."Account Type" := MagentoPaymentLineNew."Account Type"::"G/L Account";
         MagentoPaymentLineNew."Account No." := NpRvVoucherTypeNew."Account No.";
         MagentoPaymentLineNew.Description := TempNpRvVoucher.Description;

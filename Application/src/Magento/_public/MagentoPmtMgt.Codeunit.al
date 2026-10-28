@@ -461,7 +461,7 @@
 
         PaymentLine.SetRange("Allow Adjust Amount", true);
         PaymentLine.FindFirst();
-        PaymentLine.Amount += AdjustmentAmt;
+        PaymentLine.SetAmountKeepingStoreCurrency(PaymentLine.Amount + AdjustmentAmt);
         PaymentLine.Modify();
     end;
 
@@ -541,7 +541,7 @@
         if PaymentLine.FindSet(true) then
             repeat
                 if not LastPostingDocExists(PaymentLine) then begin
-                    PaymentLine.Amount += PaymentLine."Last Amount";
+                    PaymentLine.SetAmountKeepingStoreCurrency(PaymentLine.Amount + PaymentLine."Last Amount");
                     PaymentLine."Last Amount" := 0;
                     PaymentLine."Last Posting No." := '';
                 end;
@@ -561,10 +561,13 @@
                 OutstandingAmt := TotalAmountInclVAT - RefundAmt;
                 if (PaymentLine."Payment Type" = PaymentLine."Payment Type"::"Payment Method") and (PaymentLine.Amount > OutstandingAmt) then begin
                     PaymentLine2.Amount := OutstandingAmt;
+                    MoveStoreCurrencyShare(PaymentLine, PaymentLine2);
                     PaymentLine2.Modify();
                     PaymentLine.Amount := PaymentLine.Amount - OutstandingAmt;
-                end else
+                end else begin
                     PaymentLine.Amount := 0;
+                    PaymentLine."Amount (Store Currency)" := 0;
+                end;
                 PaymentLine."Last Amount" := PaymentLine2.Amount;
                 PaymentLine."Last Posting No." := DocNo;
                 PaymentLine.Posted := PaymentLine.Amount = 0;
@@ -669,7 +672,7 @@
         if PaymentLine.FindSet(true) then
             repeat
                 if not LastPostingDocExists(PaymentLine) then begin
-                    PaymentLine.Amount += PaymentLine."Last Amount";
+                    PaymentLine.SetAmountKeepingStoreCurrency(PaymentLine.Amount + PaymentLine."Last Amount");
                     PaymentLine."Last Amount" := 0;
                     PaymentLine."Last Posting No." := '';
                 end;
@@ -696,18 +699,11 @@
                 if SplitLine and (PaymentLine.Amount > OutstandingAmt + RefundPaymentsAmount) then begin
                     PaymentLine2.Amount := OutstandingAmt + RefundPaymentsAmount;
                     PaymentLine2."Requested Amount" := PaymentLine2.Amount;
-#if not BC17
-                    PaymentLine2."Amount (Store Currency)" := Round(PaymentLine."Amount (Store Currency)" / PaymentLine.Amount * PaymentLine2.Amount, 0.01);
-                    if PaymentLine2."Amount (Store Currency)" > PaymentLine."Amount (Store Currency)" then
-                        PaymentLine2."Amount (Store Currency)" := PaymentLine."Amount (Store Currency)";
+                    MoveStoreCurrencyShare(PaymentLine, PaymentLine2);
                     PaymentLine2."Requested Amt. (Store Curr.)" := PaymentLine2."Amount (Store Currency)";
-#endif
                     PaymentLine2.Modify();
 
                     PaymentLine.Amount := PaymentLine.Amount - OutstandingAmt;
-#if not BC17
-                    PaymentLine."Amount (Store Currency)" := PaymentLine."Amount (Store Currency)" - PaymentLine2."Amount (Store Currency)";
-#endif
                 end else begin
                     PaymentLine.Amount := 0;
 #if not BC17
@@ -724,6 +720,17 @@
 
                 PaymentAmt += PaymentLine2.Amount;
             until (PaymentLine.Next() = 0) or (StopWhenCovered and (PaymentAmt = TotalAmountInclVAT));
+    end;
+
+    /// <summary>
+    /// Gives the posted copy the same share of the store currency amount as it has of the amount, and leaves the rest on the document's payment line. Call it before the document line's Amount is reduced.
+    /// </summary>
+    local procedure MoveStoreCurrencyShare(var PaymentLine: Record "NPR Magento Payment Line"; var PostedPaymentLine: Record "NPR Magento Payment Line")
+    begin
+        PostedPaymentLine."Amount (Store Currency)" := PaymentLine.RoundStoreCurrencyAmount(PaymentLine."Amount (Store Currency)" / PaymentLine.Amount * PostedPaymentLine.Amount);
+        if PostedPaymentLine."Amount (Store Currency)" > PaymentLine."Amount (Store Currency)" then
+            PostedPaymentLine."Amount (Store Currency)" := PaymentLine."Amount (Store Currency)";
+        PaymentLine."Amount (Store Currency)" := PaymentLine."Amount (Store Currency)" - PostedPaymentLine."Amount (Store Currency)";
     end;
 
     local procedure PositiveOrZero(AmountIn: Decimal): Decimal

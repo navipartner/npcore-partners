@@ -541,6 +541,56 @@
                 GLSetup."Amount Rounding Precision"));
     end;
 
+    /// <summary>
+    /// Sets Amount and moves Amount (Store Currency) with it in the same proportion, so the amount in LCY that AmountLCY takes from the store currency follows the change.
+    /// </summary>
+    internal procedure SetAmountKeepingStoreCurrency(NewAmount: Decimal)
+    var
+        StoreAmountPerAmount: Decimal;
+    begin
+        // An unchanged amount keeps its store currency amount as it is, which may be exact rather than at the line's rate.
+        if NewAmount = Amount then
+            exit;
+
+        StoreAmountPerAmount := StoreCurrencyAmountPerAmount();
+        Amount := NewAmount;
+        if StoreAmountPerAmount = 0 then
+            exit;
+
+        "Amount (Store Currency)" := RoundStoreCurrencyAmount(StoreAmountPerAmount * NewAmount);
+    end;
+
+    /// <summary>
+    /// Rounds an amount in the line's store currency to that currency's rounding precision, or to the G/L Setup precision when the store currency has no Currency record.
+    /// </summary>
+    internal procedure RoundStoreCurrencyAmount(StoreCurrencyAmount: Decimal): Decimal
+    var
+        StoreCurrency: Record Currency;
+    begin
+        if not StoreCurrency.Get("Store Currency Code") then
+            StoreCurrency.InitRoundingPrecision();
+        exit(Round(StoreCurrencyAmount, StoreCurrency."Amount Rounding Precision"));
+    end;
+
+    /// <summary>
+    /// As SetAmountKeepingStoreCurrency, for a caller that knows the new amount in LCY: when the store currency is LCY, Amount (Store Currency) becomes exactly NewAmountLCY.
+    /// </summary>
+    internal procedure SetAmountKeepingStoreCurrency(NewAmount: Decimal; NewAmountLCY: Decimal)
+    begin
+        SetAmountKeepingStoreCurrency(NewAmount);
+        if ("Amount (Store Currency)" <> 0) and IsLCY("Store Currency Code") then
+            "Amount (Store Currency)" := NewAmountLCY;
+    end;
+
+    local procedure StoreCurrencyAmountPerAmount(): Decimal
+    begin
+        if ("Requested Amount" <> 0) and ("Requested Amt. (Store Curr.)" <> 0) then
+            exit("Requested Amt. (Store Curr.)" / "Requested Amount");
+        if (Amount <> 0) and ("Amount (Store Currency)" <> 0) then
+            exit("Amount (Store Currency)" / Amount);
+        exit(0);
+    end;
+
     local procedure IsLCY(CurrencyCode: Code[10]): Boolean
     begin
         if CurrencyCode = '' then

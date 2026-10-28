@@ -235,6 +235,7 @@
             end else begin
                 TempPaymentLine.Get(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", NpRvSalesLine."Document Line No.");
                 TempPaymentLine.Amount := TempPaymentLine.Amount + PaymentLine.Amount;
+                TempPaymentLine."Amount (Store Currency)" := TempPaymentLine."Amount (Store Currency)" + PaymentLine."Amount (Store Currency)";
                 TempPaymentLine.Modify();
 
                 PaymentLine.Delete(true);
@@ -247,6 +248,7 @@
                 PaymentLine.Find();
                 if PaymentLine.Amount <> TempPaymentLine.Amount then begin
                     PaymentLine.Amount := TempPaymentLine.Amount;
+                    PaymentLine."Amount (Store Currency)" := TempPaymentLine."Amount (Store Currency)";
                     PaymentLine.Modify();
                 end;
             until TempPaymentLine.Next() = 0;
@@ -394,29 +396,16 @@
     end;
 
     local procedure AdjustPaymentLineAmount(var MagentoPaymentLine: Record "NPR Magento Payment Line"; NewAmount: Decimal)
-#if not BC17
-    var
-        Currency: Record Currency;
-#endif
     begin
         if MagentoPaymentLine.Amount = NewAmount then
             exit;
 
         if MagentoPaymentLine."Requested Amount" = 0 then
             MagentoPaymentLine."Requested Amount" := MagentoPaymentLine.Amount;
-#if not BC17
         if MagentoPaymentLine."Requested Amt. (Store Curr.)" = 0 then
             MagentoPaymentLine."Requested Amt. (Store Curr.)" := MagentoPaymentLine."Amount (Store Currency)";
 
-        if (MagentoPaymentLine."Requested Amount" <> 0) and (MagentoPaymentLine."Requested Amt. (Store Curr.)" <> 0) then begin
-            if not Currency.Get(MagentoPaymentLine."Store Currency Code") then
-                Currency.InitRoundingPrecision();
-            MagentoPaymentLine."Amount (Store Currency)" :=
-                Round(MagentoPaymentLine."Requested Amt. (Store Curr.)" / MagentoPaymentLine."Requested Amount" * NewAmount, Currency."Amount Rounding Precision");
-        end;
-#endif
-
-        MagentoPaymentLine.Amount := NewAmount;
+        MagentoPaymentLine.SetAmountKeepingStoreCurrency(NewAmount);
         MagentoPaymentLine.Modify(true);
     end;
 

@@ -546,10 +546,8 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure ForeignCurrencyPartialInvoiceLeavesTheRoundingToTheLastInvoice()
     var
-        Currency: Record Currency;
         SalesHeader: Record "Sales Header";
         Voucher: Record "NPR NpRv Voucher";
-        LibraryERM: Codeunit "Library - ERM";
         FirstInvoiceNo: Code[20];
         SecondInvoiceNo: Code[20];
         OrderNo: Code[20];
@@ -559,13 +557,8 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
 
         // [GIVEN] The new voucher calculation on release is on, as in production
         SetNewVoucherCalculation(true);
-        // [GIVEN] A foreign currency at an exchange rate of 1, so a converted amount is not taken as precalculated
-        LibraryERM.CreateCurrency(Currency);
-        Currency.InitRoundingPrecision();
-        Currency.Modify();
-        LibraryERM.CreateExchangeRate(Currency.Code, WorkDate(), 1, 1);
-        // [GIVEN] An order in that currency of 99.99 + 0.01, paid 100 by a PARTIAL voucher holding 100
-        CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code, 100, 0, 99.99, 0.01, 0, Currency.Code);
+        // [GIVEN] An order in a foreign currency at an exchange rate of 1, of 99.99 + 0.01, paid 100 by a PARTIAL voucher holding 100
+        CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code, 100, 0, 99.99, 0.01, 0, CreateForeignCurrency());
         OrderNo := SalesHeader."No.";
         // [GIVEN] The first line has been invoiced, within the 0.02 rounding tolerance of the whole voucher
         SetLinesToPost(SalesHeader, 1);
@@ -769,6 +762,359 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         GLSetup.Get();
         GLSetup."Mark Cr. Memos as Corrections" := MarkCrMemosAsCorrections;
         GLSetup.Modify();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure PartialVoucherCutOnReleaseKeepsItsStoreCurrencyAmountInStep()
+    var
+        SalesHeader: Record "Sales Header";
+        Voucher: Record "NPR NpRv Voucher";
+    begin
+        // [SCENARIO] When releasing a foreign currency order cuts a PARTIAL voucher payment, its store currency amount and the voucher's reservation are cut in the same proportion.
+        Initialize();
+
+        // [GIVEN] The new voucher calculation on release is on, as in production
+        SetNewVoucherCalculation(true);
+        // [GIVEN] A foreign currency order of 50 + 30 + 20, paid 100 by a PARTIAL voucher whose payment line holds 746.00 in the local store currency
+        CreateForeignCurrencyOrderPaidByVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code);
+        // [GIVEN] The 20 line is removed, so the voucher only has 80 left to pay
+        DeleteLastItemLine(SalesHeader);
+
+        // [WHEN] The order is released
+        _LibrarySales.ReleaseSalesDocument(SalesHeader);
+
+        // [THEN] The voucher payment is cut to 80 and its store currency amount to 596.80
+        _Assert.AreEqual(80, OrderPaymentAmount(SalesHeader, "NPR Magento Payment Type"::Voucher), 'The voucher payment must be cut to the order total.');
+        _Assert.AreEqual(596.80, OrderStoreCurrencyAmount(SalesHeader, "NPR Magento Payment Type"::Voucher), 'The store currency amount must be cut with the payment.');
+        // [THEN] The voucher is reserved for 596.80
+        Voucher.CalcFields("Reserved Amount");
+        _Assert.AreEqual(596.80, Voucher."Reserved Amount", 'The reservation must follow the cut store currency amount.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure PartialInvoiceAfterAVoucherCutRedeemsItsStoreCurrencyShare()
+    var
+        SalesHeader: Record "Sales Header";
+        Voucher: Record "NPR NpRv Voucher";
+        InvoiceNo: Code[20];
+    begin
+        // [SCENARIO] A partial invoice of a foreign currency order whose voucher payment was cut on release redeems the invoice's share of the cut store currency amount.
+        Initialize();
+
+        // [GIVEN] The new voucher calculation on release is on, as in production
+        SetNewVoucherCalculation(true);
+        // [GIVEN] A foreign currency order of 50 + 30 + 20, paid 100 by a PARTIAL voucher whose payment line holds 746.00 in the local store currency
+        CreateForeignCurrencyOrderPaidByVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code);
+        // [GIVEN] The 20 line is removed and the order released, which cuts the voucher payment to 80
+        DeleteLastItemLine(SalesHeader);
+        _LibrarySales.ReleaseSalesDocument(SalesHeader);
+        // [GIVEN] Only the 50 line is shipped and invoiced
+        SetLinesToPost(SalesHeader, 1);
+
+        // [WHEN] The order is posted
+        InvoiceNo := _LibrarySales.PostSalesDocument(SalesHeader, true, true);
+
+        // [THEN] The invoice carries 373.00 of store currency amount and redeems 373.00 from the voucher
+        _Assert.AreEqual(373, PostedStoreCurrencyAmount(Database::"Sales Invoice Header", InvoiceNo, "NPR Magento Payment Type"::Voucher), 'The invoice must carry its share of the cut store currency amount.');
+        _Assert.AreEqual(-373, VoucherPaymentEntryAmount(Voucher."No.", InvoiceNo), 'The invoice must redeem its share of the cut store currency amount.');
+        // [THEN] The rest of the cut payment, 223.80, stays reserved
+        Voucher.CalcFields("Reserved Amount");
+        _Assert.AreEqual(223.80, Voucher."Reserved Amount", 'The rest of the cut payment must stay reserved.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure PartialVoucherCutWithNewVoucherCalculationOffKeepsItsStoreCurrencyAmountInStep()
+    var
+        SalesHeader: Record "Sales Header";
+        Voucher: Record "NPR NpRv Voucher";
+    begin
+        // [SCENARIO] With the new voucher calculation off, the PARTIAL module's cut of a foreign currency voucher payment also cuts its store currency amount in the same proportion.
+        Initialize();
+
+        // [GIVEN] The new voucher calculation on release is off
+        SetNewVoucherCalculation(false);
+        // [GIVEN] A foreign currency order of 50 + 30 + 20, paid 100 by a PARTIAL voucher whose payment line holds 746.00 in the local store currency
+        CreateForeignCurrencyOrderPaidByVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code);
+        // [GIVEN] The 20 line is removed, so the voucher only has 80 left to pay
+        DeleteLastItemLine(SalesHeader);
+
+        // [WHEN] The order is released
+        _LibrarySales.ReleaseSalesDocument(SalesHeader);
+
+        // [THEN] The voucher payment is cut to 80 and its store currency amount to 596.80
+        _Assert.AreEqual(80, OrderPaymentAmount(SalesHeader, "NPR Magento Payment Type"::Voucher), 'The voucher payment must be cut by what the order no longer needs.');
+        _Assert.AreEqual(596.80, OrderStoreCurrencyAmount(SalesHeader, "NPR Magento Payment Type"::Voucher), 'The store currency amount must be cut with the payment.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DefaultVoucherSetToItsAvailableAmountTakesItInStoreCurrency()
+    var
+        SalesHeader: Record "Sales Header";
+        Voucher: Record "NPR NpRv Voucher";
+    begin
+        // [SCENARIO] When releasing a foreign currency order raises a DEFAULT voucher payment to the voucher's whole available amount, the store currency amount becomes exactly that available amount.
+        Initialize();
+
+        // [GIVEN] The new voucher calculation on release is on, as in production
+        SetNewVoucherCalculation(true);
+        // [GIVEN] A foreign currency order of 50 + 30 + 20, paid 100 by a DEFAULT voucher holding 100, whose payment line holds 746.00 in the local store currency
+        CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypeDefault.Code, 100, 0, 50, 30, 20, CreateForeignCurrency());
+        SetStoreCurrencyRate(SalesHeader, "NPR Magento Payment Type"::Voucher, 7.46);
+        // [GIVEN] The voucher is topped up by 900, so 1000 of it is available to the order
+        TopUpVoucher(Voucher."No.", 900);
+
+        // [WHEN] The order is released
+        _LibrarySales.ReleaseSalesDocument(SalesHeader);
+
+        // [THEN] The store currency amount is the voucher's available 1000.00
+        _Assert.AreEqual(1000, OrderStoreCurrencyAmount(SalesHeader, "NPR Magento Payment Type"::Voucher), 'The store currency amount must be the voucher amount the payment now takes.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DefaultVoucherRaisedOnReleaseIsRedeemedForItsAvailableAmount()
+    var
+        SalesHeader: Record "Sales Header";
+        Voucher: Record "NPR NpRv Voucher";
+        InvoiceNo: Code[20];
+    begin
+        // [SCENARIO] A DEFAULT voucher payment that releasing a foreign currency order raised to the voucher's whole available amount is posted and redeemed for exactly that amount.
+        Initialize();
+
+        // [GIVEN] The new voucher calculation on release is on, as in production
+        SetNewVoucherCalculation(true);
+        // [GIVEN] A foreign currency order of 50 + 30 + 20, paid 100 by a DEFAULT voucher holding 100, whose payment line holds 746.00 in the local store currency
+        CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypeDefault.Code, 100, 0, 50, 30, 20, CreateForeignCurrency());
+        SetStoreCurrencyRate(SalesHeader, "NPR Magento Payment Type"::Voucher, 7.46);
+        // [GIVEN] The voucher is topped up by 900 and the order released, which raises the payment to the 1000 now available
+        TopUpVoucher(Voucher."No.", 900);
+        _LibrarySales.ReleaseSalesDocument(SalesHeader);
+
+        // [WHEN] The order is posted
+        InvoiceNo := _LibrarySales.PostSalesDocument(SalesHeader, true, true);
+
+        // [THEN] The voucher is redeemed for its 1000.00, not for the requested rate applied to the raised payment
+        _Assert.AreEqual(-1000, VoucherPaymentEntryAmount(Voucher."No.", InvoiceNo), 'The voucher must be redeemed for the amount the payment took.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreditMemoForAForeignCurrencyInvoiceIssuesTheStoreCurrencyAmountAsAReturnVoucher()
+    var
+        CreditMemoHeader: Record "Sales Header";
+        GLSetup: Record "General Ledger Setup";
+        SalesHeader: Record "Sales Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        Voucher: Record "NPR NpRv Voucher";
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+        CopyDocMgt: Codeunit "Copy Document Mgt.";
+        CreditMemoNo: Code[20];
+        InvoiceNo: Code[20];
+    begin
+        // [SCENARIO] A credit memo for a foreign currency invoice paid by a voucher whose payment line holds a local store currency amount issues that amount as a return voucher.
+        Initialize();
+
+        // [GIVEN] The new voucher calculation on release is on, as in production
+        SetNewVoucherCalculation(true);
+        // [GIVEN] Credit memos copied from an invoice are not posted as corrections, so the refund is issued as a return voucher
+        GLSetup.Get();
+        GLSetup."Mark Cr. Memos as Corrections" := false;
+        GLSetup.Modify();
+        // [GIVEN] A foreign currency order of 50 + 30 + 20, paid 100 by a PARTIAL voucher whose payment line holds 746.00 in the local store currency, invoiced in full
+        CreateForeignCurrencyOrderPaidByVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code);
+        InvoiceNo := _LibrarySales.PostSalesDocument(SalesHeader, true, true);
+        // [GIVEN] A credit memo copied from that invoice
+        SalesInvoiceHeader.Get(InvoiceNo);
+        CreditMemoHeader."Document Type" := CreditMemoHeader."Document Type"::"Credit Memo";
+        CreditMemoHeader.SetAllowSelectNoSeries();
+        CreditMemoHeader.Insert(true);
+        CopyDocMgt.SetPropertiesForCreditMemoCorrection();
+        CopyDocMgt.CopySalesDocForInvoiceCancelling(SalesInvoiceHeader."No.", CreditMemoHeader);
+
+        // [WHEN] The credit memo is posted
+        CreditMemoNo := _LibrarySales.PostSalesDocument(CreditMemoHeader, true, true);
+
+        // [THEN] A return voucher is issued for the 746.00 the invoice redeemed
+        VoucherEntry.SetRange("Entry Type", VoucherEntry."Entry Type"::"Issue Voucher");
+        VoucherEntry.SetRange("Document Type", VoucherEntry."Document Type"::"Credit Memo");
+        VoucherEntry.SetRange("Document No.", CreditMemoNo);
+        VoucherEntry.CalcSums(Amount);
+        _Assert.AreEqual(746, VoucherEntry.Amount, 'The credit memo must refund the store currency amount as a return voucher.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreditMemoForAnInvoicePaidByTwoVouchersReturnsBothStoreCurrencyAmounts()
+    var
+        CreditMemoHeader: Record "Sales Header";
+        GLSetup: Record "General Ledger Setup";
+        SalesHeader: Record "Sales Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SecondVoucher: Record "NPR NpRv Voucher";
+        Voucher: Record "NPR NpRv Voucher";
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+        CopyDocMgt: Codeunit "Copy Document Mgt.";
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+        CreditMemoNo: Code[20];
+        InvoiceNo: Code[20];
+    begin
+        // [SCENARIO] A credit memo for a foreign currency invoice paid by two vouchers of the same type, whose refunds are merged into one return voucher, returns the sum of both store currency amounts.
+        Initialize();
+
+        // [GIVEN] The new voucher calculation on release is on, as in production
+        SetNewVoucherCalculation(true);
+        // [GIVEN] Credit memos copied from an invoice are not posted as corrections, so the refund is issued as a return voucher
+        GLSetup.Get();
+        GLSetup."Mark Cr. Memos as Corrections" := false;
+        GLSetup.Modify();
+        // [GIVEN] A foreign currency order of 50 + 30 + 20, paid 60 by a PARTIAL voucher and 40 by a second PARTIAL voucher, whose payment lines hold 447.60 and 298.40 in the local store currency
+        CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code, 60, 0, 50, 30, 20, CreateForeignCurrency());
+        TopUpVoucher(Voucher."No.", 387.60);
+        CreateVoucher(SecondVoucher, _VoucherTypePartial.Code, 1000);
+        NpRvSalesDocMgt.RedeemVoucher(SalesHeader, SecondVoucher."Reference No.");
+        SetStoreCurrencyRate(SalesHeader, "NPR Magento Payment Type"::Voucher, 7.46);
+        // [GIVEN] The order is invoiced in full
+        InvoiceNo := _LibrarySales.PostSalesDocument(SalesHeader, true, true);
+        // [GIVEN] A credit memo copied from that invoice
+        SalesInvoiceHeader.Get(InvoiceNo);
+        CreditMemoHeader."Document Type" := CreditMemoHeader."Document Type"::"Credit Memo";
+        CreditMemoHeader.SetAllowSelectNoSeries();
+        CreditMemoHeader.Insert(true);
+        CopyDocMgt.SetPropertiesForCreditMemoCorrection();
+        CopyDocMgt.CopySalesDocForInvoiceCancelling(SalesInvoiceHeader."No.", CreditMemoHeader);
+
+        // [WHEN] The credit memo is posted
+        CreditMemoNo := _LibrarySales.PostSalesDocument(CreditMemoHeader, true, true);
+
+        // [THEN] The return voucher amounts to the 746.00 both vouchers paid
+        VoucherEntry.SetRange("Entry Type", VoucherEntry."Entry Type"::"Issue Voucher");
+        VoucherEntry.SetRange("Document Type", VoucherEntry."Document Type"::"Credit Memo");
+        VoucherEntry.SetRange("Document No.", CreditMemoNo);
+        VoucherEntry.CalcSums(Amount);
+        _Assert.AreEqual(746, VoucherEntry.Amount, 'The credit memo must refund the store currency amounts of both vouchers.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure AdjustedCardPaymentKeepsItsStoreCurrencyAmountInStep()
+    var
+        SalesHeader: Record "Sales Header";
+        Voucher: Record "NPR NpRv Voucher";
+        InvoiceNo: Code[20];
+    begin
+        // [SCENARIO] When posting raises a card payment that allows its amount to be adjusted up to the order total, its store currency amount is raised in the same proportion.
+        Initialize();
+
+        // [GIVEN] The new voucher calculation on release is on, as in production
+        SetNewVoucherCalculation(true);
+        // [GIVEN] A foreign currency order of 120, paid 80 by a card that allows adjusting its amount and holds 596.80 in the local store currency, and 20 by a PARTIAL voucher
+        CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code, 20, 80, 120, 0, 0, CreateForeignCurrency());
+        SetStoreCurrencyRate(SalesHeader, "NPR Magento Payment Type"::"Payment Method", 7.46);
+        AllowAdjustingCardAmount(SalesHeader);
+
+        // [WHEN] The order is posted
+        InvoiceNo := _LibrarySales.PostSalesDocument(SalesHeader, true, true);
+
+        // [THEN] The card pays 100 on the invoice, and its store currency amount is 746.00
+        _Assert.AreEqual(100, InvoicePaymentAmount(InvoiceNo, "NPR Magento Payment Type"::"Payment Method"), 'The card must be raised to what the voucher leaves of the order.');
+        _Assert.AreEqual(746, PostedStoreCurrencyAmount(Database::"Sales Invoice Header", InvoiceNo, "NPR Magento Payment Type"::"Payment Method"), 'The store currency amount must be raised with the card payment.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreditMemoTakesItsStoreCurrencyShareOfALargerCardRefund()
+    var
+        CreditMemoHeader: Record "Sales Header";
+        CreditMemoNo: Code[20];
+    begin
+        // [SCENARIO] A credit memo smaller than its card refund payment takes the same share of the refund's store currency amount as of its amount.
+        Initialize();
+
+        // [GIVEN] A foreign currency credit memo of 60 with a card refund of 100 that holds 746.00 in the local store currency
+        CreateCreditMemoWithLargerCardRefund(CreditMemoHeader, _GLSetup."LCY Code");
+
+        // [WHEN] The credit memo is posted
+        CreditMemoNo := _LibrarySales.PostSalesDocument(CreditMemoHeader, true, true);
+
+        // [THEN] The posted credit memo refunds 60 by card, with 447.60 of store currency amount
+        _Assert.AreEqual(60, PostedPaymentAmount(Database::"Sales Cr.Memo Header", CreditMemoNo, "NPR Magento Payment Type"::"Payment Method"), 'The credit memo must take only its own amount of the card refund.');
+        _Assert.AreEqual(447.60, PostedStoreCurrencyAmount(Database::"Sales Cr.Memo Header", CreditMemoNo, "NPR Magento Payment Type"::"Payment Method"), 'The credit memo must take the same share of the store currency amount.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreditMemoRoundsItsStoreCurrencyShareToTheStoreCurrency()
+    var
+        CreditMemoHeader: Record "Sales Header";
+        StoreCurrency: Record Currency;
+        LibraryERM: Codeunit "Library - ERM";
+        CreditMemoNo: Code[20];
+    begin
+        // [SCENARIO] A credit memo's share of a larger card refund is rounded to the store currency's own rounding precision, not to cents.
+        Initialize();
+
+        // [GIVEN] A store currency whose amounts are rounded to whole units
+        LibraryERM.CreateCurrency(StoreCurrency);
+        StoreCurrency."Amount Rounding Precision" := 1;
+        StoreCurrency.Modify();
+        // [GIVEN] A foreign currency credit memo of 60 with a card refund of 100 that holds 746 in that store currency
+        CreateCreditMemoWithLargerCardRefund(CreditMemoHeader, StoreCurrency.Code);
+
+        // [WHEN] The credit memo is posted
+        CreditMemoNo := _LibrarySales.PostSalesDocument(CreditMemoHeader, true, true);
+
+        // [THEN] The posted credit memo's store currency share is 448, not 447.60
+        _Assert.AreEqual(448, PostedStoreCurrencyAmount(Database::"Sales Cr.Memo Header", CreditMemoNo, "NPR Magento Payment Type"::"Payment Method"), 'The store currency share must be rounded to the store currency.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure InvoiceGivesBackTheStoreCurrencyShareOfAnEarlierPostingThatNoLongerExists()
+    var
+        SalesHeader: Record "Sales Header";
+        InvoiceNo: Code[20];
+    begin
+        // [SCENARIO] When the invoice an earlier posting named no longer exists, the card payment it took comes back to the order with its store currency share.
+        Initialize();
+
+        // [GIVEN] A foreign currency order of 100 paid 100 by card, which holds 746.00 in the local store currency
+        CreateDocumentPaidByCard(SalesHeader, SalesHeader."Document Type"::Order, 100, 100, _GLSetup."LCY Code");
+        // [GIVEN] An earlier posting took 60 of the card and named an invoice that no longer exists, so the line holds 40 and 298.40
+        SimulateVanishedEarlierPosting(SalesHeader, 60);
+
+        // [WHEN] The order is posted
+        InvoiceNo := _LibrarySales.PostSalesDocument(SalesHeader, true, true);
+
+        // [THEN] The invoice carries the whole card payment of 100 with its 746.00 of store currency amount
+        _Assert.AreEqual(100, InvoicePaymentAmount(InvoiceNo, "NPR Magento Payment Type"::"Payment Method"), 'The share of the vanished posting must come back to the card payment.');
+        _Assert.AreEqual(746, PostedStoreCurrencyAmount(Database::"Sales Invoice Header", InvoiceNo, "NPR Magento Payment Type"::"Payment Method"), 'The store currency share must come back with it.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreditMemoGivesBackTheStoreCurrencyShareOfAnEarlierPostingThatNoLongerExists()
+    var
+        ReturnOrderHeader: Record "Sales Header";
+        CreditMemoNo: Code[20];
+    begin
+        // [SCENARIO] When the credit memo an earlier posting of a return order named no longer exists, the card refund it took comes back with its store currency share.
+        Initialize();
+
+        // [GIVEN] A foreign currency return order of 100 refunded 100 by card, which holds 746.00 in the local store currency
+        CreateDocumentPaidByCard(ReturnOrderHeader, ReturnOrderHeader."Document Type"::"Return Order", 100, 100, _GLSetup."LCY Code");
+        // [GIVEN] An earlier posting took 60 of the refund and named a credit memo that no longer exists, so the line holds 40 and 298.40
+        SimulateVanishedEarlierPosting(ReturnOrderHeader, 60);
+
+        // [WHEN] The return order is posted
+        CreditMemoNo := _LibrarySales.PostSalesDocument(ReturnOrderHeader, true, true);
+
+        // [THEN] The credit memo carries the whole card refund of 100 with its 746.00 of store currency amount
+        _Assert.AreEqual(100, PostedPaymentAmount(Database::"Sales Cr.Memo Header", CreditMemoNo, "NPR Magento Payment Type"::"Payment Method"), 'The share of the vanished posting must come back to the card refund.');
+        _Assert.AreEqual(746, PostedStoreCurrencyAmount(Database::"Sales Cr.Memo Header", CreditMemoNo, "NPR Magento Payment Type"::"Payment Method"), 'The store currency share must come back with it.');
     end;
 
     local procedure Initialize()
@@ -1136,5 +1482,155 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         Customer.Get(CustomerNo);
         Customer.CalcFields("Balance (LCY)");
         exit(Customer."Balance (LCY)");
+    end;
+
+    /// <summary>
+    /// Creates a foreign currency at an exchange rate of 1, so a converted amount is not taken as precalculated.
+    /// </summary>
+    local procedure CreateForeignCurrency(): Code[10]
+    var
+        Currency: Record Currency;
+        LibraryERM: Codeunit "Library - ERM";
+    begin
+        LibraryERM.CreateCurrency(Currency);
+        Currency.InitRoundingPrecision();
+        Currency.Modify();
+        LibraryERM.CreateExchangeRate(Currency.Code, WorkDate(), 1, 1);
+        exit(Currency.Code);
+    end;
+
+    /// <summary>
+    /// Adds an amount to the voucher, as a top-up at a till would.
+    /// </summary>
+    local procedure TopUpVoucher(VoucherNo: Code[20]; Amount: Decimal)
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+    begin
+        Voucher.Get(VoucherNo);
+        VoucherEntry.Init();
+        VoucherEntry."Entry No." := 0;
+        VoucherEntry."Voucher No." := VoucherNo;
+        VoucherEntry."Voucher Type" := Voucher."Voucher Type";
+        VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Top-up";
+        VoucherEntry.Amount := Amount;
+        VoucherEntry."Remaining Amount" := Amount;
+        VoucherEntry.Positive := true;
+        VoucherEntry.Open := true;
+        VoucherEntry."Posting Date" := WorkDate();
+        VoucherEntry.Insert();
+    end;
+
+    /// <summary>
+    /// Creates a foreign currency order of 50 + 30 + 20 paid 100 by a voucher holding 1000, whose payment line holds 746.00 in the local store currency, as a Shopify order from a store whose shop currency is the local currency at a rate of 7.46.
+    /// </summary>
+    local procedure CreateForeignCurrencyOrderPaidByVoucher(var SalesHeader: Record "Sales Header"; var Voucher: Record "NPR NpRv Voucher"; VoucherTypeCode: Code[20])
+    begin
+        CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, VoucherTypeCode, 1000, 0, 50, 30, 20, CreateForeignCurrency());
+        SetStoreCurrencyRate(SalesHeader, "NPR Magento Payment Type"::Voucher, 7.46);
+    end;
+
+    /// <summary>
+    /// Gives each payment line of the type a store currency amount in the local currency at the given rate, as a Shopify order from a store whose shop currency is the local currency carries it.
+    /// </summary>
+    local procedure SetStoreCurrencyRate(SalesHeader: Record "Sales Header"; PaymentType: Enum "NPR Magento Payment Type"; StoreCurrencyRate: Decimal)
+    begin
+        SetStoreCurrencyRate(SalesHeader, PaymentType, StoreCurrencyRate, _GLSetup."LCY Code");
+    end;
+
+    local procedure SetStoreCurrencyRate(SalesHeader: Record "Sales Header"; PaymentType: Enum "NPR Magento Payment Type"; StoreCurrencyRate: Decimal; StoreCurrencyCode: Code[10])
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+    begin
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
+        PaymentLine.SetRange("Document No.", SalesHeader."No.");
+        PaymentLine.SetRange("Payment Type", PaymentType);
+        PaymentLine.FindSet(true);
+        repeat
+            PaymentLine."Store Currency Code" := StoreCurrencyCode;
+            PaymentLine."Amount (Store Currency)" := Round(PaymentLine.Amount * StoreCurrencyRate, 0.01);
+            PaymentLine."Requested Amt. (Store Curr.)" := Round(PaymentLine."Requested Amount" * StoreCurrencyRate, 0.01);
+            PaymentLine.Modify();
+        until PaymentLine.Next() = 0;
+    end;
+
+    /// <summary>
+    /// Creates a foreign currency credit memo of 60 with a card refund of 100 that holds 746 in the given store currency.
+    /// </summary>
+    local procedure CreateCreditMemoWithLargerCardRefund(var CreditMemoHeader: Record "Sales Header"; StoreCurrencyCode: Code[10])
+    begin
+        CreateDocumentPaidByCard(CreditMemoHeader, CreditMemoHeader."Document Type"::"Credit Memo", 60, 100, StoreCurrencyCode);
+    end;
+
+    /// <summary>
+    /// Creates a foreign currency document with one item line and a card payment that holds its amount at 7.46 in the given store currency.
+    /// </summary>
+    local procedure CreateDocumentPaidByCard(var SalesHeader: Record "Sales Header"; DocumentType: Enum "Sales Document Type"; LineAmount: Decimal; CardAmount: Decimal; StoreCurrencyCode: Code[10])
+    var
+        Customer: Record Customer;
+    begin
+        _LibrarySales.CreateCustomer(Customer);
+        EnsureSalesPostingSetup(Customer."Gen. Bus. Posting Group", Customer."VAT Bus. Posting Group");
+        _LibrarySales.CreateSalesHeader(SalesHeader, DocumentType, Customer."No.");
+        SalesHeader.Validate("Currency Code", CreateForeignCurrency());
+        SalesHeader.Validate("Prices Including VAT", true);
+        SalesHeader.Modify(true);
+        AddItemLine(SalesHeader, LineAmount);
+        AddCardPaymentLine(SalesHeader, CardAmount);
+        SetStoreCurrencyRate(SalesHeader, "NPR Magento Payment Type"::"Payment Method", 7.46, StoreCurrencyCode);
+    end;
+
+    /// <summary>
+    /// Leaves the card payment line as an earlier posting of LastAmount left it, with that posting's document no longer in the database: Amount and the store currency amount are reduced by the share it took, and Last Posting No. names a document that does not exist.
+    /// </summary>
+    local procedure SimulateVanishedEarlierPosting(SalesHeader: Record "Sales Header"; LastAmount: Decimal)
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+    begin
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
+        PaymentLine.SetRange("Document No.", SalesHeader."No.");
+        PaymentLine.SetRange("Payment Type", PaymentLine."Payment Type"::"Payment Method");
+        PaymentLine.FindFirst();
+        PaymentLine.Amount -= LastAmount;
+        PaymentLine."Amount (Store Currency)" -= Round(LastAmount * 7.46, 0.01);
+        PaymentLine."Last Amount" := LastAmount;
+        PaymentLine."Last Posting No." := 'PVI-GONE';
+        PaymentLine.Modify();
+    end;
+
+    local procedure AllowAdjustingCardAmount(SalesHeader: Record "Sales Header")
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+    begin
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
+        PaymentLine.SetRange("Document No.", SalesHeader."No.");
+        PaymentLine.SetRange("Payment Type", PaymentLine."Payment Type"::"Payment Method");
+        PaymentLine.ModifyAll("Allow Adjust Amount", true);
+    end;
+
+    local procedure OrderStoreCurrencyAmount(SalesHeader: Record "Sales Header"; PaymentType: Enum "NPR Magento Payment Type"): Decimal
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+    begin
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
+        PaymentLine.SetRange("Document No.", SalesHeader."No.");
+        PaymentLine.SetRange("Payment Type", PaymentType);
+        PaymentLine.CalcSums("Amount (Store Currency)");
+        exit(PaymentLine."Amount (Store Currency)");
+    end;
+
+    local procedure PostedStoreCurrencyAmount(DocumentTableNo: Integer; DocumentNo: Code[20]; PaymentType: Enum "NPR Magento Payment Type"): Decimal
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+    begin
+        PaymentLine.SetRange("Document Table No.", DocumentTableNo);
+        PaymentLine.SetRange("Document No.", DocumentNo);
+        PaymentLine.SetRange("Payment Type", PaymentType);
+        PaymentLine.CalcSums("Amount (Store Currency)");
+        exit(PaymentLine."Amount (Store Currency)");
     end;
 }

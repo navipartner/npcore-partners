@@ -297,7 +297,7 @@
                         (MagentoPaymentLine."Document Type" in [MagentoPaymentLine."Document Type"::"Credit Memo", MagentoPaymentLine."Document Type"::"Return Order"])) or
                        (MagentoPaymentLine."Document Table No." = Database::"Sales Cr.Memo Header")
                     then
-                        MagentoPaymentLine.Amount := -MagentoPaymentLine.Amount;
+                        MagentoPaymentLine.SetAmountKeepingStoreCurrency(-MagentoPaymentLine.Amount);
                     if MagentoPaymentLine.Amount >= 0 then
                         exit;
 
