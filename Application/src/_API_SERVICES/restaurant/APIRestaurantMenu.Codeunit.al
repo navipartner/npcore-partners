@@ -232,7 +232,9 @@ codeunit 6248644 "NPR API Restaurant Menu"
             until MenuItemTrans.Next() = 0;
         Json.EndObject();
 
-        if PictureHandler.GetPictureUrl(MenuItem.SystemId, Enum::"NPR CloudflareMediaVariants"::MEDIUM, 57600, ImageUrl) then
+        // 7-day TTL: callers cache this menu until lastUpdated changes, which EffectiveLastUpdated
+        // guarantees at least daily, so the signed URL must outlive a day plus offline devices.
+        if PictureHandler.GetPictureUrl(MenuItem.SystemId, Enum::"NPR CloudflareMediaVariants"::PREVIEW, 604800, ImageUrl) then
             Json.AddProperty('imageUrl', ImageUrl);
 
         if Item.Get(MenuItem."Item No.") and (Item."NPR Item AddOn No." <> '') then begin
@@ -455,8 +457,9 @@ codeunit 6248644 "NPR API Restaurant Menu"
             until MenuItemTrans.Next() = 0;
         Json.EndObject();
 
-        // Get image URL if available (16 hour TTL = 57600 seconds)
-        if PictureHandler.GetPictureUrl(MenuItem.SystemId, Enum::"NPR CloudflareMediaVariants"::MEDIUM, 57600, ImageUrl) then
+        // 7-day TTL: callers cache this menu until lastUpdated changes, which EffectiveLastUpdated
+        // guarantees at least daily, so the signed URL must outlive a day plus offline devices.
+        if PictureHandler.GetPictureUrl(MenuItem.SystemId, Enum::"NPR CloudflareMediaVariants"::PREVIEW, 604800, ImageUrl) then
             Json.AddProperty('imageUrl', ImageUrl);
 
         Json.EndObject();
