@@ -6,6 +6,7 @@
         GlobalKitchenOrder: Record "NPR NPRE Kitchen Order";
         NotificationHandler: Codeunit "NPR NPRE Notification Handler";
         SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+        _CancelledKitchenOrders: Codeunit "NPR HashSet of [BigInteger]";
         _HideValidationDialog: Boolean;
 
     procedure SendWPLinesToKitchen(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; FlowStatusCode: Code[10]; PrintCategoryCode: Code[20]; RequestType: Option "Order","Serving Request"; SentDateTime: DateTime): Boolean
@@ -49,6 +50,7 @@
         Sentry: Codeunit "NPR Sentry";
         RouteSpan: Codeunit "NPR Sentry Span";
         CreateSpan: Codeunit "NPR Sentry Span";
+        CancelledKitchenOrders: Codeunit "NPR HashSet of [BigInteger]";
         TouchedKitchenOrderList: List of [BigInteger];
         TouchedKitchenOrderID: BigInteger;
         StationsFound: Boolean;
@@ -70,10 +72,16 @@
 
         KitchenRequest.Reset();
         FindKitchenRequestsForSourceDoc(KitchenRequest, KitchenReqSourceParam);
-        HandleQtyChange(KitchenRequest, KitchenRequestParam, KitchenReqSourceParam);
+        HandleQtyChange(KitchenRequest, KitchenRequestParam, KitchenReqSourceParam, CancelledKitchenOrders);
+        foreach TouchedKitchenOrderID in CancelledKitchenOrders.Values() do
+            _CancelledKitchenOrders.Add(TouchedKitchenOrderID);
 
-        if KitchenRequest.IsEmpty() then
-            exit(false);
+        if KitchenRequest.IsEmpty() then begin
+            if (CancelledKitchenOrders.Count() = 0) or (RequestType <> RequestType::Order) then
+                exit(false);
+            LastUpdatedKitchenOrderID := TouchedKitchenOrderID;
+            exit(true);
+        end;
 
         Sentry.StartSpan(CreateSpan, 'bc.restaurant.kds.send-lines-to-kitchen.create-station-requests');
         KitchenRequest.FindSet(RequestType = RequestType::"Serving Request");
@@ -178,7 +186,7 @@
         exit(GlobalKitchenOrder."Order ID");
     end;
 
-    local procedure HandleQtyChange(var KitchenRequest: Record "NPR NPRE Kitchen Request"; KitchenRequestParam: Record "NPR NPRE Kitchen Request"; KitchenReqSourceParam: Record "NPR NPRE Kitchen Req.Src. Link")
+    local procedure HandleQtyChange(var KitchenRequest: Record "NPR NPRE Kitchen Request"; KitchenRequestParam: Record "NPR NPRE Kitchen Request"; KitchenReqSourceParam: Record "NPR NPRE Kitchen Req.Src. Link"; CancelledKitchenOrders: Codeunit "NPR HashSet of [BigInteger]")
     begin
         KitchenRequest.FilterGroup(2);
         KitchenRequest.SetFilter("Line Status", '<>%1', KitchenRequest."Line Status"::Cancelled);
@@ -198,17 +206,17 @@
 
         KitchenRequest.SetRange("Line Status", KitchenRequest."Line Status"::"Serving Requested", KitchenRequest."Line Status"::Planned);
         KitchenRequest.SetRange("Production Status", KitchenRequest."Production Status"::"Not Started", KitchenRequest."Production Status"::"On Hold");
-        AllocateQtyChangeToExistingKitchenRequests(KitchenRequest, KitchenReqSourceParam);
+        AllocateQtyChangeToExistingKitchenRequests(KitchenRequest, KitchenReqSourceParam, CancelledKitchenOrders);
 
         if KitchenReqSourceParam.Quantity < 0 then begin
             //Allocate quantity decrease, even if production has already been finished
             KitchenRequest.SetRange("Production Status");
-            AllocateQtyChangeToExistingKitchenRequests(KitchenRequest, KitchenReqSourceParam);
+            AllocateQtyChangeToExistingKitchenRequests(KitchenRequest, KitchenReqSourceParam, CancelledKitchenOrders);
 
             if KitchenReqSourceParam.Quantity < 0 then begin
                 //Allocate quantity decrease, even if items have already been served
                 KitchenRequest.SetRange("Line Status");
-                AllocateQtyChangeToExistingKitchenRequests(KitchenRequest, KitchenReqSourceParam);
+                AllocateQtyChangeToExistingKitchenRequests(KitchenRequest, KitchenReqSourceParam, CancelledKitchenOrders);
             end;
         end;
 
@@ -222,7 +230,7 @@
         end;
     end;
 
-    local procedure AllocateQtyChangeToExistingKitchenRequests(var KitchenRequest: Record "NPR NPRE Kitchen Request"; var KitchenReqSourceParam: Record "NPR NPRE Kitchen Req.Src. Link")
+    local procedure AllocateQtyChangeToExistingKitchenRequests(var KitchenRequest: Record "NPR NPRE Kitchen Request"; var KitchenReqSourceParam: Record "NPR NPRE Kitchen Req.Src. Link"; CancelledKitchenOrders: Codeunit "NPR HashSet of [BigInteger]")
     var
         xKitchenReqSourceParam: Record "NPR NPRE Kitchen Req.Src. Link";
     begin
@@ -237,6 +245,8 @@
                         KitchenReqSourceParam.Quantity := -KitchenRequest.Quantity;
                         KitchenReqSourceParam."Quantity (Base)" := -KitchenRequest."Quantity (Base)";
                         CancelKitchenRequest(KitchenRequest);
+                        if KitchenRequest."Order ID" <> 0 then
+                            CancelledKitchenOrders.Add(KitchenRequest."Order ID");
                     end else begin
                         CreateKitchenRequestSourceLink(KitchenRequest, KitchenReqSourceParam);
                         SetQtyChanged(KitchenRequest);
@@ -1120,6 +1130,12 @@
     begin
         foreach TouchedKitchenOrderID in TouchedKitchenOrders.Values() do
             UpdateOrderStatus(TouchedKitchenOrderID);
+    end;
+
+    internal procedure UpdateCancelledKitchenOrders()
+    begin
+        UpdateOrderStatuses(_CancelledKitchenOrders);
+        _CancelledKitchenOrders.RemoveAll();
     end;
 
     local procedure CheckLineStatusesBeforeServing(var KitchenRequest: Record "NPR NPRE Kitchen Request")

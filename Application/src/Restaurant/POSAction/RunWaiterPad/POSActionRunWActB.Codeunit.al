@@ -48,7 +48,7 @@ codeunit 6151335 "NPR POSAction: Run WAct-B"
             if SalePOS."NPRE Pre-Set Waiter Pad No." = '' then
                 Error(WPadNotSelectedErr);
             WaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.");
-            WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, WaiterPad, false);
+            WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, WaiterPad, false, WPadAction = _WPadAction::"Send Kitchen Order");
             Commit();
 
             Clear(WaiterPad2);

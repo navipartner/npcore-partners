@@ -146,6 +146,8 @@
                     until not TempWPadLineBuffer.FindFirst();  //Output type loop
             until TempFlowStatus.Next() = 0;
 
+        KitchenOrderMgt.UpdateCancelledKitchenOrders();
+
         if TempPrintTemplateBuffer.IsEmpty and not KDSUpdated then begin
             if ShowNothingToSendErr then
                 Error(NothingToSendLbl);

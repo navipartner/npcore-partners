@@ -119,7 +119,12 @@
         exit(FromWaiterPadNo + '|' + Format(FromLineNo) + '|' + ToWaiterPadNo);
     end;
 
-    procedure MoveSaleFromPOSToWaiterPad(var SalePOS: Record "NPR POS Sale"; var WaiterPad: Record "NPR NPRE Waiter Pad"; CleanupSale: Boolean) SaleCleanupSuccessful: Boolean
+    procedure MoveSaleFromPOSToWaiterPad(var SalePOS: Record "NPR POS Sale"; var WaiterPad: Record "NPR NPRE Waiter Pad"; CleanupSale: Boolean): Boolean
+    begin
+        exit(MoveSaleFromPOSToWaiterPad(SalePOS, WaiterPad, CleanupSale, false));
+    end;
+
+    procedure MoveSaleFromPOSToWaiterPad(var SalePOS: Record "NPR POS Sale"; var WaiterPad: Record "NPR NPRE Waiter Pad"; CleanupSale: Boolean; SkipAutoSendKitchenOrder: Boolean) SaleCleanupSuccessful: Boolean
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         TempLineRelation: Record "Line Number Buffer" temporary;
@@ -187,7 +192,8 @@
         OnAfterMoveSaleFromPosToWaiterPad(WaiterPad, WaiterPadLine);
 
         Commit();
-        RestaurantPrint.LinesAddedToWaiterPad(WaiterPad);
+        if not SkipAutoSendKitchenOrder then
+            RestaurantPrint.LinesAddedToWaiterPad(WaiterPad);
 
         Span.Finish();
     end;

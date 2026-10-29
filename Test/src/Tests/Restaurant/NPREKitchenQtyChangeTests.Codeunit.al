@@ -16,6 +16,7 @@ codeunit 85408 "NPR NPRE Kitchen QtyChg Tests"
         _POSInitialized: Boolean;
         _RestaurantInitialized: Boolean;
         MainCourseStepTok: Label 'MAIN', Locked = true;
+        DessertStepTok: Label 'DESSERT', Locked = true;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
@@ -112,6 +113,198 @@ codeunit 85408 "NPR NPRE Kitchen QtyChg Tests"
         // [THEN] The request is cancelled
         FindOnlyRequest(WaiterPad."No.", KitchenRequest);
         _Assert.AreEqual(KitchenRequest."Line Status"::Cancelled, KitchenRequest."Line Status", 'Dropping the line to zero should cancel its kitchen request.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure QuantityDecreasedToZero_SentWithNothingToSendCheck_RequestAndOrderCancelled()
+    var
+        KitchenOrder: Record "NPR NPRE Kitchen Order";
+        KitchenRequest: Record "NPR NPRE Kitchen Request";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+    begin
+        // [SCENARIO] Taking the only dish off the order cancels its kitchen work and its kitchen order, also when the send checks for nothing to send
+        // [GIVEN] A line of one, sent, on the only request of its kitchen order
+        Initialize();
+        CreateSentPadLine(WaiterPad, WaiterPadLine, 1);
+
+        // [WHEN] The quantity drops to zero and the pad is sent the way the Send Kitchen Order POS action does
+        SetLineQuantity(WaiterPadLine, 0);
+        _LibraryRestaurant.SendWaiterPadToKitchen(WaiterPad, true);
+
+        // [THEN] The request and its kitchen order are cancelled
+        FindOnlyRequest(WaiterPad."No.", KitchenRequest);
+        _Assert.AreEqual(KitchenRequest."Line Status"::Cancelled, KitchenRequest."Line Status", 'Dropping the only line to zero should cancel its kitchen request.');
+        KitchenOrder.Get(KitchenRequest."Order ID");
+        _Assert.AreEqual(KitchenOrder."Order Status"::Cancelled, KitchenOrder."Order Status", 'A kitchen order whose every request is cancelled should be cancelled too.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure QuantityDecreasedToZero_RequestsOnTwoOrders_BothOrdersCancelled()
+    var
+        KitchenOrder: Record "NPR NPRE Kitchen Order";
+        KitchenRequest: Record "NPR NPRE Kitchen Request";
+        KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
+        FirstOrderID: BigInteger;
+    begin
+        // [SCENARIO] Taking a dish off the order cancels it on every kitchen order it was sent to, and every one of those orders is updated
+        // [GIVEN] A new kitchen order for each send, and a line of one that was finished in production and then raised to two on a second order
+        Initialize();
+        _Restaurant.Find();
+        _Restaurant."Order ID Assign. Method" := _Restaurant."Order ID Assign. Method"::"New Each Time";
+        _Restaurant.Modify();
+        CreateSentPadLine(WaiterPad, WaiterPadLine, 1);
+        FirstOrderID := OnlyRequestOrderID(WaiterPad."No.");
+        KitchenOrderMgt.SetHideValidationDialog(true);
+        FindOnlyStation(WaiterPad."No.", KitchenRequestStation);
+        KitchenOrderMgt.EndProduction(KitchenRequestStation);
+        SetLineQuantity(WaiterPadLine, 2);
+        _LibraryRestaurant.SendWaiterPadToKitchen(WaiterPad);
+        FindRequests(WaiterPad."No.", KitchenRequest);
+        KitchenRequest.SetFilter("Order ID", '<>%1', FirstOrderID);
+        _Assert.AreEqual(1, KitchenRequest.Count(), 'The increase should have been sent on a second kitchen order.');
+
+        // [WHEN] The quantity drops to zero and the pad is sent the way the Send Kitchen Order POS action does
+        SetLineQuantity(WaiterPadLine, 0);
+        _LibraryRestaurant.SendWaiterPadToKitchen(WaiterPad, true);
+
+        // [THEN] Both kitchen orders are cancelled
+        FindRequests(WaiterPad."No.", KitchenRequest);
+        KitchenRequest.FindSet();
+        repeat
+            KitchenOrder.Get(KitchenRequest."Order ID");
+            _Assert.AreEqual(KitchenOrder."Order Status"::Cancelled, KitchenOrder."Order Status", 'Every kitchen order the dish was taken off should be cancelled.');
+        until KitchenRequest.Next() = 0;
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure QuantityDecreased_IncreaseAfterServingCancelled_ItsOrderCancelled()
+    var
+        KitchenOrder: Record "NPR NPRE Kitchen Order";
+        KitchenRequest: Record "NPR NPRE Kitchen Request";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        ServedRequestNo: BigInteger;
+    begin
+        // [SCENARIO] Cutting back only the extra portion ordered after serving cancels that portion's kitchen order, while the served one stays
+        // [GIVEN] A line of one, served, then raised to two, which puts the extra portion on a new kitchen order
+        Initialize();
+        CreateSentPadLine(WaiterPad, WaiterPadLine, 1);
+        ServeEverything(WaiterPad);
+        ServedRequestNo := OnlyRequestNo(WaiterPad."No.");
+        SetLineQuantity(WaiterPadLine, 2);
+        _LibraryRestaurant.SendWaiterPadToKitchen(WaiterPad);
+
+        // [WHEN] The quantity drops back to one and the pad is sent again
+        SetLineQuantity(WaiterPadLine, 1);
+        _LibraryRestaurant.SendWaiterPadToKitchen(WaiterPad);
+
+        // [THEN] The extra portion and its kitchen order are cancelled
+        FindRequests(WaiterPad."No.", KitchenRequest);
+        KitchenRequest.SetFilter("Request No.", '<>%1', ServedRequestNo);
+        _Assert.IsTrue(KitchenRequest.FindFirst(), 'The increase should have raised a second request.');
+        _Assert.AreEqual(KitchenRequest."Line Status"::Cancelled, KitchenRequest."Line Status", 'The extra portion should be cancelled.');
+        KitchenOrder.Get(KitchenRequest."Order ID");
+        _Assert.AreEqual(KitchenOrder."Order Status"::Cancelled, KitchenOrder."Order Status", 'The kitchen order of the cancelled portion should be cancelled too.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure QuantityDecreasedToZero_ServingRequested_ItsOrderCancelled()
+    var
+        KitchenOrder: Record "NPR NPRE Kitchen Order";
+        KitchenRequest: Record "NPR NPRE Kitchen Request";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        FirstWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        SecondWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        FirstOrderID: BigInteger;
+    begin
+        // [SCENARIO] Taking a dish off the order and then requesting serving cancels that dish's kitchen order
+        // [GIVEN] A new kitchen order for each send, one dish sent on a first order, a second dish sent on a second order, and the second dish taken off
+        Initialize();
+        _Restaurant.Find();
+        _Restaurant."Order ID Assign. Method" := _Restaurant."Order ID Assign. Method"::"New Each Time";
+        _Restaurant.Modify();
+        CreateSentPadLine(WaiterPad, FirstWaiterPadLine, 1);
+        FirstOrderID := OnlyRequestOrderID(WaiterPad."No.");
+        AddSentPadLine(WaiterPad, SecondWaiterPadLine, 1);
+        SetLineQuantity(SecondWaiterPadLine, 0);
+
+        // [WHEN] Serving is requested for the pad
+        RequestServing(WaiterPad);
+
+        // [THEN] The second dish and its kitchen order are cancelled
+        FindRequests(WaiterPad."No.", KitchenRequest);
+        KitchenRequest.SetFilter("Order ID", '<>%1', FirstOrderID);
+        _Assert.IsTrue(KitchenRequest.FindFirst(), 'The second dish should have been sent on a second kitchen order.');
+        _Assert.AreEqual(KitchenRequest."Line Status"::Cancelled, KitchenRequest."Line Status", 'The dish taken off should be cancelled.');
+        KitchenOrder.Get(KitchenRequest."Order ID");
+        _Assert.AreEqual(KitchenOrder."Order Status"::Cancelled, KitchenOrder."Order Status", 'The kitchen order of the dish taken off should be cancelled too.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure QuantityDecreasedToZero_NewDishSentTogether_NewDishJoinsSameOrder()
+    var
+        KitchenOrder: Record "NPR NPRE Kitchen Order";
+        KitchenRequest: Record "NPR NPRE Kitchen Request";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        FirstWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        SecondWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        FirstOrderID: BigInteger;
+    begin
+        // [SCENARIO] Swapping a dish for another one in the same send keeps the new dish on the same kitchen order
+        // [GIVEN] A line of one, sent, and a second dish added to the pad but not sent yet
+        Initialize();
+        CreateSentPadLine(WaiterPad, FirstWaiterPadLine, 1);
+        FirstOrderID := OnlyRequestOrderID(WaiterPad."No.");
+        AddRoutedPadLine(WaiterPad, SecondWaiterPadLine, MainCourseStepTok, 1);
+
+        // [WHEN] The first dish drops to zero and the pad is sent the way the Send Kitchen Order POS action does
+        SetLineQuantity(FirstWaiterPadLine, 0);
+        _LibraryRestaurant.SendWaiterPadToKitchen(WaiterPad, true);
+
+        // [THEN] The new dish is on the first kitchen order, which stays open
+        FindOnlyLiveRequest(WaiterPad."No.", KitchenRequest);
+        _Assert.AreEqual(FirstOrderID, KitchenRequest."Order ID", 'The new dish should join the kitchen order of the dish it replaced.');
+        KitchenOrder.Get(FirstOrderID);
+        _Assert.AreEqual(KitchenOrder."Order Status"::Planned, KitchenOrder."Order Status", 'The kitchen order should stay open for the new dish.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure QuantityDecreasedToZero_NewDishOnLaterServingStep_NewDishJoinsSameOrder()
+    var
+        KitchenOrder: Record "NPR NPRE Kitchen Order";
+        KitchenRequest: Record "NPR NPRE Kitchen Request";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        FirstWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        SecondWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        FirstOrderID: BigInteger;
+    begin
+        // [SCENARIO] Swapping a dish for one from a later serving step in the same send keeps the new dish on the same kitchen order
+        // [GIVEN] A main course of one, sent, and a dessert added to the pad but not sent yet
+        Initialize();
+        _LibraryRestaurant.AddKitchenStationAtStep(_Restaurant.Code, _SeatingLocation.Code, DessertStepTok, 0);
+        CreateSentPadLine(WaiterPad, FirstWaiterPadLine, 1);
+        FirstOrderID := OnlyRequestOrderID(WaiterPad."No.");
+        AddRoutedPadLine(WaiterPad, SecondWaiterPadLine, DessertStepTok, 1);
+
+        // [WHEN] The main course drops to zero and the pad is sent the way the Send Kitchen Order POS action does
+        SetLineQuantity(FirstWaiterPadLine, 0);
+        _LibraryRestaurant.SendWaiterPadToKitchen(WaiterPad, true);
+
+        // [THEN] The dessert is on the first kitchen order, which stays open
+        FindOnlyLiveRequest(WaiterPad."No.", KitchenRequest);
+        _Assert.AreEqual(FirstOrderID, KitchenRequest."Order ID", 'The dessert should join the kitchen order of the dish it replaced.');
+        KitchenOrder.Get(FirstOrderID);
+        _Assert.AreEqual(KitchenOrder."Order Status"::Planned, KitchenOrder."Order Status", 'The kitchen order should stay open for the dessert.');
     end;
 
     [Test]
@@ -267,18 +460,29 @@ codeunit 85408 "NPR NPRE Kitchen QtyChg Tests"
 
     local procedure CreateSentPadLine(var WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; Quantity: Decimal)
     var
-        Item: Record Item;
-        ItemRoutingProfile: Record "NPR NPRE Item Routing Profile";
         Seating: Record "NPR NPRE Seating";
     begin
         _LibraryRestaurant.CreateSeating(Seating, _SeatingLocation.Code);
         _LibraryRestaurant.CreateWaiterPadForSeating(Seating.Code, WaiterPad);
+        AddSentPadLine(WaiterPad, WaiterPadLine, Quantity);
+    end;
+
+    local procedure AddSentPadLine(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; Quantity: Decimal)
+    begin
+        AddRoutedPadLine(WaiterPad, WaiterPadLine, MainCourseStepTok, Quantity);
+        _LibraryRestaurant.SendWaiterPadToKitchen(WaiterPad);
+    end;
+
+    local procedure AddRoutedPadLine(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; ServingStep: Code[10]; Quantity: Decimal)
+    var
+        Item: Record Item;
+        ItemRoutingProfile: Record "NPR NPRE Item Routing Profile";
+    begin
         _LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         _LibraryRestaurant.CreateItemRoutingProfile(ItemRoutingProfile);
-        _LibraryRestaurant.AssignFlowStatusToRoutingProfile(ItemRoutingProfile, MainCourseStepTok);
+        _LibraryRestaurant.AssignFlowStatusToRoutingProfile(ItemRoutingProfile, ServingStep);
         _LibraryRestaurant.LinkItemToRoutingProfile(Item, ItemRoutingProfile.Code);
         _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", Item."No.", Quantity, 0, WaiterPadLine);
-        _LibraryRestaurant.SendWaiterPadToKitchen(WaiterPad);
     end;
 
     local procedure SetLineQuantity(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; Quantity: Decimal)
@@ -301,6 +505,17 @@ codeunit 85408 "NPR NPRE Kitchen QtyChg Tests"
                 _LibraryRestaurant.FinishKitchenOrder(KitchenRequest."Order ID");
             end;
         until KitchenRequest.Next() = 0;
+    end;
+
+    local procedure RequestServing(WaiterPad: Record "NPR NPRE Waiter Pad")
+    var
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
+        ServingRequestType: Option "Order","Serving Request";
+    begin
+        WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
+        KitchenOrderMgt.SendWPLinesToKitchen(WaiterPad, WaiterPadLine, MainCourseStepTok, '', ServingRequestType::"Serving Request", 0DT);
+        KitchenOrderMgt.UpdateCancelledKitchenOrders();
     end;
 
     local procedure StartProductionOnPad(WaiterPad: Record "NPR NPRE Waiter Pad")
@@ -326,12 +541,28 @@ codeunit 85408 "NPR NPRE Kitchen QtyChg Tests"
         KitchenRequest.FindFirst();
     end;
 
+    local procedure FindOnlyLiveRequest(WaiterPadNo: Code[20]; var KitchenRequest: Record "NPR NPRE Kitchen Request")
+    begin
+        FindRequests(WaiterPadNo, KitchenRequest);
+        KitchenRequest.SetFilter("Line Status", '<>%1', KitchenRequest."Line Status"::Cancelled);
+        _Assert.AreEqual(1, KitchenRequest.Count(), 'The pad should have exactly one live kitchen request at this point.');
+        KitchenRequest.FindFirst();
+    end;
+
     local procedure OnlyRequestNo(WaiterPadNo: Code[20]): BigInteger
     var
         KitchenRequest: Record "NPR NPRE Kitchen Request";
     begin
         FindOnlyRequest(WaiterPadNo, KitchenRequest);
         exit(KitchenRequest."Request No.");
+    end;
+
+    local procedure OnlyRequestOrderID(WaiterPadNo: Code[20]): BigInteger
+    var
+        KitchenRequest: Record "NPR NPRE Kitchen Request";
+    begin
+        FindOnlyRequest(WaiterPadNo, KitchenRequest);
+        exit(KitchenRequest."Order ID");
     end;
 
     local procedure RequestCount(WaiterPadNo: Code[20]): Integer

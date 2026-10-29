@@ -63,6 +63,113 @@ codeunit 85411 "NPR NPRE Kitchen Print Tests"
         NothingEligible_SendRequested_NothingToSendReportedImpl();
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SendKitchenOrderAction_AllLines_LineSentOnce()
+    var
+        Item: Record Item;
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        POSSession: Codeunit "NPR POS Session";
+        WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Close w/out Saving";
+        WPadLinesToSend: Option "New/Updated",All;
+    begin
+        // [SCENARIO] A Send Kitchen Order button on an open sale sends the order once, also when saving to the pad sends it automatically
+        // [GIVEN] Saving to the pad sends the kitchen order automatically, and an open sale on a pad holds one kitchen-routed item
+        Initialize();
+        SetSeatingLocationAutoSend("NPR NPRE Auto Send Kitch.Order"::Yes);
+        StartSaleOnPadWithRoutedItem(POSSession, WaiterPad, Item);
+
+        // [WHEN] The waiter pad action sends the kitchen order with all lines
+        RunWaiterPadActionFromSale(POSSession, WPadAction::"Send Kitchen Order", WPadLinesToSend::All);
+
+        // [THEN] The line was sent to the kitchen once
+        FindPadLineForItem(WaiterPad."No.", Item."No.", WaiterPadLine);
+        _Assert.AreEqual(1, KitchenOrderKdsLogCount(WaiterPad."No.", WaiterPadLine."Line No."), 'One press of the button should send the line to the kitchen once.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SendKitchenOrderAction_NewLines_LineSentOnceWithoutNothingToSend()
+    var
+        Item: Record Item;
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        POSSession: Codeunit "NPR POS Session";
+        WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Close w/out Saving";
+        WPadLinesToSend: Option "New/Updated",All;
+    begin
+        // [SCENARIO] A Send Kitchen Order button that sends only new lines does not report "Nothing to send." right after sending them
+        // [GIVEN] Saving to the pad sends the kitchen order automatically, and an open sale on a pad holds one kitchen-routed item
+        Initialize();
+        SetSeatingLocationAutoSend("NPR NPRE Auto Send Kitch.Order"::Yes);
+        StartSaleOnPadWithRoutedItem(POSSession, WaiterPad, Item);
+
+        // [WHEN] The waiter pad action sends the kitchen order with new and updated lines only
+        RunWaiterPadActionFromSale(POSSession, WPadAction::"Send Kitchen Order", WPadLinesToSend::"New/Updated");
+
+        // [THEN] No error was raised and the line was sent to the kitchen once
+        FindPadLineForItem(WaiterPad."No.", Item."No.", WaiterPadLine);
+        _Assert.AreEqual(1, KitchenOrderKdsLogCount(WaiterPad."No.", WaiterPadLine."Line No."), 'The new line should be sent to the kitchen once.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RequestNextServingAction_SaleStillSentOnSave()
+    var
+        Item: Record Item;
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        POSSession: Codeunit "NPR POS Session";
+        WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Close w/out Saving";
+        WPadLinesToSend: Option "New/Updated",All;
+    begin
+        // [SCENARIO] The other waiter pad actions still send the kitchen order when they save the sale to the pad
+        // [GIVEN] Saving to the pad sends the kitchen order automatically, and an open sale on a pad holds one kitchen-routed item
+        Initialize();
+        SetSeatingLocationAutoSend("NPR NPRE Auto Send Kitch.Order"::Yes);
+        StartSaleOnPadWithRoutedItem(POSSession, WaiterPad, Item);
+
+        // [WHEN] The waiter pad action requests the next serving
+        RunWaiterPadActionFromSale(POSSession, WPadAction::"Request Next Serving", WPadLinesToSend::"New/Updated");
+
+        // [THEN] Saving the sale sent the kitchen order for the line once
+        FindPadLineForItem(WaiterPad."No.", Item."No.", WaiterPadLine);
+        _Assert.AreEqual(1, KitchenOrderKdsLogCount(WaiterPad."No.", WaiterPadLine."Line No."), 'Saving the sale to the pad should still send the kitchen order before the serving is requested.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SendKitchenOrderAction_SentLineRemoved_KitchenRequestCancelled()
+    var
+        KeptItem: Record Item;
+        RemovedItem: Record Item;
+        KitchenRequest: Record "NPR NPRE Kitchen Request";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        POSSession: Codeunit "NPR POS Session";
+        WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Close w/out Saving";
+        WPadLinesToSend: Option "New/Updated",All;
+    begin
+        // [SCENARIO] A dish deleted from the sale after it was sent is cancelled in the kitchen when the Send Kitchen Order button is pressed
+        // [GIVEN] Saving to the pad does not send the kitchen order automatically, and two kitchen-routed dishes on an open sale were sent with the button
+        Initialize();
+        SetSeatingLocationAutoSend("NPR NPRE Auto Send Kitch.Order"::No);
+        StartSaleOnPadWithRoutedItem(POSSession, WaiterPad, RemovedItem);
+        AddRoutedItemToSale(POSSession, KeptItem);
+        RunWaiterPadActionFromSale(POSSession, WPadAction::"Send Kitchen Order", WPadLinesToSend::"New/Updated");
+        FindPadLineForItem(WaiterPad."No.", RemovedItem."No.", WaiterPadLine);
+        FindKitchenRequestForPadLine(WaiterPadLine, KitchenRequest);
+
+        // [WHEN] One dish is deleted from the sale and the button is pressed again
+        DeleteSaleLineForItem(POSSession, RemovedItem."No.");
+        RunWaiterPadActionFromSale(POSSession, WPadAction::"Send Kitchen Order", WPadLinesToSend::"New/Updated");
+
+        // [THEN] The deleted dish is cancelled in the kitchen
+        KitchenRequest.Find();
+        _Assert.AreEqual(KitchenRequest."Line Status"::Cancelled, KitchenRequest."Line Status", 'A dish deleted from the sale should be cancelled in the kitchen.');
+    end;
+
     #region Scenario bodies
 
     local procedure UnsentLineEligible_SentLineNotImpl()
@@ -242,11 +349,112 @@ codeunit 85411 "NPR NPRE Kitchen Print Tests"
             WaiterPad, WaiterPadLine, PrintTemplate."Print Type"::"Kitchen Order", ServingStep, ForceResend, ShowNothingToSendErr);
     end;
 
+    local procedure SetSeatingLocationAutoSend(AutoSendKitchenOrder: Enum "NPR NPRE Auto Send Kitch.Order")
+    begin
+        _SeatingLocation.Find();
+        _SeatingLocation."Auto Send Kitchen Order" := AutoSendKitchenOrder;
+        _SeatingLocation."Resend All On New Lines" := _SeatingLocation."Resend All On New Lines"::No;
+        _SeatingLocation.Modify();
+    end;
+
+    local procedure StartSaleOnPadWithRoutedItem(var POSSession: Codeunit "NPR POS Session"; var WaiterPad: Record "NPR NPRE Waiter Pad"; var Item: Record Item)
+    var
+        SalePOS: Record "NPR POS Sale";
+        Seating: Record "NPR NPRE Seating";
+        POSSale: Codeunit "NPR POS Sale";
+    begin
+        _LibraryRestaurant.CreateSeating(Seating, _SeatingLocation.Code);
+        _LibraryRestaurant.CreateWaiterPadForSeating(Seating.Code, WaiterPad);
+        CreateRoutedSaleItem(Item);
+
+        _LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, _POSUnit, POSSale);
+        _LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS."NPRE Pre-Set Waiter Pad No." := WaiterPad."No.";
+        SalePOS."NPRE Pre-Set Seating Code" := Seating.Code;
+        POSSale.Refresh(SalePOS);
+        POSSale.Modify(true, false);
+    end;
+
+    local procedure RunWaiterPadActionFromSale(POSSession: Codeunit "NPR POS Session"; WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Close w/out Saving"; WPadLinesToSend: Option "New/Updated",All)
+    var
+        POSActionRunWaiterPad: Codeunit "NPR POSAction: Run WAct-B";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NewWaiterPadNo: Code[20];
+        CleanupMessageText: Text;
+        ResultMessageText: Text;
+    begin
+        POSSession.GetSale(POSSale);
+        POSSession.GetSaleLine(POSSaleLine);
+        POSActionRunWaiterPad.RunWaiterPadAction(
+            WPadAction, WPadLinesToSend, '', false, true, POSSale, POSSaleLine, NewWaiterPadNo, ResultMessageText, CleanupMessageText);
+    end;
+
+    local procedure CreateRoutedSaleItem(var Item: Record Item)
+    var
+        ItemRoutingProfile: Record "NPR NPRE Item Routing Profile";
+    begin
+        _LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        _LibraryRestaurant.CreateItemRoutingProfile(ItemRoutingProfile);
+        _LibraryRestaurant.AssignFlowStatusToRoutingProfile(ItemRoutingProfile, MainCourseStepTok);
+        _LibraryRestaurant.LinkItemToRoutingProfile(Item, ItemRoutingProfile.Code);
+    end;
+
+    local procedure AddRoutedItemToSale(POSSession: Codeunit "NPR POS Session"; var Item: Record Item)
+    begin
+        CreateRoutedSaleItem(Item);
+        _LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+    end;
+
+    local procedure DeleteSaleLineForItem(POSSession: Codeunit "NPR POS Session"; ItemNo: Code[20])
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        POSSale: Codeunit "NPR POS Sale";
+    begin
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange("No.", ItemNo);
+        SaleLinePOS.FindFirst();
+        SaleLinePOS.Delete(true);
+    end;
+
+    local procedure FindPadLineForItem(WaiterPadNo: Code[20]; ItemNo: Code[20]; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
+    begin
+        WaiterPadLine.SetRange("Waiter Pad No.", WaiterPadNo);
+        WaiterPadLine.SetRange("No.", ItemNo);
+        _Assert.IsTrue(WaiterPadLine.FindFirst(), 'The sale line should have been saved to the waiter pad.');
+    end;
+
+    local procedure FindKitchenRequestForPadLine(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; var KitchenRequest: Record "NPR NPRE Kitchen Request")
+    var
+        KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link";
+    begin
+        KitchenReqSourceLink.SetRange("Source Document Type", KitchenReqSourceLink."Source Document Type"::"Waiter Pad");
+        KitchenReqSourceLink.SetRange("Source Document No.", WaiterPadLine."Waiter Pad No.");
+        KitchenReqSourceLink.SetRange("Source Document Line No.", WaiterPadLine."Line No.");
+        _Assert.IsTrue(KitchenReqSourceLink.FindFirst(), 'The dish should have reached the kitchen.');
+        KitchenRequest.Get(KitchenReqSourceLink."Request No.");
+    end;
+
     local procedure KdsLogCount(WaiterPadNo: Code[20]; WaiterPadLineNo: Integer): Integer
     var
         WPadLinePrintLogEntry: Record "NPR NPRE W.Pad Prnt LogEntry";
     begin
         FilterKdsLog(WaiterPadNo, WaiterPadLineNo, WPadLinePrintLogEntry);
+        exit(WPadLinePrintLogEntry.Count());
+    end;
+
+    local procedure KitchenOrderKdsLogCount(WaiterPadNo: Code[20]; WaiterPadLineNo: Integer): Integer
+    var
+        WPadLinePrintLogEntry: Record "NPR NPRE W.Pad Prnt LogEntry";
+    begin
+        FilterKdsLog(WaiterPadNo, WaiterPadLineNo, WPadLinePrintLogEntry);
+        WPadLinePrintLogEntry.SetRange("Print Type", WPadLinePrintLogEntry."Print Type"::"Kitchen Order");
         exit(WPadLinePrintLogEntry.Count());
     end;
 
