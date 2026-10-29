@@ -1,11 +1,12 @@
 page 6150936 "NPR CMPartnerSetupList"
 {
     Extensible = false;
-    Caption = 'OTA Channel Manager Partner Setup';
+    Caption = 'Partner Setup';
     PageType = List;
     SourceTable = "NPR CMPartnerSetup";
     UsageCategory = Lists;
     ApplicationArea = NPRRetail;
+    AdditionalSearchTerms = 'Tour Booking Partner Setup, OTA Channel Manager Partner Setup';
     DelayedInsert = true;
 
     layout
@@ -42,6 +43,30 @@ page 6150936 "NPR CMPartnerSetupList"
                 field(DocumentNoSeries; Rec.DocumentNoSeries)
                 {
                     ToolTip = 'No. Series used to assign the Buy-from Order Reference for orders created by this partner. Leave blank to fall back to the auto-generated CM-YYMMDDHHMMSS-XXXX format.';
+                    ApplicationArea = NPRRetail;
+                }
+
+                field(PartnerType; Rec.PartnerType)
+                {
+                    ToolTip = 'API partners submit orders through the API. Tour Booking partners are used for the bookings created on the Tour Bookings page in Business Central.';
+                    ApplicationArea = NPRRetail;
+                }
+
+                field(Distribution; Rec.Distribution)
+                {
+                    ToolTip = 'How the customer receives the order. With NP Mail, an order confirmation is sent when an unpaid order is issued, and the wallets are sent when the order is confirmed.';
+                    ApplicationArea = NPRRetail;
+                }
+
+                field(OrderConfirmationTemplateId; Rec.OrderConfirmationTemplateId)
+                {
+                    ToolTip = 'NP Email template for the order confirmation sent when an unpaid order is issued. The mail carries the order reference the customer shows at pick-up.';
+                    ApplicationArea = NPRRetail;
+                }
+
+                field(WalletEmailTemplateId; Rec.WalletEmailTemplateId)
+                {
+                    ToolTip = 'NP Email template for the wallet mail sent when the order is confirmed.';
                     ApplicationArea = NPRRetail;
                 }
             }

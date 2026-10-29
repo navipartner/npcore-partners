@@ -64,6 +64,11 @@ table 6059929 "NPR CMOrderLine"
             DataClassification = CustomerContent;
             Caption = 'Notification Address';
             ExtendedDatatype = EMail;
+
+            trigger OnValidate()
+            begin
+                Rec.NotificationAddress := CopyStr(LowerCase(Rec.NotificationAddress), 1, MaxStrLen(Rec.NotificationAddress));
+            end;
         }
 
         field(50; Name; Text[100])
@@ -78,6 +83,12 @@ table 6059929 "NPR CMOrderLine"
             Caption = 'Language';
             TableRelation = Language.Code;
         }
+
+        field(70; PosSaleLineId; Guid)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'POS Sale Line Id';
+        }
     }
 
     keys
@@ -88,6 +99,11 @@ table 6059929 "NPR CMOrderLine"
         }
 
         key(Key2; ItemNo)
+        {
+            Clustered = false;
+        }
+
+        key(Key3; PosSaleLineId)
         {
             Clustered = false;
         }

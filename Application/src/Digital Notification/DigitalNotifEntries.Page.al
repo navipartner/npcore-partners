@@ -38,7 +38,7 @@ page 6150918 "NPR Digital Notif. Entries"
                 field("Document Type"; Rec."Document Type")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the document type (Invoice, Credit Memo, or Ecom Sales Document).';
+                    ToolTip = 'Specifies the document type (Invoice, Credit Memo, Ecom Sales Document, or Channel Manager Order).';
                 }
                 field("Notification Type"; Rec."Notification Type")
                 {
@@ -246,6 +246,7 @@ page 6150918 "NPR Digital Notif. Entries"
         SalesInvHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         EcomSalesHeader: Record "NPR Ecom Sales Header";
+        Order: Record "NPR CMOrder";
     begin
         case NotifEntry."Document Type" of
             "NPR Digital Document Type"::Invoice:
@@ -257,7 +258,24 @@ page 6150918 "NPR Digital Notif. Entries"
             "NPR Digital Document Type"::"Ecom Sales Document":
                 if EcomSalesHeader.GetBySystemId(NotifEntry."Source Document Id") then
                     Page.Run(Page::"NPR Ecom Sales Document", EcomSalesHeader);
+            "NPR Digital Document Type"::"Channel Manager Order":
+                if (Order.Get(NotifEntry."Source Document Id")) then
+                    if (IsApiPartner(Order.PartnerId)) then
+                        Page.Run(Page::"NPR CMOrderCard", Order)
+                    else
+                        Page.Run(Page::"NPR CMTourBookingCard", Order);
         end;
+    end;
+
+    local procedure IsApiPartner(PartnerId: Guid): Boolean
+    var
+        PartnerSetup: Record "NPR CMPartnerSetup";
+    begin
+        if (not PartnerSetup.Get(PartnerId)) then
+            exit(false);
+        if (PartnerSetup.PartnerType <> PartnerSetup.PartnerType::API) then
+            exit(false);
+        exit(true);
     end;
 
     local procedure GetManifestUrl(ManifestId: Guid) Url: Text[250]

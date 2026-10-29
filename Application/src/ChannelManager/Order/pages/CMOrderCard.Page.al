@@ -92,7 +92,7 @@ page 6150939 "NPR CMOrderCard"
                 field(SellToEmail; Rec.SellToEmail)
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Default customer e-mail address (default for line notifications).';
+                    ToolTip = 'Default customer email address (default for line notifications).';
                 }
                 field(SellToLanguage; Rec.SellToLanguage)
                 {

@@ -1859,6 +1859,22 @@
         ClearWalletTicketAssets(WalletEntryNo, Reference, AffectedAssets);
     end;
 
+    internal procedure SetWalletName(WalletEntryNo: Integer; Name: Text[100]; var AffectedAssets: Dictionary of [Guid, Integer])
+    var
+        Wallet: Record "NPR AttractionWallet";
+    begin
+        Clear(AffectedAssets);
+        if (not Wallet.Get(WalletEntryNo)) then
+            exit;
+
+        if (Wallet.Description = Name) then
+            exit;
+
+        Wallet.Description := Name;
+        Wallet.Modify();
+        AffectedAssets.Set(Wallet.SystemId, Database::"NPR AttractionWallet");
+    end;
+
     local procedure ClearWalletHeaderReferences(Wallet: Record "NPR AttractionWallet"; Reference: Text[100]; AnonymizedReference: Text[100]; var AffectedAssets: Dictionary of [Guid, Integer])
     var
         WalletAssetHeaderRef: Record "NPR WalletAssetHeaderReference";

@@ -16,5 +16,9 @@ enum 6151015 "NPR Digital Document Type"
     {
         Caption = 'Ecom Sales Document';
     }
+    value(20; "Channel Manager Order")
+    {
+        Caption = 'Channel Manager Order';
+    }
 }
 #endif

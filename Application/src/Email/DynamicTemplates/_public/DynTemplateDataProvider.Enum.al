@@ -53,4 +53,14 @@ enum 6059867 "NPR DynTemplateDataProvider" implements "NPR IDynamicTemplateDataP
         Caption = 'Pay by Link';
         Implementation = "NPR IDynamicTemplateDataProvider" = "NPR NPEmailPayByLinkDataProv";
     }
+    value(10; CHANNEL_MANAGER_ORDER)
+    {
+        Caption = 'Channel Manager Order';
+        Implementation = "NPR IDynamicTemplateDataProvider" = "NPR CMOrderEmailDataProv";
+    }
+    value(11; CHANNEL_MANAGER_WALLETS)
+    {
+        Caption = 'Channel Manager Wallets';
+        Implementation = "NPR IDynamicTemplateDataProvider" = "NPR CMWalletsEmailDataProv";
+    }
 }

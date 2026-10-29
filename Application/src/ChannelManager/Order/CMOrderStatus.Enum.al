@@ -21,6 +21,11 @@ enum 6014584 "NPR CMOrderStatus"
         Caption = 'Scheduled';
     }
 
+    value(3; WIP)
+    {
+        Caption = 'Work in Progress';
+    }
+
     value(5; Draft)
     {
         Caption = 'Draft';

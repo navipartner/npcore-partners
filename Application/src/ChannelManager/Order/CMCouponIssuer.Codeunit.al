@@ -64,7 +64,7 @@ codeunit 6151057 "NPR CMCouponIssuer"
             exit;
 
         ResolveVisitForComponent(OrderLine, AddOnLine."Item No.", VisitDate, VisitTime);
-        GetOrComputeAddOnLinePrice(AddOnLine, VisitDate, VisitTime, PricesExcl, PricesIncl, UnitPriceExclVat, UnitPriceInclVat);
+        GetOrComputeAddOnLinePrice(AddOnLine, Order.SellToCustomerNo, VisitDate, VisitTime, PricesExcl, PricesIncl, UnitPriceExclVat, UnitPriceInclVat);
 
         PostCouponEntries := Order.PaymentReference <> '';
         Coupons.IssueCoupons(CouponSetup."Coupon Type", Quantity, TempCoupon, PostCouponEntries);
@@ -147,6 +147,7 @@ codeunit 6151057 "NPR CMCouponIssuer"
 
     local procedure GetOrComputeAddOnLinePrice(
         AddOnLine: Record "NPR NpIa Item AddOn Line";
+        CustomerNo: Code[20];
         VisitDate: Date; VisitTime: Time;
         var PricesExcl: Dictionary of [Integer, Decimal];
         var PricesIncl: Dictionary of [Integer, Decimal];
@@ -160,7 +161,7 @@ codeunit 6151057 "NPR CMCouponIssuer"
             exit;
         end;
 
-        WalletMgr.CalculateAddOnLineUnitPrice(AddOnLine, '', VisitDate, VisitTime, UnitPriceExclVat, UnitPriceInclVat);
+        WalletMgr.CalculateAddOnLineUnitPrice(AddOnLine, CustomerNo, VisitDate, VisitTime, UnitPriceExclVat, UnitPriceInclVat);
         PricesExcl.Add(AddOnLine."Line No.", UnitPriceExclVat);
         PricesIncl.Add(AddOnLine."Line No.", UnitPriceInclVat);
     end;

@@ -65,7 +65,7 @@
                 field(SellToEmail; Rec.SellToEmail)
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Default customer e-mail address on the order.';
+                    ToolTip = 'Default customer email address on the order.';
                 }
                 field(PaymentReference; Rec.PaymentReference)
                 {
@@ -121,7 +121,7 @@
             {
                 Caption = 'Clear Personal Data';
                 Image = ClearLog;
-                ToolTip = 'Remove the personal data from the selected orders: the sell-to and line names are cleared and the e-mail addresses are replaced by ones that cannot receive mail. The clear follows through to the tickets issued from the order and their associated records. The order and payment references are kept. Irreversible.';
+                ToolTip = 'Remove the personal data from the selected orders: the sell-to and line names are cleared and the email addresses are replaced by ones that cannot receive mail. The clear follows through to the tickets issued from the order and their associated records. The order and payment references are kept. Irreversible.';
                 ApplicationArea = NPRRetail;
                 Scope = Repeater;
 
@@ -159,6 +159,11 @@
     }
 
 
+
+    trigger OnOpenPage()
+    begin
+        Rec.SetFilter(PartnerType, '=%1', Rec.PartnerType::API);
+    end;
 
     trigger OnAfterGetRecord()
     var

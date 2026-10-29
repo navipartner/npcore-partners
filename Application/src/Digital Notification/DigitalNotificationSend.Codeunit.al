@@ -105,10 +105,10 @@ codeunit 6150963 "NPR Digital Notification Send"
         DigitalNotifSetup: Record "NPR Digital Notification Setup";
     begin
         NotifEntry.SetRange(Sent, false);
-        NotifEntry.SetFilter("Document Type", '<>%1', "NPR Digital Document Type"::"Ecom Sales Document");
+        NotifEntry.SetFilter("Document Type", '<>%1&<>%2', "NPR Digital Document Type"::"Ecom Sales Document", "NPR Digital Document Type"::"Channel Manager Order");
 
-        if not DigitalNotifSetup.Get() then
-            exit;
+        if (not DigitalNotifSetup.Get()) then
+            DigitalNotifSetup.Init();
 
         if DigitalNotifSetup."Max Attempts" > 0 then
             NotifEntry.SetFilter("Attempt Count", '<%1', DigitalNotifSetup."Max Attempts");

@@ -45,7 +45,7 @@ codeunit 6151040 "NPR CMJobQueueSetup"
     internal procedure ShowMissingJobQueueEntryNotification()
     var
         Notif: Notification;
-        Msg: Label 'No Job Queue Entry exists for the OTA Channel Manager Runner. Submitted orders will not be processed automatically until one is created.';
+        Msg: Label 'No Job Queue Entry exists for the OTA Channel Manager Runner. Submitted orders will not be processed and order emails will not be sent until one is created.';
         ActionLbl: Label 'Create Job Queue Entry';
     begin
         if (JobQueueEntryExists()) then

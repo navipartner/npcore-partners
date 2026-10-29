@@ -3,10 +3,13 @@ codeunit 6150986 "NPR CMJobQueueRunner"
     Access = Internal;
 
     trigger OnRun()
+    var
+        Distribution: Codeunit "NPR CMOrderDistribution";
     begin
         RecoverStaleScheduled();
         RecoverStaleProcessing();
         DispatchSubmittedOrders();
+        Distribution.SendPendingNotifications();
     end;
 
     local procedure RecoverStaleScheduled()

@@ -38,6 +38,11 @@ table 6059928 "NPR CMOrder"
             DataClassification = CustomerContent;
             Caption = 'Sell-to Email';
             ExtendedDatatype = EMail;
+
+            trigger OnValidate()
+            begin
+                Rec.SellToEmail := CopyStr(LowerCase(Rec.SellToEmail), 1, MaxStrLen(Rec.SellToEmail));
+            end;
         }
 
         field(40; SellToName; Text[100])
@@ -59,6 +64,22 @@ table 6059928 "NPR CMOrder"
             Caption = 'Payment Reference';
         }
 
+        field(65; PaymentOption; Enum "NPR CMPaymentOption")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Payment Option';
+
+            trigger OnValidate()
+            begin
+                case Rec.PaymentOption of
+                    Rec.PaymentOption::PayAtPickup:
+                        Rec.PaymentReference := '';
+                    Rec.PaymentOption::Invoice:
+                        Rec.PaymentReference := Rec.DocumentNo;
+                end;
+            end;
+        }
+
         field(70; Status; Enum "NPR CMOrderStatus")
         {
             DataClassification = CustomerContent;
@@ -74,6 +95,33 @@ table 6059928 "NPR CMOrder"
         {
             DataClassification = CustomerContent;
             Caption = 'Received At';
+        }
+
+        field(90; SellToCustomerNo; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Sell-to Customer No.';
+            TableRelation = Customer."No.";
+
+            trigger OnValidate()
+            var
+                Customer: Record Customer;
+            begin
+                if (Rec.SellToCustomerNo = '') then
+                    exit;
+
+                Customer.SetLoadFields(Name, "E-Mail", "Language Code");
+                Customer.Get(Rec.SellToCustomerNo);
+                Rec.SellToName := Customer.Name;
+                Rec.Validate(SellToEmail, Customer."E-Mail");
+                Rec.SellToLanguage := Customer."Language Code";
+            end;
+        }
+
+        field(95; PartnerType; Enum "NPR CMPartnerType")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Partner Type';
         }
 
         field(100; JobId; Code[40])
@@ -130,6 +178,11 @@ table 6059928 "NPR CMOrder"
             Clustered = false;
         }
 
+        key(Key7; PartnerType, ReceivedAt)
+        {
+            Clustered = false;
+        }
+
 #IF NOT (BC17 or BC18 or BC19 or BC20)
         key(KeySync; SystemRowVersion)
         {
@@ -143,6 +196,13 @@ table 6059928 "NPR CMOrder"
         {
         }
     }
+
+    internal procedure GetDataCaption(): Text
+    begin
+        if ((Rec.SellToOrderReference = '') or (Rec.SellToOrderReference = Rec.DocumentNo)) then
+            exit(Rec.DocumentNo);
+        exit(Rec.DocumentNo + ' / ' + Rec.SellToOrderReference);
+    end;
 
     internal procedure GetStatusStyle() StatusStyle: Text
     begin

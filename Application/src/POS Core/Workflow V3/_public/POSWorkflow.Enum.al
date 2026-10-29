@@ -1321,4 +1321,9 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'SHOW_TERMINAL_QRCODE', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Show QRCode";
     }
+    value(6151540; TOUR_BOOKING_PICKUP)
+    {
+        Caption = 'TOUR_BOOKING_PICKUP', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR CMPOSActionTourPickup";
+    }
 }

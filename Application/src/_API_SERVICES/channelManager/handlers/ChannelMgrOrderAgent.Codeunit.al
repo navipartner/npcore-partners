@@ -60,6 +60,9 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
         if (not ExistingOrder.Get(OrderId)) then
             exit(Response.RespondResourceNotFound(StrSubstNo('Order ''%1'' not found', OrderId)));
 
+        if (not IsApiOrder(ExistingOrder)) then
+            exit(Response.RespondBadRequest(StrSubstNo('Order ''%1'' does not belong to an API partner', OrderId)));
+
         if (not (ExistingOrder.Status in [ExistingOrder.Status::Draft, ExistingOrder.Status::Error])) then
             exit(Response.RespondBadRequest(StrSubstNo('Order cannot be replaced in status %1', ExistingOrder.Status)));
 
@@ -102,6 +105,9 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
 
         if (not Order.Get(OrderId)) then
             exit(Response.RespondResourceNotFound(StrSubstNo('Order ''%1'' not found', OrderId)));
+
+        if (not IsApiOrder(Order)) then
+            exit(Response.RespondBadRequest(StrSubstNo('Order ''%1'' does not belong to an API partner', OrderId)));
 
         if (Order.Status in [Order.Status::Submitted, Order.Status::Scheduled, Order.Status::Processing]) then
             exit(Response.RespondBadRequest(StrSubstNo('Order is mid-flight (status %1); retry once it has settled.', Order.Status)));
@@ -202,6 +208,9 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
 
         if (not Order.Get(OrderId)) then
             exit(Response.RespondResourceNotFound(StrSubstNo('Order ''%1'' not found', OrderId)));
+
+        if (not IsApiOrder(Order)) then
+            exit(Response.RespondBadRequest(StrSubstNo('Order ''%1'' does not belong to an API partner', OrderId)));
 
         // Idempotency: confirming an already-Issued order is a no-op.
         if (Order.Status = Order.Status::Issued) then
@@ -484,7 +493,7 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
             exit(false);
 
         Order.SellToOrderReference := CopyStr(SellToOrderReference, 1, MaxStrLen(Order.SellToOrderReference));
-        Order.SellToEmail := CopyStr(SellToEmail, 1, MaxStrLen(Order.SellToEmail));
+        Order.SellToEmail := CopyStr(SellToEmail.ToLower(), 1, MaxStrLen(Order.SellToEmail));
         Order.SellToName := CopyStr(SellToName, 1, MaxStrLen(Order.SellToName));
         Order.SellToLanguage := CopyStr(SellToLanguage.ToUpper(), 1, MaxStrLen(Order.SellToLanguage));
         Order.PaymentReference := CopyStr(PaymentReference, 1, MaxStrLen(Order.PaymentReference));
@@ -501,6 +510,21 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
             Response.RespondBadRequest(StrSubstNo('Partner ''%1'' is not active', PartnerSetup.Name));
             exit(false);
         end;
+        if (PartnerSetup.PartnerType <> PartnerSetup.PartnerType::API) then begin
+            Response.RespondBadRequest(StrSubstNo('Partner ''%1'' is not an API partner', PartnerSetup.Name));
+            exit(false);
+        end;
+        exit(true);
+    end;
+
+    local procedure IsApiOrder(var Order: Record "NPR CMOrder"): Boolean
+    var
+        PartnerSetup: Record "NPR CMPartnerSetup";
+    begin
+        if (not PartnerSetup.Get(Order.PartnerId)) then
+            exit(false);
+        if (PartnerSetup.PartnerType <> PartnerSetup.PartnerType::API) then
+            exit(false);
         exit(true);
     end;
 
@@ -542,6 +566,7 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
         ItemsToken: JsonToken;
         ItemsArray: JsonArray;
         ItemToken: JsonToken;
+        TicketIssuer: Codeunit "NPR CMTicketIssuer";
         LineNo: Integer;
     begin
         if (not Body.Get('items', ItemsToken)) then begin
@@ -560,7 +585,7 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
 
         LineNo := 0;
         foreach ItemToken in ItemsArray do begin
-            LineNo += 100000;
+            LineNo += TicketIssuer.GetLineNoSpacing();
             if (not TryParseItem(ItemToken, Order, LineNo, TempOrderLine, TempOrderComponent, TempOrderWallet, Response)) then
                 exit(false);
         end;
@@ -570,6 +595,7 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
     local procedure TryParseItem(ItemToken: JsonToken; var Order: Record "NPR CMOrder"; LineNo: Integer; var TempOrderLine: Record "NPR CMOrderLine" temporary; var TempOrderComponent: Record "NPR CMOrderComponent" temporary; var TempOrderWallet: Record "NPR CMOrderWallet" temporary; var Response: Codeunit "NPR API Response"): Boolean
     var
         TimeHelper: Codeunit "NPR TM TimeHelper";
+        TicketIssuer: Codeunit "NPR CMTicketIssuer";
         Item: Record Item;
         ItemObj: JsonObject;
         Token: JsonToken;
@@ -584,7 +610,7 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
         LocalDateTime: DateTime;
     begin
         if (not ItemToken.IsObject()) then begin
-            Response.RespondBadRequest(StrSubstNo('items[%1] must be an object', (LineNo div 100000) - 1));
+            Response.RespondBadRequest(StrSubstNo('items[%1] must be an object', (LineNo div TicketIssuer.GetLineNoSpacing()) - 1));
             exit(false);
         end;
         ItemObj := ItemToken.AsObject();
@@ -613,7 +639,7 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
 
         LocalDateTime := TimeHelper.GetLocalTimeAtAdmission('');
         if (VisitDate < DT2Date(LocalDateTime)) then begin
-            Response.RespondBadRequest(StrSubstNo('items[%1] visitDate must not be in the past (received %2, local today %3)', (LineNo div 100000) - 1, VisitDate, DT2Date(LocalDateTime)));
+            Response.RespondBadRequest(StrSubstNo('items[%1] visitDate must not be in the past (received %2, local today %3)', (LineNo div TicketIssuer.GetLineNoSpacing()) - 1, VisitDate, DT2Date(LocalDateTime)));
             exit(false);
         end;
 
@@ -647,9 +673,13 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
         TempOrderLine.Quantity := Quantity;
         TempOrderLine.VisitDate := VisitDate;
         TempOrderLine.VisitTime := VisitTime;
-        TempOrderLine.NotificationAddress := CopyStr(NotificationAddressText, 1, MaxStrLen(TempOrderLine.NotificationAddress));
+        TempOrderLine.NotificationAddress := CopyStr(NotificationAddressText.ToLower(), 1, MaxStrLen(TempOrderLine.NotificationAddress));
         TempOrderLine.Name := CopyStr(NameText, 1, MaxStrLen(TempOrderLine.Name));
         TempOrderLine.Language := CopyStr(LanguageText, 1, MaxStrLen(TempOrderLine.Language));
+        if (ExpectedWalletCount(TempOrderLine) > TicketIssuer.GetMaxWalletsPerLine()) then begin
+            Response.RespondBadRequest(StrSubstNo('items[%1] quantity must be <= %2 (received %3)', (LineNo div TicketIssuer.GetLineNoSpacing()) - 1, TicketIssuer.GetMaxWalletsPerLine(), Quantity));
+            exit(false);
+        end;
         TempOrderLine.Insert();
 
         for SeqNo := 1 to ExpectedWalletCount(TempOrderLine) do begin
@@ -732,6 +762,7 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
     local procedure TryParseComponentScheduleEntry(EntryToken: JsonToken; var TempOrderLine: Record "NPR CMOrderLine" temporary; Item: Record Item; ComponentNo: Integer; var TempOrderComponent: Record "NPR CMOrderComponent" temporary; var Response: Codeunit "NPR API Response"): Boolean
     var
         TimeHelper: Codeunit "NPR TM TimeHelper";
+        TicketIssuer: Codeunit "NPR CMTicketIssuer";
         EntryObj: JsonObject;
         ComponentItemNoText: Text;
         VisitDate: Date;
@@ -762,7 +793,7 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
         LocalDateTime := TimeHelper.GetLocalTimeAtAdmission('');
 
         if (VisitDate < DT2Date(LocalDateTime)) then begin
-            Response.RespondBadRequest(StrSubstNo('items[%1].componentSchedule entry ''%2'' visitDate must not be in the past (received %3, local today %4)', (TempOrderLine.LineNo div 100000) - 1, ComponentItemNoText, VisitDate, DT2Date(LocalDateTime)));
+            Response.RespondBadRequest(StrSubstNo('items[%1].componentSchedule entry ''%2'' visitDate must not be in the past (received %3, local today %4)', (TempOrderLine.LineNo div TicketIssuer.GetLineNoSpacing()) - 1, ComponentItemNoText, VisitDate, DT2Date(LocalDateTime)));
             exit(false);
         end;
 
@@ -917,6 +948,8 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
                 exit('Submitted');
             Status::Scheduled:
                 exit('Scheduled');
+            Status::WIP:
+                exit('WIP');
             Status::Processing:
                 exit('Processing');
             Status::Draft:

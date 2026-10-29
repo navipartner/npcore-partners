@@ -110,6 +110,9 @@
     var
         TicketIssuer: Codeunit "NPR CMTicketIssuer";
         CouponIssuer: Codeunit "NPR CMCouponIssuer";
+        Distribution: Codeunit "NPR CMOrderDistribution";
+        TourBookingMgt: Codeunit "NPR CMTourBookingMgt";
+        SalesHeader: Record "Sales Header";
     begin
         if (Order.PaymentReference = '') then
             exit;
@@ -120,17 +123,34 @@
         Order.Status := Order.Status::Issued;
         Order.Modify();
 
+        if (Order.PaymentOption = Order.PaymentOption::Invoice) then
+            TourBookingMgt.CreateSalesInvoice(Order, SalesHeader);
+
         BuildManifestForOrder(Order);
+        Distribution.QueueWalletNotification(Order);
 
         Commit();
     end;
 
     internal procedure DestroyOrderAssets(var Order: Record "NPR CMOrder")
+    begin
+        ReleaseOrderAssets(Order);
+        DeleteOrderComponents(Order.OrderId);
+        DeleteOrderLines(Order.OrderId);
+
+        Order.StatusMessage := '';
+        Order.Status := Order.Status::Cancelled;
+        Order.Modify();
+    end;
+
+
+    internal procedure ReleaseOrderAssets(var Order: Record "NPR CMOrder")
     var
         TicketIssuer: Codeunit "NPR CMTicketIssuer";
         CouponIssuer: Codeunit "NPR CMCouponIssuer";
         WalletFacade: Codeunit "NPR AttractionWallet";
         NPDesignerFacade: Codeunit "NPR NPDesignerManifestFacade";
+        Distribution: Codeunit "NPR CMOrderDistribution";
         WalletEntryNos: List of [Integer];
         CouponSystemIds: List of [Guid];
         WalletEntryNo: Integer;
@@ -149,15 +169,12 @@
         CouponIssuer.DeleteCoupons(CouponSystemIds);
 
         DeleteOrderWallets(Order.OrderId);
-        DeleteOrderComponents(Order.OrderId);
-        DeleteOrderLines(Order.OrderId);
 
-        Order.StatusMessage := '';
-        Order.Status := Order.Status::Cancelled;
+        Distribution.DeleteUnsentNotifications(Order);
+
         Order.JobId := '';
         Clear(Order.ManifestId);
         Order.ManifestUrl := '';
-        Order.Modify();
     end;
 
     #endregion
@@ -166,6 +183,7 @@
     local procedure IssueForOrder(var Order: Record "NPR CMOrder"; var TempOrderWallet: Record "NPR CMOrderWallet" temporary)
     var
         TicketIssuer: Codeunit "NPR CMTicketIssuer";
+        Distribution: Codeunit "NPR CMOrderDistribution";
         TicketImportJobId: Code[40];
         TempImportHeader: Record "NPR TM ImportTicketHeader" temporary;
         TempImportLine: Record "NPR TM ImportTicketLine" temporary;
@@ -193,6 +211,7 @@
         if (Order.PaymentReference = '') then begin
             Order.Status := Order.Status::Draft;
             Order.Modify();
+            Distribution.QueueOrderConfirmation(Order);
             Commit();
         end else
             ConfirmOrder(Order);
@@ -314,7 +333,7 @@
         if (not PartnerSetup.Get(Order.PartnerId)) then
             exit;
 
-        TemplateId := PartnerSetup.NPDesignerTemplateId;
+        TemplateId := PartnerSetup.GetDesignLayoutId();
         if (TemplateId = '') then
             exit;
 
@@ -437,7 +456,7 @@
                 InnerLine.Delete(true);
     end;
 
-    local procedure GenerateDocumentNo(PartnerId: Guid): Code[20]
+    internal procedure GenerateDocumentNo(PartnerId: Guid): Code[20]
     var
         PartnerSetup: Record "NPR CMPartnerSetup";
     begin
@@ -474,20 +493,21 @@
 #ENDIF
 
     #region Clear Holder
-    /// <summary>
-    /// Anonymizes an order and every asset it issued.
-    /// </summary>
     internal procedure AnonymizeOrder(OrderParam: Record "NPR CMOrder"; var AffectedAssets: Dictionary of [Guid, Integer])
     var
         Order: Record "NPR CMOrder";
         OrderLine: Record "NPR CMOrderLine";
         TicketAnonymize: Codeunit "NPR TM Anonymize";
+        Distribution: Codeunit "NPR CMOrderDistribution";
         ClearedTickets: List of [Code[20]];
         AnonymizedReference: Text[100];
         SellToAddress: Text[100];
         HolderAddresses: Dictionary of [Integer, Text[100]];
+        LastVisitDate: Date;
+        ClearableFrom: Date;
         HasChanges: Boolean;
         OrderNotFinal: Label 'Personal data can only be removed from an order with status %1 or %2. Order ''%3'' has status %4.', Comment = '%1 = Issued status caption, %2 = Cancelled status caption, %3 = sell-to order reference, %4 = the order''s current status caption';
+        RetentionNotOver: Label 'The personal data of order ''%1'' can be removed from %2, six months after its last visit on %3.', Comment = '%1 = sell-to order reference, %2 = the first date the personal data can be removed, %3 = the last visit date';
     begin
         Clear(AffectedAssets);
         if (not Order.Get(OrderParam.OrderId)) then
@@ -496,6 +516,14 @@
         // An order that can still be processed would issue its tickets to the pseudonym.
         if (not (Order.Status in [Order.Status::Issued, Order.Status::Cancelled])) then
             Error(OrderNotFinal, Format(Order.Status::Issued), Format(Order.Status::Cancelled), Order.SellToOrderReference, Format(Order.Status));
+
+        // The order is still needed for the visit, and after it for reporting.
+        LastVisitDate := GetMaxVisitDate(Order);
+        if (LastVisitDate <> 0D) then begin
+            ClearableFrom := CalcDate('<6M>', LastVisitDate);
+            if (Today() < ClearableFrom) then
+                Error(RetentionNotOver, Order.SellToOrderReference, ClearableFrom, LastVisitDate);
+        end;
 
         AnonymizedReference := TicketAnonymize.GetAnonymizedAddress(Order.DocumentNo);
         SellToAddress := Order.SellToEmail;
@@ -538,6 +566,7 @@
             until (OrderLine.Next() = 0);
 
         ClearOrderWallets(Order, HolderAddresses, AffectedAssets);
+        Distribution.AnonymizeNotifications(Order, AnonymizedReference, AffectedAssets);
 
         if (TicketAnonymize.Anonymize(GetOrderToken(Order), ClearedTickets) <> '') then
             ReportClearedTickets(ClearedTickets, AffectedAssets);
@@ -550,20 +579,45 @@
         WalletManagement: Codeunit "NPR AttractionWallet";
         WalletAssets: Dictionary of [Guid, Integer];
     begin
-        if (HolderAddresses.Count() = 0) then
-            exit;
-
         OrderWallet.SetFilter(OrderId, '=%1', Order.OrderId);
-        OrderWallet.SetFilter(WalletEntryNo, '<>%1', 0);
-        if (not OrderWallet.FindSet()) then
+        if (not OrderWallet.FindSet(true)) then
             exit;
 
         repeat
-            if (HolderAddresses.ContainsKey(OrderWallet.LineNo)) then begin
-                WalletManagement.ClearWalletReference(OrderWallet.WalletEntryNo, HolderAddresses.Get(OrderWallet.LineNo), WalletAssets);
-                MergeAffectedAssets(WalletAssets, AffectedAssets);
-            end;
+            ClearOrderWalletName(OrderWallet, AffectedAssets);
+
+            if (OrderWallet.WalletEntryNo <> 0) then
+                if (HolderAddresses.ContainsKey(OrderWallet.LineNo)) then begin
+                    WalletManagement.ClearWalletReference(OrderWallet.WalletEntryNo, HolderAddresses.Get(OrderWallet.LineNo), WalletAssets);
+                    MergeAffectedAssets(WalletAssets, AffectedAssets);
+                end;
         until (OrderWallet.Next() = 0);
+    end;
+
+    // A wallet can be named after its holder, so it gets the name it would have had without one.
+    local procedure ClearOrderWalletName(var OrderWallet: Record "NPR CMOrderWallet"; var AffectedAssets: Dictionary of [Guid, Integer])
+    var
+        OrderLine: Record "NPR CMOrderLine";
+        WalletManagement: Codeunit "NPR AttractionWallet";
+        WalletAssets: Dictionary of [Guid, Integer];
+        DefaultName: Text[100];
+    begin
+        if (not OrderLine.Get(OrderWallet.OrderId, OrderWallet.LineNo)) then
+            exit;
+
+        DefaultName := DeriveDefaultWalletName(OrderLine);
+
+        if (OrderWallet.WalletEntryNo <> 0) then begin
+            WalletManagement.SetWalletName(OrderWallet.WalletEntryNo, DefaultName, WalletAssets);
+            MergeAffectedAssets(WalletAssets, AffectedAssets);
+        end;
+
+        if (OrderWallet.WalletName in ['', DefaultName]) then
+            exit;
+
+        OrderWallet.WalletName := DefaultName;
+        OrderWallet.Modify();
+        AffectedAssets.Set(OrderWallet.SystemId, Database::"NPR CMOrderWallet");
     end;
 
     local procedure AddHolderAddress(var HolderAddresses: Dictionary of [Integer, Text[100]]; OrderLine: Record "NPR CMOrderLine"; SellToAddress: Text[100]; AnonymizedReference: Text[100])
@@ -578,6 +632,19 @@
             exit;
 
         HolderAddresses.Set(OrderLine.LineNo, Address);
+    end;
+
+    local procedure GetMaxVisitDate(Order: Record "NPR CMOrder") MaxVisitDate: Date
+    var
+        OrderLine: Record "NPR CMOrderLine";
+    begin
+        OrderLine.SetFilter(OrderId, '=%1', Order.OrderId);
+        OrderLine.SetLoadFields(VisitDate);
+        if (OrderLine.FindSet()) then
+            repeat
+                if (OrderLine.VisitDate > MaxVisitDate) then
+                    MaxVisitDate := OrderLine.VisitDate;
+            until (OrderLine.Next() = 0);
     end;
 
     local procedure ReportClearedTickets(ClearedTickets: List of [Code[20]]; var AffectedAssets: Dictionary of [Guid, Integer])

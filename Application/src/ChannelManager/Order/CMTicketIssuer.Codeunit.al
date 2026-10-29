@@ -271,7 +271,7 @@ codeunit 6151055 "NPR CMTicketIssuer"
                         AddonItem.Get(AddOnLine."Item No.");
                         if (AddonItem."NPR Ticket Type" <> '') then begin
                             ResolveVisitForComponent(OrderLine, AddOnLine."Item No.", VisitDate, VisitTime);
-                            GetOrComputeAddOnLinePrice(AddOnLine, VisitDate, VisitTime, PricesExcl, PricesIncl, UnitPriceExclVat, UnitPriceInclVat);
+                            GetOrComputeAddOnLinePrice(AddOnLine, Order.SellToCustomerNo, VisitDate, VisitTime, PricesExcl, PricesIncl, UnitPriceExclVat, UnitPriceInclVat);
                             for InstanceIdx := 1 to GetAddOnQuantity(AddOnLine) do begin
                                 ImportIdxWithinSeqNo += 1;
                                 BuildOneTicketImportLine(
@@ -285,7 +285,7 @@ codeunit 6151055 "NPR CMTicketIssuer"
             end else begin
                 if (MasterItem."NPR Ticket Type" <> '') then begin
                     if (not PricesExcl.ContainsKey(NonPackageCacheKey)) then begin
-                        CalculateDynamicTicketPrice(OrderLine.ItemNo, '', OrderLine.VisitDate, OrderLine.VisitTime, UnitPriceExclVat, UnitPriceInclVat);
+                        CalculateDynamicTicketPrice(OrderLine.ItemNo, '', Order.SellToCustomerNo, OrderLine.VisitDate, OrderLine.VisitTime, UnitPriceExclVat, UnitPriceInclVat);
                         PricesExcl.Add(NonPackageCacheKey, UnitPriceExclVat);
                         PricesIncl.Add(NonPackageCacheKey, UnitPriceInclVat);
                     end else begin
@@ -314,6 +314,7 @@ codeunit 6151055 "NPR CMTicketIssuer"
 
     local procedure GetOrComputeAddOnLinePrice(
         AddOnLine: Record "NPR NpIa Item AddOn Line";
+        CustomerNo: Code[20];
         VisitDate: Date; VisitTime: Time;
         var PricesExcl: Dictionary of [Integer, Decimal];
         var PricesIncl: Dictionary of [Integer, Decimal];
@@ -327,7 +328,7 @@ codeunit 6151055 "NPR CMTicketIssuer"
             exit;
         end;
 
-        WalletMgr.CalculateAddOnLineUnitPrice(AddOnLine, '', VisitDate, VisitTime, UnitPriceExclVat, UnitPriceInclVat);
+        WalletMgr.CalculateAddOnLineUnitPrice(AddOnLine, CustomerNo, VisitDate, VisitTime, UnitPriceExclVat, UnitPriceInclVat);
         PricesExcl.Add(AddOnLine."Line No.", UnitPriceExclVat);
         PricesIncl.Add(AddOnLine."Line No.", UnitPriceInclVat);
     end;
@@ -374,7 +375,7 @@ codeunit 6151055 "NPR CMTicketIssuer"
         TempImportLine.Insert();
     end;
 
-    local procedure CalculateDynamicTicketPrice(ItemNo: Code[20]; VariantCode: Code[10]; VisitDate: Date; VisitTime: Time; var UnitPriceExclVat: Decimal; var UnitPriceInclVat: Decimal)
+    local procedure CalculateDynamicTicketPrice(ItemNo: Code[20]; VariantCode: Code[10]; CustomerNo: Code[20]; VisitDate: Date; VisitTime: Time; var UnitPriceExclVat: Decimal; var UnitPriceInclVat: Decimal)
     var
         DynamicPrice: Codeunit "NPR TM Dynamic Price";
         TicketUnitPrice: Decimal;
@@ -384,7 +385,7 @@ codeunit 6151055 "NPR CMTicketIssuer"
         ErpUnitPriceVatPercentage: Decimal;
     begin
         TicketUnitPrice := DynamicPrice.CalculatePrice(
-            ItemNo, VariantCode, '', VisitDate, VisitTime, 1,
+            ItemNo, VariantCode, CustomerNo, VisitDate, VisitTime, 1,
             ErpUnitPrice, ErpDiscountPct, ErpUnitPriceIncludesVat, ErpUnitPriceVatPercentage);
 
         if (ErpUnitPriceIncludesVat) then begin
@@ -514,11 +515,22 @@ codeunit 6151055 "NPR CMTicketIssuer"
     // ---- TokenLine encoding ----
     // Layout: LineNo (multiples of 100000) + SeqNo*10 + ImportIdxWithinSeqNo
     // Valid up to SeqNo<10000 and ImportIdxWithinSeqNo<10 (max 9 tickets per wallet from a package template expansion).
+    // EncodeTokenLine packs SeqNo * 10 + ImportIdx between a line's number and the next line's, so lines must be this far apart.
+    internal procedure GetLineNoSpacing(): Integer
+    begin
+        exit(100000);
+    end;
+
+    internal procedure GetMaxWalletsPerLine(): Integer
+    begin
+        exit(GetLineNoSpacing() div 10 - 1);
+    end;
+
     local procedure EncodeTokenLine(LineNo: Integer; SeqNo: Integer; ImportIdxWithinSeqNo: Integer): Integer
     var
         EncodingOverflowErr: Label 'CMTicketIssuer token line encoding overflow: LineNo=%1 SeqNo=%2 ImportIdx=%3. SeqNo must stay below 10000 and ImportIdx below 10. This is a programming bug.', Locked = true;
     begin
-        if ((SeqNo >= 10000) or (ImportIdxWithinSeqNo >= 10)) then
+        if ((SeqNo > GetMaxWalletsPerLine()) or (ImportIdxWithinSeqNo >= 10)) then
             Error(EncodingOverflowErr, LineNo, SeqNo, ImportIdxWithinSeqNo);
         exit(LineNo + SeqNo * 10 + ImportIdxWithinSeqNo);
     end;

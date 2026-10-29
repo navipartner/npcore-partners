@@ -57,6 +57,32 @@ table 6059939 "NPR CMPartnerSetup"
             Caption = 'Buy-from Order Reference No. Series';
             TableRelation = "No. Series";
         }
+
+        field(70; PartnerType; Enum "NPR CMPartnerType")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Partner Type';
+        }
+
+        field(80; Distribution; Enum "NPR CMDistribution")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Distribution';
+        }
+
+        field(81; OrderConfirmationTemplateId; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Order Confirmation Email Template';
+            TableRelation = "NPR NPEmailTemplate".TemplateId where(DataProvider = const(CHANNEL_MANAGER_ORDER));
+        }
+
+        field(82; WalletEmailTemplateId; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Wallet Email Template';
+            TableRelation = "NPR NPEmailTemplate".TemplateId where(DataProvider = const(CHANNEL_MANAGER_WALLETS));
+        }
     }
 
     keys
@@ -78,6 +104,18 @@ table 6059939 "NPR CMPartnerSetup"
         {
         }
     }
+
+    internal procedure GetDesignLayoutId(): Text[40]
+    var
+        WalletSetup: Record "NPR WalletAssetSetup";
+    begin
+        if (Rec.NPDesignerTemplateId <> '') then
+            exit(Rec.NPDesignerTemplateId);
+        if (Rec.PartnerType <> Rec.PartnerType::TourBooking) then
+            exit('');
+        if (WalletSetup.Get()) then
+            exit(WalletSetup.NPDesignerTemplateId);
+    end;
 
     trigger OnInsert()
     var

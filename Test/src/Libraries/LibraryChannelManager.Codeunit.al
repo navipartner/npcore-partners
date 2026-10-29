@@ -77,4 +77,50 @@ codeunit 85254 "NPR Library Channel Manager"
         TempOrderWallet.SeqNo := SeqNo;
         TempOrderWallet.Insert();
     end;
+
+    #region Tour Booking
+    internal procedure CreateTourBookingPartner(Distribution: Enum "NPR CMDistribution"; OrderConfirmationTemplateId: Code[20]; WalletEmailTemplateId: Code[20]) PartnerId: Guid
+    var
+        PartnerSetup: Record "NPR CMPartnerSetup";
+    begin
+        PartnerId := CreatePartner();
+        PartnerSetup.Get(PartnerId);
+        PartnerSetup.PartnerType := PartnerSetup.PartnerType::TourBooking;
+        PartnerSetup.Distribution := Distribution;
+        PartnerSetup.OrderConfirmationTemplateId := OrderConfirmationTemplateId;
+        PartnerSetup.WalletEmailTemplateId := WalletEmailTemplateId;
+        PartnerSetup.Modify();
+    end;
+
+    // A booking as the Tour Booking page creates it: new from the partner, then the customer and e-mail entered on the card.
+    internal procedure CreateTourBooking(PartnerId: Guid; PaymentOption: Enum "NPR CMPaymentOption"; var Order: Record "NPR CMOrder")
+    var
+        Customer: Record Customer;
+        LibrarySales: Codeunit "Library - Sales";
+        TourBookingMgt: Codeunit "NPR CMTourBookingMgt";
+    begin
+        TourBookingMgt.InitNewOrder(Order, PartnerId);
+        LibrarySales.CreateCustomer(Customer);
+        Order.Validate(SellToCustomerNo, Customer."No.");
+        Order.Validate(SellToEmail, 'booker@navipartner.dk');
+        Order.Validate(PaymentOption, PaymentOption);
+        Order.Modify();
+    end;
+
+    // A line as the Lines page enters it: the item is checked the same way the page checks it.
+    internal procedure AddTourBookingLine(var Order: Record "NPR CMOrder"; LineNo: Integer; ItemNo: Code[20]; Quantity: Integer; VisitDate: Date; VisitTime: Time; var OrderLine: Record "NPR CMOrderLine")
+    var
+        TourBookingMgt: Codeunit "NPR CMTourBookingMgt";
+    begin
+        OrderLine.Init();
+        OrderLine.OrderId := Order.OrderId;
+        OrderLine.LineNo := LineNo;
+        OrderLine.ItemNo := ItemNo;
+        TourBookingMgt.ValidateLineItem(OrderLine);
+        OrderLine.Validate(Quantity, Quantity);
+        OrderLine.VisitDate := VisitDate;
+        OrderLine.VisitTime := VisitTime;
+        OrderLine.Insert();
+    end;
+    #endregion
 }

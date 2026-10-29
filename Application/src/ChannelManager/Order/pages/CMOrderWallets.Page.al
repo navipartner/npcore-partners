@@ -1,7 +1,7 @@
 page 6150945 "NPR CMOrderWallets"
 {
     Extensible = false;
-    Caption = 'OTA Channel Manager Order Wallets';
+    Caption = 'Order Wallets';
     PageType = List;
     SourceTable = "NPR CMOrderWallet";
     UsageCategory = None;
