@@ -341,25 +341,30 @@ codeunit 6151048 "NPR ChannelMgrOrderAgent"
     local procedure AppendWallet(ResponseJson: Codeunit "NPR JSON Builder"; var OrderWallet: Record "NPR CMOrderWallet"; Line: Record "NPR CMOrderLine")
     var
         Wallet: Record "NPR AttractionWallet";
-        WalletReferenceNumber: Code[50];
-        WalletId: Guid;
     begin
-        Wallet.ReadIsolation := IsolationLevel::ReadCommitted;
-        if (Wallet.Get(OrderWallet.WalletEntryNo)) then begin
-            WalletReferenceNumber := Wallet.ReferenceNumber;
-            WalletId := Wallet.SystemId;
-        end;
-
         ResponseJson.StartObject()
             .AddProperty('seqNo', OrderWallet.SeqNo)
-            .AddProperty('walletId', Format(WalletId, 0, 4).ToLower())
-            .AddProperty('walletReferenceNumber', WalletReferenceNumber)
             .AddProperty('externalReferenceNumber', OrderWallet.ExternalReferenceNumber)
-            .AddProperty('name', OrderWallet.WalletName)
-            .AddProperty('issuedAt', OrderWallet.IssuedAt)
-            .AddProperty('unitPriceExclVat', OrderWallet.UnitPriceExclVat)
-            .AddProperty('unitPriceInclVat', OrderWallet.UnitPriceInclVat)
-            .AddProperty('currencyCode', OrderWallet.CurrencyCode);
+            .AddProperty('name', OrderWallet.WalletName);
+
+        // Until the order is issued the row is a placeholder: there is no wallet and no price stored yet.
+        Wallet.ReadIsolation := IsolationLevel::ReadCommitted;
+        if (Wallet.Get(OrderWallet.WalletEntryNo)) then
+            ResponseJson
+                .AddProperty('walletId', Format(Wallet.SystemId, 0, 4).ToLower())
+                .AddProperty('walletReferenceNumber', Wallet.ReferenceNumber)
+                .AddProperty('issuedAt', OrderWallet.IssuedAt)
+                .AddProperty('unitPriceExclVat', OrderWallet.UnitPriceExclVat)
+                .AddProperty('unitPriceInclVat', OrderWallet.UnitPriceInclVat)
+                .AddProperty('currencyCode', OrderWallet.CurrencyCode)
+        else
+            ResponseJson
+                .AddProperty('walletId')
+                .AddProperty('walletReferenceNumber')
+                .AddProperty('issuedAt')
+                .AddProperty('unitPriceExclVat')
+                .AddProperty('unitPriceInclVat')
+                .AddProperty('currencyCode');
 
         if (OrderWallet.ManifestUrl <> '') then
             ResponseJson.AddProperty('manifestUrl', OrderWallet.ManifestUrl);
