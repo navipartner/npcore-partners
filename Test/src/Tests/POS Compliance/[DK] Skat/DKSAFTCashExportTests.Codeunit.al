@@ -5,8 +5,10 @@ codeunit 85488 "NPR DK SAF-T Cash Export Tests"
     var
         _Assert: Codeunit Assert;
         _LibraryDKFiscal: Codeunit "NPR Library DK Fiscal";
+        _LibraryERM: Codeunit "Library - ERM";
         _LibraryInventory: Codeunit "NPR Library - Inventory";
         _LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        _LibraryUtility: Codeunit "Library - Utility";
         _ConfirmReplies: List of [Boolean];
         _ExpectedConfirmQuestions: List of [Text];
         _GenerateImmediatelyQstTxt: Label 'did not schedule the SAF-T file generation', Locked = true;
@@ -911,6 +913,7 @@ codeunit 85488 "NPR DK SAF-T Cash Export Tests"
         POSEntry: Record "NPR POS Entry";
         POSUnit: Record "NPR POS Unit";
         Salesperson: Record "Salesperson/Purchaser";
+        VATPostingSetup: Record "VAT Posting Setup";
         NamespaceManager: XmlNamespaceManager;
         Document: XmlDocument;
         TransactionXPath: Text;
@@ -922,10 +925,12 @@ codeunit 85488 "NPR DK SAF-T Cash Export Tests"
         _LibraryDKFiscal.CreateDKAuditSetup(POSUnit);
         _LibraryPOSMasterData.CreateSalespersonForPOSUsage(Salesperson);
         CreatePaymentMethod(CashPaymentMethod, Enum::"NPR Payment Processing Type"::CASH);
+        CreateVATPostingSetup(VATPostingSetup, 25);
         CreateSignedFiscalSale(POSUnit, POSEntry, 'DKCT-ORDER');
         POSEntry."Salesperson Code" := Salesperson.Code;
         POSEntry.Modify();
         AddItemLine(POSEntry, 10000, CreateItemNo(), 1, 125, 100);
+        SetLineVAT(POSEntry, 10000, VATPostingSetup);
         AddPaymentLine(POSEntry, 10000, CashPaymentMethod.Code, 125);
 
         // [WHEN] The SAF-T file is exported
@@ -940,11 +945,28 @@ codeunit 85488 "NPR DK SAF-T Cash Export Tests"
             'nr,lineID,lineType,artID,qnt,lineAmntIn,lineAmntEx,amntTp,cashTransLineDescr,vat',
             ChildNames(Document, NamespaceManager, TransactionXPath + '/s:ctLine'), 'The ctLine children must follow the XSD sequence.');
         _Assert.AreEqual(
-            'vatPerc,vatAmnt,vatAmntTp,vatBasAmnt',
+            'vatCode,vatPerc,vatAmnt,vatAmntTp,vatBasAmnt',
             ChildNames(Document, NamespaceManager, TransactionXPath + '/s:ctLine/s:vat'), 'The ctLine vat children must follow the XSD sequence.');
         _Assert.AreEqual(
             'paymentType,paidAmnt,empID',
             ChildNames(Document, NamespaceManager, TransactionXPath + '/s:payment'), 'The payment children must follow the XSD sequence.');
+        _Assert.AreEqual(
+            'vatCode,dateOfEntry,vatDesc,standardVatCode',
+            ChildNames(Document, NamespaceManager, VatCodeDetailXPath(VATPostingSetup."VAT Identifier")), 'The vatCodeDetail children must follow the XSD sequence.');
+        _Assert.AreEqual(
+            'periodNumber,periodDesc,startDatePeriod,startTimePeriod,endDatePeriod,endTimePeriod',
+            ChildNames(Document, NamespaceManager, '/s:auditfile/s:company/s:periods/s:period'), 'The period children must follow the XSD sequence.');
+
+        // [THEN] vatCodeDetails and periods come between generalLedger and employees in company
+        _Assert.AreEqual(
+            1, CountNodes(Document, NamespaceManager, '/s:auditfile/s:company/s:generalLedger/following-sibling::*[1][self::s:vatCodeDetails]'),
+            'vatCodeDetails must directly follow generalLedger in company.');
+        _Assert.AreEqual(
+            1, CountNodes(Document, NamespaceManager, '/s:auditfile/s:company/s:vatCodeDetails/following-sibling::*[1][self::s:periods]'),
+            'periods must directly follow vatCodeDetails in company.');
+        _Assert.AreEqual(
+            1, CountNodes(Document, NamespaceManager, '/s:auditfile/s:company/s:periods/following-sibling::*[1][self::s:employees]'),
+            'employees must directly follow periods in company.');
 
         // [THEN] basics comes between articles and location in company
         _Assert.AreEqual(
@@ -992,6 +1014,165 @@ codeunit 85488 "NPR DK SAF-T Cash Export Tests"
             _Assert.IsFalse(BasicIDs.Contains(BasicID), StrSubstNo('basicID ''%1'' is declared more than once.', BasicID));
             BasicIDs.Add(BasicID);
         end;
+
+        AssertAllConfirmsRaised();
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandler')]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure VATCodeOfEachLineIsDeclaredInVatCodeDetails()
+    var
+        POSEntry: Record "NPR POS Entry";
+        StandardVATPostingSetup: Record "VAT Posting Setup";
+        ZeroVATPostingSetup: Record "VAT Posting Setup";
+        NamespaceManager: XmlNamespaceManager;
+        Document: XmlDocument;
+        StandardDetailXPath: Text;
+        ZeroDetailXPath: Text;
+    begin
+        // [SCENARIO] SKAT technical description v1.3 sections 3.10-3.11: vatCodeDetails is mandatory and maps every vatCode used on a line to a standard VAT code.
+        Initialize();
+
+        // [GIVEN] A sale with a 25 % line and a 0 % line, each posted with its own VAT posting setup
+        CreateVATPostingSetup(StandardVATPostingSetup, 25);
+        CreateVATPostingSetup(ZeroVATPostingSetup, 0);
+        CreateFiscalSale(POSEntry, 'DKVAT-CODES', '', 175);
+        AddItemLine(POSEntry, 10000, CreateItemNo(), 1, 125, 100);
+        SetLineVAT(POSEntry, 10000, StandardVATPostingSetup);
+        AddItemLine(POSEntry, 20000, CreateItemNo(), 1, 50, 50);
+        SetLineVAT(POSEntry, 20000, ZeroVATPostingSetup);
+
+        // [WHEN] The SAF-T file is exported
+        RunExport(Document, NamespaceManager);
+
+        // [THEN] Each ctLine carries the VAT identifier of its line as vatCode
+        _Assert.AreEqual(
+            StandardVATPostingSetup."VAT Identifier", SelectText(Document, NamespaceManager, TransactionXPathFor(POSEntry) + '/s:ctLine[s:lineID=''10000'']/s:vat/s:vatCode'),
+            'The 25 % line must carry its VAT identifier as vatCode.');
+        _Assert.AreEqual(
+            ZeroVATPostingSetup."VAT Identifier", SelectText(Document, NamespaceManager, TransactionXPathFor(POSEntry) + '/s:ctLine[s:lineID=''20000'']/s:vat/s:vatCode'),
+            'The 0 % line must carry its VAT identifier as vatCode.');
+
+        // [THEN] Each vatCode is declared in vatCodeDetails with its first use, the setup description and SKAT's standard code (1 = 25 %, 0 = 0 %)
+        StandardDetailXPath := VatCodeDetailXPath(StandardVATPostingSetup."VAT Identifier");
+        _Assert.AreEqual(1, CountNodes(Document, NamespaceManager, StandardDetailXPath), 'The 25 % vatCode must be declared once in vatCodeDetails.');
+        _Assert.AreEqual(Format(WorkDate(), 0, 9), SelectText(Document, NamespaceManager, StandardDetailXPath + '/s:dateOfEntry'), 'dateOfEntry must be the date the code was first used.');
+        _Assert.AreEqual(StandardVATPostingSetup.Description, SelectText(Document, NamespaceManager, StandardDetailXPath + '/s:vatDesc'), 'vatDesc must be the VAT posting setup description.');
+        _Assert.AreEqual('1', SelectText(Document, NamespaceManager, StandardDetailXPath + '/s:standardVatCode'), 'A 25 % code must map to standard VAT code 1.');
+
+        ZeroDetailXPath := VatCodeDetailXPath(ZeroVATPostingSetup."VAT Identifier");
+        _Assert.AreEqual(1, CountNodes(Document, NamespaceManager, ZeroDetailXPath), 'The 0 % vatCode must be declared once in vatCodeDetails.');
+        _Assert.AreEqual('0', SelectText(Document, NamespaceManager, ZeroDetailXPath + '/s:standardVatCode'), 'A 0 % code must map to standard VAT code 0.');
+
+        AssertAllConfirmsRaised();
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandler')]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure VATCodeUsedOnSeveralDaysIsDeclaredOnceWithItsFirstUse()
+    var
+        EarlierPOSEntry: Record "NPR POS Entry";
+        LaterPOSEntry: Record "NPR POS Entry";
+        VATPostingSetup: Record "VAT Posting Setup";
+        NamespaceManager: XmlNamespaceManager;
+        Document: XmlDocument;
+        DetailXPath: Text;
+    begin
+        // [SCENARIO] SKAT technical description v1.3 section 3.11: dateOfEntry is the first use of the code, and a code is declared once.
+        Initialize();
+
+        // [GIVEN] The same VAT code used on a sale today and, on another POS unit, on a sale yesterday
+        CreateVATPostingSetup(VATPostingSetup, 25);
+        CreateFiscalSale(LaterPOSEntry, 'DKVAT-LATER', '', 125);
+        AddItemLine(LaterPOSEntry, 10000, CreateItemNo(), 1, 125, 100);
+        SetLineVAT(LaterPOSEntry, 10000, VATPostingSetup);
+        CreateFiscalSale(EarlierPOSEntry, 'DKVAT-EARLIER', '', 125);
+        EarlierPOSEntry."Entry Date" := WorkDate() - 1;
+        EarlierPOSEntry.Modify();
+        AddItemLine(EarlierPOSEntry, 10000, CreateItemNo(), 1, 125, 100);
+        SetLineVAT(EarlierPOSEntry, 10000, VATPostingSetup);
+
+        // [WHEN] Both days are exported
+        RunExportForPeriod(WorkDate() - 1, WorkDate(), Document, NamespaceManager);
+
+        // [THEN] The code is declared once, dated on its first use
+        DetailXPath := VatCodeDetailXPath(VATPostingSetup."VAT Identifier");
+        _Assert.AreEqual(1, CountNodes(Document, NamespaceManager, DetailXPath), 'A vatCode used on several lines must be declared once.');
+        _Assert.AreEqual(Format(WorkDate() - 1, 0, 9), SelectText(Document, NamespaceManager, DetailXPath + '/s:dateOfEntry'), 'dateOfEntry must be the earliest use in the export.');
+
+        AssertAllConfirmsRaised();
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandler')]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure VATCodeWithoutSetupDescriptionIsDescribedByItsCode()
+    var
+        POSEntry: Record "NPR POS Entry";
+        VATPostingSetup: Record "VAT Posting Setup";
+        NamespaceManager: XmlNamespaceManager;
+        Document: XmlDocument;
+    begin
+        // [SCENARIO] PR review: vatDesc is mandatory in vatCodeDetail, but the VAT posting setup description is optional and often blank.
+        // A blank description dropped vatDesc from the file.
+        Initialize();
+
+        // [GIVEN] A sale whose line uses a VAT posting setup without a description
+        CreateVATPostingSetup(VATPostingSetup, 25);
+        VATPostingSetup.Description := '';
+        VATPostingSetup.Modify();
+        CreateFiscalSale(POSEntry, 'DKVAT-NODESC', '', 125);
+        AddItemLine(POSEntry, 10000, CreateItemNo(), 1, 125, 100);
+        SetLineVAT(POSEntry, 10000, VATPostingSetup);
+
+        // [WHEN] The SAF-T file is exported
+        RunExport(Document, NamespaceManager);
+
+        // [THEN] The vatCode is described by the code itself
+        _Assert.AreEqual(
+            VATPostingSetup."VAT Identifier", SelectText(Document, NamespaceManager, VatCodeDetailXPath(VATPostingSetup."VAT Identifier") + '/s:vatDesc'),
+            'vatDesc must fall back to the vatCode when the VAT posting setup has no description.');
+
+        AssertAllConfirmsRaised();
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandler')]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExportPeriodIsReportedAsCalendarMonthPeriods()
+    var
+        NamespaceManager: XmlNamespaceManager;
+        Document: XmlDocument;
+        StartingDate: Date;
+        EndingDate: Date;
+        PeriodXPath: Text;
+    begin
+        // [SCENARIO] SKAT technical description v1.3 sections 3.12-3.13: periods is mandatory and lists the periods the audit file covers.
+        Initialize();
+
+        // [GIVEN] An export from the middle of January to the middle of February
+        StartingDate := DMY2Date(15, 1, Date2DMY(WorkDate(), 3));
+        EndingDate := DMY2Date(10, 2, Date2DMY(WorkDate(), 3));
+
+        // [WHEN] The SAF-T file is exported
+        RunExportForPeriod(StartingDate, EndingDate, Document, NamespaceManager);
+
+        // [THEN] There is one period per calendar month, cut to the export dates and covering whole days
+        PeriodXPath := '/s:auditfile/s:company/s:periods/s:period';
+        _Assert.AreEqual(2, CountNodes(Document, NamespaceManager, PeriodXPath), 'Each calendar month in the export must be one period.');
+
+        _Assert.AreEqual('1', SelectText(Document, NamespaceManager, PeriodXPath + '[1]/s:periodNumber'), 'The first period must be number 1.');
+        _Assert.AreNotEqual('', SelectText(Document, NamespaceManager, PeriodXPath + '[1]/s:periodDesc'), 'A period must have a description.');
+        _Assert.AreEqual(Format(StartingDate, 0, 9), SelectText(Document, NamespaceManager, PeriodXPath + '[1]/s:startDatePeriod'), 'The first period must start on the export starting date.');
+        _Assert.AreEqual('00:00:00', SelectText(Document, NamespaceManager, PeriodXPath + '[1]/s:startTimePeriod'), 'A period must start at the beginning of the day.');
+        _Assert.AreEqual(Format(CalcDate('<CM>', StartingDate), 0, 9), SelectText(Document, NamespaceManager, PeriodXPath + '[1]/s:endDatePeriod'), 'The first period must end on the last day of January.');
+        _Assert.AreEqual('23:59:59', SelectText(Document, NamespaceManager, PeriodXPath + '[1]/s:endTimePeriod'), 'A period must end at the end of the day.');
+
+        _Assert.AreEqual('2', SelectText(Document, NamespaceManager, PeriodXPath + '[2]/s:periodNumber'), 'The second period must be number 2.');
+        _Assert.AreEqual(Format(DMY2Date(1, 2, Date2DMY(WorkDate(), 3)), 0, 9), SelectText(Document, NamespaceManager, PeriodXPath + '[2]/s:startDatePeriod'), 'The second period must start on the first day of February.');
+        _Assert.AreEqual(Format(EndingDate, 0, 9), SelectText(Document, NamespaceManager, PeriodXPath + '[2]/s:endDatePeriod'), 'The last period must end on the export ending date.');
 
         AssertAllConfirmsRaised();
     end;
@@ -1247,6 +1428,132 @@ codeunit 85488 "NPR DK SAF-T Cash Export Tests"
         DKAuditMgt.SetSigningCertificate(_LibraryDKFiscal.GetRSA3072TestCert());
     end;
 
+    [Test]
+    [HandlerFunctions('ConfirmHandler')]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure VATCodeUsedForZeroRatedAndVATLiableLinesIsReportedBeforeTheExport()
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSUnit: Record "NPR POS Unit";
+        SAFTExportHeader: Record "NPR DK SAF-T Cash Exp. Header";
+        StandardVATPostingSetup: Record "VAT Posting Setup";
+        ZeroVATPostingSetup: Record "VAT Posting Setup";
+        ExportDate: Date;
+        OriginalWorkDate: Date;
+    begin
+        // [SCENARIO] PR review: Business Central only keeps one VAT % per VAT identifier within a VAT business posting group.
+        // An identifier set up at 25 % in one group and 0 % in another got the standard VAT code of whichever line was read first.
+        Initialize();
+        OriginalWorkDate := WorkDate();
+
+        // [GIVEN] One VAT identifier set up at 25 % in one VAT business posting group and at 0 % in another
+        CreateVATPostingSetup(StandardVATPostingSetup, 25);
+        CreateVATPostingSetup(ZeroVATPostingSetup, 0);
+        ZeroVATPostingSetup."VAT Identifier" := StandardVATPostingSetup."VAT Identifier";
+        ZeroVATPostingSetup.Modify();
+
+        // [GIVEN] A signed sale on a DK fiscal POS unit with a line under each setup, on a day no other test uses
+        ExportDate := CalcDate('<-70D>', OriginalWorkDate);
+        WorkDate(ExportDate);
+        _LibraryDKFiscal.CreateDKAuditSetup(POSUnit);
+        CreateSignedFiscalSale(POSUnit, POSEntry, 'DKCT-MIXEDVAT');
+        AddItemLine(POSEntry, 10000, CreateItemNo(), 1, 125, 100);
+        SetLineVAT(POSEntry, 10000, StandardVATPostingSetup);
+        AddItemLine(POSEntry, 20000, CreateItemNo(), 1, 50, 50);
+        SetLineVAT(POSEntry, 20000, ZeroVATPostingSetup);
+        WorkDate(OriginalWorkDate);
+
+        // [WHEN] The export is started for that day and the user declines
+        CreateExportHeader(SAFTExportHeader, ExportDate, ExportDate, false);
+        EnqueueConfirm(StandardVATPostingSetup."VAT Identifier" + ' is used for both zero-rated and VAT-liable lines', false);
+        Codeunit.Run(Codeunit::"NPR DK SAF-T Cash Export Mgt.", SAFTExportHeader);
+
+        // [THEN] The user was warned that the identifier cannot be mapped to one standard VAT code
+        AssertAllConfirmsRaised();
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandler')]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure VATCodeUsedAtTwoRatesOnAUnitWithoutDKAuditIsReportedBeforeTheExport()
+    var
+        POSEntry: Record "NPR POS Entry";
+        SAFTExportHeader: Record "NPR DK SAF-T Cash Exp. Header";
+        StandardVATPostingSetup: Record "VAT Posting Setup";
+        ZeroVATPostingSetup: Record "VAT Posting Setup";
+        ExportDate: Date;
+        OriginalWorkDate: Date;
+    begin
+        // [SCENARIO] PR review: the file holds the fiscal sales of every POS unit, but the VAT code check only looked at DK audited units.
+        // A unit without the DK audit profile could make the export map an identifier to the wrong standard VAT code without a warning.
+        Initialize();
+        OriginalWorkDate := WorkDate();
+
+        // [GIVEN] One VAT identifier set up at 25 % in one VAT business posting group and at 0 % in another
+        CreateVATPostingSetup(StandardVATPostingSetup, 25);
+        CreateVATPostingSetup(ZeroVATPostingSetup, 0);
+        ZeroVATPostingSetup."VAT Identifier" := StandardVATPostingSetup."VAT Identifier";
+        ZeroVATPostingSetup.Modify();
+
+        // [GIVEN] A fiscal sale on a POS unit without the DK audit profile, with a line under each setup, on a day no other test uses
+        ExportDate := CalcDate('<-80D>', OriginalWorkDate);
+        WorkDate(ExportDate);
+        CreateFiscalSale(POSEntry, 'DKCT-NODKVAT', '', 125);
+        AddItemLine(POSEntry, 10000, CreateItemNo(), 1, 125, 100);
+        SetLineVAT(POSEntry, 10000, StandardVATPostingSetup);
+        AddItemLine(POSEntry, 20000, CreateItemNo(), 1, 50, 50);
+        SetLineVAT(POSEntry, 20000, ZeroVATPostingSetup);
+        WorkDate(OriginalWorkDate);
+
+        // [WHEN] The export is started for that day and the user declines
+        CreateExportHeader(SAFTExportHeader, ExportDate, ExportDate, false);
+        EnqueueConfirm(StandardVATPostingSetup."VAT Identifier" + ' is used for both zero-rated and VAT-liable lines', false);
+        Codeunit.Run(Codeunit::"NPR DK SAF-T Cash Export Mgt.", SAFTExportHeader);
+
+        // [THEN] The user was warned that the identifier cannot be mapped to one standard VAT code
+        AssertAllConfirmsRaised();
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandler')]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure LineWithoutVATIdentifierIsReportedBeforeTheExport()
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSUnit: Record "NPR POS Unit";
+        SAFTExportHeader: Record "NPR DK SAF-T Cash Exp. Header";
+        VATPostingSetup: Record "VAT Posting Setup";
+        ExportDate: Date;
+        OriginalWorkDate: Date;
+    begin
+        // [SCENARIO] PR review: VAT Identifier is optional on VAT Posting Setup and is copied onto POS lines as it is.
+        // A line without one was exported without vatCode, and when no line had one the mandatory vatCodeDetails section was left out without a warning.
+        Initialize();
+        OriginalWorkDate := WorkDate();
+
+        // [GIVEN] A VAT posting setup without a VAT identifier
+        CreateVATPostingSetup(VATPostingSetup, 25);
+        VATPostingSetup."VAT Identifier" := '';
+        VATPostingSetup.Modify();
+
+        // [GIVEN] A signed sale on a DK fiscal POS unit with a line under that setup, on a day no other test uses
+        ExportDate := CalcDate('<-90D>', OriginalWorkDate);
+        WorkDate(ExportDate);
+        _LibraryDKFiscal.CreateDKAuditSetup(POSUnit);
+        CreateSignedFiscalSale(POSUnit, POSEntry, 'DKCT-NOVATID');
+        AddItemLine(POSEntry, 10000, CreateItemNo(), 1, 125, 100);
+        SetLineVAT(POSEntry, 10000, VATPostingSetup);
+        WorkDate(OriginalWorkDate);
+
+        // [WHEN] The export is started for that day and the user declines
+        CreateExportHeader(SAFTExportHeader, ExportDate, ExportDate, false);
+        EnqueueConfirm(VATPostingSetup."VAT Prod. Posting Group" + ' have no ', false);
+        Codeunit.Run(Codeunit::"NPR DK SAF-T Cash Export Mgt.", SAFTExportHeader);
+
+        // [THEN] The user was warned that the lines cannot be given a VAT code
+        AssertAllConfirmsRaised();
+    end;
+
     local procedure FindFiscalEntry(var POSEntry: Record "NPR POS Entry"; FiscalNo: Code[20])
     begin
         POSEntry.SetRange("Fiscal No.", FiscalNo);
@@ -1345,6 +1652,38 @@ codeunit 85488 "NPR DK SAF-T Cash Export Tests"
         POSEntryPaymentLine."Amount (LCY)" := AmountLCY;
         POSEntryPaymentLine."Payment Amount" := AmountLCY;
         POSEntryPaymentLine.Insert();
+    end;
+
+    local procedure CreateVATPostingSetup(var VATPostingSetup: Record "VAT Posting Setup"; VATPct: Decimal)
+    var
+        VATBusinessPostingGroup: Record "VAT Business Posting Group";
+        VATProductPostingGroup: Record "VAT Product Posting Group";
+    begin
+        _LibraryERM.CreateVATBusinessPostingGroup(VATBusinessPostingGroup);
+        _LibraryERM.CreateVATProductPostingGroup(VATProductPostingGroup);
+        _LibraryERM.CreateVATPostingSetup(VATPostingSetup, VATBusinessPostingGroup.Code, VATProductPostingGroup.Code);
+        // Its own code, so the tests tell the exported VAT identifier apart from the VAT product posting group.
+        VATPostingSetup."VAT Identifier" := _LibraryUtility.GenerateRandomCode(VATPostingSetup.FieldNo("VAT Identifier"), Database::"VAT Posting Setup");
+        VATPostingSetup."VAT %" := VATPct;
+        VATPostingSetup.Description := CopyStr('DK SAF-T test VAT ' + Format(VATPct), 1, MaxStrLen(VATPostingSetup.Description));
+        VATPostingSetup.Modify();
+    end;
+
+    local procedure SetLineVAT(POSEntry: Record "NPR POS Entry"; LineNo: Integer; VATPostingSetup: Record "VAT Posting Setup")
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+    begin
+        POSEntrySalesLine.Get(POSEntry."Entry No.", LineNo);
+        POSEntrySalesLine."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
+        POSEntrySalesLine."VAT Prod. Posting Group" := VATPostingSetup."VAT Prod. Posting Group";
+        POSEntrySalesLine."VAT Identifier" := VATPostingSetup."VAT Identifier";
+        POSEntrySalesLine."VAT %" := VATPostingSetup."VAT %";
+        POSEntrySalesLine.Modify();
+    end;
+
+    local procedure VatCodeDetailXPath(VATCode: Code[20]): Text
+    begin
+        exit(StrSubstNo('/s:auditfile/s:company/s:vatCodeDetails/s:vatCodeDetail[s:vatCode=''%1'']', VATCode));
     end;
 
     local procedure CreatePaymentMethod(var POSPaymentMethod: Record "NPR POS Payment Method"; ProcessingType: Enum "NPR Payment Processing Type")

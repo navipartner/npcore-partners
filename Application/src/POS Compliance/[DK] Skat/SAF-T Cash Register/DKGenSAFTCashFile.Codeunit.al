@@ -134,14 +134,15 @@ codeunit 6184670 "NPR DK Gen. SAF-T Cash File"
 
         ExportBusinessPartners();
         ExportChartOfAccounts();
-        // ExportVATCodes(); (optional)
-        // ExportPeriods (optional)
+        AddVATCodeDetailsNode();
+        ExportPeriods(SAFTExportLine);
         ExportSalespersons();
         ExportItems();
         AddBasicsNode();
 
         ExportLocations(POSStore, SAFTExportLine, true, true);
 
+        ExportRegisteredVATCodes();
         ExportRegisteredArticles();
         ExportRegisteredBasics();
 
@@ -286,78 +287,92 @@ codeunit 6184670 "NPR DK Gen. SAF-T Cash File"
         SAFTXMLHelper.FinalizeXMLNode();
     end;
 
-    // local procedure ExportVATCodes()
-    // var
-    //     VATCode: Record "VAT Code";
-    //     VATPostingSetup: Record "VAT Posting Setup";
-    //     SAFTExportMgt: Codeunit "NPR DK SAF-T Cash Export Mgt.";
-    //     NotApplicableVATCode: Code[10];
-    //     FirstUsedOnPurch: Date;
-    //     FirstUsedOnSales: Date;
-    //     ExportingVatCodesTxt: Label 'Exporting VAT Codes to vatCodeDetails XML element...';
-    // begin
-    // if not VATCode.FindSet() then
-    //     exit;
+    local procedure AddVATCodeDetailsNode()
+    begin
+        SAFTXMLHelper.AddNewXMLNode('vatCodeDetails', '');
+        _VATCodeDetailsXMLNode := SAFTXMLHelper.GetCurrXMLNode();
+        SAFTXMLHelper.FinalizeXMLNode();
+    end;
 
-    // SAFTXMLHelper.AddNewXMLNode('vatCodeDetails', '');
+    local procedure RegisterVATCode(var POSEntrySalesLine: Record "NPR POS Entry Sales Line"; FirstUsedOn: Date)
+    var
+        VATPostingSetup: Record "VAT Posting Setup";
+        VATCode: Code[20];
+    begin
+        VATCode := POSEntrySalesLine."VAT Identifier";
+        if VATCode = '' then
+            exit;
+        if _VATCodeDates.ContainsKey(VATCode) then begin
+            if FirstUsedOn < _VATCodeDates.Get(VATCode) then
+                _VATCodeDates.Set(VATCode, FirstUsedOn);
+            exit;
+        end;
 
-    // if GuiAllowed() then begin
-    //     Window.Update(1, ExportingVatCodesTxt);
-    //     TotalRecNo := VATCode.Count();
-    // end;
+        _VATCodeDates.Add(VATCode, FirstUsedOn);
+        // SKAT's code list defines only standard VAT code 1 (25 %) and 0 (0 %).
+        if POSEntrySalesLine."VAT %" = 0 then
+            _VATCodeStandardCodes.Add(VATCode, '0')
+        else
+            _VATCodeStandardCodes.Add(VATCode, '1');
+        VATPostingSetup.SetLoadFields(Description);
+        if VATPostingSetup.Get(POSEntrySalesLine."VAT Bus. Posting Group", POSEntrySalesLine."VAT Prod. Posting Group") and (VATPostingSetup.Description <> '') then
+            _VATCodeDescs.Add(VATCode, VATPostingSetup.Description)
+        else
+            _VATCodeDescs.Add(VATCode, VATCode);
+    end;
 
-    // NotApplicableVATCode := SAFTExportMgt.GetNotApplicationVATCode();
-    // repeat
-    //     CheckGuiAllowedAndUpdateWindow();
+    local procedure ExportRegisteredVATCodes()
+    var
+        VATCode: Code[20];
+    begin
+        SAFTXMLHelper.ReopenXMLNode(_VATCodeDetailsXMLNode);
+        foreach VATCode in _VATCodeDates.Keys() do begin
+            SAFTXMLHelper.AddNewXMLNode('vatCodeDetail', '');
 
-    //     VATPostingSetup.SetRange("VAT Code", VATCode.Code);
-    //     if VATPostingSetup.FindFirst() then begin
-    //         if VATPostingSetup."Sales VAT Account" <> '' then
-    //             FirstUsedOnSales := GetFistUsageDate(1);
+            SAFTXMLHelper.AppendXMLNode('vatCode', VATCode);
+            SAFTXMLHelper.AppendXMLNode('dateOfEntry', FormatDate(_VATCodeDates.Get(VATCode)));
+            SAFTXMLHelper.AppendXMLNode('vatDesc', _VATCodeDescs.Get(VATCode));
+            SAFTXMLHelper.AppendXMLNode('standardVatCode', _VATCodeStandardCodes.Get(VATCode));
 
-    //         if VATPostingSetup."Purchase VAT Account" <> '' then
-    //             FirstUsedOnPurch := GetFistUsageDate(0);
+            SAFTXMLHelper.FinalizeXMLNode();
+        end;
+        SAFTXMLHelper.FinalizeXMLNode();
 
-    //         if FirstUsedOnSales > FirstUsedOnPurch then
-    //             ExportVatCodeDetail(VATCode.Code, VATCode.Code, CopyStr(VATPostingSetup.Description, 1, MaxStrLen(VATPostingSetup.Description)), FirstUsedOnPurch)
-    //         else
-    //             ExportVatCodeDetail(VATCode.Code, VATCode.Code, CopyStr(VATPostingSetup.Description, 1, MaxStrLen(VATPostingSetup.Description)), FirstUsedOnSales);
-    //     end;
-    // until VATCode.Next() = 0;
+        if not _VATCodeDetailsXMLNode.HasElements() then
+            _VATCodeDetailsXMLNode.Remove();
+    end;
 
-    // SAFTXMLHelper.FinalizeXMLNode();
-    // end;
+    local procedure ExportPeriods(SAFTExportLine: Record "NPR DK SAF-T Cash Export Line")
+    var
+        PeriodStartDate: Date;
+        PeriodEndDate: Date;
+        PeriodNo: Integer;
+    begin
+        SAFTXMLHelper.AddNewXMLNode('periods', '');
 
-    // local procedure ExportVatCodeDetail(SAFTTaxCode: Code[20]; StandardTaxCode: Code[10]; Description: Text; FirstUsedOn: Date)
-    // var
-    // begin
-    //     SAFTXMLHelper.AddNewXMLNode('vatCodeDetail', '');
+        PeriodStartDate := SAFTExportLine."Starting Date";
+        while PeriodStartDate <= SAFTExportLine."Ending Date" do begin
+            PeriodNo += 1;
+            PeriodEndDate := CalcDate('<CM>', PeriodStartDate);
+            if PeriodEndDate > SAFTExportLine."Ending Date" then
+                PeriodEndDate := SAFTExportLine."Ending Date";
 
-    //     SAFTXMLHelper.AppendXMLNode('vatCode', SAFTTaxCode);
-    //     SAFTXMLHelper.AppendXMLNode('dateOfEntry', FormatDate(FirstUsedOn));
-    //     SAFTXMLHelper.AppendXMLNode('vatDesc', Description);
-    //     SAFTXMLHelper.AppendXMLNode('standardVatCode', StandardTaxCode);
+            SAFTXMLHelper.AddNewXMLNode('period', '');
 
-    //     SAFTXMLHelper.FinalizeXMLNode();
-    // end;
+            SAFTXMLHelper.AppendXMLNode('periodNumber', Format(PeriodNo));
+            SAFTXMLHelper.AppendXMLNode('periodDesc', Format(PeriodStartDate, 0, '<Month Text> <Year4>'));
+            SAFTXMLHelper.AppendXMLNode('startDatePeriod', FormatDate(PeriodStartDate));
+            SAFTXMLHelper.AppendXMLNode('startTimePeriod', '00:00:00');
+            SAFTXMLHelper.AppendXMLNode('endDatePeriod', FormatDate(PeriodEndDate));
+            SAFTXMLHelper.AppendXMLNode('endTimePeriod', '23:59:59');
 
-    // local procedure GetFistUsageDate(EntryType: Option Purchase,Sale): Date
-    // var
-    //     POSEntry: Record "NPR POS Entry";
-    //     POSSalesLine: Record "NPR POS Entry Sales Line";
-    // begin
-    //     POSSalesLine.SetCurrentKey("VAT Bus. Posting Group", "VAT Prod. Posting Group", "POS Entry No.", "Gen. Posting Type");
-    //     if EntryType = EntryType::Purchase then
-    //         POSSalesLine.SetRange("Gen. Posting Type", POSSalesLine."Gen. Posting Type"::Purchase)
-    //     else
-    //         POSSalesLine.SetFilter("Gen. Posting Type", '<>%1', POSSalesLine."Gen. Posting Type"::Purchase);
+            SAFTXMLHelper.FinalizeXMLNode();
 
-    //     if POSSalesLine.FindFirst() then
-    //         if POSEntry.Get(POSSalesLine."POS Entry No.") then
-    //             exit(POSEntry."Entry Date");
+            PeriodStartDate := PeriodEndDate + 1;
+        end;
 
-    //     exit(0D);
-    // end;
+        SAFTXMLHelper.FinalizeXMLNode();
+    end;
 
     local procedure ExportSalespersons()
     var
@@ -776,7 +791,7 @@ codeunit 6184670 "NPR DK Gen. SAF-T Cash File"
     begin
         POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSEntrySalesLine.SetFilter(Type, '<>%1&<>%2', POSEntrySalesLine.Type::Comment, POSEntrySalesLine.Type::Rounding);
-        POSEntrySalesLine.SetLoadFields("No.", Quantity, Description, "VAT %", "Amount Incl. VAT (LCY)", "Amount Excl. VAT (LCY)");
+        POSEntrySalesLine.SetLoadFields("No.", Quantity, Description, "VAT %", "VAT Identifier", "VAT Bus. Posting Group", "VAT Prod. Posting Group", "Amount Incl. VAT (LCY)", "Amount Excl. VAT (LCY)");
         if not POSEntrySalesLine.FindSet() then
             exit;
 
@@ -800,6 +815,7 @@ codeunit 6184670 "NPR DK Gen. SAF-T Cash File"
             SAFTXMLHelper.AppendXMLNode('cashTransLineDescr', POSEntrySalesLine.Description);
 
             SAFTXMLHelper.AddNewXMLNode('vat', '');
+            SAFTXMLHelper.AppendXMLNode('vatCode', POSEntrySalesLine."VAT Identifier");
             SAFTXMLHelper.AppendXMLNode('vatPerc', Format(POSEntrySalesLine."VAT %", 0, 9));
             SAFTXMLHelper.AppendXMLNode('vatAmnt', FormatAmount(Abs(POSEntrySalesLine."Amount Incl. VAT (LCY)" - POSEntrySalesLine."Amount Excl. VAT (LCY)")));
             SAFTXMLHelper.AppendXMLNode('vatAmntTp', AmountType);
@@ -809,6 +825,7 @@ codeunit 6184670 "NPR DK Gen. SAF-T Cash File"
             SAFTXMLHelper.FinalizeXMLNode();
 
             RegisterArticle(ArtID, POSEntrySalesLine, POSEntry."Entry Date");
+            RegisterVATCode(POSEntrySalesLine, POSEntry."Entry Date");
         until POSEntrySalesLine.Next() = 0;
     end;
 
@@ -1127,6 +1144,10 @@ codeunit 6184670 "NPR DK Gen. SAF-T Cash File"
         TotalRecNo: Integer;
         _ArticlesXMLNode: XmlElement;
         _BasicsXMLNode: XmlElement;
+        _VATCodeDetailsXMLNode: XmlElement;
+        _VATCodeDates: Dictionary of [Code[20], Date];
+        _VATCodeDescs: Dictionary of [Code[20], Text];
+        _VATCodeStandardCodes: Dictionary of [Code[20], Text];
         _RegisteredArticles: Dictionary of [Text, Text];
         _RegisteredArticleDates: Dictionary of [Text, Date];
         _ExistingItems: Dictionary of [Code[20], Boolean];
