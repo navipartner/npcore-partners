@@ -53,6 +53,23 @@ codeunit 6151546 "NPR SI Audit Mgt."
         CheckAreDataSetAndAccordingToCompliance(FrontEnd);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Fiscal Perm. Check", 'OnAddSaleRequiredPermissions', '', false, false)]
+    local procedure OnAddSaleRequiredPermissions(AuditHandler: Code[20]; var POSFiscalPermCheck: Codeunit "NPR POS Fiscal Perm. Check")
+    begin
+        if AuditHandler <> HandlerCode() then
+            exit;
+
+        POSFiscalPermCheck.AddRead(Database::"NPR SI Fiscalization Setup");
+        POSFiscalPermCheck.AddRead(Database::"NPR SI Aux Salesperson/Purch.");
+        POSFiscalPermCheck.AddRead(Database::"NPR SI POS Sale");
+        POSFiscalPermCheck.AddRead(Database::"NPR SI POS Store Mapping");
+        POSFiscalPermCheck.AddWrite(Database::"NPR SI Aux Sales CrMemo Header");
+        POSFiscalPermCheck.AddWrite(Database::"NPR SI Aux Sales Header");
+        POSFiscalPermCheck.AddWrite(Database::"NPR SI Aux Sales Inv. Header");
+        POSFiscalPermCheck.AddWrite(Database::"NPR SI POS Audit Log Aux. Info");
+        POSFiscalPermCheck.AddWrite(Database::"NPR SI Salesbook Receipt");
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', false, false)]
     local procedure OnAfterEndSale(var Sender: Codeunit "NPR POS Sale"; SalePOS: Record "NPR POS Sale");
     var
@@ -600,6 +617,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
         SIAuxSalesHeader: Record "NPR SI Aux Sales Header";
         SIAuxSalespersonPurch: Record "NPR SI Aux Salesperson/Purch.";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
+        NoSetupReadPermissionErr: Label 'You cannot post this document because it must be fiscalized and you do not have permission to read %1.', Comment = '%1 = SI Fiscalization Setup table caption';
     begin
         if not IsSIFiscalActive() then
             exit;
@@ -607,6 +625,9 @@ codeunit 6151546 "NPR SI Audit Mgt."
         SIAuxSalesHeader.ReadSIAuxSalesHeaderFields(SalesHeader);
         if SIAuxSalesHeader."NPR SI POS Unit" = '' then
             exit;
+
+        if not SIFiscalSetup.ReadPermission() then
+            Error(NoSetupReadPermissionErr, SIFiscalSetup.TableCaption());
 
         SalesHeader.TestField("Salesperson Code");
         SalespersonPurchaser.Get(SalesHeader."Salesperson Code");
@@ -702,6 +723,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
 
     #region SI Fiscal - Procedures/Helper Functions
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR SI Fiscalization Setup", 'R')]
     internal procedure IsSIFiscalActive(): Boolean
     begin
         if not SIFiscalSetup.Get() then

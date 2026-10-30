@@ -6,6 +6,7 @@ codeunit 6060088 "NPR BG VISION Local. Mgt."
     var
         HasBGVISIONLocalisationSetup: Boolean;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR BG Vision Local. Setup", 'R')]
     internal procedure GetLocalisationSetupEnabled(): Boolean
     var
         BGVISIONLocalisationSetup: Record "NPR BG Vision Local. Setup";

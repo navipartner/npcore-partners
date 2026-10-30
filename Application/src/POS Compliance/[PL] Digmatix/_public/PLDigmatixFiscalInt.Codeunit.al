@@ -1,5 +1,6 @@
 codeunit 6150901 "NPR PL Digmatix Fiscal Int."
 {
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR PL Digmatix Fisc. Setup", 'R')]
     procedure IsPLFiscalActive(): Boolean
     var
         PLFiscalizationSetup: Record "NPR PL Digmatix Fisc. Setup";

@@ -274,6 +274,21 @@ codeunit 6184848 "NPR AT Audit Mgt."
         CheckATCashRegister(POSUnit);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Fiscal Perm. Check", 'OnAddSaleRequiredPermissions', '', false, false)]
+    local procedure OnAddSaleRequiredPermissions(AuditHandler: Code[20]; var POSFiscalPermCheck: Codeunit "NPR POS Fiscal Perm. Check")
+    begin
+        if AuditHandler <> HandlerCode() then
+            exit;
+
+        POSFiscalPermCheck.AddRead(Database::"NPR AT Fiscalization Setup");
+        POSFiscalPermCheck.AddRead(Database::"NPR AT Cash Register");
+        POSFiscalPermCheck.AddRead(Database::"NPR AT Organization");
+        POSFiscalPermCheck.AddRead(Database::"NPR AT POS Payment Method Map");
+        POSFiscalPermCheck.AddRead(Database::"NPR AT SCU");
+        POSFiscalPermCheck.AddRead(Database::"NPR AT VAT Posting Setup Map");
+        POSFiscalPermCheck.AddWrite(Database::"NPR AT POS Audit Log Aux. Info");
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnBeforeEndSale', '', false, false)]
     local procedure HandleOnBeforeEndSale(var Sender: Codeunit "NPR POS Sale"; SaleHeader: Record "NPR POS Sale");
     var
@@ -529,6 +544,7 @@ codeunit 6184848 "NPR AT Audit Mgt."
     #endregion
 
     #region AT Fiscal - Procedures/Helper Functions
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR AT Fiscalization Setup", 'R')]
     internal procedure IsATFiscalizationEnabled(): Boolean
     var
         ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";

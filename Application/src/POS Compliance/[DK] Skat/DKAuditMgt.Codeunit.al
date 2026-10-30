@@ -751,6 +751,7 @@ codeunit 6184669 "NPR DK Audit Mgt."
     end;
 #endif
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR DK Fiscalization Setup", 'R')]
     internal procedure IsDKFiscalActive(): Boolean
     var
         DKFiscalSetup: Record "NPR DK Fiscalization Setup";
@@ -772,6 +773,16 @@ codeunit 6184669 "NPR DK Audit Mgt."
         _Initialized := true;
         _Enabled := true;
         exit(true);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Fiscal Perm. Check", 'OnAddSaleRequiredPermissions', '', false, false)]
+    local procedure OnAddSaleRequiredPermissions(AuditHandler: Code[20]; var POSFiscalPermCheck: Codeunit "NPR POS Fiscal Perm. Check")
+    begin
+        if AuditHandler <> HandlerCode() then
+            exit;
+
+        POSFiscalPermCheck.AddRead(Database::"NPR DK Fiscalization Setup");
+        POSFiscalPermCheck.AddWrite(Database::"NPR DK POS Audit Log Aux. Info");
     end;
 
     internal procedure HandlerCode(): Text[20]

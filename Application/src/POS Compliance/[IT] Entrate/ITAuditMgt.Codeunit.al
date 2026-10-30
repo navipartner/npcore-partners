@@ -48,6 +48,20 @@ codeunit 6184647 "NPR IT Audit Mgt."
         CheckIsDataSetAccordingToCompliance(FrontEnd);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Fiscal Perm. Check", 'OnAddSaleRequiredPermissions', '', false, false)]
+    local procedure OnAddSaleRequiredPermissions(AuditHandler: Code[20]; var POSFiscalPermCheck: Codeunit "NPR POS Fiscal Perm. Check")
+    begin
+        if AuditHandler <> HandlerCode() then
+            exit;
+
+        POSFiscalPermCheck.AddRead(Database::"NPR IT Fiscalization Setup");
+        POSFiscalPermCheck.AddRead(Database::"NPR IT POS Sale");
+        POSFiscalPermCheck.AddWrite(Database::"NPR IT POS Audit Log Aux Info");
+        POSFiscalPermCheck.AddWrite(Database::"NPR IT POS Paym. Method Mapp.");
+        POSFiscalPermCheck.AddWrite(Database::"NPR IT POS Unit Mapping");
+        POSFiscalPermCheck.AddWrite(Database::"NPR IT VAT Department Codebook");
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSEntry', '', false, false)]
     local procedure OnAfterInsertPOSEntry(var SalePOS: Record "NPR POS Sale"; var POSEntry: Record "NPR POS Entry");
     begin
@@ -365,6 +379,7 @@ codeunit 6184647 "NPR IT Audit Mgt."
     #endregion
 
     #region IT Fiscal - Procedures/Helper Functions
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR IT Fiscalization Setup", 'R')]
     internal procedure IsITFiscalEnabled(): Boolean
     var
         ITFiscalSetup: Record "NPR IT Fiscalization Setup";

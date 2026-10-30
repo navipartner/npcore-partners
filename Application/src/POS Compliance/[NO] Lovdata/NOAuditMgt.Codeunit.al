@@ -700,6 +700,7 @@ codeunit 6151548 "NPR NO Audit Mgt."
     end;
 #endif
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR NO Fiscalization Setup", 'R')]
     internal procedure IsNOFiscalActive(): Boolean
     var
         NOFiscalSetup: Record "NPR NO Fiscalization Setup";
@@ -721,6 +722,16 @@ codeunit 6151548 "NPR NO Audit Mgt."
         _Initialized := true;
         _Enabled := true;
         exit(true);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Fiscal Perm. Check", 'OnAddSaleRequiredPermissions', '', false, false)]
+    local procedure OnAddSaleRequiredPermissions(AuditHandler: Code[20]; var POSFiscalPermCheck: Codeunit "NPR POS Fiscal Perm. Check")
+    begin
+        if AuditHandler <> HandlerCode() then
+            exit;
+
+        POSFiscalPermCheck.AddRead(Database::"NPR NO Fiscalization Setup");
+        POSFiscalPermCheck.AddWrite(Database::"NPR NO POS Audit Log Aux. Info");
     end;
 
     internal procedure HandlerCode(): Text[20]

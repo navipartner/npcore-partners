@@ -27,6 +27,7 @@ codeunit 6248728 "NPR RO Cust. Ledg. Post. Mgt."
         CustomerPostingGroupFilter := ROFiscalisationSetup."Customer Posting Group Filter";
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR RO Fiscalisation Setup", 'R')]
     local procedure IsROFiscalizationEnabled(var ROFiscalisationSetup: Record "NPR RO Fiscalisation Setup"): Boolean
     begin
         if not ROFiscalisationSetup.Get() then

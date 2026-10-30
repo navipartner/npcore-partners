@@ -61,6 +61,15 @@ codeunit 6248407 "NPR PL Digmatix Audit Mgt."
 
         PLFiscalIntegration.OnTestIsProfileSetAccordingToComplianceOnBeforeInitSale(POSUnit);
     end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Fiscal Perm. Check", 'OnAddSaleRequiredPermissions', '', false, false)]
+    local procedure OnAddSaleRequiredPermissions(AuditHandler: Code[20]; var POSFiscalPermCheck: Codeunit "NPR POS Fiscal Perm. Check")
+    begin
+        if AuditHandler <> HandlerCode() then
+            exit;
+
+        POSFiscalPermCheck.AddRead(Database::"NPR PL Digmatix Fisc. Setup");
+    end;
     #endregion
 
     #region PL Fiscal - Helper Procedures

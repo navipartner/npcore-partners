@@ -27,6 +27,7 @@ codeunit 6185071 "NPR CRO Cust. Ledg. Post. Mgt."
         CustomerPostingGroupFilter := CROFiscalizationSetup."Customer Posting Group Filter";
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR CRO Fiscalization Setup", 'R')]
     local procedure IsCROFiscalizationEnabled(var CROFiscalizationSetup: Record "NPR CRO Fiscalization Setup"): Boolean
     begin
         if not CROFiscalizationSetup.Get() then

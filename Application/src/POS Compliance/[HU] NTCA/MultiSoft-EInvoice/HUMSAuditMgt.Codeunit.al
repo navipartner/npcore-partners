@@ -112,6 +112,7 @@ codeunit 6184708 "NPR HU MS Audit Mgt."
         tmpRetailList.Insert();
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR HU MS Fiscalization Setup", 'R')]
     internal procedure IsHUFiscalActive(): Boolean
     var
         HUFiscalSetup: Record "NPR HU MS Fiscalization Setup";
@@ -129,6 +130,15 @@ codeunit 6184708 "NPR HU MS Audit Mgt."
         if POSAuditProfile."Audit Handler" <> HandlerCode() then
             exit(false);
         exit(true);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Fiscal Perm. Check", 'OnAddSaleRequiredPermissions', '', false, false)]
+    local procedure OnAddSaleRequiredPermissions(AuditHandler: Code[20]; var POSFiscalPermCheck: Codeunit "NPR POS Fiscal Perm. Check")
+    begin
+        if AuditHandler <> HandlerCode() then
+            exit;
+
+        POSFiscalPermCheck.AddRead(Database::"NPR HU MS Payment Method Map.");
     end;
 
     internal procedure HandlerCode(): Text[20]

@@ -2,6 +2,7 @@ codeunit 6151389 "NPR RS Localisation Mgt."
 {
     Access = Internal;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR RS Localisation Setup", 'R')]
     internal procedure GetLocalisationSetupEnabled(): Boolean
     begin
         if not HasRSLocalisationSetup then

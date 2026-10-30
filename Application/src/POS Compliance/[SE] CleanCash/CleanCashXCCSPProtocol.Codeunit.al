@@ -185,6 +185,17 @@
         tmpRetailList.Insert();
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Fiscal Perm. Check", 'OnAddSaleRequiredPermissions', '', false, false)]
+    local procedure OnAddSaleRequiredPermissions(AuditHandler: Code[20]; var POSFiscalPermCheck: Codeunit "NPR POS Fiscal Perm. Check")
+    begin
+        if AuditHandler <> HandlerCode().ToUpper() then
+            exit;
+
+        POSFiscalPermCheck.AddRead(Database::"NPR CleanCash Setup");
+        POSFiscalPermCheck.AddWrite(Database::"NPR CleanCash Trans. Request");
+        POSFiscalPermCheck.AddWrite(Database::"NPR CleanCash Trans. Response");
+    end;
+
     procedure HandlerCode(): Text
     var
         HandlerCodeTxt: Label 'SE_CleanCash-XCCSP', Locked = true, MaxLength = 20;

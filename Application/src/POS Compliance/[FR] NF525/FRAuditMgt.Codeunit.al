@@ -49,6 +49,17 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
     #endregion
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Fiscal Perm. Check", 'OnAddSaleRequiredPermissions', '', false, false)]
+    local procedure OnAddSaleRequiredPermissions(AuditHandler: Code[20]; var POSFiscalPermCheck: Codeunit "NPR POS Fiscal Perm. Check")
+    begin
+        if AuditHandler <> HandlerCode() then
+            exit;
+
+        POSFiscalPermCheck.AddRead(Database::"NPR FR Audit Setup");
+        POSFiscalPermCheck.AddRead(Database::"NPR FR Audit No. Series");
+        POSFiscalPermCheck.AddWrite(Database::"NPR FR POS Audit Log Add. Info");
+    end;
+
     procedure HandlerCode(): Text[8]
     begin
         exit('FR_NF525');

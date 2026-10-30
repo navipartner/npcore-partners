@@ -144,6 +144,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         exit(FeatureManagement.IsFeatureEnabled());
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR RS Localisation Setup", 'R')]
     local procedure IsRSLocalizationEnabled(): Boolean
     var
         RSLocalisationSetup: Record "NPR RS Localisation Setup";
@@ -154,6 +155,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         exit(RSLocalisationSetup."Enable RS Local");
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR RS R Localization Setup", 'R')]
     local procedure IsRSRLocalizationEnabled(): Boolean
     var
         RSRLocalizationSetup: Record "NPR RS R Localization Setup";
@@ -164,6 +166,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         exit(RSRLocalizationSetup."Enable RS Retail Localization");
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR RS Fiscalisation Setup", 'R')]
     local procedure IsRSFiscalizationEnabled(): Boolean
     var
         RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
@@ -174,6 +177,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         exit(RSFiscalizationSetup."Enable RS Fiscal");
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR NO Fiscalization Setup", 'R')]
     local procedure IsNOFiscalizationEnabled(): Boolean
     var
         NOFiscalizationSetup: Record "NPR NO Fiscalization Setup";
@@ -184,6 +188,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         exit(NOFiscalizationSetup."Enable NO Fiscal");
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR DK Fiscalization Setup", 'R')]
     local procedure IsDKFiscalizationnEnabled(): Boolean
     var
         DKFiscalizationSetup: Record "NPR DK Fiscalization Setup";
@@ -194,6 +199,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         exit(DKFiscalizationSetup."Enable DK Fiscal");
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR HU MS Fiscalization Setup", 'R')]
     local procedure IsHUMultiSoftEInvEnabled(): Boolean
     var
         HUMSFiscalizationSetup: Record "NPR HU MS Fiscalization Setup";
@@ -204,6 +210,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         exit(HUMSFiscalizationSetup."Enable HU Fiscal");
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR SI Fiscalization Setup", 'R')]
     local procedure IsSIFiscalizationEnabled(): Boolean
     var
         SIFiscalizationSetup: Record "NPR SI Fiscalization Setup";
@@ -214,6 +221,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         exit(SIFiscalizationSetup."Enable SI Fiscal");
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR CRO Fiscalization Setup", 'R')]
     local procedure IsCROFiscalizationEnabled(): Boolean
     var
         CROFiscalizationSetup: Record "NPR CRO Fiscalization Setup";
@@ -224,6 +232,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         exit(CROFiscalizationSetup."Enable CRO Fiscal");
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR BG Fiscalization Setup", 'R')]
     local procedure IsBGSISFiscalizationEnabled(): Boolean
     var
         BGFiscalizationSetup: Record "NPR BG Fiscalization Setup";
@@ -234,6 +243,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         exit(BGFiscalizationSetup."BG SIS Fiscal Enabled");
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR IT Fiscalization Setup", 'R')]
     local procedure IsITFiscalizationEnabled(): Boolean
     var
         ITFiscalizationSetup: Record "NPR IT Fiscalization Setup";
@@ -244,6 +254,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         exit(ITFiscalizationSetup."Enable IT Fiscal");
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR SE Fiscalization Setup.", 'R')]
     local procedure IsSEFiscalizationEnabled(): Boolean
     var
         SEFiscalizationSetup: Record "NPR SE Fiscalization Setup.";
@@ -254,6 +265,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         exit(SEFiscalizationSetup."Enable SE Fiscal");
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR AT Fiscalization Setup", 'R')]
     local procedure IsATFiscalizationEnabled(): Boolean
     var
         ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
@@ -264,6 +276,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         exit(ATFiscalizationSetup."AT Fiscal Enabled");
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR ES Fiscalization Setup", 'R')]
     local procedure IsESFiscalizationEnabled(): Boolean
     var
         ESFiscalizationSetup: Record "NPR ES Fiscalization Setup";
@@ -274,6 +287,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         exit(ESFiscalizationSetup."ES Fiscal Enabled");
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR RS E-Invoice Setup", 'R')]
     local procedure IsRSEinvoiceEnabled(): Boolean
     var
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
@@ -284,6 +298,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         exit(RSEInvoiceSetup."Enable RS E-Invoice");
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR DE Fiscalization Setup", 'R')]
     local procedure IsDEFiscalizationEnabled(): Boolean
     var
         DEFiscalizationSetup: Record "NPR DE Fiscalization Setup";
@@ -294,6 +309,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         exit(DEFiscalizationSetup."Enable DE Fiscal");
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR BE Fiscalisation Setup", 'R')]
     local procedure IsBEFiscalizationEnabled(): Boolean
     var
         BEFiscalizationSetup: Record "NPR BE Fiscalisation Setup";
@@ -304,6 +320,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         exit(BEFiscalizationSetup."Enable BE Fiscal");
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR HU L Fiscalization Setup", 'R')]
     local procedure IsHULaurelFiscalizationEnabled(): Boolean
     var
         HULFiscalizationSetup: Record "NPR HU L Fiscalization Setup";
@@ -314,6 +331,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         exit(HULFiscalizationSetup."HU Laurel Fiscal Enabled");
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR PL Digmatix Fisc. Setup", 'R')]
     local procedure IsPLFiscalizationEnabled(): Boolean
     var
         PLFiscalizationSetup: Record "NPR PL Digmatix Fisc. Setup";
@@ -324,6 +342,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         exit(PLFiscalizationSetup."Enable PL Fiscal");
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR RO Fiscalisation Setup", 'R')]
     local procedure IsROFiscalizationEnabled(): Boolean
     var
         ROFiscalisationSetup: Record "NPR RO Fiscalisation Setup";

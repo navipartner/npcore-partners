@@ -48,6 +48,7 @@ codeunit 6184844 "NPR SE CC Cash Reg. Audit Mgt."
 
     #region SE CleanCash Helper Procedures
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR SE Fiscalization Setup.", 'R')]
     local procedure IsSECleanCashEnabled(): Boolean
     var
         SEFiscalizationSetup: Record "NPR SE Fiscalization Setup.";

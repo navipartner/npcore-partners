@@ -141,6 +141,26 @@ codeunit 6059942 "NPR RS Audit Mgt."
         CheckAreDataSetAndAccordingToCompliance(FrontEnd);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Fiscal Perm. Check", 'OnAddSaleRequiredPermissions', '', false, false)]
+    local procedure OnAddSaleRequiredPermissions(AuditHandler: Code[20]; var POSFiscalPermCheck: Codeunit "NPR POS Fiscal Perm. Check")
+    begin
+        if AuditHandler <> HandlerCode() then
+            exit;
+
+        POSFiscalPermCheck.AddRead(Database::"NPR RS Fiscalisation Setup");
+        POSFiscalPermCheck.AddRead(Database::"NPR RS Allowed Tax Rates");
+        POSFiscalPermCheck.AddRead(Database::"NPR RS POS Paym. Meth. Mapping");
+        POSFiscalPermCheck.AddRead(Database::"NPR RS POS Sale");
+        POSFiscalPermCheck.AddRead(Database::"NPR RS POS Unit Mapping");
+        POSFiscalPermCheck.AddRead(Database::"NPR RS Payment Method Mapping");
+        POSFiscalPermCheck.AddRead(Database::"NPR RS VAT Post. Setup Mapping");
+        POSFiscalPermCheck.AddWrite(Database::"NPR RS Aux Sales CrMemo Header");
+        POSFiscalPermCheck.AddWrite(Database::"NPR RS Aux Sales Header");
+        POSFiscalPermCheck.AddWrite(Database::"NPR RS Aux Sales Inv. Header");
+        POSFiscalPermCheck.AddWrite(Database::"NPR RS POS Audit Log Aux. Copy");
+        POSFiscalPermCheck.AddWrite(Database::"NPR RS POS Audit Log Aux. Info");
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: Rev. Dir. Sale", 'OnBeforeHendleReverse', '', false, false)]
     local procedure OnBeforeHendleReverse(Setup: Codeunit "NPR POS Setup"; var SalesTicketNo: Code[20]; Context: Codeunit "NPR POS JSON Helper");
     var
@@ -569,6 +589,8 @@ codeunit 6059942 "NPR RS Audit Mgt."
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
         RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
     begin
+        if not IsRSFiscalActive() then
+            exit;
         CheckSalesLinesRetailLocation(SalesHeader);
         if not RetailLocationExistsOnSalesLines then
             exit;
@@ -702,6 +724,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
         exit(true);
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR RS Fiscalisation Setup", 'R')]
     internal procedure IsRSFiscalActive(): Boolean
     var
         RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";

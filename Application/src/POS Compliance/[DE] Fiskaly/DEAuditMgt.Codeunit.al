@@ -22,6 +22,7 @@
         exit(POSAuditProfile."Audit Handler" = HandlerCode());
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR DE Fiscalization Setup", 'R')]
     internal procedure IsFiscalizationEnabled(): Boolean
     var
         DEFiscalizationSetup: Record "NPR DE Fiscalization Setup";
@@ -417,6 +418,20 @@
         CompanyInformation.TestField("VAT Registration No.");
         CheckTssJobQueue();
         CheckDSFINVKJobQueue();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Fiscal Perm. Check", 'OnAddSaleRequiredPermissions', '', false, false)]
+    local procedure OnAddSaleRequiredPermissions(AuditHandler: Code[20]; var POSFiscalPermCheck: Codeunit "NPR POS Fiscal Perm. Check")
+    begin
+        if AuditHandler <> HandlerCode() then
+            exit;
+
+        POSFiscalPermCheck.AddRead(Database::"NPR DE Audit Setup");
+        POSFiscalPermCheck.AddRead(Database::"NPR DE POS Unit Aux. Info");
+        POSFiscalPermCheck.AddRead(Database::"NPR DE TSS");
+        POSFiscalPermCheck.AddRead(Database::"NPR Payment Method Mapper");
+        POSFiscalPermCheck.AddRead(Database::"NPR VAT Post. Group Mapper");
+        POSFiscalPermCheck.AddWrite(Database::"NPR DE POS Audit Log Aux. Info");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workshift Checkpoint", 'OnAfterEndWorkshift', '', true, true)]

@@ -11,6 +11,7 @@
         _InFilterLbl: Label '%1|%2', Locked = true;
         _NotInFilterLbl: Label '<>%1&<>%2', Locked = true;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR RS R Localization Setup", 'R')]
     internal procedure IsRSLocalizationActive(): Boolean
     begin
         if not _HasRSLocalizationSetup then begin

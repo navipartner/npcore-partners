@@ -223,6 +223,20 @@ codeunit 6184866 "NPR ES Audit Mgt."
         CheckESClientAndESOrganization(POSUnit);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Fiscal Perm. Check", 'OnAddSaleRequiredPermissions', '', false, false)]
+    local procedure OnAddSaleRequiredPermissions(AuditHandler: Code[20]; var POSFiscalPermCheck: Codeunit "NPR POS Fiscal Perm. Check")
+    begin
+        if AuditHandler <> HandlerCode() then
+            exit;
+
+        POSFiscalPermCheck.AddRead(Database::"NPR ES Fiscalization Setup");
+        POSFiscalPermCheck.AddRead(Database::"NPR ES Client");
+        POSFiscalPermCheck.AddRead(Database::"NPR ES Organization");
+        POSFiscalPermCheck.AddRead(Database::"NPR ES Return Reason Mapping");
+        POSFiscalPermCheck.AddRead(Database::"NPR ES Signer");
+        POSFiscalPermCheck.AddWrite(Database::"NPR ES POS Audit Log Aux. Info");
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Front End Management", 'OnBeforeChangeToPaymentView', '', false, false)]
     local procedure OnBeforeChangeToPaymentView(sender: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session")
     var
@@ -519,6 +533,7 @@ codeunit 6184866 "NPR ES Audit Mgt."
     #endregion
 
     #region ES Fiscal - Procedures/Helper Functions
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR ES Fiscalization Setup", 'R')]
     internal procedure IsESFiscalizationEnabled(): Boolean
     var
         ESFiscalizationSetup: Record "NPR ES Fiscalization Setup";

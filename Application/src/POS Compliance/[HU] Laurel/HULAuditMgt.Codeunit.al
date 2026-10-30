@@ -253,6 +253,21 @@ codeunit 6185037 "NPR HU L Audit Mgt."
         TestPOSUnitMapping(POSUnit."No.");
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Fiscal Perm. Check", 'OnAddSaleRequiredPermissions', '', false, false)]
+    local procedure OnAddSaleRequiredPermissions(AuditHandler: Code[20]; var POSFiscalPermCheck: Codeunit "NPR POS Fiscal Perm. Check")
+    begin
+        if AuditHandler <> HandlerCode() then
+            exit;
+
+        POSFiscalPermCheck.AddRead(Database::"NPR HU L Fiscalization Setup");
+        POSFiscalPermCheck.AddRead(Database::"NPR HU L POS Paym. Meth. Mapp.");
+        POSFiscalPermCheck.AddRead(Database::"NPR HU L POS Unit Mapping");
+        POSFiscalPermCheck.AddRead(Database::"NPR HU L Return Reason Mapp.");
+        POSFiscalPermCheck.AddRead(Database::"NPR HU L VAT Post. Setup Mapp.");
+        POSFiscalPermCheck.AddWrite(Database::"NPR HU L POS Audit Log Aux.");
+        POSFiscalPermCheck.AddWrite(Database::"NPR HU L POS Sale");
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnBeforeEndSale', '', false, false)]
     local procedure HandleOnBeforeEndSale(SaleHeader: Record "NPR POS Sale")
     var
@@ -678,6 +693,7 @@ codeunit 6185037 "NPR HU L Audit Mgt."
     #endregion
 
     #region HU Laurel Fiscal - Procedures/Helper Functions
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR HU L Fiscalization Setup", 'R')]
     internal procedure IsHULFiscalizationEnabled(): Boolean
     var
         HULFiscalizationSetup: Record "NPR HU L Fiscalization Setup";

@@ -27,6 +27,7 @@
 
     #region RS E-Invoice Mgt. Procedures
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR RS E-Invoice Setup", 'R')]
     procedure IsRSEInvoiceEnabled(): Boolean
     var
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";

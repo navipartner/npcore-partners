@@ -12,6 +12,7 @@ codeunit 6184737 "NPR Retail Localization Mgt."
         end;
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR RS R Localization Setup", 'R')]
     local procedure RSRetailEnabled(): Boolean
     var
         RSRLocalization: Record "NPR RS R Localization Setup";

@@ -235,6 +235,21 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
         CheckSalesperson(Salesperson);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Fiscal Perm. Check", 'OnAddSaleRequiredPermissions', '', false, false)]
+    local procedure OnAddSaleRequiredPermissions(AuditHandler: Code[20]; var POSFiscalPermCheck: Codeunit "NPR POS Fiscal Perm. Check")
+    begin
+        if AuditHandler <> HandlerCode() then
+            exit;
+
+        POSFiscalPermCheck.AddRead(Database::"NPR BG Fiscalization Setup");
+        POSFiscalPermCheck.AddRead(Database::"NPR BG SIS POS Paym. Meth. Map");
+        POSFiscalPermCheck.AddRead(Database::"NPR BG SIS Return Reason Map");
+        POSFiscalPermCheck.AddRead(Database::"NPR BG SIS VAT Post. Setup Map");
+        POSFiscalPermCheck.AddWrite(Database::"NPR BG SIS POS Audit Log Aux.");
+        POSFiscalPermCheck.AddWrite(Database::"NPR BG SIS POS Sale");
+        POSFiscalPermCheck.AddWrite(Database::"NPR BG SIS POS Unit Mapping");
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: Rev. Dir. Sale", 'OnBeforeHendleReverse', '', false, false)]
     local procedure HandleOnBeforeHendleReverse(Setup: Codeunit "NPR POS Setup"; var SalesTicketNo: Code[20]);
     var
@@ -418,6 +433,7 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
     #endregion
 
     #region BG SIS Fiscal - Procedures/Helper Functions
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR BG Fiscalization Setup", 'R')]
     local procedure IsBGSISFiscalEnabled(): Boolean
     var
         BGFiscalizationSetup: Record "NPR BG Fiscalization Setup";

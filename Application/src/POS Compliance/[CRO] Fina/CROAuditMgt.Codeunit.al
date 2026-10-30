@@ -73,6 +73,24 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CheckAreDataSetAndAccordingToCompliance(FrontEnd);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Fiscal Perm. Check", 'OnAddSaleRequiredPermissions', '', false, false)]
+    local procedure OnAddSaleRequiredPermissions(AuditHandler: Code[20]; var POSFiscalPermCheck: Codeunit "NPR POS Fiscal Perm. Check")
+    begin
+        if AuditHandler <> HandlerCode() then
+            exit;
+
+        POSFiscalPermCheck.AddRead(Database::"NPR CRO Fiscalization Setup");
+        POSFiscalPermCheck.AddRead(Database::"NPR CRO Aux Salesperson/Purch.");
+        POSFiscalPermCheck.AddRead(Database::"NPR CRO POS Paym. Method Mapp.");
+        POSFiscalPermCheck.AddRead(Database::"NPR CRO POS Sale");
+        POSFiscalPermCheck.AddRead(Database::"NPR CRO POS Store Mapping");
+        POSFiscalPermCheck.AddRead(Database::"NPR CRO Payment Method Mapping");
+        POSFiscalPermCheck.AddWrite(Database::"NPR CRO Aux Sales Cr. Memo Hdr");
+        POSFiscalPermCheck.AddWrite(Database::"NPR CRO Aux Sales Header");
+        POSFiscalPermCheck.AddWrite(Database::"NPR CRO Aux Sales Inv. Header");
+        POSFiscalPermCheck.AddWrite(Database::"NPR CRO POS Aud. Log Aux. Info");
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Unit", 'OnAfterValidateEvent', 'No.', false, false)]
     local procedure POSUnitOnBeforeInsert(var Rec: Record "NPR POS Unit")
     var
@@ -810,6 +828,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     #endregion
 
     #region CRO Fiscal - Procedures/Helper Functions
+    [InherentPermissions(PermissionObjectType::TableData, Database::"NPR CRO Fiscalization Setup", 'R')]
     internal procedure IsCROFiscalActive(): Boolean
     begin
         if not CROFiscalSetup.Get() then
@@ -867,6 +886,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         POSUnit: Record "NPR POS Unit";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         NotCROAuditProfileErr: Label 'CRO Audit Profile is not selected on POS Unit No.: %1', Comment = '%1 - POS Unit No.';
+        NoSetupReadPermissionErr: Label 'You cannot post this document because it must be fiscalized and you do not have permission to read %1.', Comment = '%1 - CRO Fiscalization Setup table caption';
     begin
         if not IsCROFiscalActive() then
             exit;
@@ -878,6 +898,9 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         POSUnit.Get(CROAuxSalesHeader."NPR CRO POS Unit");
         if not IsCROAuditEnabled(POSUnit."POS Audit Profile") then
             Error(NotCROAuditProfileErr, POSUnit."No.");
+
+        if not CROFiscalSetup.ReadPermission() then
+            Error(NoSetupReadPermissionErr, CROFiscalSetup.TableCaption());
 
         SalesHeader.TestField("Payment Method Code");
         SalesHeader.TestField("Salesperson Code");
