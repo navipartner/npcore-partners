@@ -388,7 +388,8 @@ codeunit 6248644 "NPR API Restaurant Menu"
         if Upsell.FindSet() then
             repeat
                 if UpsellMenuItem.GetBySystemId(Upsell."Menu Item System Id") then
-                    BuildUpsellItem(UpsellMenuItem, Upsell."Sort Key", PosUnitCode, VATBusPostingGroup, Json);
+                    if IsShownOnMenu(UpsellMenuItem) then
+                        BuildUpsellItem(UpsellMenuItem, Upsell."Sort Key", PosUnitCode, VATBusPostingGroup, Json);
             until Upsell.Next() = 0;
     end;
 
@@ -406,8 +407,19 @@ codeunit 6248644 "NPR API Restaurant Menu"
         if Upsell.FindSet() then
             repeat
                 if UpsellMenuItem.GetBySystemId(Upsell."Menu Item System Id") then
-                    BuildUpsellItem(UpsellMenuItem, Upsell."Sort Key", PosUnitCode, VATBusPostingGroup, Json);
+                    if IsShownOnMenu(UpsellMenuItem) then
+                        BuildUpsellItem(UpsellMenuItem, Upsell."Sort Key", PosUnitCode, VATBusPostingGroup, Json);
             until Upsell.Next() = 0;
+    end;
+
+    local procedure IsShownOnMenu(MenuItem: Record "NPR NPRE Menu Item"): Boolean
+    var
+        MenuCategory: Record "NPR NPRE Menu Category";
+    begin
+        if MenuItem.Status = MenuItem.Status::"Inactive Hidden" then
+            exit(false);
+        MenuCategory.ReadIsolation := IsolationLevel::ReadCommitted;
+        exit(MenuCategory.Get(MenuItem."Restaurant Code", MenuItem."Menu Code", MenuItem."Category Code"));
     end;
 
     local procedure BuildUpsellItem(MenuItem: Record "NPR NPRE Menu Item"; SortKey: Integer; PosUnitCode: Code[10]; VATBusPostingGroup: Code[20]; var Json: Codeunit "NPR JSON Builder")
@@ -421,7 +433,8 @@ codeunit 6248644 "NPR API Restaurant Menu"
 
         Json.AddProperty('itemCode', MenuItem."Item No.")
             .AddProperty('variantCode', MenuItem."Variant Code")
-            .AddProperty('sortKey', SortKey);
+            .AddProperty('sortKey', SortKey)
+            .AddProperty('status', MenuItem.Status.Names.Get(MenuItem.Status.Ordinals.IndexOf(MenuItem.Status.AsInteger())));
 
         // Get unit price
         UnitPrice := GetItemPrice(MenuItem."Item No.", MenuItem."Variant Code", PosUnitCode, VATBusPostingGroup);

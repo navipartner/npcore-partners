@@ -1716,6 +1716,189 @@ codeunit 85157 "NPR POS API Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_CheckoutUpsells_OnlyItemsShownOnMenu()
+    var
+        Assert: Codeunit Assert;
+        Menu: Record "NPR NPRE Menu";
+        MainMenuItem: Record "NPR NPRE Menu Item";
+        MenuContent: JsonObject;
+        Upsells: JsonArray;
+        Upsell: JsonObject;
+        JToken: JsonToken;
+        HiddenItemNo: Code[20];
+        VisibleItemNo: Code[20];
+        ActiveItemNo: Code[20];
+        RemovedItemNo: Code[20];
+    begin
+        // [SCENARIO] checkoutUpsellItems only offers items the category list also shows, each with its status
+        // [GIVEN] Checkout upsells that are Inactive (hidden), Inactive (visible), Active, and left behind by a deleted category
+        CreateMenuWithUpsells(Enum::"NPR NPRE Upsell Table"::Menu, Menu, MainMenuItem, HiddenItemNo, VisibleItemNo, ActiveItemNo, RemovedItemNo);
+
+        // [WHEN] Get menu
+        MenuContent := GetMenuContent(Menu);
+
+        // [THEN] Hidden and left-behind items are not offered, the others carry their status
+        Assert.IsTrue(MenuContent.Get('checkoutUpsellItems', JToken), 'menuContent should have checkoutUpsellItems');
+        Upsells := JToken.AsArray();
+        Assert.IsFalse(FindMenuItemByItemCode(Upsells, HiddenItemNo, Upsell), 'Inactive (hidden) item must not be offered as a checkout upsell');
+        Assert.IsFalse(FindMenuItemByItemCode(Upsells, RemovedItemNo, Upsell), 'Item from a deleted category must not be offered as a checkout upsell');
+        Assert.AreEqual('Inactive Visible', GetUpsellStatus(Upsells, VisibleItemNo), 'Wrong status on the Inactive (visible) checkout upsell');
+        Assert.AreEqual('Active', GetUpsellStatus(Upsells, ActiveItemNo), 'Wrong status on the Active checkout upsell');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_ItemUpsells_OnlyItemsShownOnMenu()
+    var
+        Assert: Codeunit Assert;
+        Menu: Record "NPR NPRE Menu";
+        MainMenuItem: Record "NPR NPRE Menu Item";
+        MenuContent: JsonObject;
+        Categories: JsonArray;
+        MainItemObj: JsonObject;
+        Upsells: JsonArray;
+        Upsell: JsonObject;
+        JToken: JsonToken;
+        HiddenItemNo: Code[20];
+        VisibleItemNo: Code[20];
+        ActiveItemNo: Code[20];
+        RemovedItemNo: Code[20];
+    begin
+        // [SCENARIO] A menu item's upsellItems only offer items the category list also shows, each with its status
+        // [GIVEN] Upsells on a menu item that are Inactive (hidden), Inactive (visible), Active, and left behind by a deleted category
+        CreateMenuWithUpsells(Enum::"NPR NPRE Upsell Table"::MenuItem, Menu, MainMenuItem, HiddenItemNo, VisibleItemNo, ActiveItemNo, RemovedItemNo);
+
+        // [WHEN] Get menu
+        MenuContent := GetMenuContent(Menu);
+
+        // [THEN] Hidden and left-behind items are not offered, the others carry their status
+        Assert.IsTrue(MenuContent.Get('categories', JToken), 'menuContent should have categories');
+        Categories := JToken.AsArray();
+        Assert.AreEqual(1, Categories.Count(), 'Only the category that was not deleted should be listed');
+        Categories.Get(0, JToken);
+        JToken.AsObject().Get('items', JToken);
+        Assert.IsTrue(FindMenuItemByItemCode(JToken.AsArray(), MainMenuItem."Item No.", MainItemObj), 'Category should contain the main menu item');
+        Assert.IsTrue(MainItemObj.Get('upsellItems', JToken), 'Main menu item should have upsellItems');
+        Upsells := JToken.AsArray();
+        Assert.IsFalse(FindMenuItemByItemCode(Upsells, HiddenItemNo, Upsell), 'Inactive (hidden) item must not be offered as an item upsell');
+        Assert.IsFalse(FindMenuItemByItemCode(Upsells, RemovedItemNo, Upsell), 'Item from a deleted category must not be offered as an item upsell');
+        Assert.AreEqual('Inactive Visible', GetUpsellStatus(Upsells, VisibleItemNo), 'Wrong status on the Inactive (visible) item upsell');
+        Assert.AreEqual('Active', GetUpsellStatus(Upsells, ActiveItemNo), 'Wrong status on the Active item upsell');
+    end;
+
+    local procedure CreateMenuWithUpsells(UpsellTable: Enum "NPR NPRE Upsell Table"; var Menu: Record "NPR NPRE Menu"; var MainMenuItem: Record "NPR NPRE Menu Item"; var HiddenItemNo: Code[20]; var VisibleItemNo: Code[20]; var ActiveItemNo: Code[20]; var RemovedItemNo: Code[20])
+    var
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        MainItem: Record Item;
+        ItemRoutingProfile: Record "NPR NPRE Item Routing Profile";
+        MenuCategory: Record "NPR NPRE Menu Category";
+        RemovedMenuCategory: Record "NPR NPRE Menu Category";
+        Restaurant: Record "NPR NPRE Restaurant";
+        POSRestProfile: Record "NPR POS NPRE Rest. Profile";
+        UpsellOwnerId: Guid;
+    begin
+        InitializeMenu();
+
+        POSRestProfile.Get(_POSUnit."POS Restaurant Profile");
+        Restaurant.Get(POSRestProfile."Restaurant Code");
+
+        LibraryRestaurant.CreateMenu(Menu, Restaurant.Code);
+        LibraryRestaurant.CreateMenuCategory(MenuCategory, Restaurant.Code, Menu.Code, 'UPSELL');
+        LibraryRestaurant.CreateMenuCategory(RemovedMenuCategory, Restaurant.Code, Menu.Code, 'REMOVED');
+        LibraryRestaurant.CreateItemRoutingProfile(ItemRoutingProfile);
+
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(MainItem, _POSUnit, _POSStore);
+        LibraryRestaurant.LinkItemToRoutingProfile(MainItem, ItemRoutingProfile.Code);
+        LibraryRestaurant.CreateMenuItem(MainMenuItem, Restaurant.Code, Menu.Code, MenuCategory."Category Code", MainItem."No.");
+
+        if UpsellTable = Enum::"NPR NPRE Upsell Table"::Menu then
+            UpsellOwnerId := Menu.SystemId
+        else
+            UpsellOwnerId := MainMenuItem.SystemId;
+
+        HiddenItemNo := AddUpsellTestItem(UpsellTable, UpsellOwnerId, 10000, MenuCategory, ItemRoutingProfile.Code, Enum::"NPR NPRE Menu Item Status"::"Inactive Hidden");
+        VisibleItemNo := AddUpsellTestItem(UpsellTable, UpsellOwnerId, 20000, MenuCategory, ItemRoutingProfile.Code, Enum::"NPR NPRE Menu Item Status"::"Inactive Visible");
+        ActiveItemNo := AddUpsellTestItem(UpsellTable, UpsellOwnerId, 30000, MenuCategory, ItemRoutingProfile.Code, Enum::"NPR NPRE Menu Item Status"::Active);
+        RemovedItemNo := AddUpsellTestItem(UpsellTable, UpsellOwnerId, 40000, RemovedMenuCategory, ItemRoutingProfile.Code, Enum::"NPR NPRE Menu Item Status"::Active);
+
+        RemovedMenuCategory.Delete(true);
+        Commit();
+    end;
+
+    local procedure AddUpsellTestItem(UpsellTable: Enum "NPR NPRE Upsell Table"; UpsellOwnerId: Guid; LineNo: Integer; MenuCategory: Record "NPR NPRE Menu Category"; ItemRoutingProfileCode: Code[20]; MenuItemStatus: Enum "NPR NPRE Menu Item Status"): Code[20]
+    var
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Item: Record Item;
+        MenuItem: Record "NPR NPRE Menu Item";
+        Upsell: Record "NPR NPRE Upsell";
+    begin
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryRestaurant.LinkItemToRoutingProfile(Item, ItemRoutingProfileCode);
+        LibraryRestaurant.CreateMenuItem(MenuItem, MenuCategory."Restaurant Code", MenuCategory."Menu Code", MenuCategory."Category Code", Item."No.");
+        MenuItem.Status := MenuItemStatus;
+        MenuItem.Modify();
+
+        Upsell.Init();
+        Upsell."External Table" := UpsellTable;
+        Upsell."External System Id" := UpsellOwnerId;
+        Upsell."Line No." := LineNo;
+        Upsell."Menu Item System Id" := MenuItem.SystemId;
+        Upsell.Insert(true);
+        exit(Item."No.");
+    end;
+
+    local procedure GetMenuContent(Menu: Record "NPR NPRE Menu") MenuContent: JsonObject
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Restaurant: Record "NPR NPRE Restaurant";
+        Response: JsonObject;
+        ResponseBody: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        JToken: JsonToken;
+    begin
+        Restaurant.Get(Menu."Restaurant Code");
+        Response := LibraryNPRetailAPI.CallApi('GET',
+            '/restaurant/' + FormatGuid(Restaurant.SystemId) + '/menu/' + FormatGuid(Menu.SystemId),
+            Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Get menu should succeed');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        Assert.IsTrue(ResponseBody.Get('menuContent', JToken), 'Response should have menuContent');
+        MenuContent := JToken.AsObject();
+    end;
+
+    local procedure FindMenuItemByItemCode(Items: JsonArray; ItemNo: Code[20]; var ItemObj: JsonObject): Boolean
+    var
+        JToken: JsonToken;
+        ItemCodeToken: JsonToken;
+    begin
+        foreach JToken in Items do begin
+            ItemObj := JToken.AsObject();
+            if ItemObj.Get('itemCode', ItemCodeToken) then
+                if ItemCodeToken.AsValue().AsCode() = ItemNo then
+                    exit(true);
+        end;
+        Clear(ItemObj);
+        exit(false);
+    end;
+
+    local procedure GetUpsellStatus(Upsells: JsonArray; ItemNo: Code[20]): Text
+    var
+        Assert: Codeunit Assert;
+        Upsell: JsonObject;
+        JToken: JsonToken;
+    begin
+        Assert.IsTrue(FindMenuItemByItemCode(Upsells, ItemNo, Upsell), StrSubstNo('Upsell %1 should be in the list', ItemNo));
+        Assert.IsTrue(Upsell.Get('status', JToken), StrSubstNo('Upsell %1 should carry a status', ItemNo));
+        exit(JToken.AsValue().AsText());
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RestaurantMenu_LastUpdated_UpdatedOnItemPriceChange()
     var
         Assert: Codeunit Assert;
