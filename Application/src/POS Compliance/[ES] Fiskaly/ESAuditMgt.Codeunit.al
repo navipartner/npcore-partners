@@ -99,7 +99,8 @@ codeunit 6184866 "NPR ES Audit Mgt."
                     POSEntry.Get(POSAuditLog."Record ID");
 
                     if not (POSEntry."Post Item Entry Status" in [POSEntry."Post Item Entry Status"::"Not To Be Posted"]) then
-                        InsertESPOSAuditLogAuxInfo(POSEntry, POSStore, POSUnit);
+                        if not IsPrepaymentOrDepositOnlySale(POSEntry."Entry No.") then
+                            InsertESPOSAuditLogAuxInfo(POSEntry, POSStore, POSUnit);
                 end;
         end;
     end;
@@ -132,7 +133,7 @@ codeunit 6184866 "NPR ES Audit Mgt."
         ESPOSAuditLogAuxInfo."POS Store Code" := POSStore.Code;
         ESPOSAuditLogAuxInfo."POS Unit No." := POSUnit."No.";
         ESPOSAuditLogAuxInfo."Source Document No." := POSEntry."Document No.";
-        ESPOSAuditLogAuxInfo."Amount Incl. Tax" := POSEntry."Amount Incl. Tax";
+        ESPOSAuditLogAuxInfo."Amount Incl. Tax" := CalcInvoiceAmountInclTax(POSEntry);
         ESPOSAuditLogAuxInfo."Salesperson Code" := POSEntry."Salesperson Code";
 
         ESClient.Get(ESPOSAuditLogAuxInfo."POS Unit No.");
@@ -188,7 +189,7 @@ codeunit 6184866 "NPR ES Audit Mgt."
                 ESPOSAuditLogAuxInfo."Invoice Type" := ESPOSAuditLogAuxInfo."Invoice Type"::CORRECTING;
             ESPOSAuditLogAuxInfo."Amount Incl. Tax" = 0:
                 begin
-                    POSEntrySalesLine.SetRange("POS Entry No.", POSEntryNo);
+                    FilterFiscalizableLines(POSEntryNo, POSEntrySalesLine);
                     POSEntrySalesLine.FindFirst();
 
                     if OriginalPOSEntrySalesLine.GetBySystemId(POSEntrySalesLine."Orig.POS Entry S.Line SystemId") then
@@ -727,6 +728,47 @@ codeunit 6184866 "NPR ES Audit Mgt."
     begin
         if TenantMedia.Get(MediaId) then
             TenantMedia.Delete(true);
+    end;
+
+    local procedure IsPrepaymentOrDepositOnlySale(POSEntryNo: Integer): Boolean
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+    begin
+        // Customer lines are payments on the customer account, not supplies. Prepayments and payments of sales documents are invoiced by the documents posted for them,
+        // payments of posted invoices and credit memos were invoiced when those were posted, and a deposit not tied to identified goods is no advance payment (art. 75.Dos LIVA),
+        // so its goods are invoiced when they are sold. Any other sale is sent to Fiskaly, so a sale Fiskaly cannot accept fails visibly.
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntryNo);
+        POSEntrySalesLine.SetFilter(Type, '<>%1&<>%2&<>%3', POSEntrySalesLine.Type::Customer, POSEntrySalesLine.Type::Comment, POSEntrySalesLine.Type::Rounding);
+        POSEntrySalesLine.SetRange("Exclude from Posting", false);
+        if not POSEntrySalesLine.IsEmpty() then
+            exit(false);
+
+        FilterNotInvoicedLines(POSEntryNo, POSEntrySalesLine);
+        exit(not POSEntrySalesLine.IsEmpty());
+    end;
+
+    local procedure CalcInvoiceAmountInclTax(POSEntry: Record "NPR POS Entry"): Decimal
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+    begin
+        FilterNotInvoicedLines(POSEntry."Entry No.", POSEntrySalesLine);
+        POSEntrySalesLine.CalcSums("Amount Incl. VAT");
+        exit(POSEntry."Amount Incl. Tax" - POSEntrySalesLine."Amount Incl. VAT");
+    end;
+
+    internal procedure FilterFiscalizableLines(POSEntryNo: Integer; var POSEntrySalesLine: Record "NPR POS Entry Sales Line")
+    begin
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntryNo);
+        POSEntrySalesLine.SetFilter(Type, '%1|%2', POSEntrySalesLine.Type::Item, POSEntrySalesLine.Type::Voucher);
+        POSEntrySalesLine.SetFilter(Quantity, '<>0');
+        POSEntrySalesLine.SetRange("Exclude from Posting", false);
+    end;
+
+    internal procedure FilterNotInvoicedLines(POSEntryNo: Integer; var POSEntrySalesLine: Record "NPR POS Entry Sales Line")
+    begin
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntryNo);
+        POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Customer);
+        POSEntrySalesLine.SetRange("Exclude from Posting", false);
     end;
 
     local procedure IsPrintReceiptEnabled(): Boolean

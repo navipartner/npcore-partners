@@ -1249,14 +1249,13 @@ codeunit 6184937 "NPR ES Fiskaly Communication"
     var
         Item: Record Item;
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        ESAuditMgt: Codeunit "NPR ES Audit Mgt.";
         UnitDiscountExclVAT: Decimal;
         UnitPriceExclVAT: Decimal;
     begin
         JsonTextWriter.WriteStartArray('items');
 
-        POSEntrySalesLine.SetRange("POS Entry No.", ESPOSAuditLogAuxInfo."POS Entry No.");
-        POSEntrySalesLine.SetFilter(Type, '%1|%2', POSEntrySalesLine.Type::Item, POSEntrySalesLine.Type::Voucher);
-        POSEntrySalesLine.SetFilter(Quantity, '<>0');
+        ESAuditMgt.FilterFiscalizableLines(ESPOSAuditLogAuxInfo."POS Entry No.", POSEntrySalesLine);
         if POSEntrySalesLine.FindSet() then
             repeat
                 JsonTextWriter.WriteStartObject('');
@@ -1856,8 +1855,9 @@ codeunit 6184937 "NPR ES Fiskaly Communication"
     var
         OriginalPOSEntrySalesLine: Record "NPR POS Entry Sales Line";
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        ESAuditMgt: Codeunit "NPR ES Audit Mgt.";
     begin
-        POSEntrySalesLine.SetRange("POS Entry No.", POSEntryNo);
+        ESAuditMgt.FilterFiscalizableLines(POSEntryNo, POSEntrySalesLine);
         POSEntrySalesLine.FindFirst();
 
         OriginalPOSEntrySalesLine.GetBySystemId(POSEntrySalesLine."Orig.POS Entry S.Line SystemId");

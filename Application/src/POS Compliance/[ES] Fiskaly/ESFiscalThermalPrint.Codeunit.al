@@ -30,7 +30,7 @@ codeunit 6248600 "NPR ES Fiscal Thermal Print"
 
         if ESPOSAuditLogAuxInfo.IsPendingOfflineSubmission() then begin
             AddOfflineComplianceInformation(ESPOSAuditLogAuxInfo);
-            AddReceiptInformation(POSEntry);
+            AddReceiptInformation(POSEntry, ESPOSAuditLogAuxInfo);
             AddPapercutCommand();
             exit;
         end;
@@ -40,7 +40,7 @@ codeunit 6248600 "NPR ES Fiscal Thermal Print"
         if VerifactuCompliance then
             AddVerifactuComplianceQRCode(ESPOSAuditLogAuxInfo);
 
-        AddReceiptInformation(POSEntry);
+        AddReceiptInformation(POSEntry, ESPOSAuditLogAuxInfo);
 
         if not VerifactuCompliance then
             AddTicketBAIComplianceQRCode(ESPOSAuditLogAuxInfo);
@@ -48,7 +48,7 @@ codeunit 6248600 "NPR ES Fiscal Thermal Print"
         AddPapercutCommand();
     end;
 
-    local procedure AddReceiptInformation(POSEntry: Record "NPR POS Entry")
+    local procedure AddReceiptInformation(POSEntry: Record "NPR POS Entry"; ESPOSAuditLogAuxInfo: Record "NPR ES POS Audit Log Aux. Info")
     var
         RetailLogo: Record "NPR Retail Logo";
         POSUnit: Record "NPR POS Unit";
@@ -58,6 +58,7 @@ codeunit 6248600 "NPR ES Fiscal Thermal Print"
         Contact: Record Contact;
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         ItemVariant: Record "Item Variant";
+        NotInvoicedPOSEntrySalesLine: Record "NPR POS Entry Sales Line";
         POSEntryTaxLine: Record "NPR POS Entry Tax Line";
         GeneralLedgerSetup: Record "General Ledger Setup";
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
@@ -65,6 +66,7 @@ codeunit 6248600 "NPR ES Fiscal Thermal Print"
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         POSTicketRcptText: Record "NPR POS Ticket Rcpt. Text";
         POSUnitRcptTxtProfile: Record "NPR POS Unit Rcpt.Txt Profile";
+        ESAuditMgt: Codeunit "NPR ES Audit Mgt.";
         POSUnitReceiptTextFound: Boolean;
         LogoFontLbl: Label 'Logo', Locked = true;
         ReceiptLogoLbl: Label 'RECEIPT', Locked = true;
@@ -83,6 +85,7 @@ codeunit 6248600 "NPR ES Fiscal Thermal Print"
         LineDiscountLbl: Label 'Line Discount';
         IncludingVATLbl: Label 'Including VAT';
         TotalLbl: Label 'Total';
+        AmountToPayLbl: Label 'Amount to Pay';
         DefaultText1Lbl: Label 'REMEMBER TO KEEP THIS TICKET';
         DefaultText2Lbl: Label 'IN CASE YOU NEED TO EXCHANGE THE ITEM';
         DefaultText3Lbl: Label 'WITHIN 15 DAYS OF PURCHASE';
@@ -190,10 +193,12 @@ codeunit 6248600 "NPR ES Fiscal Thermal Print"
         Printer.AddLine('', 0);
 
         // Sale Lines
-        POSEntrySalesLine.SetLoadFields("No.", Description, Type, "Variant Code", Quantity, "Unit Price", "Amount Incl. VAT", "Line Discount Amount Incl. VAT", "Line Discount %");
+        POSEntrySalesLine.SetLoadFields("No.", Description, Type, "Variant Code", Quantity, "Unit Price", "Amount Incl. VAT", "Line Discount Amount Incl. VAT", "Line Discount %", "Exclude from Posting");
         POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         if POSEntrySalesLine.FindSet() then
             repeat
+                if POSEntrySalesLine."Exclude from Posting" and (POSEntrySalesLine.Type <> POSEntrySalesLine.Type::Comment) then
+                    continue;
                 case POSEntrySalesLine.Type of
                     POSEntrySalesLine.Type::Item:
                         begin
@@ -215,7 +220,6 @@ codeunit 6248600 "NPR ES Fiscal Thermal Print"
                         end;
                     POSEntrySalesLine.Type::Comment:
                         Printer.AddLine(POSEntrySalesLine.Description, 0);
-                    POSEntrySalesLine.Type::Customer,
                     POSEntrySalesLine.Type::"G/L Account",
                     POSEntrySalesLine.Type::Payout:
                         begin
@@ -261,8 +265,29 @@ codeunit 6248600 "NPR ES Fiscal Thermal Print"
         Printer.SetBold(true);
         Printer.AddTextField(1, 0, TotalLbl + ' ' + GeneralLedgerSetup."LCY Code");
         Printer.AddTextField(2, 0, '');
-        Printer.AddTextField(3, 2, Format(POSEntry."Amount Incl. Tax", 0, '<Precision,2:2><Standard Format,2>'));
+        Printer.AddTextField(3, 2, Format(ESPOSAuditLogAuxInfo."Amount Incl. Tax", 0, '<Precision,2:2><Standard Format,2>'));
         Printer.SetBold(false);
+
+        // Prepayments and customer deposits paid in the same sale, which are not part of the invoice, and the amount the customer paid for the whole sale
+        ESAuditMgt.FilterNotInvoicedLines(POSEntry."Entry No.", NotInvoicedPOSEntrySalesLine);
+        NotInvoicedPOSEntrySalesLine.SetLoadFields(Description, "Amount Incl. VAT");
+        if NotInvoicedPOSEntrySalesLine.FindSet() then begin
+            Printer.SetPadChar('-');
+            Printer.AddLine('', 0);
+            repeat
+                Printer.AddTextField(1, 0, NotInvoicedPOSEntrySalesLine.Description);
+                Printer.AddTextField(2, 0, '');
+                Printer.AddTextField(3, 2, Format(NotInvoicedPOSEntrySalesLine."Amount Incl. VAT", 0, '<Precision,2:2><Standard Format,2>'));
+            until NotInvoicedPOSEntrySalesLine.Next() = 0;
+
+            Printer.SetPadChar('-');
+            Printer.AddLine('', 0);
+            Printer.SetBold(true);
+            Printer.AddTextField(1, 0, AmountToPayLbl + ' ' + GeneralLedgerSetup."LCY Code");
+            Printer.AddTextField(2, 0, '');
+            Printer.AddTextField(3, 2, Format(POSEntry."Amount Incl. Tax", 0, '<Precision,2:2><Standard Format,2>'));
+            Printer.SetBold(false);
+        end;
 
         // Payment lines
         POSEntryPaymentLine.SetLoadFields(Description, "Payment Amount");
