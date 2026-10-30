@@ -105,8 +105,8 @@
         Coupon.SetRange("Reference No.", UpperCase(ReferenceNo));
         if not Coupon.FindFirst() then begin
             NpDcArchCoupon.SetRange("Reference No.", UpperCase(ReferenceNo));
-            if NpDcArchCoupon.FindFirst() then
-                Error(Text005, ReferenceNo)
+            if NpDcArchCoupon.FindLast() then
+                ThrowArchivedCouponError(NpDcArchCoupon, ReferenceNo)
             else
                 Error(Text004);
         end;
@@ -122,6 +122,38 @@
             exit;
 
         NpDcModuleValidateDefault.ValidateCoupon(SalePOS, Coupon);
+    end;
+
+    local procedure ThrowArchivedCouponError(NpDcArchCoupon: Record "NPR NpDc Arch. Coupon"; ReferenceNo: Text)
+    var
+        NpDcArchCouponEntry: Record "NPR NpDc Arch.Coupon Entry";
+        POSEntry: Record "NPR POS Entry";
+        POSStore: Record "NPR POS Store";
+        POSUnit: Record "NPR POS Unit";
+        POSEntryManagement: Codeunit "NPR POS Entry Management";
+        UsedInPOSErr: Label 'Coupon with %1 %2 has already been used at %3 %4 (%5), %6 %7 (%8), on %9 at %10.', Comment = '%1 = Reference No. caption, %2 = Coupon Reference No., %3 = POS Store caption, %4 = POS Store Code, %5 = POS Store Name, %6 = POS Unit caption, %7 = POS Unit No., %8 = POS Unit Name, %9 = Date of use, %10 = Time of use';
+        UsedErr: Label 'Coupon with %1 %2 has already been used on %3.', Comment = '%1 = Reference No. caption, %2 = Coupon Reference No., %3 = Date of use';
+        ArchivedOnErr: Label 'Coupon with %1 %2 was archived on %3.', Comment = '%1 = Reference No. caption, %2 = Coupon Reference No., %3 = Archive date';
+    begin
+        NpDcArchCouponEntry.SetCurrentKey("Arch. Coupon No.");
+        NpDcArchCouponEntry.SetRange("Arch. Coupon No.", NpDcArchCoupon."No.");
+        if not NpDcArchCouponEntry.FindLast() then
+            Error(Text005, ReferenceNo);
+        if NpDcArchCouponEntry."Entry Type" = NpDcArchCouponEntry."Entry Type"::"Manual Archive" then
+            Error(ArchivedOnErr, NpDcArchCoupon.FieldCaption("Reference No."), ReferenceNo, NpDcArchCouponEntry."Posting Date");
+        if NpDcArchCouponEntry."Entry Type" <> NpDcArchCouponEntry."Entry Type"::"Discount Application" then
+            Error(Text005, ReferenceNo);
+
+        if NpDcArchCouponEntry."Document Type" = NpDcArchCouponEntry."Document Type"::"POS Entry" then
+            if POSEntryManagement.FindPOSEntryViaDocumentNo(NpDcArchCouponEntry."Document No.", POSEntry) then begin
+                if not POSStore.Get(POSEntry."POS Store Code") then
+                    Clear(POSStore);
+                if not POSUnit.Get(POSEntry."POS Unit No.") then
+                    Clear(POSUnit);
+                Error(UsedInPOSErr, NpDcArchCoupon.FieldCaption("Reference No."), ReferenceNo, POSStore.TableCaption, POSEntry."POS Store Code", POSStore.Name, POSUnit.TableCaption, POSEntry."POS Unit No.", POSUnit.Name, POSEntry."Entry Date", POSEntry."Ending Time");
+            end;
+
+        Error(UsedErr, NpDcArchCoupon.FieldCaption("Reference No."), ReferenceNo, NpDcArchCouponEntry."Posting Date");
     end;
 
     #endregion Validate Coupon

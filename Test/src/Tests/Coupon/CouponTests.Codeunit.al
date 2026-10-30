@@ -6307,6 +6307,221 @@ codeunit 85074 "NPR Coupon Tests"
         Assert.AreNotEqual(FirstReferenceNo, TempCoupon."Reference No.", 'Coupon Reference No. is expected to differ per issued coupon.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ScanCouponUsedInPOSShowsStoreUnitDateTime()
+    // [SCENARIO] Scanning a coupon already used in a POS sale names the POS store, POS unit, date and time of that sale
+    var
+        ArchCoupon: Record "NPR NpDc Arch. Coupon";
+        POSEntry: Record "NPR POS Entry";
+        POSStore: Record "NPR POS Store";
+        POSUnit: Record "NPR POS Unit";
+        SalePOS: Record "NPR POS Sale";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        UsedInPOSErr: Label 'Coupon with %1 %2 has already been used at %3 %4 (%5), %6 %7 (%8), on %9 at %10.';
+    begin
+        Initialize();
+        // [GIVEN] A POS store and a POS unit with names
+        POSStore.Get(_POSStore.Code);
+        POSStore.Name := 'Store Grillen';
+        POSStore.Modify();
+        POSUnit.Get(_POSUnit."No.");
+        POSUnit.Name := 'Register 01';
+        POSUnit.Modify();
+
+        // [GIVEN] A coupon used in a finished POS sale
+        LibraryCoupon.IssueCouponMultipleQuantity(_CouponType, 1, TempCoupon);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        Assert.IsTrue(LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, 0, ''), 'Transaction end not according to test scenario.');
+        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+        POSEntry.SetRange("POS Unit No.", POSUnit."No.");
+        POSEntry.FindFirst();
+
+        // [WHEN] The coupon is scanned again in the next sale
+        asserterror LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        // [THEN] The error names the store, unit, date and time of the sale that used the coupon
+        Assert.ExpectedError(StrSubstNo(UsedInPOSErr, ArchCoupon.FieldCaption("Reference No."), TempCoupon."Reference No.", POSStore.TableCaption, POSStore.Code, POSStore.Name, POSUnit.TableCaption, POSUnit."No.", POSUnit.Name, POSEntry."Entry Date", POSEntry."Ending Time"));
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ScanCouponRedeemedOutsidePOSShowsDate()
+    // [SCENARIO] Scanning a coupon already redeemed outside POS names the date it was used
+    var
+        ArchCoupon: Record "NPR NpDc Arch. Coupon";
+        Coupon: Record "NPR NpDc Coupon";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
+        POSSale: Codeunit "NPR POS Sale";
+        UsedErr: Label 'Coupon with %1 %2 has already been used on %3.';
+    begin
+        Initialize();
+        // [GIVEN] A coupon redeemed through the coupon API 7 days ago
+        LibraryCoupon.IssueCouponMultipleQuantity(_CouponType, 1, TempCoupon);
+        Coupon.Get(TempCoupon."No.");
+        NpDcCouponMgt.RedeemCoupon(Coupon, 'WEBORDER-1');
+        SetClosingArchivedCouponEntryPostingDate(TempCoupon."Reference No.", Today() - 7);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [WHEN] The coupon is scanned in POS
+        asserterror LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        // [THEN] The error names the date the coupon was used
+        Assert.ExpectedError(StrSubstNo(UsedErr, ArchCoupon.FieldCaption("Reference No."), TempCoupon."Reference No.", Today() - 7));
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ScanManuallyArchivedCouponShowsArchiveDate()
+    // [SCENARIO] Scanning a coupon that was archived by hand without being used names the date it was archived
+    var
+        ArchCoupon: Record "NPR NpDc Arch. Coupon";
+        Coupon: Record "NPR NpDc Coupon";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
+        POSSale: Codeunit "NPR POS Sale";
+        ArchivedOnErr: Label 'Coupon with %1 %2 was archived on %3.';
+    begin
+        Initialize();
+        // [GIVEN] An unused coupon archived by hand 7 days ago
+        LibraryCoupon.IssueCouponMultipleQuantity(_CouponType, 1, TempCoupon);
+        Coupon.Get(TempCoupon."No.");
+        NpDcCouponMgt.ArchiveCoupon(Coupon);
+        SetClosingArchivedCouponEntryPostingDate(TempCoupon."Reference No.", Today() - 7);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [WHEN] The coupon is scanned in POS
+        asserterror LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        // [THEN] The error names the date the coupon was archived
+        Assert.ExpectedError(StrSubstNo(ArchivedOnErr, ArchCoupon.FieldCaption("Reference No."), TempCoupon."Reference No.", Today() - 7));
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ScanArchivedCouponWithoutEntriesKeepsArchivedMessage()
+    // [SCENARIO] Scanning an archived coupon that has no archived entries keeps the "is archived" message
+    var
+        ArchCoupon: Record "NPR NpDc Arch. Coupon";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSale: Codeunit "NPR POS Sale";
+        ArchivedErr: Label 'Coupon with Reference No. %1 is archived.';
+    begin
+        Initialize();
+        // [GIVEN] An archived coupon without archived entries
+        ArchCoupon.Init();
+        ArchCoupon."No." := LibraryUtility.GenerateRandomCode20(ArchCoupon.FieldNo("No."), Database::"NPR NpDc Arch. Coupon");
+        ArchCoupon."Coupon Type" := _CouponType.Code;
+        ArchCoupon."Reference No." := ArchCoupon."No.";
+        ArchCoupon.Insert();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [WHEN] The coupon is scanned in POS
+        asserterror LibraryCoupon.ScanCouponReferenceCode(_POSSession, ArchCoupon."Reference No.");
+
+        // [THEN] The error only says the coupon is archived
+        Assert.ExpectedError(StrSubstNo(ArchivedErr, ArchCoupon."Reference No."));
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ScanPartlyUsedThenArchivedCouponShowsArchiveDate()
+    // [SCENARIO] Scanning a multi-use coupon that was used once and then archived by hand names the date it was archived, not the sale
+    var
+        ArchCoupon: Record "NPR NpDc Arch. Coupon";
+        Coupon: Record "NPR NpDc Coupon";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
+        POSSale: Codeunit "NPR POS Sale";
+        ArchivedOnErr: Label 'Coupon with %1 %2 was archived on %3.';
+    begin
+        Initialize();
+        // [GIVEN] A coupon with 2 uses, used once in a finished POS sale
+        LibraryCoupon.IssueCouponMultipleQuantity(_CouponType, 2, TempCoupon);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        Assert.IsTrue(LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, 0, ''), 'Transaction end not according to test scenario.');
+
+        // [GIVEN] The coupon is archived by hand with one use left, 7 days ago
+        Assert.IsTrue(Coupon.Get(TempCoupon."No."), 'Precondition: the coupon still has one use left.');
+        NpDcCouponMgt.ArchiveCoupon(Coupon);
+        SetClosingArchivedCouponEntryPostingDate(TempCoupon."Reference No.", Today() - 7);
+
+        // [WHEN] The coupon is scanned again in the next sale
+        asserterror LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        // [THEN] The error names the date the coupon was archived
+        Assert.ExpectedError(StrSubstNo(ArchivedOnErr, ArchCoupon.FieldCaption("Reference No."), TempCoupon."Reference No.", Today() - 7));
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ScanReusedReferenceNoShowsNewestArchivedCoupon()
+    // [SCENARIO] When two archived coupons share a Reference No., the error describes the one archived last
+    var
+        ArchCoupon: Record "NPR NpDc Arch. Coupon";
+        ArchCouponEntry: Record "NPR NpDc Arch.Coupon Entry";
+        Coupon: Record "NPR NpDc Coupon";
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryUtility: Codeunit "Library - Utility";
+        NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
+        POSSale: Codeunit "NPR POS Sale";
+        FixedReferenceNo: Code[20];
+        ArchivedOnErr: Label 'Coupon with %1 %2 was archived on %3.';
+    begin
+        Initialize();
+        // [GIVEN] A Coupon Type whose Reference No. Pattern is a fixed code, so every coupon gets the same Reference No.
+        FixedReferenceNo := LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type");
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 10, FixedReferenceNo);
+
+        // [GIVEN] A first coupon archived by hand 30 days ago
+        LibraryCoupon.IssueCouponDefaultHandler(CouponType, 1, TempCoupon);
+        Coupon.Get(TempCoupon."No.");
+        NpDcCouponMgt.ArchiveCoupon(Coupon);
+        ArchCoupon.SetRange("Reference No.", FixedReferenceNo);
+        ArchCoupon.FindFirst();
+        ArchCouponEntry.SetRange("Arch. Coupon No.", ArchCoupon."No.");
+        ArchCouponEntry.ModifyAll("Posting Date", Today() - 30);
+
+        // [GIVEN] A second coupon with the same Reference No., archived by hand 7 days ago
+        TempCoupon.DeleteAll();
+        LibraryCoupon.IssueCouponDefaultHandler(CouponType, 1, TempCoupon);
+        Coupon.Get(TempCoupon."No.");
+        NpDcCouponMgt.ArchiveCoupon(Coupon);
+        SetClosingArchivedCouponEntryPostingDate(FixedReferenceNo, Today() - 7);
+        Assert.AreEqual(2, ArchCoupon.Count(), 'Precondition: two archived coupons share the Reference No.');
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [WHEN] The Reference No. is scanned in POS
+        asserterror LibraryCoupon.ScanCouponReferenceCode(_POSSession, FixedReferenceNo);
+
+        // [THEN] The error names the date the second coupon was archived
+        Assert.ExpectedError(StrSubstNo(ArchivedOnErr, ArchCoupon.FieldCaption("Reference No."), FixedReferenceNo, Today() - 7));
+    end;
+
     local procedure Initialize()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -6395,6 +6610,20 @@ codeunit 85074 "NPR Coupon Tests"
         NpDcArchCouponEntry.SetRange("Register No.", RegisterNo);
         NpDcArchCouponEntry.CalcSums(Amount);
         NpDcArchCouponEntryAmount := -NpDcArchCouponEntry.Amount;
+    end;
+
+    local procedure SetClosingArchivedCouponEntryPostingDate(ReferenceNo: Text; PostingDate: Date)
+    var
+        ArchCoupon: Record "NPR NpDc Arch. Coupon";
+        ArchCouponEntry: Record "NPR NpDc Arch.Coupon Entry";
+    begin
+        ArchCoupon.SetRange("Reference No.", ReferenceNo);
+        ArchCoupon.FindLast();
+        ArchCouponEntry.SetCurrentKey("Arch. Coupon No.");
+        ArchCouponEntry.SetRange("Arch. Coupon No.", ArchCoupon."No.");
+        ArchCouponEntry.FindLast();
+        ArchCouponEntry."Posting Date" := PostingDate;
+        ArchCouponEntry.Modify();
     end;
 
     local procedure SumCouponDiscountPercentForApplicationNumber(DiscountPercent: Decimal; NumberOfApplications: Integer) SumCouponDiscountPercent: Decimal
