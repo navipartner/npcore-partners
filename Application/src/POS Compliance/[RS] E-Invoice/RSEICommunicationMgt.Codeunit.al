@@ -374,6 +374,15 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
     #region RS EI Sales Invoice Communication Mgt.
 
     internal procedure SendSalesDocument(var RSEInvoiceDocument: Record "NPR RS E-Invoice Document")
+    begin
+        if not RSEInvoiceMgt.IsRSEInvoiceEnabled() then
+            exit;
+
+        if not SendSalesDocumentRequest(RSEInvoiceDocument) then
+            RSEInvoiceDocument.Delete();
+    end;
+
+    local procedure SendSalesDocumentRequest(var RSEInvoiceDocument: Record "NPR RS E-Invoice Document") IsSent: Boolean
     var
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
         HttpRequestType: Enum "Http Request Type";
@@ -381,27 +390,25 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
         RequestText: Text;
         ResponseText: Text;
         Url: Text;
+        RequestID: Guid;
         IsHandled: Boolean;
         SendSalesDocumentPathLbl: Label '/api/publicAPi/sales-invoice/ubl?requestId=%1&sendToCir=%2&executeValidation=%3', Locked = true, Comment = '%1 = Request Id, %2 = Should be sent to CIR, %3 = Should Validation Be Executed';
     begin
-        if not RSEInvoiceMgt.IsRSEInvoiceEnabled() then
-            exit;
-
         RSEInvoiceSetup.GetRSEInvoiceSetupWithCheck();
 
-        RSEInvoiceDocument."Request ID" := CreateGuid();
-        Url := FormatUrl(RSEInvoiceSetup."API URL", StrSubstNo(SendSalesDocumentPathLbl, RSEInvoiceDocument."Request ID", RSEInvoiceDocument."CIR Invoice", 'false'));
+        RequestID := CreateGuid();
+        Url := FormatUrl(RSEInvoiceSetup."API URL", StrSubstNo(SendSalesDocumentPathLbl, RequestID, RSEInvoiceDocument."CIR Invoice", 'false'));
 
         RequestText := RSEInvoiceDocument.GetRequestContent();
         SetRequestMessageContent(RequestMessage, RequestText, HttpRequestType::POST, 'application/xml', Url, RSEInvoiceSetup."API Key", true);
 
-        OnBeforeSendHttpRequestForSalesDocument(RequestMessage, ResponseText, RSEInvoiceDocument, IsHandled);
-        if IsHandled then
-            exit;
-        if SendHttpRequest(RequestMessage, ResponseText, false) then
-            ProcessSendSalesInvoiceDocumentResponse(RSEInvoiceDocument, ResponseText)
-        else
-            RSEInvoiceDocument.Delete();
+        OnBeforeSendHttpRequestForSalesDocument(RequestMessage, ResponseText, RSEInvoiceDocument, IsSent, IsHandled);
+        if not IsHandled then
+            IsSent := SendHttpRequest(RequestMessage, ResponseText, false);
+        if IsSent then begin
+            RSEInvoiceDocument."Request ID" := RequestID;
+            ProcessSendSalesInvoiceDocumentResponse(RSEInvoiceDocument, ResponseText);
+        end;
     end;
 
     internal procedure RefreshSalesDocumentStatus(DateChange: Date)
@@ -454,8 +461,11 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
 
     internal procedure ResendSalesDocument(var RSEInvoiceDocument: Record "NPR RS E-Invoice Document")
     begin
-        SendSalesDocument(RSEInvoiceDocument);
-        GetSalesDocumentStatus(RSEInvoiceDocument);
+        if not RSEInvoiceMgt.IsRSEInvoiceEnabled() then
+            exit;
+
+        if SendSalesDocumentRequest(RSEInvoiceDocument) then
+            GetSalesDocumentStatus(RSEInvoiceDocument);
     end;
 
     internal procedure CancelSalesInvoiceDocument(var RSEInvoiceDocument: Record "NPR RS E-Invoice Document")
@@ -863,7 +873,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
     #region Automated Test Mockup Events
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeSendHttpRequestForSalesDocument(RequestMessage: HttpRequestMessage; var ResponseText: Text; var RSEInvoiceDocument: Record "NPR RS E-Invoice Document"; var IsHandled: Boolean)
+    local procedure OnBeforeSendHttpRequestForSalesDocument(RequestMessage: HttpRequestMessage; var ResponseText: Text; var RSEInvoiceDocument: Record "NPR RS E-Invoice Document"; var IsSent: Boolean; var IsHandled: Boolean)
     begin
     end;
 

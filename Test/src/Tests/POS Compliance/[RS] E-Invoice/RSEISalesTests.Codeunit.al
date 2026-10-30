@@ -115,6 +115,162 @@ codeunit 85199 "NPR RS EI Sales Tests"
         UnbindSubscription(LibraryRSEInvoice);
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('ShouldSendDocumentToSEFConfirmHandler,GeneralMessageHandler')]
+    procedure GivenSEFRejectsSalesDocuments_WhenASentInvoiceIsResent_ThenItsEInvoiceDocumentIsKept()
+    var
+        RSEInvoiceDocument: Record "NPR RS E-Invoice Document";
+        SentRSEInvoiceDocument: Record "NPR RS E-Invoice Document";
+        LibraryRSEInvoice: Codeunit "NPR Library RS E-Invoice";
+        RSEICommunicationMgt: Codeunit "NPR RS EI Communication Mgt.";
+    begin
+        // [Scenario] A resend that SEF does not accept keeps the e-invoice document of the earlier accepted send
+        // [Given] Enable Mock response instead of real http response
+        BindSubscription(LibraryRSEInvoice);
+
+        // [Given] RS E-Invoice Setup
+        InitializeData();
+
+        // [Given] A posted invoice that SEF accepted
+        SentRSEInvoiceDocument.SetRange("Document No.", PostSalesOrder('EIRSREJ'));
+        SentRSEInvoiceDocument.FindFirst();
+        _Assert.IsFalse(IsNullGuid(SentRSEInvoiceDocument."Request ID"), 'Precondition: the accepted send must store a Request ID.');
+        _Assert.AreEqual(3357127, SentRSEInvoiceDocument."Sales Invoice ID", 'Precondition: the accepted send must store the SEF Sales Invoice ID.');
+
+        // [Given] SEF rejects sales documents but still answers status requests
+        LibraryRSEInvoice.SetSEFRejectsSalesDocuments(true);
+
+        // [When] The invoice is resent
+        RSEInvoiceDocument := SentRSEInvoiceDocument;
+        RSEICommunicationMgt.ResendSalesDocument(RSEInvoiceDocument);
+
+        // [Then] Its e-invoice document still holds the request and SEF ids of the accepted send
+        _Assert.IsTrue(RSEInvoiceDocument.Get(SentRSEInvoiceDocument."Entry No."), 'A resend that SEF did not accept must not delete the e-invoice document.');
+        _Assert.AreEqual(SentRSEInvoiceDocument."Request ID", RSEInvoiceDocument."Request ID", 'A resend that SEF did not accept must not replace the Request ID.');
+        _Assert.AreEqual(SentRSEInvoiceDocument."Sales Invoice ID", RSEInvoiceDocument."Sales Invoice ID", 'A resend that SEF did not accept must not replace the Sales Invoice ID.');
+
+        // [Cleanup] Remove the e-invoice document and unbind Event Subscriptions in Test Library Codeunit
+        RSEInvoiceDocument.Delete();
+        UnbindSubscription(LibraryRSEInvoice);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('ShouldSendDocumentToSEFConfirmHandler,GeneralMessageHandler')]
+    procedure GivenSEFRejectsSalesDocuments_WhenAResentInvoiceIsSaved_ThenItKeepsTheRequestIDOfTheAcceptedSend()
+    var
+        RSEInvoiceDocument: Record "NPR RS E-Invoice Document";
+        SentRSEInvoiceDocument: Record "NPR RS E-Invoice Document";
+        LibraryRSEInvoice: Codeunit "NPR Library RS E-Invoice";
+        RSEICommunicationMgt: Codeunit "NPR RS EI Communication Mgt.";
+    begin
+        // [Scenario] A resend that SEF does not accept leaves nothing on the record that saving it afterwards (as the Resend page action does) would store
+        // [Given] Enable Mock response instead of real http response
+        BindSubscription(LibraryRSEInvoice);
+
+        // [Given] RS E-Invoice Setup
+        InitializeData();
+
+        // [Given] A posted invoice that SEF accepted
+        SentRSEInvoiceDocument.SetRange("Document No.", PostSalesOrder('EIRSSAV'));
+        SentRSEInvoiceDocument.FindFirst();
+        _Assert.IsFalse(IsNullGuid(SentRSEInvoiceDocument."Request ID"), 'Precondition: the accepted send must store a Request ID.');
+
+        // [Given] SEF rejects sales documents but still answers status requests
+        LibraryRSEInvoice.SetSEFRejectsSalesDocuments(true);
+
+        // [When] The invoice is resent and the record is saved afterwards
+        RSEInvoiceDocument := SentRSEInvoiceDocument;
+        RSEICommunicationMgt.ResendSalesDocument(RSEInvoiceDocument);
+        RSEInvoiceDocument.Modify();
+
+        // [Then] The e-invoice document still holds the Request ID of the accepted send
+        RSEInvoiceDocument.Get(SentRSEInvoiceDocument."Entry No.");
+        _Assert.AreEqual(SentRSEInvoiceDocument."Request ID", RSEInvoiceDocument."Request ID", 'A resend that SEF did not accept must not leave its Request ID on the record.');
+
+        // [Cleanup] Remove the e-invoice document and unbind Event Subscriptions in Test Library Codeunit
+        RSEInvoiceDocument.Delete();
+        UnbindSubscription(LibraryRSEInvoice);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('ShouldSendDocumentToSEFConfirmHandler,GeneralMessageHandler')]
+    procedure GivenSEFIsUp_WhenASentInvoiceIsResent_ThenItsStatusIsRefreshedFromSEF()
+    var
+        RSEInvoiceDocument: Record "NPR RS E-Invoice Document";
+        LibraryRSEInvoice: Codeunit "NPR Library RS E-Invoice";
+        RSEICommunicationMgt: Codeunit "NPR RS EI Communication Mgt.";
+        SentRequestID: Guid;
+    begin
+        // [Scenario] A resend that SEF accepts is followed by a status refresh from SEF
+        // [Given] Enable Mock response instead of real http response
+        BindSubscription(LibraryRSEInvoice);
+
+        // [Given] RS E-Invoice Setup
+        InitializeData();
+
+        // [Given] A posted invoice that SEF accepted, still a draft locally
+        RSEInvoiceDocument.SetRange("Document No.", PostSalesOrder('EIRSUP'));
+        RSEInvoiceDocument.FindFirst();
+        _Assert.AreEqual(RSEInvoiceDocument."Invoice Status"::DRAFT, RSEInvoiceDocument."Invoice Status", 'Precondition: this test needs a document SEF has not reported a status for yet.');
+        SentRequestID := RSEInvoiceDocument."Request ID";
+        _Assert.IsFalse(IsNullGuid(SentRequestID), 'Precondition: the accepted send must store a Request ID.');
+
+        // [When] The invoice is resent
+        RSEICommunicationMgt.ResendSalesDocument(RSEInvoiceDocument);
+
+        // [Then] The document carries the Request ID of the resend and the status SEF reports
+        RSEInvoiceDocument.Get(RSEInvoiceDocument."Entry No.");
+        _Assert.IsFalse(IsNullGuid(RSEInvoiceDocument."Request ID"), 'A resend that SEF accepted must store its Request ID.');
+        _Assert.AreNotEqual(SentRequestID, RSEInvoiceDocument."Request ID", 'A resend that SEF accepted must store the Request ID it was sent with.');
+        _Assert.AreEqual(RSEInvoiceDocument."Invoice Status"::APPROVED, RSEInvoiceDocument."Invoice Status", 'A resend that SEF accepted must refresh the document status from SEF.');
+
+        // [Cleanup] Remove the e-invoice document and unbind Event Subscriptions in Test Library Codeunit
+        RSEInvoiceDocument.Delete();
+        UnbindSubscription(LibraryRSEInvoice);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('ShouldSendDocumentToSEFConfirmHandler,GeneralMessageHandler')]
+    procedure GivenSEFRejectsSalesDocuments_WhenAnInvoiceIsPosted_ThenNoEInvoiceDocumentIsKept()
+    var
+        RSEInvoiceDocument: Record "NPR RS E-Invoice Document";
+        LibraryRSEInvoice: Codeunit "NPR Library RS E-Invoice";
+    begin
+        // [Scenario] A first send that SEF does not accept leaves no e-invoice document, so Send E-Invoice on the posted invoice can create it again
+        // [Given] Enable Mock response instead of real http response
+        BindSubscription(LibraryRSEInvoice);
+
+        // [Given] RS E-Invoice Setup
+        InitializeData();
+
+        // [Given] SEF rejects sales documents
+        LibraryRSEInvoice.SetSEFRejectsSalesDocuments(true);
+
+        // [When] A sales order is posted
+        RSEInvoiceDocument.SetRange("Document No.", PostSalesOrder('EIPSREJ'));
+
+        // [Then] No e-invoice document is kept for the posted invoice
+        _Assert.RecordIsEmpty(RSEInvoiceDocument);
+
+        // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit
+        UnbindSubscription(LibraryRSEInvoice);
+    end;
+
+    local procedure PostSalesOrder(NoSeriesPrefix: Text) PostedDocumentNo: Code[20]
+    var
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        LibraryRSEInvoice: Codeunit "NPR Library RS E-Invoice";
+    begin
+        LibraryRSEInvoice.CreateSalesHeaderWLines(SalesHeader, SalesLine, SalesHeader."Document Type"::Order, SalesLine.Type::Item, _Customer, _GeneralPostingSetup, _VATPostingSetup, NoSeriesPrefix);
+        _PostedDocumentNo := LibraryRSEInvoice.PeekNextPostingNo(SalesHeader."Posting No. Series");
+        PostedDocumentNo := _LibrarySales.PostSalesDocument(SalesHeader, true, true);
+    end;
+
     internal procedure InitializeData()
     var
         LibraryRSEInvoice: Codeunit "NPR Library RS E-Invoice";

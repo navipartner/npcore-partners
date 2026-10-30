@@ -10,6 +10,7 @@ codeunit 85200 "NPR Library RS E-Invoice"
         _LibraryInventory: Codeunit "Library - Inventory";
         _LibraryERM: Codeunit "Library - ERM";
         _LibraryRandom: Codeunit "Library - Random";
+        _SEFRejectsSalesDocuments: Boolean;
 
     #region Library RS E-Invoice Setups
 
@@ -336,6 +337,11 @@ codeunit 85200 "NPR Library RS E-Invoice"
     begin
         exit(NoSeries.PeekNextNo(NoSeriesCode));
     end;
+
+    internal procedure SetSEFRejectsSalesDocuments(SEFRejectsSalesDocuments: Boolean)
+    begin
+        _SEFRejectsSalesDocuments := SEFRejectsSalesDocuments;
+    end;
     #endregion Library RS E-Invoice Misc
 
     #region Library RS E-Invoice Initial Data
@@ -520,7 +526,7 @@ codeunit 85200 "NPR Library RS E-Invoice"
             DocumentType::"Credit Memo":
                 Assert.IsTrue(RSEInvoiceDocument."Document Type" = RSEInvoiceDocument."Document Type"::"Sales Cr. Memo", 'RS E-Invoice document type must be Sales Cr. Memo');
         end;
-        Assert.IsTrue(Format(RSEInvoiceDocument."Sales Invoice ID") <> '', 'Sales Invoice ID must be received from SEF');
+        Assert.AreNotEqual(0, RSEInvoiceDocument."Sales Invoice ID", 'Sales Invoice ID must be received from SEF');
 
         RSEInvoiceDocument.Delete();
     end;
@@ -769,16 +775,18 @@ codeunit 85200 "NPR Library RS E-Invoice"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RS EI Communication Mgt.", 'OnBeforeSendHttpRequestForSalesDocument', '', false, false)]
-    local procedure OnBeforeSendHttpRequestForSalesDocument(sender: Codeunit "NPR RS EI Communication Mgt."; RequestMessage: HttpRequestMessage; var ResponseText: Text; var RSEInvoiceDocument: Record "NPR RS E-Invoice Document"; var IsHandled: Boolean)
+    local procedure OnBeforeSendHttpRequestForSalesDocument(sender: Codeunit "NPR RS EI Communication Mgt."; RequestMessage: HttpRequestMessage; var ResponseText: Text; var RSEInvoiceDocument: Record "NPR RS E-Invoice Document"; var IsSent: Boolean; var IsHandled: Boolean)
     begin
+        IsHandled := true;
+        if _SEFRejectsSalesDocuments then
+            exit;
         ResponseText :=
                 '{' +
                 '"InvoiceId":3267322,' +
                 '"PurchaseInvoiceId":3267322,' +
                 '"SalesInvoiceId":3357127' +
                 '}';
-        sender.ProcessSendSalesInvoiceDocumentResponse(RSEInvoiceDocument, ResponseText);
-        IsHandled := true;
+        IsSent := true;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RS EI Communication Mgt.", 'OnBeforeSendHttpRequestForGetSalesDocumentStatus', '', false, false)]
