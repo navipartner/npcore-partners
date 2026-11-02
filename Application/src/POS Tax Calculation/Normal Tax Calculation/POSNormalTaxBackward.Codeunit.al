@@ -26,7 +26,6 @@
 
     local procedure Upsert(var POSSaleTaxLine: record "NPR POS Sale Tax Line"; Rec: Record "NPR POS Sale Line"; POSSaleTax: Record "NPR POS Sale Tax"; Currency: Record Currency)
     var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         TaxType: Enum "NPR POS Tax Type";
     begin
@@ -42,13 +41,8 @@
 
             OnBeforeCalculateActiveTaxAmountLine(POSSaleTaxLine, Rec, POSSaleTax, Currency, TaxType);
 
-            if FeatureFlagsManagement.IsEnabled('fullyDiscountedPOSLineNetsToZero') then begin
-                POSSaleTaxLine."Amount Incl. Tax" := POSSaleTaxCalc.CalcAmountAfterDiscount(POSSaleTaxLine."Unit Price Incl. Tax" * POSSaleTaxLine.Quantity, POSSaleTaxLine."Discount Amount" + POSSaleTaxLine."Invoice Disc. Amount", Currency."Amount Rounding Precision");
-                POSSaleTaxLine."Line Amount" := POSSaleTaxCalc.CalcAmountAfterDiscount(POSSaleTaxLine."Unit Price Incl. Tax" * POSSaleTaxLine.Quantity, POSSaleTaxLine."Discount Amount", Currency."Amount Rounding Precision");
-            end else begin
-                POSSaleTaxLine."Amount Incl. Tax" := POSSaleTaxLine."Unit Price Incl. Tax" * POSSaleTaxLine.Quantity - POSSaleTaxLine."Discount Amount" - POSSaleTaxLine."Invoice Disc. Amount";
-                POSSaleTaxLine."Line Amount" := POSSaleTaxLine."Unit Price Incl. Tax" * POSSaleTaxLine.Quantity - POSSaleTaxLine."Discount Amount";
-            end;
+            POSSaleTaxLine."Amount Incl. Tax" := POSSaleTaxCalc.CalcAmountAfterDiscount(POSSaleTaxLine."Unit Price Incl. Tax" * POSSaleTaxLine.Quantity, POSSaleTaxLine."Discount Amount" + POSSaleTaxLine."Invoice Disc. Amount", Currency."Amount Rounding Precision");
+            POSSaleTaxLine."Line Amount" := POSSaleTaxCalc.CalcAmountAfterDiscount(POSSaleTaxLine."Unit Price Incl. Tax" * POSSaleTaxLine.Quantity, POSSaleTaxLine."Discount Amount", Currency."Amount Rounding Precision");
             POSSaleTaxLine."Amount Excl. Tax" := POSSaleTaxLine."Amount Incl. Tax" / (1 + POSSaleTaxLine."Tax %" / 100);
             POSSaleTaxLine."Tax Amount" := POSSaleTaxLine."Amount Incl. Tax" - POSSaleTaxLine."Amount Excl. Tax";
 

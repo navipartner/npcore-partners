@@ -1608,7 +1608,6 @@
     local procedure GetRelatedMembershipsBuffer(SalesInvoiceHeader: Record "Sales Invoice Header"; var TempMemebrship: Record "NPR MM Membership" temporary) Found: Boolean
     var
         MembershipEntry: Record "NPR MM Membership Entry";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         TempMemebrshipTempErrorLbl: Label 'TempMemebrship must be a temporary table. This is a programming error.';
     begin
         if not TempMemebrship.IsTemporary then
@@ -1621,10 +1620,7 @@
         MembershipEntry.Reset();
         MembershipEntry.SetRange("Source Type", MembershipEntry."Source Type"::SALESHEADER);
         MembershipEntry.SetRange("Document Type", Enum::"Sales Document Type"::Order);
-        if FeatureFlagsManagement.IsEnabled('useExternalNoInEcommerceFlow') then
-            MembershipEntry.SetRange("Document No.", SalesInvoiceHeader."NPR External Order No.")
-        else
-            MembershipEntry.SetRange("Document No.", SalesInvoiceHeader."External Document No.");
+        MembershipEntry.SetRange("Document No.", SalesInvoiceHeader."NPR External Order No.");
         MembershipEntry.SetLoadFields("Membership Entry No.");
         if not MembershipEntry.FindSet() then
             exit;

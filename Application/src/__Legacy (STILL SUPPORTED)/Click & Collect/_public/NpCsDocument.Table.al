@@ -838,13 +838,9 @@ table 6151198 "NPR NpCs Document"
 
     local procedure CheckDeliveryStatus()
     var
-        FeatureFlagManagement: Codeunit "NPR Feature Flags Management";
         Handled: Boolean;
         CannotChangeErr: Label 'You cannot change this %1 when its %2 is %3, because it can cause data discrepancy.', Comment = '%1 - NpCs Document table caption, %2 - Delivery Status field caption, %3 - Deliver Status field value';
     begin
-        if not FeatureFlagManagement.IsEnabled('checkCollectDocumentDeliveryStatus') then
-            exit;
-
         OnBeforeCheckDeliveryStatus(Rec, Handled, DeliveryStatusCheckSuspended, CurrFieldNo);
         if Handled then
             exit;

@@ -155,11 +155,7 @@
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
         POSStore: Record "NPR POS Store";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        if not FeatureFlagsManagement.IsEnabled('perioddiscountvatcheckpospostingsetup') then
-            exit(Customer.Get(TempSalePOS."Customer No."));
-
         if not POSStore.Get(TempSalePOS."POS Store Code") then
             exit(false);
 
@@ -176,11 +172,7 @@
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
         POSStore: Record "NPR POS Store";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        if not FeatureFlagsManagement.IsEnabled('perioddiscountvatcheckpospostingsetup') then
-            exit(false);
-
         if not POSStore.Get(TempSalePOS."POS Store Code") then
             exit(false);
 

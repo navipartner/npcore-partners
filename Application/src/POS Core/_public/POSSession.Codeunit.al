@@ -225,25 +225,22 @@
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSSaleSet, POSSaleLineSet, POSPaymentLineSet : Boolean;
-        FeatureFlag: Codeunit "NPR Feature Flags Management";
     begin
         GetSaleContext(POSSale, POSSaleLine, POSPaymentLine);
 
-        if (FeatureFlag.IsEnabled('usePOSDataRowIds')) then begin
-            if (Context.SelectToken('data.rowIds.BUILTIN_SALE', JToken)) then begin
-                POSSale.SetBySystemId(JToken.AsValue().AsText());
-                POSSaleSet := true;
-            end;
+        if (Context.SelectToken('data.rowIds.BUILTIN_SALE', JToken)) then begin
+            POSSale.SetBySystemId(JToken.AsValue().AsText());
+            POSSaleSet := true;
+        end;
 
-            if (Context.SelectToken('data.rowIds.BUILTIN_SALELINE', JToken)) then begin
-                POSSaleLine.SetBySystemId(JToken.AsValue().AsText());
-                POSSaleLineSet := true;
-            end;
+        if (Context.SelectToken('data.rowIds.BUILTIN_SALELINE', JToken)) then begin
+            POSSaleLine.SetBySystemId(JToken.AsValue().AsText());
+            POSSaleLineSet := true;
+        end;
 
-            if (Context.SelectToken('data.rowIds.BUILTIN_PAYMENTLINE', JToken)) then begin
-                POSPaymentLine.SetBySystemId(JToken.AsValue().AsText());
-                POSPaymentLineSet := true;
-            end;
+        if (Context.SelectToken('data.rowIds.BUILTIN_PAYMENTLINE', JToken)) then begin
+            POSPaymentLine.SetBySystemId(JToken.AsValue().AsText());
+            POSPaymentLineSet := true;
         end;
 
         if (Context.SelectToken('data.positions.BUILTIN_SALE', JToken) and (not POSSaleSet)) then
@@ -742,16 +739,11 @@
 
     procedure ChangeViewPayment()
     var
-        POSViewChangeWorkflowMgt: Codeunit "NPR POS View Change WF Mgt.";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         PaymentProcessingEvents: Codeunit "NPR Payment Processing Events";
         Sale: Codeunit "NPR POS Sale";
     begin
         ErrorIfNotInitialized();
-        if not FeatureFlagsManagement.IsEnabled('removeviewswitchscenarios') then
-            POSViewChangeWorkflowMgt.InvokeOnPaymentViewWorkflow()
-        else
-            PaymentProcessingEvents.InvokeOnPaymentView(Sale);
+        PaymentProcessingEvents.InvokeOnPaymentView(Sale);
         _FrontEnd.PaymentView(_Setup);
     end;
 

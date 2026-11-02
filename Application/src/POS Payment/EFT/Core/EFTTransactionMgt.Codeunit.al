@@ -450,7 +450,6 @@
         POSPaymentMethod: Record "NPR POS Payment Method";
         EFTSetup: Record "NPR EFT Setup";
         UseGLAccountLine: Boolean;
-        FeatureFlag: Codeunit "NPR Feature Flags Management";
     begin
         if not EFTTransactionRequest.Successful then
             exit;
@@ -464,12 +463,8 @@
         end;
 
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
-        if FeatureFlag.IsEnabled('newsurchargeandtipaccountsetup') then begin
-            POSPaymentMethod.Get(EFTTransactionRequest."Original POS Payment Type Code");
-            UseGLAccountLine := POSPaymentMethod."EFT Surcharge Account No." <> '';
-        end else begin
-            UseGLAccountLine := EFTSetup.UseAccountPostingForServices();
-        end;
+        POSPaymentMethod.Get(EFTTransactionRequest."Original POS Payment Type Code");
+        UseGLAccountLine := POSPaymentMethod."EFT Surcharge Account No." <> '';
 
         if UseGLAccountLine then begin
             POSPaymentMethod.Get(EFTTransactionRequest."Original POS Payment Type Code");
@@ -504,7 +499,6 @@
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         OriginalProcessingType: Integer;
         EFTSetup: Record "NPR EFT Setup";
-        FeatureFlag: Codeunit "NPR Feature Flags Management";
         UseGLAccountLine: Boolean;
     begin
         if not EFTTransactionRequest.Successful then
@@ -519,12 +513,8 @@
         end;
 
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
-        if FeatureFlag.IsEnabled('newsurchargeandtipaccountsetup') then begin
-            POSPaymentMethod.Get(EFTTransactionRequest."Original POS Payment Type Code");
-            UseGLAccountLine := POSPaymentMethod."EFT Tip Account No." <> '';
-        end else begin
-            UseGLAccountLine := EFTSetup.UseAccountPostingForServices();
-        end;
+        POSPaymentMethod.Get(EFTTransactionRequest."Original POS Payment Type Code");
+        UseGLAccountLine := POSPaymentMethod."EFT Tip Account No." <> '';
 
         if UseGLAccountLine then begin
             POSPaymentMethod.Get(EFTTransactionRequest."Original POS Payment Type Code");

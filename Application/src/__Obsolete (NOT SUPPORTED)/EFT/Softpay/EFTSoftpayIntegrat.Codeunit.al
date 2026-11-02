@@ -47,9 +47,7 @@ codeunit 6059891 "NPR EFT Softpay Integrat."
         if (not EftTransactionRequest.IsType(IntegrationType())) then
             exit;
 
-        if FeatureFlagsManagement.IsEnabled('softpaywarning') then begin
-            Message('SoftPay is being phased out of NP Retail. Please contact your NP Retail supplier for more information');
-        end;
+        Message('SoftPay is being phased out of NP Retail. Please contact your NP Retail supplier for more information');
 
         if FeatureFlagsManagement.IsEnabled('softpayblock') then begin
             Error('SoftPay is no longer supported in NP Retail');

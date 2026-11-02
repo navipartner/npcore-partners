@@ -3,18 +3,6 @@ codeunit 6184596 "NPR EFT Adyen AbortAcquire Req"
 {
     Access = Internal;
 
-    procedure GetRequestJson(EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"): Text
-    var
-        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
-        AuxiliaryOperationID: Integer;
-    begin
-        if EFTTransactionRequest."Processed Entry No." <> 0 then begin
-            OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Processed Entry No.");
-            AuxiliaryOperationID := OriginalEFTTransactionRequest."Auxiliary Operation ID";
-        end;
-        exit(GetRequestJson(EFTTransactionRequest, EFTSetup, AuxiliaryOperationID));
-    end;
-
     procedure GetRequestJson(EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; AuxiliaryOperationID: Integer): Text
     var
         Json: Codeunit "Json Text Reader/Writer";

@@ -16,18 +16,13 @@
     end;
 
     local procedure "Code"(var POSEntry: Record "NPR POS Entry")
-    var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         Clear(_POSPostItemEntries);
         if _ReplaceDates then
             _POSPostItemEntries.SetPostingDate(_ReplacePostingDate, _ReplaceDocumentDate, _PostingDate);
 
         _POSPostItemEntries.CreateAssemblyOrders(POSEntry);  // Assembly order creation is committed
-        if FeatureFlagsManagement.IsEnabled(DisallowCommitsDuringPosItemTransactionsPostingFeatureFlag()) then
-            PostNoCommits(POSEntry)
-        else
-            Post(POSEntry);
+        PostNoCommits(POSEntry);
     end;
 
     [CommitBehavior(CommitBehavior::Error)]
@@ -57,10 +52,5 @@
         _ReplacePostingDate := NewReplacePostingDate;
         _ReplaceDocumentDate := NewReplaceDocumentDate;
         _PostingDate := NewPostingDate;
-    end;
-
-    local procedure DisallowCommitsDuringPosItemTransactionsPostingFeatureFlag(): Text[50]
-    begin
-        exit('disallowCommitsDuringPosItemTransactionsPosting');
     end;
 }

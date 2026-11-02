@@ -6,9 +6,7 @@
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
 #endif
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         Text000: Label 'Apply Payment - Default (Full Payment)';
-        NewVoucherCalculationFeatureFlagToken: Label 'newvouchercalculationonsalesorderreleasedoc', Locked = true;
 
     [Obsolete('Delete when final v1/v2 workflow is gone', '2023-06-28')]
     procedure ApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; EndSale: Boolean)
@@ -90,7 +88,6 @@
         PaymentAmountLCY: Decimal;
         TotalReturnAmount: Decimal;
         TotalSalesAmount: Decimal;
-        TotalPaidAmount: Decimal;
         LineNo: Integer;
         AmountValidated: Boolean;
         HasPOSPaymentMethodItemFilter: Boolean;
@@ -120,19 +117,14 @@
             end;
         end;
 
-        SalesHeader.CalcFields("NPR Magento Payment Amount");
         TotalSalesAmount := GetTotalAmtInclVat(SalesHeader);
-        TotalPaidAmount := SalesHeader."NPR Magento Payment Amount";
 
-        if FeatureFlagsManagement.IsEnabled(NewVoucherCalculationFeatureFlagToken) then begin
-            TotalReturnAmount := CalcVoucherAmountBeforeCurrentLine(SalesHeader, MagentoPaymentLine."Line No.");
-            if TotalReturnAmount > 0 then
-                exit;
-            ReturnAmount := CalcTotalPositiveVoucherAmount(SalesHeader) - TotalSalesAmount;
-            if ReturnAmount < 0 then
-                ReturnAmount := 0;
-        end else
-            TotalReturnAmount := TotalPaidAmount - TotalSalesAmount;
+        TotalReturnAmount := CalcVoucherAmountBeforeCurrentLine(SalesHeader, MagentoPaymentLine."Line No.");
+        if TotalReturnAmount > 0 then
+            exit;
+        ReturnAmount := CalcTotalPositiveVoucherAmount(SalesHeader) - TotalSalesAmount;
+        if ReturnAmount < 0 then
+            ReturnAmount := 0;
 
         HasPOSPaymentMethodItemFilter := PmtMethodItemMgt.HasPOSPaymentMethodItemFilter(NpRvVoucherType."Payment Type");
         if HasPOSPaymentMethodItemFilter then begin
@@ -148,18 +140,10 @@
                     exit;
                 ReturnAmount := 0;
             end else begin
-                if FeatureFlagsManagement.IsEnabled(NewVoucherCalculationFeatureFlagToken) then begin
-                    if ReturnAmount < 0 then
-                        ReturnAmount := 0;
-                end else begin
-                    if ReturnAmount < TotalReturnAmount then
-                        ReturnAmount := TotalReturnAmount;
-                end;
+                if ReturnAmount < 0 then
+                    ReturnAmount := 0;
             end;
         end;
-
-        if not HasPOSPaymentMethodItemFilter and not FeatureFlagsManagement.IsEnabled(NewVoucherCalculationFeatureFlagToken) then
-            ReturnAmount := TotalReturnAmount;
 
         NpRvReturnVoucherType.Get(NpRvVoucherType.Code);
         NpRvReturnVoucherType.TestField("Return Voucher Type");
@@ -172,8 +156,6 @@
             ReturnLineExists := true;
             MagentoPaymentLineNew.Get(Database::"Sales Header", NpRvSalesLineNew."Document Type",
               NpRvSalesLineNew."Document No.", NpRvSalesLineNew."Document Line No.");
-            if not FeatureFlagsManagement.IsEnabled(NewVoucherCalculationFeatureFlagToken) then
-                ReturnAmount -= MagentoPaymentLineNew.Amount;
         end;
 
         if ReturnAmount <= 0 then begin
@@ -540,11 +522,8 @@
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EcomSalesDocApiEvents", OnAfterReserveVoucher, '', false, false)]
     local procedure "NPR EcomSalesDocApiEvents_OnAfterReserveVoucher"(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; var VoucherSalesLine: Record "NPR NpRv Sales Line")
-    var
-        blockNonpartialVouchersAsEcommercePayment: Label 'blockNonpartialVouchersAsEcommercePayment', Locked = true;
     begin
-        if FeatureFlagsManagement.IsEnabled(blockNonpartialVouchersAsEcommercePayment) then
-            EcomSalesDocUtils.CheckPartialVoucherAllowed(EcomSalesPmtLine, VoucherSalesLine, ModuleCode());
+        EcomSalesDocUtils.CheckPartialVoucherAllowed(EcomSalesPmtLine, VoucherSalesLine, ModuleCode());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Entria Integration Events", OnAfterReserveEntriaVoucher, '', false, false)]

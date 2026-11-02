@@ -4,7 +4,6 @@
 
     var
         Text000: Label 'Apply Payment - Partial';
-        NewVoucherCalculationFeatureFlagToken: Label 'newvouchercalculationonsalesorderreleasedoc', Locked = true;
 
     [Obsolete('Delete when final v1/v2 workflow is gone', '2023-06-28')]
     procedure ApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line")
@@ -35,45 +34,32 @@
     procedure ApplyPaymentSalesDoc(NpRvVoucherType: Record "NPR NpRv Voucher Type"; SalesHeader: Record "Sales Header"; var NpRvSalesLine: Record "NPR NpRv Sales Line")
     var
         MagentoPaymentLine: Record "NPR Magento Payment Line";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
         TotalAmtInclVat: Decimal;
-        ReturnAmount: Decimal;
         AmountUsedByPreviousVouchers: Decimal;
         AmountNeededFromThisVoucher: Decimal;
     begin
-        SalesHeader.CalcFields("NPR Magento Payment Amount");
         TotalAmtInclVat := NpRvSalesDocMgt.GetAmountToInvoiceInclVat(SalesHeader);
-        if not FeatureFlagsManagement.IsEnabled(NewVoucherCalculationFeatureFlagToken) then begin
-            ReturnAmount := SalesHeader."NPR Magento Payment Amount" - TotalAmtInclVat;
-            if ReturnAmount <= 0 then
-                exit;
-        end;
 
         NpRvSalesLine.Get(NpRvSalesLine.Id);
         NpRvSalesLine.TestField("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
         MagentoPaymentLine.Get(DATABASE::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", NpRvSalesLine."Document Line No.");
 
-        if FeatureFlagsManagement.IsEnabled(NewVoucherCalculationFeatureFlagToken) then begin
-            AmountUsedByPreviousVouchers := GetVoucherAmountBeforeLine(SalesHeader, NpRvSalesLine."Document Line No.");
-            if MagentoPaymentLine."Requested Amount" = 0 then
-                MagentoPaymentLine."Requested Amount" := MagentoPaymentLine.Amount;
-            if MagentoPaymentLine."Requested Amt. (Store Curr.)" = 0 then
-                MagentoPaymentLine."Requested Amt. (Store Curr.)" := MagentoPaymentLine."Amount (Store Currency)";
-            // Always use Requested Amount (original value) to calculate how much we can use from this voucher
-            if AmountUsedByPreviousVouchers >= TotalAmtInclVat then
-                AmountNeededFromThisVoucher := 0
-            else if (AmountUsedByPreviousVouchers + MagentoPaymentLine."Requested Amount") > TotalAmtInclVat then
-                AmountNeededFromThisVoucher := TotalAmtInclVat - AmountUsedByPreviousVouchers
-            else
-                AmountNeededFromThisVoucher := MagentoPaymentLine."Requested Amount";
+        AmountUsedByPreviousVouchers := GetVoucherAmountBeforeLine(SalesHeader, NpRvSalesLine."Document Line No.");
+        if MagentoPaymentLine."Requested Amount" = 0 then
+            MagentoPaymentLine."Requested Amount" := MagentoPaymentLine.Amount;
+        if MagentoPaymentLine."Requested Amt. (Store Curr.)" = 0 then
+            MagentoPaymentLine."Requested Amt. (Store Curr.)" := MagentoPaymentLine."Amount (Store Currency)";
+        // Always use Requested Amount (original value) to calculate how much we can use from this voucher
+        if AmountUsedByPreviousVouchers >= TotalAmtInclVat then
+            AmountNeededFromThisVoucher := 0
+        else if (AmountUsedByPreviousVouchers + MagentoPaymentLine."Requested Amount") > TotalAmtInclVat then
+            AmountNeededFromThisVoucher := TotalAmtInclVat - AmountUsedByPreviousVouchers
+        else
+            AmountNeededFromThisVoucher := MagentoPaymentLine."Requested Amount";
 
-            if MagentoPaymentLine.Amount <> AmountNeededFromThisVoucher then begin
-                MagentoPaymentLine.SetAmountKeepingStoreCurrency(AmountNeededFromThisVoucher);
-                MagentoPaymentLine.Modify(true);
-            end;
-        end else begin
-            MagentoPaymentLine.SetAmountKeepingStoreCurrency(MagentoPaymentLine.Amount - ReturnAmount);
+        if MagentoPaymentLine.Amount <> AmountNeededFromThisVoucher then begin
+            MagentoPaymentLine.SetAmountKeepingStoreCurrency(AmountNeededFromThisVoucher);
             MagentoPaymentLine.Modify(true);
         end;
 

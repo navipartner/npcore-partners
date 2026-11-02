@@ -1004,13 +1004,9 @@ codeunit 6151195 "NPR NpCs Collect Mgt."
 
     local procedure CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument: Record "NPR NpCs Document"; SalesHeader: Record "Sales Header")
     var
-        FeatureFlagManagement: Codeunit "NPR Feature Flags Management";
         Handled: Boolean;
         CannotChangeErr: Label 'You cannot change Sales %1 %2 when its related %3 has %4 %5, because it can cause data discrepancy.', Comment = '%1 Document Type field value - %2 - Document Number field value, %3 - NpCs Document table caption, %4 - Delivery Status field caption, %5 - Deliver Status field value';
     begin
-        if not FeatureFlagManagement.IsEnabled('checkCollectDocumentDeliveryStatus') then
-            exit;
-
         OnBeforeCheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader, Handled);
         if Handled then
             exit;

@@ -147,7 +147,6 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
         TicketRequest: Record "NPR TM Ticket Reservation Req.";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
         Admission: Record "NPR TM Admission";
-        FeatureFlag: Codeunit "NPR Feature Flags Management";
         ItemNoCode: Code[20];
     begin
 #pragma warning disable AA0139
@@ -165,14 +164,9 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
         TicketRequest.Quantity := EcommSalesLine.Quantity;
         TicketRequest."Admission Code" := TicketManager.GetDefaultAdmissionCode(ItemNoCode, EcommSalesLine."Variant Code");
 #pragma warning disable AA0139, AL0432
-        if FeatureFlag.IsEnabled(RemoveEcomTicketHolderNameAndLanguage()) then begin
-            TicketRequest.TicketHolderName := CopyStr(EcomSalesHeader."Sell-to Name", 1, 100);
-            if EcomSalesHeader."Language Code" <> '' then
-                TicketRequest.TicketHolderPreferredLanguage := EcomSalesHeader."Language Code";
-        end else begin
-            TicketRequest.TicketHolderName := EcomSalesHeader."Ticket Holder Name";
-            TicketRequest.TicketHolderPreferredLanguage := EcomSalesHeader."Ticket Holder Preferred Lang";
-        end;
+        TicketRequest.TicketHolderName := CopyStr(EcomSalesHeader."Sell-to Name", 1, 100);
+        if EcomSalesHeader."Language Code" <> '' then
+            TicketRequest.TicketHolderPreferredLanguage := EcomSalesHeader."Language Code";
 #pragma warning restore AA0139, AL0432
         TicketBOM.Get(TicketRequest."Item No.", TicketRequest."Variant Code", TicketRequest."Admission Code");
         Admission.Get(TicketRequest."Admission Code");
@@ -570,7 +564,6 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
         EcomSalesHeader2: Record "NPR Ecom Sales Header";
         EcomSalesLine: Record "NPR Ecom Sales Line";
         TicketRequest: Record "NPR TM Ticket Reservation Req.";
-        FeatureFlag: Codeunit "NPR Feature Flags Management";
         ConfirmedWithDifDoc: Boolean;
         MissingtokenErr: Label 'Processing Token must be set before confirming tickets.';
         MissingReservationErr: Label 'No ticket reservations found for the provided Token or it was already confirmed with another document.';
@@ -588,10 +581,7 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
             exit;
         end;
 #pragma warning disable AA0139, AL0432
-        if FeatureFlag.IsEnabled(RemoveEcomTicketHolderNameAndLanguage()) then
-            TicketRequestManager.SetReservationRequestExtraInfo(EcomSalesHeader2."Ticket Reservation Token", EcomSalesHeader2."Sell-to Email", EcomSalesHeader2."External No.", CopyStr(EcomSalesHeader2."Sell-to Name", 1, 100), EcomSalesHeader2."Language Code")
-        else
-            TicketRequestManager.SetReservationRequestExtraInfo(EcomSalesHeader2."Ticket Reservation Token", EcomSalesHeader2."Sell-to Email", EcomSalesHeader2."External No.", EcomSalesHeader2."Ticket Holder Name", EcomSalesHeader2."Ticket Holder Preferred Lang");
+        TicketRequestManager.SetReservationRequestExtraInfo(EcomSalesHeader2."Ticket Reservation Token", EcomSalesHeader2."Sell-to Email", EcomSalesHeader2."External No.", CopyStr(EcomSalesHeader2."Sell-to Name", 1, 100), EcomSalesHeader2."Language Code");
 #pragma warning restore AA0139, AL0432
         SetTicketLinesToProcessFilters(EcomSalesLine, EcomSalesHeader2);
         if not EcomSalesLine.FindSet() then
@@ -748,11 +738,6 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
         EcomSalesLine.SetRange(Subtype, EcomSalesLine.Subtype::Ticket);
         EcomSalesLine.ModifyAll("Virtual Item Process ErrMsg", '');
         EcomSalesLine.ModifyAll("Virtual Item Process Status", EcomSalesLine."Virtual Item Process Status"::" ");
-    end;
-
-    internal procedure RemoveEcomTicketHolderNameAndLanguage(): Text[100]
-    begin
-        exit('removeEcomTicketHolderNameAndLanguage');
     end;
 
     var

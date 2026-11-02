@@ -145,44 +145,13 @@ codeunit 6185053 "NPR API Response"
         exit(_CurrCodeunit);
     end;
 
-    local procedure GetResponseJsonBase64() ResponseJson: JsonObject
-    var
-        HeadersJson: JsonObject;
-        HeaderKey: Text;
-        HeaderValue: Text;
-        Base64Convert: Codeunit "Base64 Convert";
-    begin
-        ResponseJson.Add('statusCode', _StatusCode);
-
-        Clear(HeadersJson);
-        foreach HeaderKey in _Headers.Keys do begin
-            _Headers.Get(HeaderKey, HeaderValue);
-            HeadersJson.Add(HeaderKey, HeaderValue);
-        end;
-        HeadersJson.Add('x-server-cache-id', ServiceInstanceId());
-
-        ResponseJson.Add('headers', HeadersJson);
-        ResponseJson.Add('proxyMetadata', GetProxyResponseMetadata());
-        ResponseJson.Add('frontmatter', true);
-
-        if _StreamInitialized then begin
-            ResponseJson.Add('body', Base64Convert.ToBase64(_ResponseJsonStream));
-        end else begin
-            ResponseJson.Add('body', EncodeJsonObjectToBase64(_ResponseBody));
-        end;
-    end;
-
     procedure GetResponseJson() ResponseJson: JsonObject
     var
         HeadersJson: JsonObject;
         HeaderKey: Text;
         HeaderValue: Text;
         StreamJsonToken: JsonToken;
-        FeatureFlag: Codeunit "NPR Feature Flags Management";
     begin
-        if (not FeatureFlag.IsEnabled('bcRestApiProxyRawJsonStringTransfer')) then
-            exit(GetResponseJsonBase64());
-
         ResponseJson.Add('statusCode', _StatusCode);
 
         Clear(HeadersJson);
@@ -207,15 +176,6 @@ codeunit 6185053 "NPR API Response"
     procedure IsInitialized(): Boolean
     begin
         exit(_HascurrCodeunit);
-    end;
-
-    local procedure EncodeJsonObjectToBase64(var JsonToken: JsonToken) Base64String: Text
-    var
-        TempBlob: Codeunit "Temp Blob";
-        Base64Convert: Codeunit "Base64 Convert";
-    begin
-        JsonToken.WriteTo(TempBlob.CreateOutStream(TextEncoding::UTF8));
-        Base64String := Base64Convert.ToBase64(TempBlob.CreateInStream(TextEncoding::UTF8));
     end;
 
     local procedure GetNPRetailVersion(): Text

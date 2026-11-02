@@ -156,7 +156,6 @@
             group(BinTransfer)
             {
                 Caption = 'Bin Transfer';
-                Visible = BinTransferVisible;
                 group(BinTransferOUT)
                 {
                     Caption = 'Transfer OUT';
@@ -247,15 +246,4 @@
             }
         }
     }
-
-    trigger OnOpenPage()
-    var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
-        POSActionBinTransferB: Codeunit "NPR POS Action: Bin Transfer B";
-    begin
-        BinTransferVisible := FeatureFlagsManagement.IsEnabled(POSActionBinTransferB.NewBinTransferFeatureFlag());
-    end;
-
-    var
-        BinTransferVisible: Boolean;
 }

@@ -977,30 +977,6 @@ codeunit 6184496 "NPR Pepper Library HWC"
         exit(EFTTransactionRequest.Insert());
     end;
 
-    local procedure CreatePaymentOfGoodsRequest(RegisterNo: Code[10]; SalesReceiptNo: Code[20]; CurrencyCode: Code[10]; Amount: Decimal; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
-    var
-        GLSetup: Record "General Ledger Setup";
-    begin
-
-        InitializeGenericRequest(RegisterNo, EFTTransactionRequest);
-
-        _PepperConfiguration.TestField("Transaction Type Payment Code");
-
-        if (CurrencyCode = '') then begin
-            GLSetup.Get();
-            CurrencyCode := GLSetup."LCY Code";
-        end;
-
-        EFTTransactionRequest."Sales Ticket No." := SalesReceiptNo;
-        EFTTransactionRequest."Reference Number Input" := SalesReceiptNo;
-
-        EFTTransactionRequest."Currency Code" := CurrencyCode;
-        EFTTransactionRequest."Amount Input" := Amount;
-        SetTrxProcessingType('10', RegisterNo, EFTTransactionRequest);
-        EFTTransactionRequest."Auto Voidable" := true;
-        exit(EFTTransactionRequest.Insert());
-    end;
-
     local procedure CreateRecoveryTransactionRequest(SourceTransactionRequest: Record "NPR EFT Transaction Request"; var RecoveryTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
     begin
 
@@ -1830,21 +1806,13 @@ codeunit 6184496 "NPR Pepper Library HWC"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreatePaymentOfGoodsRequest', '', false, false)]
     local procedure OnCreatePaymentOfGoodsRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
-    var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         if (not EftTransactionRequest.IsType(GetIntegrationType())) then
             exit;
 
-        if FeatureFlagsManagement.IsEnabled('pepperwarning') then begin
-            Message('Pepper terminals are being phased out of NP Retail. Please contact your NP Retail supplier for more information');
-        end;
+        Message('Pepper terminals are being phased out of NP Retail. Please contact your NP Retail supplier for more information');
 
-        if FeatureFlagsManagement.IsEnabled('pepperblock') then begin
-            Error('Pepper terminals are no longer supported in NP Retail');
-        end;
-
-        Handled := CreatePaymentOfGoodsRequest(EftTransactionRequest."Register No.", EftTransactionRequest."Sales Ticket No.", EftTransactionRequest."Currency Code", EftTransactionRequest."Amount Input", EftTransactionRequest);
+        Error('Pepper terminals are no longer supported in NP Retail');
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateRefundRequest', '', false, false)]

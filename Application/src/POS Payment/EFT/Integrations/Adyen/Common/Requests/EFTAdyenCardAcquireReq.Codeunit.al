@@ -2,21 +2,6 @@ codeunit 6184592 "NPR EFT Adyen CardAcquire Req"
 {
     Access = Internal;
 
-    procedure GetRequestJson(EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"): Text
-    var
-        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
-        AmountInput: Decimal;
-    begin
-        if (
-            (EFTTransactionRequest."Auxiliary Operation ID" = "NPR EFT Adyen Aux Operation"::ACQUIRE_CARD.AsInteger()) and
-            (EFTTransactionRequest."Initiated from Entry No." > 0)
-        ) then begin
-            OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");
-            AmountInput := OriginalEFTTransactionRequest."Amount Input";
-        end;
-        exit(GetRequestJson(EFTTransactionRequest, EFTSetup, AmountInput));
-    end;
-
     procedure GetRequestJson(EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; AmountInput: Decimal): Text
     var
         Json: Codeunit "Json Text Reader/Writer";

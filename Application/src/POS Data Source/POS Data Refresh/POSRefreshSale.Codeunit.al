@@ -6,7 +6,6 @@ codeunit 6150749 "NPR POS Refresh Sale"
     var
         _rows: Dictionary of [Text, Text]; //Rec.SystemId, SerializedRowJsonObject
         _rowsNewInsert: Dictionary of [Text, Boolean]; //Rec.SystemId, InsertedInThisStack
-        UseLanguageAgnosticDataKeysFeatureTok: Label 'useLanguageAgnosticDataKeys', Locked = true;
 
     procedure GetDeltaData() Data: JsonObject
     var
@@ -20,8 +19,6 @@ codeunit 6150749 "NPR POS Refresh Sale"
         TempSale: Record "NPR POS Sale" temporary;
         POSSetup: Codeunit "NPR POS Setup";
         POSSaleRec: Record "NPR POS Sale";
-        UseLanguageAgnosticDataKeys, PositionWithNames : Boolean;
-        FeatureFlag: Codeunit "NPR Feature Flags Management";
     begin
         //TODO: Fix frontend to support keyed SystemId objects instead of keyless array, so we can delete the restructuring below.
         //TODO: Fix frontend to support leaving out the legacy fields from the refresh JSON.
@@ -41,11 +38,8 @@ codeunit 6150749 "NPR POS Refresh Sale"
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(POSSaleRec);
 
-        UseLanguageAgnosticDataKeys := FeatureFlag.IsEnabled(UseLanguageAgnosticDataKeysFeatureTok);
-        PositionWithNames := (not UseLanguageAgnosticDataKeys);
-
         if POSSaleRec."Register No." <> '' then begin
-            Data.Add('currentPosition', POSSaleRec.GetPosition(PositionWithNames));
+            Data.Add('currentPosition', POSSaleRec.GetPosition(false));
             Data.Add('currentRowId', Format(POSSaleRec.SystemId, 0, 4).ToLower());
         end else begin
             //For backwards compatibility reasons we support refreshing the POS sale record even if no sale is currently active.
@@ -54,7 +48,7 @@ codeunit 6150749 "NPR POS Refresh Sale"
             TempSale."Register No." := POSSetup.GetPOSUnitNo();
             TempSale.Date := Today();
             TempSale.Insert();
-            Data.Add('currentPosition', TempSale.GetPosition(PositionWithNames));
+            Data.Add('currentPosition', TempSale.GetPosition(false));
             // TODO: This will just be a null guid, does it matter?
             Data.Add('currentRowId', Format(TempSale.SystemId, 0, 4).ToLower());
         end;
@@ -193,12 +187,7 @@ codeunit 6150749 "NPR POS Refresh Sale"
         Handled: Boolean;
         MissingSubscriberErr: Label 'Extension "%1" for data source "%2" did not respond to %3 event.';
         DataRowLbl: Label '%1.%2', Locked = true;
-        UseLanguageAgnosticDataKeys, PositionWithNames : Boolean;
-        FeatureFlag: Codeunit "NPR Feature Flags Management";
     begin
-        UseLanguageAgnosticDataKeys := FeatureFlag.IsEnabled(UseLanguageAgnosticDataKeysFeatureTok);
-        PositionWithNames := (not UseLanguageAgnosticDataKeys);
-
         if not SkipContent then begin
             FieldsObject.Add(Format(Rec.FieldNo("Register No.")), Rec."Register No.");
             FieldsObject.Add(Format(Rec.FieldNo("Sales Ticket No.")), Rec."Sales Ticket No.");
@@ -272,7 +261,7 @@ codeunit 6150749 "NPR POS Refresh Sale"
             end;
         end;
 
-        RowObject.Add('position', Rec.GetPosition(PositionWithNames));
+        RowObject.Add('position', Rec.GetPosition(false));
         RowObject.Add('rowId', Format(Rec.SystemId, 0, 4).ToLower());
         RowObject.Add('negative', false);
         RowObject.Add('class', '');

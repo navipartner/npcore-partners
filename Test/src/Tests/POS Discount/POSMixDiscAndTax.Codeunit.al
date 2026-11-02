@@ -25,7 +25,6 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         LibraryRandom: Codeunit "Library - Random";
         LibraryTaxCalc: Codeunit "NPR POS Lib. - Tax Calc.";
         LibraryPOSDiscount: Codeunit "NPR Library - POS Discount";
-        LibraryFeatureFlags: Codeunit "NPR Library - Feature Flags";
         Initialized: Boolean;
         DayDirection: Option Today,Future,Past;
 
@@ -10602,7 +10601,6 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         DiscountCode: Code[20];
-        PreviousFeatureFlagValue: Boolean;
     begin
         // [SCENARIO CORE-1843] Buy 6 get 1 free on an item with a 3 decimal price incl. VAT gives a free line with exactly 100% discount and zero amounts
 
@@ -10610,7 +10608,6 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         InitializeData();
         LibraryApplicationArea.EnableVATSetup();
         LibraryPOSDiscount.AllowThreeDecimalUnitPrices();
-        PreviousFeatureFlagValue := LibraryFeatureFlags.EnableFeatureFlag('fullyDiscountedPOSLineNetsToZero');
 
         // [GIVEN] Enable discount
         EnableDiscount();
@@ -10641,8 +10638,6 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         // [WHEN] Quantity is changed to the minimum quantity of the mix discount
         POSSaleLineUnit.SetQuantity(6);
 
-        LibraryFeatureFlags.SetFeatureFlag('fullyDiscountedPOSLineNetsToZero', PreviousFeatureFlagValue);
-
         // [THEN] The free line has exactly 100% discount and zero amounts
         FilterSaleLines(POSSaleLine, POSSale, Item."No.");
         Assert.AreEqual(2, POSSaleLine.Count(), 'Unexpected number of sale lines in the sale');
@@ -10669,7 +10664,6 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
         DiscountCode: Code[20];
-        PreviousFeatureFlagValue: Boolean;
     begin
         // [SCENARIO CORE-1843] Buy 6 get 1 free on an item with a 3 decimal price that rounds down gives a free line with exactly 100% discount, not 99.97%
 
@@ -10677,7 +10671,6 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         InitializeData();
         LibraryApplicationArea.EnableVATSetup();
         LibraryPOSDiscount.AllowThreeDecimalUnitPrices();
-        PreviousFeatureFlagValue := LibraryFeatureFlags.EnableFeatureFlag('fullyDiscountedPOSLineNetsToZero');
 
         // [GIVEN] Enable discount
         EnableDiscount();
@@ -10703,8 +10696,6 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [WHEN] The minimum quantity of the mix discount is added to the sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 6);
-
-        LibraryFeatureFlags.SetFeatureFlag('fullyDiscountedPOSLineNetsToZero', PreviousFeatureFlagValue);
 
         // [THEN] The free line has exactly 100% discount and zero amounts
         FilterSaleLines(POSSaleLine, POSSale, Item."No.");
@@ -10733,7 +10724,6 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         POSSaleUnit: Codeunit "NPR POS Sale";
         SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         DiscountCode: Code[20];
-        PreviousFeatureFlagValue: Boolean;
     begin
         // [SCENARIO CORE-1843] Buy 6 get 1 free on an item with a 3 decimal price excl. VAT gives a free line with exactly 100% discount and zero amounts
 
@@ -10741,7 +10731,6 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         InitializeData();
         LibraryApplicationArea.EnableVATSetup();
         LibraryPOSDiscount.AllowThreeDecimalUnitPrices();
-        PreviousFeatureFlagValue := LibraryFeatureFlags.EnableFeatureFlag('fullyDiscountedPOSLineNetsToZero');
 
         // [GIVEN] Customer with prices excl. VAT
         CreateCustomer(Customer, false, true);
@@ -10774,8 +10763,6 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         // [WHEN] The minimum quantity of the mix discount is added to the sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 6);
 
-        LibraryFeatureFlags.SetFeatureFlag('fullyDiscountedPOSLineNetsToZero', PreviousFeatureFlagValue);
-
         // [THEN] The free line has exactly 100% discount and zero amounts
         FilterSaleLines(POSSaleLine, POSSale, Item."No.");
         Assert.AreEqual(2, POSSaleLine.Count(), 'Unexpected number of sale lines in the sale');
@@ -10802,7 +10789,6 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
-        PreviousFeatureFlagValue: Boolean;
     begin
         // [SCENARIO CORE-1843] A manual 100% line discount on an item with a 3 decimal price incl. VAT gives zero amounts, not -0.01
 
@@ -10810,7 +10796,6 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         InitializeData();
         LibraryApplicationArea.EnableVATSetup();
         LibraryPOSDiscount.AllowThreeDecimalUnitPrices();
-        PreviousFeatureFlagValue := LibraryFeatureFlags.EnableFeatureFlag('fullyDiscountedPOSLineNetsToZero');
 
         // [GIVEN] Enable discount
         EnableDiscount();
@@ -10832,8 +10817,6 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [WHEN] The item is added with a manual 100% line discount
         LibraryPOSMock.CreateItemLineWithDiscount(POSSession, Item."No.", 1, 100);
-
-        LibraryFeatureFlags.SetFeatureFlag('fullyDiscountedPOSLineNetsToZero', PreviousFeatureFlagValue);
 
         // [THEN] The line is free with zero amounts
         POSSession.GetSaleLine(POSSaleLineUnit);
@@ -10863,7 +10846,6 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         FreeLineDiscountPct: Decimal;
         PaidLineAmountInclVAT: Decimal;
         PreviousAmountRoundingPrecision: Decimal;
-        PreviousFeatureFlagValue: Boolean;
     begin
         // [SCENARIO CORE-1843] On a tenant whose money precision is thousandths, the free line is still exactly 100% and zero, and the discount keeps that precision
 
@@ -10871,7 +10853,6 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         InitializeData();
         LibraryApplicationArea.EnableVATSetup();
         LibraryPOSDiscount.AllowThreeDecimalUnitPrices();
-        PreviousFeatureFlagValue := LibraryFeatureFlags.EnableFeatureFlag('fullyDiscountedPOSLineNetsToZero');
 
         // [GIVEN] Enable discount
         EnableDiscount();
@@ -10915,7 +10896,6 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
             PaidLineAmountInclVAT := POSSaleLine."Amount Including VAT";
 
         LibraryPOSDiscount.SetAmountRoundingPrecision(PreviousAmountRoundingPrecision);
-        LibraryFeatureFlags.SetFeatureFlag('fullyDiscountedPOSLineNetsToZero', PreviousFeatureFlagValue);
 
         // [THEN] The free line is exactly 100% and zero, and the discount keeps the thousandths precision
         Assert.AreEqual(7.355, FreeLineDiscountAmount, 'Discount Amount on the free line');

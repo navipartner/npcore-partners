@@ -15,7 +15,6 @@ codeunit 6059880 "NPR POS Action: Change View-B"
         POSSale: Codeunit "NPR POS Sale";
         POSSession: Codeunit "NPR POS Session";
         POSTestItemInventory: Codeunit "NPR POS Test Item Inventory";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         CancelSaleLbl: Label 'There is an active sale. If you continue the sale will be automatically cancelled. Are you sure you want to continue?';
     begin
         POSSession.GetSetup(POSSetup);
@@ -51,11 +50,9 @@ codeunit 6059880 "NPR POS Action: Change View-B"
                 POSSession.ChangeViewSale();
             ViewType::Payment:
                 begin
-                    if FeatureFlagsManagement.IsEnabled('removeviewswitchscenarios') then begin
-                        POSSession.GetSale(POSSale);
-                        POSSale.GetCurrentSale(SalePOS);
-                        POSTestItemInventory.Run(SalePOS);
-                    end;
+                    POSSession.GetSale(POSSale);
+                    POSSale.GetCurrentSale(SalePOS);
+                    POSTestItemInventory.Run(SalePOS);
                     POSSession.ChangeViewPayment();
                 end;
             ViewType::Balance:

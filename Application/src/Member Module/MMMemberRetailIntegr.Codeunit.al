@@ -23,9 +23,6 @@
         ADMIT_MEMBERS: Label 'Do you want to admit the member(s)?';
         CONFIRM_CARD_BLOCKED: Label 'This member card is blocked, do you want to continue anyway?';
 
-#if not (BC17 or BC18 or BC19 or BC20 or BC21)
-        _FeatureFlagManagement: Codeunit "NPR Feature Flags Management";
-#endif
     trigger OnRun()
     var
     begin
@@ -550,13 +547,6 @@
         end;
 
         MembershipManagement.GetCommunicationMethod_Ticket(Member."Entry No.", 0, NotificationMethod, NotificationAddress, NotificationEngine);
-
-#if not (BC17 or BC18 or BC19 or BC20 or BC21)
-        if (not (_FeatureFlagManagement.IsEnabled('enableTriStateLockingFeaturesInTicketModule'))) then
-            TicketRequestManager.LockResources('IssueTicketFromMemberScan');
-#else
-        TicketRequestManager.LockResources('IssueTicketFromMemberScan');
-#endif
 
         Token := TicketRequestManager.CreateReservationRequest(ItemNo, VariantCode, 1, Member."External Member No.");
         TicketRequestManager.SetReservationRequestExtraInfoSkipPriceCalculation(Token, NotificationAddress, Member."External Member No.", Member."Display Name", Member.PreferredLanguageCode);

@@ -898,10 +898,6 @@ codeunit 85011 "NPR Library - Ticket Module"
         WorkDate(Today());
         NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
         CreateNumberSeries();
-
-#if not (BC17 or BC18 or BC19 or BC20 or BC21)
-        EnableTriStateLockingFeaturesInTicketModule();
-#endif
     end;
 
     // The service time resolver (TMTimeHelper) and the validator (Today()/Time()) must read the same clock, or a ride
@@ -946,27 +942,6 @@ codeunit 85011 "NPR Library - Ticket Module"
         IsDaylightSavingsTime: Boolean;
     begin
         exit(Abs(TimeHelper.GetTimeZoneLocalTime(TimeZoneNo, TimeZoneCode, IsDaylightSavingsTime) - SessionNow) <= 60000);
-    end;
-
-    internal procedure EnableTriStateLockingFeaturesInTicketModule()
-    var
-        FeatureFlag: Record "NPR Feature Flag";
-        Enabled: Boolean;
-    begin
-        // 'enableTriStateLockingFeaturesInTicketModule'
-        if (not FeatureFlag.Get('enableTriStateLockingFeaturesInTicketModule')) then begin
-            FeatureFlag.Name := 'enableTriStateLockingFeaturesInTicketModule';
-            FeatureFlag.value := Format(true);
-            FeatureFlag.Insert();
-            exit;
-        end;
-
-        if (Evaluate(Enabled, FeatureFlag.Value)) then
-            if (Enabled) then
-                exit;
-
-        FeatureFlag.value := Format(true);
-        FeatureFlag.Modify();
     end;
 
     local procedure GetNextNo(): Code[20]

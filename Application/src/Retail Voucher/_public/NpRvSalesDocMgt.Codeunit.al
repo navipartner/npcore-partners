@@ -340,12 +340,10 @@
     var
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
         TotalAmtInclVat: Decimal;
         VoucherAmount: Decimal;
         RemainingAmountNeeded: Decimal;
-        NewVoucherCalculationFeatureFlagToken: Label 'newvouchercalculationonsalesorderreleasedoc', Locked = true;
     begin
         NpRvSalesLine.SetCurrentKey("Document Source", "Document Type", "Document No.", "Document Line No.");
         NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
@@ -361,37 +359,35 @@
             ApplyPayment(SalesHeader, NpRvSalesLine);
         until NpRvSalesLine.Next() = 0;
 
-        if FeatureFlagsManagement.IsEnabled(NewVoucherCalculationFeatureFlagToken) then begin
-            TotalAmtInclVat := GetAmountToInvoiceInclVat(SalesHeader);
-            VoucherAmount := MagentoPmtMgt.GetNetVoucherAmount(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
+        TotalAmtInclVat := GetAmountToInvoiceInclVat(SalesHeader);
+        VoucherAmount := MagentoPmtMgt.GetNetVoucherAmount(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
 
-            MagentoPaymentLine.Reset();
-            MagentoPaymentLine.SetRange("Document Table No.", Database::"Sales Header");
-            MagentoPaymentLine.SetRange("Document Type", SalesHeader."Document Type");
-            MagentoPaymentLine.SetRange("Document No.", SalesHeader."No.");
-            MagentoPaymentLine.SetFilter("Payment Type", '<>%1', MagentoPaymentLine."Payment Type"::Voucher);
-            MagentoPaymentLine.SetRange("Points Payment", false);
+        MagentoPaymentLine.Reset();
+        MagentoPaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        MagentoPaymentLine.SetRange("Document Type", SalesHeader."Document Type");
+        MagentoPaymentLine.SetRange("Document No.", SalesHeader."No.");
+        MagentoPaymentLine.SetFilter("Payment Type", '<>%1', MagentoPaymentLine."Payment Type"::Voucher);
+        MagentoPaymentLine.SetRange("Points Payment", false);
 
-            if VoucherAmount >= TotalAmtInclVat then begin
-                if MagentoPaymentLine.FindSet() then
-                    repeat
-                        AdjustPaymentLineAmount(MagentoPaymentLine, 0);
-                    until MagentoPaymentLine.Next() = 0;
-            end else begin
-                RemainingAmountNeeded := TotalAmtInclVat - VoucherAmount;
-                if MagentoPaymentLine.FindSet() then
-                    repeat
-                        if MagentoPaymentLine."Requested Amount" > 0 then begin
-                            if RemainingAmountNeeded <= 0 then
-                                AdjustPaymentLineAmount(MagentoPaymentLine, 0)
-                            else if MagentoPaymentLine."Requested Amount" <= RemainingAmountNeeded then
-                                AdjustPaymentLineAmount(MagentoPaymentLine, MagentoPaymentLine."Requested Amount")
-                            else
-                                AdjustPaymentLineAmount(MagentoPaymentLine, RemainingAmountNeeded);
-                            RemainingAmountNeeded -= MagentoPaymentLine.Amount;
-                        end;
-                    until MagentoPaymentLine.Next() = 0;
-            end;
+        if VoucherAmount >= TotalAmtInclVat then begin
+            if MagentoPaymentLine.FindSet() then
+                repeat
+                    AdjustPaymentLineAmount(MagentoPaymentLine, 0);
+                until MagentoPaymentLine.Next() = 0;
+        end else begin
+            RemainingAmountNeeded := TotalAmtInclVat - VoucherAmount;
+            if MagentoPaymentLine.FindSet() then
+                repeat
+                    if MagentoPaymentLine."Requested Amount" > 0 then begin
+                        if RemainingAmountNeeded <= 0 then
+                            AdjustPaymentLineAmount(MagentoPaymentLine, 0)
+                        else if MagentoPaymentLine."Requested Amount" <= RemainingAmountNeeded then
+                            AdjustPaymentLineAmount(MagentoPaymentLine, MagentoPaymentLine."Requested Amount")
+                        else
+                            AdjustPaymentLineAmount(MagentoPaymentLine, RemainingAmountNeeded);
+                        RemainingAmountNeeded -= MagentoPaymentLine.Amount;
+                    end;
+                until MagentoPaymentLine.Next() = 0;
         end;
     end;
 
@@ -1599,7 +1595,6 @@
         VoucherType: Record "NPR NpRv Voucher Type";
         RelatedVoucherType: Record "NPR NpRv Voucher Type";
         TempMagentoPaymentLineProccessed: Record "NPR Magento Payment Line" temporary;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         SkipLine: Boolean;
         TempOtherVoucherPaymentLineTemporaryError: Label 'The parameter TempOtherVoucherPaymentLine must be temporary. This is a programming error.';
     begin
@@ -1612,10 +1607,7 @@
 
         CurrMagentoPaymentLine.Reset();
         CurrMagentoPaymentLine.SetRange("Document Table No.", Database::"NPR Ecom Sales Header");
-        if FeatureFlagsManagement.IsEnabled('useExternalNoInEcommerceFlow') then
-            CurrMagentoPaymentLine.SetRange("Document No.", EcomSalesHeader."External No.")
-        else
-            CurrMagentoPaymentLine.SetRange("Document No.", EcomSalesHeader."External Document No.");
+        CurrMagentoPaymentLine.SetRange("Document No.", EcomSalesHeader."External No.");
         CurrMagentoPaymentLine.SetRange("Payment Type", CurrMagentoPaymentLine."Payment Type"::Voucher);
         CurrMagentoPaymentLine.SetLoadFields("Document Table No.", "Document No.", "Payment Type", "No.");
         if not CurrMagentoPaymentLine.FindSet() then

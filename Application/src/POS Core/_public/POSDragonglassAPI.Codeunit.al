@@ -86,7 +86,6 @@ codeunit 6060078 "NPR POS Dragonglass API"
         POSSaleRec: Record "NPR POS Sale";
         SaleSystemId: Guid;
         BuiltInSaleKey: Text;
-        FeatureFlag: Codeunit "NPR Feature Flags Management";
     begin
 
         if (Context.SelectToken('context.parameters.saleSystemId', JToken)) then begin
@@ -99,8 +98,7 @@ codeunit 6060078 "NPR POS Dragonglass API"
         end;
 
         BuiltInSaleKey := 'data.positions.BUILTIN_SALE';
-        if (FeatureFlag.IsEnabled('dragonglassHttpNewSaleKey')) then
-            BuiltInSaleKey := 'context.' + BuiltInSaleKey;
+        BuiltInSaleKey := 'context.' + BuiltInSaleKey;
 
         if (Context.SelectToken(BuiltInSaleKey, JToken)) then begin
             TempPOSSale.SetPosition(JToken.AsValue().AsText());

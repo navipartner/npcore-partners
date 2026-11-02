@@ -48,7 +48,6 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         EcomSalesDocApiEvents: Codeunit "NPR EcomSalesDocApiEvents";
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
-        FeatureFlag: Codeunit "NPR Feature Flags Management";
         SalesDocToJsonToken: JsonToken;
         SellToCustomerJsonToken: JsonToken;
         ShipmentJsonToken: JsonToken;
@@ -83,12 +82,6 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         EcomSalesHeader."Ticket Reservation Token" := JsonHelper.GetJText(RequestBody, 'ticketReservationToken', MaxStrLen(EcomSalesHeader."Ticket Reservation Token"), true, false).Trim();
         if EcomSalesHeader."Ticket Reservation Token" <> '' then
             EcomCreateTicketImpl.ValidateAndUpdateRequestsWithEcommerceDocNo(EcomSalesHeader);
-        if not FeatureFlag.IsEnabled(EcomCreateTicketImpl.RemoveEcomTicketHolderNameAndLanguage()) then begin
-#pragma warning disable AL0432
-            EcomSalesHeader."Ticket Holder Name" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'ticketHolder', MaxStrLen(EcomSalesHeader."Ticket Holder Name"), false);
-            EcomSalesHeader."Ticket Holder Preferred Lang" := EcomSalesDocUtils.GetJTextMaxLength(RequestBody, 'ticketHolderLanguage', MaxStrLen(EcomSalesHeader."Ticket Holder Preferred Lang"), false);
-#pragma warning restore AL0432
-        end;
         EcomSalesHeader."Language Tag" := JsonHelper.GetJText(RequestBody, 'languageTag', MaxStrLen(EcomSalesHeader."Language Tag"), true, false);
         EcomSalesDocUtils.ValidateLanguageTag(EcomSalesHeader."Language Tag");
         EcomSalesHeader."Language Code" := EcomSalesDocUtils.LanguageTagToLanguageCode(EcomSalesHeader."Language Tag");

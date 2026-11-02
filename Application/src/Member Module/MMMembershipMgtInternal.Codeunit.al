@@ -5,8 +5,6 @@
     var
         MembershipEvents: Codeunit "NPR MM Membership Events";
         _MembershipWebhooks: Codeunit "NPR MM MembershipWebhooks";
-        _FeatureFlag: Codeunit "NPR Feature Flags Management";
-        PriceCalcInterfaceTok: Label 'alterationPriceCalcInterface', Locked = true;
 
         CASE_MISSING: Label '%1 value %2 is missing its implementation.';
         TO_MANY_MEMBERS: Label 'Max number of members exceeded. The membership %1 of type %2 allows a maximum of %3 members per membership.';
@@ -2178,7 +2176,6 @@
         IPriceHandler: Interface "NPR IMemberAlterationPriceHandler";
         Item: Record Item;
         EndDateNew: Date;
-        CancelledFraction: Decimal;
         CommitmentPeriodEnforced: Boolean;
         PlaceHolderLbl: Label '%1: %2 {%3 .. %4}', Locked = true;
     begin
@@ -2257,20 +2254,8 @@
             if (not Confirm(CONFIRM_CANCEL, false, MembershipAlterationSetup.Description, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date", EndDateNew)) then
                 exit(false);
 
-        if (_FeatureFlag.IsEnabled(PriceCalcInterfaceTok)) then begin
-            IPriceHandler := MembershipAlterationSetup."Price Calculation";
-            SuggestedUnitPrice := IPriceHandler.CalculateCancelAlterationPrice(MembershipAlterationSetup, MemberInfoCapture, MembershipEntry, EndDateNew);
-        end else begin
-            CancelledFraction := 1 - CalculatePeriodStartToDateFraction(MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date", EndDateNew);
-            case MembershipAlterationSetup."Price Calculation" of
-                MembershipAlterationSetup."Price Calculation"::UNIT_PRICE:
-                    SuggestedUnitPrice := -1 * MembershipEntry."Unit Price";
-                MembershipAlterationSetup."Price Calculation"::PRICE_DIFFERENCE:
-                    SuggestedUnitPrice := Round(-CancelledFraction * MembershipEntry."Unit Price", 1);
-                MembershipAlterationSetup."Price Calculation"::TIME_DIFFERENCE:
-                    SuggestedUnitPrice := 0;
-            end;
-        end;
+        IPriceHandler := MembershipAlterationSetup."Price Calculation";
+        SuggestedUnitPrice := IPriceHandler.CalculateCancelAlterationPrice(MembershipAlterationSetup, MemberInfoCapture, MembershipEntry, EndDateNew);
 
         ReasonText := StrSubstNo(PlaceHolderLbl, MemberInfoCapture."Information Context", MembershipEntry.Context, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date");
 
@@ -2460,21 +2445,8 @@
         if (not CheckAgeConstraintOnMembershipAlter(Membership, MembershipAlterationSetup, MemberInfoCapture."Document Date", StartDateNew, EndDateNew, ReasonText)) then
             exit(ExitFalseOrWithError(WithConfirm, GetAlterAgeConstraintErrorText(MemberInfoCapture, MembershipAlterationSetup, ReasonText)));
 
-        if (_FeatureFlag.IsEnabled(PriceCalcInterfaceTok)) then begin
-            IPriceHandler := MembershipAlterationSetup."Price Calculation";
-            SuggestedUnitPrice := IPriceHandler.CalculateRenewAlterationPrice(MembershipAlterationSetup, MemberInfoCapture, MembershipEntry);
-        end else begin
-            case MembershipAlterationSetup."Price Calculation" of
-                MembershipAlterationSetup."Price Calculation"::UNIT_PRICE:
-                    SuggestedUnitPrice := Item."Unit Price";
-                MembershipAlterationSetup."Price Calculation"::PRICE_DIFFERENCE:
-                    SuggestedUnitPrice := Item."Unit Price";
-                MembershipAlterationSetup."Price Calculation"::TIME_DIFFERENCE:
-                    SuggestedUnitPrice := Item."Unit Price";
-            end;
-
-            SuggestedUnitPrice += MembershipAlterationSetup."Member Unit Price" * GetMembershipMemberCountForAlteration(Membership."Entry No.", MembershipAlterationSetup);
-        end;
+        IPriceHandler := MembershipAlterationSetup."Price Calculation";
+        SuggestedUnitPrice := IPriceHandler.CalculateRenewAlterationPrice(MembershipAlterationSetup, MemberInfoCapture, MembershipEntry);
 
         if (not CheckExtendMemberCards(false, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", ReasonText)) then
             exit(ExitFalseOrWithError(WithConfirm, ReasonText));
@@ -2578,8 +2550,6 @@
         EndDateNew: Date;
         EndDateCurrent: Date;
         EntryNo: Integer;
-        CancelledFraction: Decimal;
-        NewFraction: Decimal;
         StartDateLedgerEntryNo: Integer;
         EndDateLedgerEntryNo: Integer;
         PlaceHolderLbl: Label '%1: %4 -> %5 {%2 .. %3}', Locked = true;
@@ -2666,25 +2636,8 @@
         if (not CheckAgeConstraintOnMembershipAlter(Membership, MembershipAlterationSetup, MemberInfoCapture."Document Date", StartDateNew, EndDateNew, ReasonText)) then
             exit(ExitFalseOrWithError(WithConfirm, GetAlterAgeConstraintErrorText(MemberInfoCapture, MembershipAlterationSetup, ReasonText)));
 
-        if (_FeatureFlag.IsEnabled(PriceCalcInterfaceTok)) then begin
-            IPriceHandler := MembershipAlterationSetup."Price Calculation";
-            SuggestedUnitPrice := IPriceHandler.CalculateExtendAlterationPrice(MembershipAlterationSetup, MemberInfoCapture, MembershipEntry, StartDateNew, EndDateNew);
-        end else begin
-            CancelledFraction := 1 - CalculatePeriodStartToDateFraction(MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date", StartDateNew);
-            NewFraction := 1 - CalculatePeriodStartToDateFraction(StartDateNew, EndDateNew, MembershipEntry."Valid Until Date");
-            case MembershipAlterationSetup."Price Calculation" of
-                MembershipAlterationSetup."Price Calculation"::UNIT_PRICE:
-                    SuggestedUnitPrice := Item."Unit Price";
-
-                MembershipAlterationSetup."Price Calculation"::PRICE_DIFFERENCE:
-                    SuggestedUnitPrice := Round(-CancelledFraction * MembershipEntry."Unit Price (Base)" + Item."Unit Price", 0.01);
-
-                MembershipAlterationSetup."Price Calculation"::TIME_DIFFERENCE:
-                    SuggestedUnitPrice := Round(NewFraction * Item."Unit Price", 0.01);
-            end;
-
-            SuggestedUnitPrice += MembershipAlterationSetup."Member Unit Price" * GetMembershipMemberCountForAlteration(Membership."Entry No.", MembershipAlterationSetup);
-        end;
+        IPriceHandler := MembershipAlterationSetup."Price Calculation";
+        SuggestedUnitPrice := IPriceHandler.CalculateExtendAlterationPrice(MembershipAlterationSetup, MemberInfoCapture, MembershipEntry, StartDateNew, EndDateNew);
 
         if (not CheckExtendMemberCards(false, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", ReasonText)) then
             exit(ExitFalseOrWithError(WithConfirm, ReasonText));
@@ -2869,24 +2822,8 @@
         if (not CheckAgeConstraintOnMembershipAlter(Membership, MembershipAlterationSetup, MemberInfoCapture."Document Date", StartDateNew, EndDateNew, ReasonText)) then
             exit(ExitFalseOrWithError(WithConfirm, GetAlterAgeConstraintErrorText(MemberInfoCapture, MembershipAlterationSetup, ReasonText)));
 
-        if (_FeatureFlag.IsEnabled(PriceCalcInterfaceTok)) then begin
-            IPriceHandler := MembershipAlterationSetup."Price Calculation";
-            SuggestedUnitPrice := IPriceHandler.CalculateUpgradeAlterationPrice(MembershipAlterationSetup, MemberInfoCapture, MembershipEntry, ValidFromDate, StartDateNew, EndDateNew);
-        end else begin
-            RemainingFraction := 1 - CalculatePeriodStartToDateFraction(ValidFromDate, EndDateNew, StartDateNew);
-            case MembershipAlterationSetup."Price Calculation" of
-                MembershipAlterationSetup."Price Calculation"::UNIT_PRICE:
-                    SuggestedUnitPrice := Item."Unit Price";
-
-                MembershipAlterationSetup."Price Calculation"::PRICE_DIFFERENCE:
-                    SuggestedUnitPrice := -RemainingFraction * MembershipEntry."Unit Price (Base)" + RemainingFraction * Item."Unit Price";
-
-                MembershipAlterationSetup."Price Calculation"::TIME_DIFFERENCE:
-                    SuggestedUnitPrice := RemainingFraction * Item."Unit Price";
-            end;
-
-            SuggestedUnitPrice += MembershipAlterationSetup."Member Unit Price" * GetMembershipMemberCountForAlteration(Membership."Entry No.", MembershipAlterationSetup);
-        end;
+        IPriceHandler := MembershipAlterationSetup."Price Calculation";
+        SuggestedUnitPrice := IPriceHandler.CalculateUpgradeAlterationPrice(MembershipAlterationSetup, MemberInfoCapture, MembershipEntry, ValidFromDate, StartDateNew, EndDateNew);
 
         if (not CheckExtendMemberCards(false, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", ReasonText)) then
             exit(ExitFalseOrWithError(WithConfirm, ReasonText));
@@ -3280,18 +3217,10 @@
 
     internal procedure CalculateAutoRenewPrice(MembershipEntryNo: Integer; MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; MemberInfoCapture: Record "NPR MM Member Info Capture"; MembershipEntry: Record "NPR MM Membership Entry") SuggestedUnitPrice: Decimal
     var
-        Item: Record Item;
         IPriceHandler: Interface "NPR IMemberAlterationPriceHandler";
     begin
-        if (_FeatureFlag.IsEnabled(PriceCalcInterfaceTok)) then begin
-            IPriceHandler := MembershipAlterationSetup."Price Calculation";
-            SuggestedUnitPrice := IPriceHandler.CalculateAutoRenewAlterationPrice(MembershipAlterationSetup, MemberInfoCapture, MembershipEntry);
-        end else begin
-            Item.SetLoadFields("Unit Price");
-            Item.Get(MemberInfoCapture."Item No.");
-            SuggestedUnitPrice := Item."Unit Price";
-            SuggestedUnitPrice += MembershipAlterationSetup."Member Unit Price" * GetMembershipMemberCountForAlteration(MembershipEntryNo, MembershipAlterationSetup);
-        end;
+        IPriceHandler := MembershipAlterationSetup."Price Calculation";
+        SuggestedUnitPrice := IPriceHandler.CalculateAutoRenewAlterationPrice(MembershipAlterationSetup, MemberInfoCapture, MembershipEntry);
     end;
 
     internal procedure CarryOutMembershipRenewal(var MemberInfoCapture: Record "NPR MM Member Info Capture"; MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; StartDateNew: Date; EndDateNew: Date; var EntryNo: Integer; var ReasonText: Text): Boolean

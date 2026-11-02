@@ -776,9 +776,4 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         PmtBinCheckpoint.SetFilter("Bank Deposit Amount", '<>%1', 0);
         exit(not PmtBinCheckpoint.IsEmpty());
     end;
-
-    procedure NewBinTransferFeatureFlag(): Text[50]
-    begin
-        exit('binTransferDragonglassDialog_v2');
-    end;
 }

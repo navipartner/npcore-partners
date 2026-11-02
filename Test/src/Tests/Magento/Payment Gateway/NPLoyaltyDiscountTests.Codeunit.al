@@ -720,28 +720,11 @@ codeunit 85237 "NPR NPLoyaltyDiscountTests"
 
     procedure Initialize()
     begin
-        EnableNewVoucherCalculationOnSalesOrderRelease();
         if not Initialized then begin
             PrepareDataForJson();
             CreateSetupData();
             Initialized := true;
         end;
-    end;
-
-    local procedure EnableNewVoucherCalculationOnSalesOrderRelease()
-    var
-        FeatureFlag: Record "NPR Feature Flag";
-        NewVoucherCalculationFeatureFlagToken: Label 'newvouchercalculationonsalesorderreleasedoc', Locked = true;
-    begin
-        if not FeatureFlag.Get(NewVoucherCalculationFeatureFlagToken) then begin
-            FeatureFlag.Name := NewVoucherCalculationFeatureFlagToken;
-            FeatureFlag.Value := Format(true);
-            FeatureFlag.Insert();
-            exit;
-        end;
-
-        FeatureFlag.Value := Format(true);
-        FeatureFlag.Modify();
     end;
 
     local procedure CreateSetupData()

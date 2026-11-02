@@ -185,7 +185,6 @@
         AttributeNo: Integer;
         FieldLength: Integer;
         MappedColumnNo: Integer;
-        FeatureFlag: Codeunit "NPR Feature Flags Public Acc.";
     begin
         Window.Open(
          AnalyzingDataLbl +
@@ -229,10 +228,7 @@
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Item Category Code"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
 # pragma warning disable AA0139
-                                if (FeatureFlag.IsEnabled('itemWkshtExcelImportValidateItemCategoryCode_v2')) then
-                                    ItemWorksheetLine.Validate("Item Category Code", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength))
-                                else
-                                    ItemWorksheetLine."Item Category Code" := CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength);
+                                ItemWorksheetLine.Validate("Item Category Code", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
 # pragma warning restore AA0139
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Vendor No."), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then

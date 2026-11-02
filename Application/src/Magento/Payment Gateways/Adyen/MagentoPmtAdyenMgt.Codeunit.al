@@ -18,7 +18,6 @@
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         PaymentLine: Record "NPR Magento Payment Line";
         AdyenSetup: Record "NPR PG Adyen Setup";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         AdyenAsyncPayProcesFeature: Codeunit "NPR AdyenAsyncPmtProcesFeature";
         HttpWebRequest: HttpRequestMessage;
         JsonO: JsonObject;
@@ -57,10 +56,7 @@
                 begin
                     EcomSalesHeader.GetBySystemId(Request."Document System Id");
                     CurrencyCode := EcomSalesHeader."Currency Code";
-                    if FeatureFlagsManagement.IsEnabled('useExternalNoInEcommerceFlow') then
-                        Reference := EcomSalesHeader."External No."
-                    else
-                        Reference := EcomSalesHeader."External Document No.";
+                    Reference := EcomSalesHeader."External No.";
                 end;
             else
                 Error(WrongTableSuppliedErr, Request."Document Table No.", StrSubstNo('%1, %2', Database::"Sales Header", Database::"Sales Invoice Header"));

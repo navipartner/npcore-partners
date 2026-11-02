@@ -1593,7 +1593,6 @@
         MembershipSetup: Record "NPR MM Membership Setup";
         MembershipEntry: Record "NPR MM Membership Entry";
         ValidUntilBaseDate: Date;
-        FeatureFlag: Codeunit "NPR Feature Flags Management";
     begin
 
         _PreSelectedCustomerContact := ((Rec."Contact No." <> '') or (Rec."Customer No." <> '')) and not Rec."Originates From File Import";
@@ -1669,10 +1668,7 @@
                                 _ShowAzureSection := true;
                             end;
 
-                            if (FeatureFlag.IsEnabled('memberCardFieldNonEditable')) then
-                                _ExternalCardNumberEditable := (Rec."External Card No." = '')
-                            else
-                                _ExternalCardNumberEditable := true;
+                            _ExternalCardNumberEditable := (Rec."External Card No." = '');
                         end;
                     MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER:
                         _ShowAddToMembershipSection := true;

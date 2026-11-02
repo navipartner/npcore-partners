@@ -179,11 +179,8 @@
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EcomSalesDocApiEvents", OnAfterReserveVoucher, '', false, false)]
     local procedure "NPR EcomSalesDocApiEvents_OnAfterReserveVoucher"(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; var VoucherSalesLine: Record "NPR NpRv Sales Line")
-    var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        if FeatureFlagsManagement.IsEnabled('blockNonpartialVouchersAsEcommercePayment') then
-            EcomSalesDocUtils.CheckPartialVoucherAllowed(EcomSalesPmtLine, VoucherSalesLine, ModuleCode());
+        EcomSalesDocUtils.CheckPartialVoucherAllowed(EcomSalesPmtLine, VoucherSalesLine, ModuleCode());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Entria Integration Events", OnAfterReserveEntriaVoucher, '', false, false)]

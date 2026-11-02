@@ -81,10 +81,6 @@
         CONFIRM_EXCEED_CAPACITY: Label 'Capacity for %1 will be exceeded. Do you want to continue?';
         _TicketExecutionContext: Option SALES,ADMISSION;
 
-#if not (BC17 or BC18 or BC19 or BC20 or BC21)
-        _FeatureFlagManagement: Codeunit "NPR Feature Flags Management";
-#endif
-
     /**
     * Finalize ticket from end of sale
     **/
@@ -1847,7 +1843,6 @@
                                                                                       ScannerStationId: Code[10];
                                                                                       WithPrint: Boolean)
     var
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Ticket: Record "NPR TM Ticket";
         AdmissionScannerStation: Record "NPR MM Admis. Scanner Stations";
         TimeHelper: Codeunit "NPR TM TimeHelper";
@@ -1856,12 +1851,6 @@
 
         if (not GetTicket(TicketIdentifierType, TicketNumber, Ticket)) then
             RaiseError(StrSubstNo(INVALID_REFERENCE, REFERENCE, TicketNumber), INVALID_REFERENCE_NO);
-#if not (BC17 or BC18 or BC19 or BC20 or BC21)
-        if (not (_FeatureFlagManagement.IsEnabled('enableTriStateLockingFeaturesInTicketModule'))) then
-            TicketRequestManager.LockResources('RegisterArrival');
-#else
-        TicketRequestManager.LockResources('RegisterArrival');
-#endif
 
         Ticket.SetRecFilter();
 

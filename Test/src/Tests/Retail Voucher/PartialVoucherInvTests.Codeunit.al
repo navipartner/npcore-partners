@@ -32,8 +32,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] The first partial invoice of an order paid by a PARTIAL voucher and a card is paid by the voucher first, redeems only the invoice amount and keeps the rest of the voucher payment reserved.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] An order of 400.98 + 399.96, paid 0.94 by card and 800 by a PARTIAL voucher holding 1000
         CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code, 1000, 0.94, 400.98, 399.96, 0);
         // [GIVEN] Only the first line is shipped and invoiced
@@ -72,8 +70,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] The last partial invoice redeems what is left of the voucher payment and takes the card payment, and the voucher has been redeemed by exactly what the order used.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] An order of 400.98 + 399.96, paid 0.94 by card and 800 by a PARTIAL voucher holding 1000
         CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code, 1000, 0.94, 400.98, 399.96, 0);
         OrderNo := SalesHeader."No.";
@@ -117,8 +113,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] With two vouchers on the order, a partial invoice uses up the first voucher, takes the rest from the second and keeps the second's remainder reserved.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] An order of 400.98 + 399.96, paid 300.94 by card, 300 by a PARTIAL voucher holding 300 and 200 by a SHOPIFY gift card holding 200
         CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code, 300, 300.94, 400.98, 399.96, 0);
         CreateVoucher(SecondVoucher, _VoucherTypeShopify.Code, 200);
@@ -153,8 +147,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] When the first voucher covers a partial invoice on its own, the second voucher is not redeemed on it and stays fully reserved for the order.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] An order of 400.98 + 399.96, paid 0.94 by card, 500 by a PARTIAL voucher holding 500 and 300 by a SHOPIFY gift card holding 300
         CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code, 500, 0.94, 400.98, 399.96, 0);
         CreateVoucher(SecondVoucher, _VoucherTypeShopify.Code, 300);
@@ -192,8 +184,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] A voucher payment cut to the order total after a line was removed is not raised back to its original request on a later invoice, so the balance it freed can be spent elsewhere meanwhile.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] An order of 400 + 400 + 100, paid 900 by a PARTIAL voucher holding 900
         CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code, 900, 0, 400, 400, 100);
         OrderNo := SalesHeader."No.";
@@ -228,8 +218,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] When releasing the order cuts a voucher payment to 0 because other vouchers cover the order, that voucher is no longer reserved for it.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] An order of 400 + 400 + 300, paid 800 by a PARTIAL voucher and 300 by a SHOPIFY gift card
         CreateOrderPaidByTwoVouchers(SalesHeader, Voucher, SecondVoucher);
         // [GIVEN] The 300 line is removed, so the first voucher covers the order on its own
@@ -257,8 +245,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] A voucher that pays nothing on the order can be used up and archived elsewhere without stopping the order's next invoice.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] An order of 400 + 400 + 300, paid 800 by a PARTIAL voucher and 300 by a SHOPIFY gift card
         CreateOrderPaidByTwoVouchers(SalesHeader, Voucher, SecondVoucher);
         // [GIVEN] The 300 line is removed and the order released, so the gift card pays nothing
@@ -290,8 +276,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] An order whose gift card the ecommerce capture already redeemed and archived can still be invoiced in parts: the captured voucher line is split like a card payment and not redeemed again.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] An order of 400 + 400, paid 400 by card and 400 by a PARTIAL voucher holding 400
         CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code, 400, 400, 400, 400, 0);
         // [GIVEN] The ecommerce capture redeemed the whole voucher, which archived it
@@ -324,8 +308,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] On a later partial invoice the release-time rebalance gives the card only what is left to invoice after the vouchers, not what the whole order total would leave it.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] An order of 400 + 300 + 100, paid 500 by a PARTIAL voucher and 400 by card, released and with the 400 line invoiced, so the voucher keeps 100 and the card 300 of its 400 requested
         CreateOrderWithFirstLineInvoicedByVoucher(SalesHeader, Voucher);
         // [GIVEN] The 300 line is shipped and invoiced next
@@ -351,8 +333,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] After a partial invoice, payments that exceed what is left to invoice stop posting, the same way payments above the order total do before the first invoice.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] An order of 400 + 300 + 100, paid 500 by a PARTIAL voucher and 400 by card, released and with the 400 line invoiced, so the voucher keeps 100 and the card 300
         CreateOrderWithFirstLineInvoicedByVoucher(SalesHeader, Voucher);
         // [GIVEN] The order is reopened and its 100 line removed, so 300 is left to invoice against 400 of payments
@@ -379,8 +359,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] A gift card the ecommerce capture redeemed for more than is left on the order stops posting, rather than the excess being left behind on the order.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] An order of 300 + 100, paid 400 by a PARTIAL voucher holding 400
         CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code, 400, 0, 300, 100, 0);
         // [GIVEN] The ecommerce capture redeemed the whole voucher, which archived it
@@ -415,8 +393,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] A corrective credit memo for a partial invoice paid partly by the voucher and partly by card refunds the card share and gives exactly the voucher share back to the voucher.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] Credit memos copied from an invoice are posted as corrections
         GLSetup.Get();
         MarkCrMemosAsCorrections := GLSetup."Mark Cr. Memos as Corrections";
@@ -467,8 +443,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] A voucher type with the SHOPIFY apply payment module is split over partial invoices like a PARTIAL one.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] An order of 400.98 + 399.96, paid 0.94 by card and 800 by a SHOPIFY gift card holding 800
         CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypeShopify.Code, 800, 0.94, 400.98, 399.96, 0);
         // [GIVEN] Only the first line is shipped and invoiced
@@ -496,8 +470,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] A voucher type whose apply payment module is declared partial through OnSupportsPartialPayment is split over partial invoices like a PARTIAL one.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] A custom apply payment module that declares partial payment support through OnSupportsPartialPayment
         BindSubscription(CustomPaymentModule);
         // [GIVEN] An order of 400.98 + 399.96, paid 0.94 by card and 800 by a voucher of that module
@@ -516,34 +488,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure PartialInvoiceWithNewVoucherCalculationOff()
-    var
-        SalesHeader: Record "Sales Header";
-        Voucher: Record "NPR NpRv Voucher";
-        InvoiceNo: Code[20];
-    begin
-        // [SCENARIO] With the new voucher calculation off, a partial invoice still redeems only its share of the PARTIAL voucher.
-        Initialize();
-
-        // [GIVEN] The new voucher calculation on release is off
-        SetNewVoucherCalculation(false);
-        // [GIVEN] An order of 400.98 + 399.96, paid 0.94 by card and 800 by a PARTIAL voucher holding 1000
-        CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code, 1000, 0.94, 400.98, 399.96, 0);
-        // [GIVEN] Only the first line is shipped and invoiced
-        SetLinesToPost(SalesHeader, 1);
-
-        // [WHEN] The order is posted
-        InvoiceNo := _LibrarySales.PostSalesDocument(SalesHeader, true, true);
-
-        // [THEN] The voucher is redeemed by the invoice amount and the rest stays reserved
-        _Assert.AreEqual(-400.98, VoucherPaymentEntryAmount(Voucher."No.", InvoiceNo), 'The voucher must be redeemed by the invoice share only.');
-        Voucher.CalcFields("Reserved Amount");
-        _Assert.AreEqual(399.02, Voucher."Reserved Amount", 'The remainder must stay reserved on the voucher.');
-        _Assert.AreEqual(0, CustomerBalance(SalesHeader."Bill-to Customer No."), 'The invoice must be fully paid by its share of the payments.');
-    end;
-
-    [Test]
-    [TestPermissions(TestPermissions::Disabled)]
     procedure ForeignCurrencyPartialInvoiceLeavesTheRoundingToTheLastInvoice()
     var
         SalesHeader: Record "Sales Header";
@@ -555,8 +499,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] In a foreign currency order, a partial invoice that leaves a few cents of the voucher payment on the order redeems only its own share, so the last invoice can still redeem the rest.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] An order in a foreign currency at an exchange rate of 1, of 99.99 + 0.01, paid 100 by a PARTIAL voucher holding 100
         CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code, 100, 0, 99.99, 0.01, 0, CreateForeignCurrency());
         OrderNo := SalesHeader."No.";
@@ -587,8 +529,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] Once the first invoice used up the voucher, a later partial invoice is paid by the card alone and is not blocked by the spent voucher line.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] An order of 400.98 + 200 + 199.96, paid 500.94 by card and 300 by a PARTIAL voucher holding 300
         CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code, 300, 500.94, 400.98, 200, 199.96);
         OrderNo := SalesHeader."No.";
@@ -619,8 +559,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] An order paid by a PARTIAL voucher and a card that is invoiced in one go still carries both payments in full on the one invoice.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] An order of 400.98 + 399.96, paid 0.94 by card and 800 by a PARTIAL voucher holding 1000
         CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code, 1000, 0.94, 400.98, 399.96, 0);
 
@@ -648,8 +586,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] A voucher type with the DEFAULT apply payment module, which issues a return voucher for what is left, still blocks partial invoicing.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] An order of 400.98 + 399.96, paid 0.94 by card and 800 by a DEFAULT voucher holding 800
         CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypeDefault.Code, 800, 0.94, 400.98, 399.96, 0);
         // [GIVEN] Only the first line is shipped and invoiced
@@ -679,8 +615,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] A credit memo for the first partial invoice refunds only that invoice's share of the voucher payment, while the rest of the order's voucher payment stays reserved.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] Credit memos copied from an invoice are not posted as corrections, so the refund is issued as a return voucher
         GLSetup.Get();
         GLSetup."Mark Cr. Memos as Corrections" := false;
@@ -729,8 +663,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] A corrective credit memo for the first partial invoice gives exactly that invoice's share back to the original voucher, while the rest of the order's voucher payment stays reserved.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] Credit memos copied from an invoice are posted as corrections
         GLSetup.Get();
         MarkCrMemosAsCorrections := GLSetup."Mark Cr. Memos as Corrections";
@@ -774,8 +706,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] When releasing a foreign currency order cuts a PARTIAL voucher payment, its store currency amount and the voucher's reservation are cut in the same proportion.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] A foreign currency order of 50 + 30 + 20, paid 100 by a PARTIAL voucher whose payment line holds 746.00 in the local store currency
         CreateForeignCurrencyOrderPaidByVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code);
         // [GIVEN] The 20 line is removed, so the voucher only has 80 left to pay
@@ -803,8 +733,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] A partial invoice of a foreign currency order whose voucher payment was cut on release redeems the invoice's share of the cut store currency amount.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] A foreign currency order of 50 + 30 + 20, paid 100 by a PARTIAL voucher whose payment line holds 746.00 in the local store currency
         CreateForeignCurrencyOrderPaidByVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code);
         // [GIVEN] The 20 line is removed and the order released, which cuts the voucher payment to 80
@@ -826,31 +754,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure PartialVoucherCutWithNewVoucherCalculationOffKeepsItsStoreCurrencyAmountInStep()
-    var
-        SalesHeader: Record "Sales Header";
-        Voucher: Record "NPR NpRv Voucher";
-    begin
-        // [SCENARIO] With the new voucher calculation off, the PARTIAL module's cut of a foreign currency voucher payment also cuts its store currency amount in the same proportion.
-        Initialize();
-
-        // [GIVEN] The new voucher calculation on release is off
-        SetNewVoucherCalculation(false);
-        // [GIVEN] A foreign currency order of 50 + 30 + 20, paid 100 by a PARTIAL voucher whose payment line holds 746.00 in the local store currency
-        CreateForeignCurrencyOrderPaidByVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code);
-        // [GIVEN] The 20 line is removed, so the voucher only has 80 left to pay
-        DeleteLastItemLine(SalesHeader);
-
-        // [WHEN] The order is released
-        _LibrarySales.ReleaseSalesDocument(SalesHeader);
-
-        // [THEN] The voucher payment is cut to 80 and its store currency amount to 596.80
-        _Assert.AreEqual(80, OrderPaymentAmount(SalesHeader, "NPR Magento Payment Type"::Voucher), 'The voucher payment must be cut by what the order no longer needs.');
-        _Assert.AreEqual(596.80, OrderStoreCurrencyAmount(SalesHeader, "NPR Magento Payment Type"::Voucher), 'The store currency amount must be cut with the payment.');
-    end;
-
-    [Test]
-    [TestPermissions(TestPermissions::Disabled)]
     procedure DefaultVoucherSetToItsAvailableAmountTakesItInStoreCurrency()
     var
         SalesHeader: Record "Sales Header";
@@ -859,8 +762,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] When releasing a foreign currency order raises a DEFAULT voucher payment to the voucher's whole available amount, the store currency amount becomes exactly that available amount.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] A foreign currency order of 50 + 30 + 20, paid 100 by a DEFAULT voucher holding 100, whose payment line holds 746.00 in the local store currency
         CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypeDefault.Code, 100, 0, 50, 30, 20, CreateForeignCurrency());
         SetStoreCurrencyRate(SalesHeader, "NPR Magento Payment Type"::Voucher, 7.46);
@@ -885,8 +786,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] A DEFAULT voucher payment that releasing a foreign currency order raised to the voucher's whole available amount is posted and redeemed for exactly that amount.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] A foreign currency order of 50 + 30 + 20, paid 100 by a DEFAULT voucher holding 100, whose payment line holds 746.00 in the local store currency
         CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypeDefault.Code, 100, 0, 50, 30, 20, CreateForeignCurrency());
         SetStoreCurrencyRate(SalesHeader, "NPR Magento Payment Type"::Voucher, 7.46);
@@ -918,8 +817,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] A credit memo for a foreign currency invoice paid by a voucher whose payment line holds a local store currency amount issues that amount as a return voucher.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] Credit memos copied from an invoice are not posted as corrections, so the refund is issued as a return voucher
         GLSetup.Get();
         GLSetup."Mark Cr. Memos as Corrections" := false;
@@ -965,8 +862,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] A credit memo for a foreign currency invoice paid by two vouchers of the same type, whose refunds are merged into one return voucher, returns the sum of both store currency amounts.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] Credit memos copied from an invoice are not posted as corrections, so the refund is issued as a return voucher
         GLSetup.Get();
         GLSetup."Mark Cr. Memos as Corrections" := false;
@@ -1009,8 +904,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         // [SCENARIO] When posting raises a card payment that allows its amount to be adjusted up to the order total, its store currency amount is raised in the same proportion.
         Initialize();
 
-        // [GIVEN] The new voucher calculation on release is on, as in production
-        SetNewVoucherCalculation(true);
         // [GIVEN] A foreign currency order of 120, paid 80 by a card that allows adjusting its amount and holds 596.80 in the local store currency, and 20 by a PARTIAL voucher
         CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code, 20, 80, 120, 0, 0, CreateForeignCurrency());
         SetStoreCurrencyRate(SalesHeader, "NPR Magento Payment Type"::"Payment Method", 7.46);
@@ -1182,21 +1075,6 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         _VoucherTypeCustom."Apply Payment Module" := CustomPaymentModule.ModuleCode();
         if not _VoucherTypeCustom.Insert() then
             _VoucherTypeCustom.Modify();
-    end;
-
-    local procedure SetNewVoucherCalculation(Enabled: Boolean)
-    var
-        FeatureFlag: Record "NPR Feature Flag";
-        NewVoucherCalculationFeatureFlagTok: Label 'newvouchercalculationonsalesorderreleasedoc', Locked = true;
-    begin
-        if not FeatureFlag.Get(NewVoucherCalculationFeatureFlagTok) then begin
-            FeatureFlag.Name := NewVoucherCalculationFeatureFlagTok;
-            FeatureFlag.Value := Format(Enabled);
-            FeatureFlag.Insert();
-            exit;
-        end;
-        FeatureFlag.Value := Format(Enabled);
-        FeatureFlag.Modify();
     end;
 
     /// <summary>

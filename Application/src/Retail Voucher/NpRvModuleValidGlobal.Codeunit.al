@@ -569,9 +569,8 @@
         Voucher."Phone No." := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'pohone_no', MaxStrLen(Voucher."Phone No."), false);
         Voucher."Voucher Message" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'voucher_message', MaxStrLen(Voucher."Voucher Message"), false);
         if Evaluate(Voucher."Issue Date", NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_date', 0, false), 9) then;
-        if NpRvVoucherMgt.AllowTopupFromMasterFeatureEnabled() then
-            if AllowTopupInXML(Node) then
-                Voucher."Allow Top-up" := NpXmlDomMgt.GetElementBoolean(Node.AsXmlElement(), 'allow_topup', false);
+        if AllowTopupInXML(Node) then
+            Voucher."Allow Top-up" := NpXmlDomMgt.GetElementBoolean(Node.AsXmlElement(), 'allow_topup', false);
 #pragma warning restore
         Voucher.Modify(true);
         Commit();
@@ -1160,8 +1159,7 @@
         if NpRvVoucherType."Validate Voucher Module" <> ModuleCode() then
             exit;
         if FindVoucherAmount(NpRvVoucher."Reference No.", NpRvVoucherType, VoucherAmount, Node) then begin
-            if NpRvVoucherMgt.AllowTopupFromMasterFeatureEnabled() then
-                UpdateAllowTopup(NpRvVoucher."Reference No.", NpRvVoucherType, Node);
+            UpdateAllowTopup(NpRvVoucher."Reference No.", NpRvVoucherType, Node);
             if NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then
                 UpdateReservationEntries(Node.AsXmlElement(), NpRvVoucher);
             NpRvVoucher.CalcFields(Amount);

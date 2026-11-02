@@ -55,20 +55,15 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
 
     local procedure PrepareWorkflow(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; Setup: Codeunit "NPR POS Setup") Response: JsonObject
     var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         BinNo: Code[10];
         PosUnitNo: Code[10];
         TransferDirection: Option "",TransferOut,TransferIn;
-        LegacyAction: Boolean;
     begin
         SelectPosUnitBin(Context, Setup, PosUnitNo, BinNo);
         Context.SetContext('PosUnitNo', PosUnitNo);
         Context.SetContext('PosUnitBinNo', BinNo);
 
-        LegacyAction := not FeatureFlagsManagement.IsEnabled(POSActionBinTransferB.NewBinTransferFeatureFlag());
-        Response.Add('legacyAction', LegacyAction);
-        if LegacyAction then
-            exit;
+        Response.Add('legacyAction', false);
         TransferDirection := Context.GetIntegerParameter(TransferDirectionParamName);
         Response.Add('binTransferContextData', POSActionBinTransferB.GetBinTransferContextData(PosUnitNo, BinNo, TransferDirection));
         Response.Add('postWorkflows', AddPostWorkflowsToRun(Context, Sale));

@@ -540,15 +540,10 @@
     internal procedure InitialEntryExists(Voucher: Record "NPR NpRv Voucher"): Boolean
     var
         VoucherEntry: Record "NPR NpRv Voucher Entry";
-        FeatureFlags: Codeunit "NPR Feature Flags Management";
-        NewVoucherFilterInitialEntryExistTok: Label 'newVoucherFilterInitialEntryExist', Locked = true;
     begin
         VoucherEntry.SetCurrentKey("Voucher No.", "Entry Type", "Partner Code");
         VoucherEntry.SetRange("Voucher No.", Voucher."No.");
-        if FeatureFlags.IsEnabled(NewVoucherFilterInitialEntryExistTok) then
-            VoucherEntry.SetFilter("Entry Type", '%1|%2', VoucherEntry."Entry Type"::"Issue Voucher", VoucherEntry."Entry Type"::"Partner Issue Voucher")
-        else
-            VoucherEntry.SetRange("Entry Type", VoucherEntry."Entry Type"::"Issue Voucher");
+        VoucherEntry.SetFilter("Entry Type", '%1|%2', VoucherEntry."Entry Type"::"Issue Voucher", VoucherEntry."Entry Type"::"Partner Issue Voucher");
         exit(not VoucherEntry.IsEmpty());
     end;
 
@@ -2469,13 +2464,6 @@
         NewVoucherReservation: Codeunit "NPR New Voucher Reservation";
     begin
         exit(NewVoucherReservation.IsFeatureEnabled());
-    end;
-
-    internal procedure AllowTopupFromMasterFeatureEnabled(): Boolean
-    var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
-    begin
-        exit(FeatureFlagsManagement.IsEnabled('allowTopupFromMaster'));
     end;
 
     [IntegrationEvent(false, false)]

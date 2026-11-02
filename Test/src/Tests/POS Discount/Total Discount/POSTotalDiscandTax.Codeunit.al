@@ -20,7 +20,6 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
         TaxGroup: Record "Tax Group";
         VATBusinessPostingGroup: Record "VAT Business Posting Group";
         Assert: Codeunit Assert;
-        LibraryFeatureFlags: Codeunit "NPR Library - Feature Flags";
         LibraryTaxCalc: Codeunit "NPR POS Lib. - Tax Calc.";
         POSSession: Codeunit "NPR POS Session";
 
@@ -6180,7 +6179,6 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
         DiscountFilterLbl: Label '%1|%2', Locked = true, Comment = '%1 - discount table id, %2 - discount table id';
         MixDiscountCode: Code[20];
-        PreviousFeatureFlagValue: Boolean;
     begin
         // [SCENARIO CORE-1843] A total discount applied on top of a free mix discount line with a 3 decimal price keeps that line at exactly 100% and zero amounts
 
@@ -6188,7 +6186,6 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
         InitializeData();
         LibraryApplicationArea.EnableVATSetup();
         LibraryPOSDiscount.AllowThreeDecimalUnitPrices();
-        PreviousFeatureFlagValue := LibraryFeatureFlags.EnableFeatureFlag('fullyDiscountedPOSLineNetsToZero');
 
         // [GIVEN] No Discounts
         DeleteDiscounts();
@@ -6228,8 +6225,6 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         POSSalesDiscountCalcMgt.OnAfterTotalPressedPOS(SaleLinePOS);
-
-        LibraryFeatureFlags.SetFeatureFlag('fullyDiscountedPOSLineNetsToZero', PreviousFeatureFlagValue);
 
         // [THEN] The free line carries the total discount and still has exactly 100% discount and zero amounts
         SaleLinePOS.Reset();
@@ -6280,7 +6275,6 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
         SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         DiscountFilterLbl: Label '%1|%2', Locked = true, Comment = '%1 - discount table id, %2 - discount table id';
         MixDiscountCode: Code[20];
-        PreviousFeatureFlagValue: Boolean;
     begin
         // [SCENARIO CORE-1843] A total discount on a sale that runs excluding VAT keeps a free mix discount line at exactly 100% and zero amounts
 
@@ -6288,7 +6282,6 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
         InitializeData();
         LibraryApplicationArea.EnableVATSetup();
         LibraryPOSDiscount.AllowThreeDecimalUnitPrices();
-        PreviousFeatureFlagValue := LibraryFeatureFlags.EnableFeatureFlag('fullyDiscountedPOSLineNetsToZero');
 
         // [GIVEN] No Discounts
         DeleteDiscounts();
@@ -6334,8 +6327,6 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         POSSalesDiscountCalcMgt.OnAfterTotalPressedPOS(SaleLinePOS);
-
-        LibraryFeatureFlags.SetFeatureFlag('fullyDiscountedPOSLineNetsToZero', PreviousFeatureFlagValue);
 
         // [THEN] The free line still has exactly 100% discount and zero amounts
         SaleLinePOS.Reset();
@@ -6385,7 +6376,6 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
         DiscountFilterLbl: Label '%1|%2', Locked = true, Comment = '%1 - discount table id, %2 - discount table id';
         MixDiscountCode: Code[20];
-        PreviousFeatureFlagValue: Boolean;
     begin
         // [SCENARIO CORE-1843] An amount type total discount applied on top of a free mix discount line with a 3 decimal price keeps that line at exactly 100% and zero amounts
 
@@ -6393,7 +6383,6 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
         InitializeData();
         LibraryApplicationArea.EnableVATSetup();
         LibraryPOSDiscount.AllowThreeDecimalUnitPrices();
-        PreviousFeatureFlagValue := LibraryFeatureFlags.EnableFeatureFlag('fullyDiscountedPOSLineNetsToZero');
 
         // [GIVEN] No Discounts
         DeleteDiscounts();
@@ -6433,8 +6422,6 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         POSSalesDiscountCalcMgt.OnAfterTotalPressedPOS(SaleLinePOS);
-
-        LibraryFeatureFlags.SetFeatureFlag('fullyDiscountedPOSLineNetsToZero', PreviousFeatureFlagValue);
 
         // [THEN] The free line takes no share of the amount discount and stays at exactly 100% with zero amounts
         SaleLinePOS.Reset();
