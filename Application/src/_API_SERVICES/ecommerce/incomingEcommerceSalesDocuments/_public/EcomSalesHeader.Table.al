@@ -558,7 +558,9 @@ table 6151258 "NPR Ecom Sales Header"
     trigger OnDelete()
     var
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
     begin
+        SpfyPaymentGatewayHdlr.KeepBillingEventIds(Rec);
         EcomSalesDocUtils.DeleteSalesDocSalesLines(Rec);
         EcomSalesDocUtils.DeleteSalesDocPaymentLines(Rec);
         EcomSalesDocUtils.DeleteMagentoPaymentLines(Rec);

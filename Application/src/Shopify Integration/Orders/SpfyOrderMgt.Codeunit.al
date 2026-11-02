@@ -814,8 +814,13 @@ codeunit 6184814 "NPR Spfy Order Mgt."
            not (PresentmentCurrencyCodeIsLCY and CurrencyBlankForLCY and CurrentOrderCurrencyIsLCY)  //Skip currency change check when both presentment and current order are LCY and the store blanks LCY
         then begin
             TestCurrencyCodeChangePossible(SalesHeader);
-            if PaymentMgt.HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", PaymentLine) then
+            if PaymentMgt.HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", PaymentLine) then begin
+                PaymentLine.FindSet();
+                repeat
+                    SpfyPaymentGatewayHdlr.KeepBillingEventIds(PaymentLine);
+                until PaymentLine.Next() = 0;
                 PaymentLine.DeleteAll();
+            end;
         end;
         if not (PresentmentCurrencyCodeIsLCY and CurrencyBlankForLCY) then
             SalesHeader.Validate("Currency Code", SpfyEventLogEntry."Presentment Currency Code")

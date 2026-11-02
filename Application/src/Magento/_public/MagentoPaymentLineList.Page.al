@@ -529,6 +529,13 @@
         SetGatewayEnabled();
     end;
 
+    trigger OnDeleteRecord(): Boolean
+    var
+        SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
+    begin
+        SpfyPaymentGatewayHdlr.KeepBillingEventIds(Rec);
+    end;
+
     var
 #if not BC17
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";

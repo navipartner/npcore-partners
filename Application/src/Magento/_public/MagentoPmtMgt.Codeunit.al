@@ -226,16 +226,19 @@
         PaymentLine: Record "NPR Magento Payment Line";
         MagentoPmtAdyenMgt: Codeunit "NPR Magento Pmt. Adyen Mgt.";
         NPLoyaltyDiscountHandler: Codeunit "NPR NPLoyalty Discount Handler";
+        SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
     begin
         if Rec.IsTemporary then
             exit;
         if not HasMagentoPayment(Database::"Sales Header", Rec."Document Type", Rec."No.", PaymentLine) then
             exit;
 
+        // Posting deletes the order without RunTrigger; its invoice copies already carry the billing event ids.
         if RunTrigger then
             if not Rec.IsCreditDocType() then begin
                 PaymentLine.FindSet();
                 repeat
+                    SpfyPaymentGatewayHdlr.KeepBillingEventIds(PaymentLine);
                     MagentoPmtAdyenMgt.CheckUnproccesedWebhook(PaymentLine);
                     if not NPLoyaltyDiscountHandler.IsLoyaltyPointsPaymentLine(PaymentLine."Payment Gateway Code") then
                         CancelPaymentLine(PaymentLine);
@@ -664,6 +667,7 @@
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
 #ENDIF
         LogMgt: Codeunit "NPR PG Interactions Log Mgt.";
+        SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
         OutstandingAmt: Decimal;
         SplitLine: Boolean;
     begin
@@ -678,6 +682,7 @@
                 end;
                 if PaymentLine2.Get(Database::"Sales Invoice Header", 0, DocNo, PaymentLine."Line No.") then
                     PaymentLine2.Delete();
+                SpfyPaymentGatewayHdlr.TakeOverKeptBillingEventIds(PaymentLine);
                 PaymentLine2.Init();
                 PaymentLine2 := PaymentLine;
                 PaymentLine2."Document Table No." := Database::"Sales Invoice Header";

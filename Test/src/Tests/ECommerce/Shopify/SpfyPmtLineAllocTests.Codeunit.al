@@ -1320,6 +1320,220 @@ codeunit 85547 "NPR Spfy Pmt Line Alloc Tests"
         // [THEN] No error is raised, so the capture goes ahead
     end;
 
+    [Test]
+    procedure AuthorizationCapturedInShopify_NcQueue_AmountEventsQueuedAtImport()
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        LibBilling: Codeunit "NPR Library - Spfy Billing";
+        OrderNo: Code[20];
+        StartEntryNo: BigInteger;
+    begin
+        // [SCENARIO] On the NC task queue, an order whose authorization Shopify has already captured gets its order amount billing events when its payment lines are imported.
+        Initialize();
+
+        // [GIVEN] Sales order 100 with no payment lines yet
+        OrderNo := 'SPFYPA-B1';
+        InsertOrder(OrderNo, 100);
+        StartEntryNo := LibBilling.LastBillingQueueEntryNo();
+
+        // [WHEN] The payment lines are imported from a card authorization of 100 that Shopify has fully captured
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), FinallyCapturedAuthorizationJson(100, 100));
+
+        // [THEN] The card line is saved as captured
+        OrderCardLine(OrderNo, PaymentLine);
+        _Assert.AreNotEqual(0D, PaymentLine."Date Captured", 'A line of an authorization Shopify has already captured must be saved as captured.');
+        // [THEN] One presentment and one shop currency amount event are queued under the ids stored on the line
+        LibBilling.AssertSingleAmountQueueEntry(PaymentLine."NPR Spfy Ord.Amt.PCY Event Id", "NPR Billing Event Type"::ECOM_SHOPIFY_ORDERS_AMOUNT_PRESENTMENT, 100);
+        LibBilling.AssertSingleAmountQueueEntry(PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id", "NPR Billing Event Type"::ECOM_SHOPIFY_ORDERS_AMOUNT_SHOP, 100);
+        _Assert.AreEqual(2, LibBilling.AmountQueueEntriesSince(StartEntryNo), 'A captured payment must be billed exactly once in each currency.');
+    end;
+
+    [Test]
+    procedure AuthorizationCapturedInShopify_TaskList_AmountEventsQueuedAtImport()
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        LibBilling: Codeunit "NPR Library - Spfy Billing";
+        OrderNo: Code[20];
+        StartEntryNo: BigInteger;
+    begin
+        // [SCENARIO] On the Shopify Task List, an order whose authorization Shopify has already captured gets its order amount billing events when its payment lines are imported.
+        Initialize();
+
+        // [GIVEN] Sales order 100 with no payment lines yet
+        OrderNo := 'SPFYPA-B2';
+        InsertOrder(OrderNo, 100);
+        StartEntryNo := LibBilling.LastBillingQueueEntryNo();
+
+        // [WHEN] The payment lines are imported from a card authorization of 100 that Shopify has fully captured
+        UpdatePaymentLines(true, OrderRecordId(OrderNo), FinallyCapturedAuthorizationJson(100, 100));
+
+        // [THEN] The card line is saved as captured
+        OrderCardLine(OrderNo, PaymentLine);
+        _Assert.AreNotEqual(0D, PaymentLine."Date Captured", 'A line of an authorization Shopify has already captured must be saved as captured.');
+        // [THEN] One presentment and one shop currency amount event are queued under the ids stored on the line
+        LibBilling.AssertSingleAmountQueueEntry(PaymentLine."NPR Spfy Ord.Amt.PCY Event Id", "NPR Billing Event Type"::ECOM_SHOPIFY_ORDERS_AMOUNT_PRESENTMENT, 100);
+        LibBilling.AssertSingleAmountQueueEntry(PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id", "NPR Billing Event Type"::ECOM_SHOPIFY_ORDERS_AMOUNT_SHOP, 100);
+        _Assert.AreEqual(2, LibBilling.AmountQueueEntriesSince(StartEntryNo), 'A captured payment must be billed exactly once in each currency.');
+    end;
+
+    [Test]
+    procedure CapturedLineRefreshedAgain_NcQueue_NoSecondAmountEvent()
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        LibBilling: Codeunit "NPR Library - Spfy Billing";
+        OrderNo: Code[20];
+        StartEntryNo: BigInteger;
+    begin
+        // [SCENARIO] On the NC task queue, refreshing the payment lines of an order already billed at capture queues no further order amount billing event.
+        Initialize();
+
+        // [GIVEN] Sales order 100 whose card line was imported from an authorization of 100 Shopify had already captured, and billed then
+        OrderNo := 'SPFYPA-B3';
+        InsertOrder(OrderNo, 100);
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), FinallyCapturedAuthorizationJson(100, 100));
+        OrderCardLine(OrderNo, PaymentLine);
+        _Assert.AreNotEqual(0D, PaymentLine."Date Captured", 'Precondition: the card line must have been imported as captured.');
+        StartEntryNo := LibBilling.LastBillingQueueEntryNo();
+
+        // [WHEN] The payment lines are refreshed from the same transactions again
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), FinallyCapturedAuthorizationJson(100, 100));
+
+        // [THEN] No further order amount billing event is queued
+        _Assert.AreEqual(0, LibBilling.AmountQueueEntriesSince(StartEntryNo), 'A payment already billed at capture must not be billed again by a later refresh.');
+    end;
+
+    [Test]
+    procedure CapturedLineRefreshedAgain_TaskList_NoSecondAmountEvent()
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        LibBilling: Codeunit "NPR Library - Spfy Billing";
+        OrderNo: Code[20];
+        StartEntryNo: BigInteger;
+    begin
+        // [SCENARIO] On the Shopify Task List, refreshing the payment lines of an order already billed at capture queues no further order amount billing event.
+        Initialize();
+
+        // [GIVEN] Sales order 100 whose card line was imported from an authorization of 100 Shopify had already captured, and billed then
+        OrderNo := 'SPFYPA-B4';
+        InsertOrder(OrderNo, 100);
+        UpdatePaymentLines(true, OrderRecordId(OrderNo), FinallyCapturedAuthorizationJson(100, 100));
+        OrderCardLine(OrderNo, PaymentLine);
+        _Assert.AreNotEqual(0D, PaymentLine."Date Captured", 'Precondition: the card line must have been imported as captured.');
+        StartEntryNo := LibBilling.LastBillingQueueEntryNo();
+
+        // [WHEN] The payment lines are refreshed from the same transactions again
+        UpdatePaymentLines(true, OrderRecordId(OrderNo), FinallyCapturedAuthorizationJson(100, 100));
+
+        // [THEN] No further order amount billing event is queued
+        _Assert.AreEqual(0, LibBilling.AmountQueueEntriesSince(StartEntryNo), 'A payment already billed at capture must not be billed again by a later refresh.');
+    end;
+
+    [Test]
+    procedure OpenAuthorization_NcQueue_NoAmountEventAtImport()
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        LibBilling: Codeunit "NPR Library - Spfy Billing";
+        OrderNo: Code[20];
+        StartEntryNo: BigInteger;
+    begin
+        // [SCENARIO] On the NC task queue, an order whose authorization Shopify still holds open is not billed when its payment lines are imported.
+        Initialize();
+
+        // [GIVEN] Sales order 100 with no payment lines yet
+        OrderNo := 'SPFYPA-B5';
+        InsertOrder(OrderNo, 100);
+        StartEntryNo := LibBilling.LastBillingQueueEntryNo();
+
+        // [WHEN] The payment lines are imported from a card authorization of 100 that Shopify has not captured
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), StrSubstNo('[%1]', AuthorizationJson(100)));
+
+        // [THEN] The card line is not captured and nothing is billed
+        OrderCardLine(OrderNo, PaymentLine);
+        _Assert.AreEqual(0D, PaymentLine."Date Captured", 'An open authorization must not be marked captured.');
+        _Assert.AreEqual(0, LibBilling.AmountQueueEntriesSince(StartEntryNo), 'A payment that is not captured must not be billed at import.');
+    end;
+
+    [Test]
+    procedure OpenAuthorization_TaskList_NoAmountEventAtImport()
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        LibBilling: Codeunit "NPR Library - Spfy Billing";
+        OrderNo: Code[20];
+        StartEntryNo: BigInteger;
+    begin
+        // [SCENARIO] On the Shopify Task List, an order whose authorization Shopify still holds open is not billed when its payment lines are imported.
+        Initialize();
+
+        // [GIVEN] Sales order 100 with no payment lines yet
+        OrderNo := 'SPFYPA-B6';
+        InsertOrder(OrderNo, 100);
+        StartEntryNo := LibBilling.LastBillingQueueEntryNo();
+
+        // [WHEN] The payment lines are imported from a card authorization of 100 that Shopify has not captured
+        UpdatePaymentLines(true, OrderRecordId(OrderNo), StrSubstNo('[%1]', AuthorizationJson(100)));
+
+        // [THEN] The card line is not captured and nothing is billed
+        OrderCardLine(OrderNo, PaymentLine);
+        _Assert.AreEqual(0D, PaymentLine."Date Captured", 'An open authorization must not be marked captured.');
+        _Assert.AreEqual(0, LibBilling.AmountQueueEntriesSince(StartEntryNo), 'A payment that is not captured must not be billed at import.');
+    end;
+
+    [Test]
+    procedure VoidedAuthorizationLine_NcQueue_IsNotBilledAtImport()
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        LibBilling: Codeunit "NPR Library - Spfy Billing";
+        OrderNo: Code[20];
+        StartEntryNo: BigInteger;
+    begin
+        // [SCENARIO] On the NC task queue, a card line whose authorization has nothing unsettled and nothing captured from it (voided or expired) is neither saved as captured nor billed when the payment lines are refreshed, since Shopify took no money.
+        Initialize();
+
+        // [GIVEN] Sales order 100 carrying a card line of 100 whose capture was requested, for an authorization that was later voided
+        OrderNo := 'SPFYPA-B7';
+        InsertOrder(OrderNo, 100);
+        PaymentLine := AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method", 100, TransactionId(6));
+        PaymentLine."Capture Requested" := true;
+        PaymentLine.Modify();
+        StartEntryNo := LibBilling.LastBillingQueueEntryNo();
+
+        // [WHEN] The payment lines are refreshed from the voided authorization
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), StrSubstNo('[%1]', AuthorizationJson(TransactionId(6), 100, 0)));
+
+        // [THEN] The card line is not saved as captured and nothing is billed
+        PaymentLine.Find();
+        _Assert.AreEqual(0D, PaymentLine."Date Captured", 'A line of an authorization Shopify took no money from must not be saved as captured at import.');
+        _Assert.AreEqual(0, LibBilling.AmountQueueEntriesSince(StartEntryNo), 'A line of an authorization Shopify took no money from must not be billed.');
+    end;
+
+    [Test]
+    procedure VoidedAuthorizationLine_TaskList_IsNotBilledAtImport()
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        LibBilling: Codeunit "NPR Library - Spfy Billing";
+        OrderNo: Code[20];
+        StartEntryNo: BigInteger;
+    begin
+        // [SCENARIO] On the Shopify Task List, a card line whose authorization has nothing unsettled and nothing captured from it (voided or expired) is neither saved as captured nor billed when the payment lines are refreshed, since Shopify took no money.
+        Initialize();
+
+        // [GIVEN] Sales order 100 carrying a card line of 100 whose capture was requested, for an authorization that was later voided
+        OrderNo := 'SPFYPA-B8';
+        InsertOrder(OrderNo, 100);
+        PaymentLine := AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method", 100, TransactionId(6));
+        PaymentLine."Capture Requested" := true;
+        PaymentLine.Modify();
+        StartEntryNo := LibBilling.LastBillingQueueEntryNo();
+
+        // [WHEN] The payment lines are refreshed from the voided authorization
+        UpdatePaymentLines(true, OrderRecordId(OrderNo), StrSubstNo('[%1]', AuthorizationJson(TransactionId(6), 100, 0)));
+
+        // [THEN] The card line is not saved as captured and nothing is billed
+        PaymentLine.Find();
+        _Assert.AreEqual(0D, PaymentLine."Date Captured", 'A line of an authorization Shopify took no money from must not be saved as captured at import.');
+        _Assert.AreEqual(0, LibBilling.AmountQueueEntriesSince(StartEntryNo), 'A line of an authorization Shopify took no money from must not be billed.');
+    end;
+
     local procedure Initialize()
     var
         Currency: Record Currency;
@@ -1725,6 +1939,15 @@ codeunit 85547 "NPR Spfy Pmt Line Alloc Tests"
         PaymentLine.SetRange("Payment Type", PaymentType);
         PaymentLine.CalcSums(Amount);
         exit(PaymentLine.Amount);
+    end;
+
+    local procedure OrderCardLine(OrderNo: Code[20]; var PaymentLine: Record "NPR Magento Payment Line")
+    begin
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        PaymentLine.SetRange("Document Type", PaymentLine."Document Type"::Order);
+        PaymentLine.SetRange("Document No.", OrderNo);
+        PaymentLine.SetRange("Payment Type", PaymentLine."Payment Type"::"Payment Method");
+        PaymentLine.FindFirst();
     end;
 
     local procedure OrderLinesStoreCurrencyAmount(OrderNo: Code[20]; PaymentType: Enum "NPR Magento Payment Type"): Decimal

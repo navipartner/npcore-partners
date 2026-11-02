@@ -311,7 +311,12 @@
         }
         field(6059983; "NPR Ecom Spfy.Ord.Amt.Event Id"; Guid)
         {
-            Caption = 'Ecommerce Shopify Orders Amount Event Id';
+            Caption = 'Ecommerce Shopify Orders Amount (Shop Currency) Event Id';
+            DataClassification = CustomerContent;
+        }
+        field(4; "NPR Spfy Ord.Amt.PCY Event Id"; Guid)
+        {
+            Caption = 'Ecommerce Shopify Orders Amount (Presentment Currency) Event Id';
             DataClassification = CustomerContent;
         }
         field(6059984; "NPR Inc Ecom Sale Id"; Guid)

@@ -157,40 +157,181 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
     end;
 
 #if not (BC18 or BC19 or BC20 or BC21 or BC22)
+    /// <summary>
+    /// Bills the payment line when this capture attempt confirmed Shopify took the money: it found the capture done, or Shopify reported the capture succeeded.
+    /// </summary>
+    internal procedure RegisterBillingEventsOnCapture(var PaymentLine: Record "NPR Magento Payment Line"; xPaymentLine: Record "NPR Magento Payment Line"; Response: Record "NPR PG Payment Response"; CaptureFound: Boolean)
+    begin
+        if xPaymentLine."Date Captured" <> 0D then
+            exit;
+        if CaptureFound or
+           (Response."Response Success" and (Response."Reported Operation Status" = Response."Reported Operation Status"::Success))
+        then
+            RegisterBillingEventsOnConfirmedCapture(PaymentLine);
+    end;
+
+    /// <summary>
+    /// Bills a payment line whose capture Shopify confirmed. A posted line is skipped, because posting billed it.
+    /// </summary>
+    internal procedure RegisterBillingEventsOnConfirmedCapture(var PaymentLine: Record "NPR Magento Payment Line")
+    begin
+        if PaymentLine.Posted then
+            exit;
+        RegisterBillingEvents(PaymentLine);
+    end;
+
     internal procedure RegisterBillingEvents(var PaymentLine: Record "NPR Magento Payment Line")
     var
         EventBillingClient: Codeunit "NPR Event Billing Client";
         MetadataJson: JsonObject;
+        TransactionID: Text[30];
     begin
-        if not IsShopifyPaymentLine(PaymentLine.RecordId()) then
+        TransactionID := GetShopifyTransactionID(PaymentLine);
+        if TransactionID = '' then
             exit;
 
         MetadataJson.Add('shopify_store_code', GetShopifyStoreCode(PaymentLine));
         MetadataJson.Add('currency', PaymentLine.TransactionCurrencyCode(false));
+        // The event ids are stored on the line, so the copy made at posting carries them and registering it again adds nothing.
+        // A line re-created for a transaction whose billed line was deleted takes over the ids kept from it.
+        // The presentment id is seeded with SystemId, the key used before it was stored, so a line already registered that way is not billed twice.
+        if IsNullGuid(PaymentLine."NPR Spfy Ord.Amt.PCY Event Id") and IsNullGuid(PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id") then
+            TakeOverKeptBillingEventIds(PaymentLine, TransactionID);
+        if IsNullGuid(PaymentLine."NPR Spfy Ord.Amt.PCY Event Id") then
+            PaymentLine."NPR Spfy Ord.Amt.PCY Event Id" := PaymentLine.SystemId;
         EventBillingClient.RegisterEvent(
-            PaymentLine.SystemId, Enum::"NPR Billing Event Type"::ECOM_SHOPIFY_ORDERS_AMOUNT_PRESENTMENT, PaymentLine.Amount, MetadataJson.AsToken());
+            PaymentLine."NPR Spfy Ord.Amt.PCY Event Id", Enum::"NPR Billing Event Type"::ECOM_SHOPIFY_ORDERS_AMOUNT_PRESENTMENT, PaymentLine.Amount, MetadataJson.AsToken());
 
         if PaymentLine."Amount (Store Currency)" <> 0 then begin
             MetadataJson.Replace('currency', PaymentLine."Store Currency Code");
-            PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id" := CreateGuid();
+            if IsNullGuid(PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id") then
+                PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id" := CreateGuid();
             EventBillingClient.RegisterEvent(
                 PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id", Enum::"NPR Billing Event Type"::ECOM_SHOPIFY_ORDERS_AMOUNT_SHOP, PaymentLine."Amount (Store Currency)", MetadataJson.AsToken());
         end;
     end;
 
-    local procedure IsShopifyPaymentLine(PaymentLineRecID: RecordId): Boolean
+    /// <summary>
+    /// Keeps the billing event ids of a billed, unposted Shopify payment line that is about to be deleted, so a line re-created for the same transaction is not billed again.
+    /// </summary>
+    internal procedure KeepBillingEventIds(PaymentLine: Record "NPR Magento Payment Line")
+    var
+        PmtLineBillingIds: Record "NPR Spfy Pmt. Line Billing Ids";
+        TransactionID: Text[30];
+    begin
+        if PaymentLine.IsTemporary() or PaymentLine.Posted then
+            exit;
+        if IsNullGuid(PaymentLine."NPR Spfy Ord.Amt.PCY Event Id") and IsNullGuid(PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id") then
+            exit;
+        TransactionID := GetShopifyTransactionID(PaymentLine);
+        if TransactionID = '' then
+            exit;
+        if PmtLineBillingIds.Get(TransactionID) then
+            exit;
+        // With another line of the transaction left, a later line of it cannot be told apart as this one's replacement.
+        if OtherUnpostedLineOfTransactionExists(PaymentLine, TransactionID) then
+            exit;
+
+        PmtLineBillingIds.Init();
+        PmtLineBillingIds."Shopify Transaction ID" := TransactionID;
+        PmtLineBillingIds."PCY Event Id" := PaymentLine."NPR Spfy Ord.Amt.PCY Event Id";
+        PmtLineBillingIds."Shop Event Id" := PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id";
+        PmtLineBillingIds.Insert();
+    end;
+
+    /// <summary>
+    /// Keeps the billing event ids of the Shopify payment lines still on an ecommerce document that is about to be deleted. Processing the order again creates new lines for the same transactions.
+    /// </summary>
+    internal procedure KeepBillingEventIds(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+    begin
+        if EcomSalesHeader.IsTemporary() then
+            exit;
+        PaymentLine.SetRange("Document Table No.", Database::"NPR Ecom Sales Header");
+        PaymentLine.SetRange("Document No.", EcomSalesHeader."External No.");
+        PaymentLine.SetRange("NPR Inc Ecom Sale Id", EcomSalesHeader.SystemId);
+        if PaymentLine.FindSet() then
+            repeat
+                KeepBillingEventIds(PaymentLine);
+            until PaymentLine.Next() = 0;
+    end;
+
+    local procedure OtherUnpostedLineOfTransactionExists(PaymentLine: Record "NPR Magento Payment Line"; TransactionID: Text[30]): Boolean
+    var
+        OtherPaymentLine: Record "NPR Magento Payment Line";
+        SpfyAssignedID: Record "NPR Spfy Assigned ID";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"NPR Magento Payment Line", "NPR Spfy ID Type"::"Entry ID", TransactionID, SpfyAssignedID);
+        if SpfyAssignedID.FindSet() then
+            repeat
+                if SpfyAssignedID."BC Record ID" <> PaymentLine.RecordId() then
+                    if OtherPaymentLine.Get(SpfyAssignedID."BC Record ID") then
+                        if not OtherPaymentLine.Posted then
+                            if not IsLeftOnDeletedEcomDocument(OtherPaymentLine) then
+                                exit(true);
+            until SpfyAssignedID.Next() = 0;
+    end;
+
+    /// <summary>
+    /// Deleting an ecommerce document leaves its payment lines behind. Such a line is no longer a line of its transaction.
+    /// </summary>
+    local procedure IsLeftOnDeletedEcomDocument(PaymentLine: Record "NPR Magento Payment Line"): Boolean
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+    begin
+        if PaymentLine."Document Table No." <> Database::"NPR Ecom Sales Header" then
+            exit(false);
+        EcomSalesHeader.SetRange(SystemId, PaymentLine."NPR Inc Ecom Sale Id");
+        exit(EcomSalesHeader.IsEmpty());
+    end;
+
+    /// <summary>
+    /// Gives a line without billing event ids the ids kept for its transaction. Called before the line is copied onto an invoice, so the line and every invoice copy carry them.
+    /// </summary>
+    internal procedure TakeOverKeptBillingEventIds(var PaymentLine: Record "NPR Magento Payment Line")
+    var
+        PmtLineBillingIds: Record "NPR Spfy Pmt. Line Billing Ids";
+        TransactionID: Text[30];
+    begin
+        if not (IsNullGuid(PaymentLine."NPR Spfy Ord.Amt.PCY Event Id") and IsNullGuid(PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id")) then
+            exit;
+        if PmtLineBillingIds.IsEmpty() then
+            exit;
+        TransactionID := GetShopifyTransactionID(PaymentLine);
+        if TransactionID = '' then
+            exit;
+        TakeOverKeptBillingEventIds(PaymentLine, TransactionID);
+    end;
+
+    local procedure TakeOverKeptBillingEventIds(var PaymentLine: Record "NPR Magento Payment Line"; TransactionID: Text[30])
+    var
+        PmtLineBillingIds: Record "NPR Spfy Pmt. Line Billing Ids";
+    begin
+        if not PmtLineBillingIds.Get(TransactionID) then
+            exit;
+        PaymentLine."NPR Spfy Ord.Amt.PCY Event Id" := PmtLineBillingIds."PCY Event Id";
+        PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id" := PmtLineBillingIds."Shop Event Id";
+        PmtLineBillingIds.Delete();
+    end;
+
+    local procedure GetShopifyTransactionID(PaymentLine: Record "NPR Magento Payment Line"): Text[30]
     var
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
     begin
-        exit(SpfyAssignedIDMgt.GetAssignedShopifyID(PaymentLineRecID, "NPR Spfy ID Type"::"Entry ID") <> '');
+        exit(CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(PaymentLine.RecordId(), "NPR Spfy ID Type"::"Entry ID"), 1, 30));
     end;
 
     local procedure GetShopifyStoreCode(PaymentLine: Record "NPR Magento Payment Line"): Code[20]
     var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
         ShopifyStoreCode: Text;
     begin
         case PaymentLine."Document Table No." of
@@ -210,6 +351,11 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
                     SalesCrMemoHeader."No." := PaymentLine."Document No.";
                     ShopifyStoreCode := SpfyAssignedIDMgt.GetAssignedShopifyID(SalesCrMemoHeader.RecordId(), "NPR Spfy ID Type"::"Store Code");
                 end;
+            // A virtual item is captured while its payment line still belongs to the ecommerce document.
+            Database::"NPR Ecom Sales Header":
+                if EcomSalesHeader.GetBySystemId(PaymentLine."NPR Inc Ecom Sale Id") then
+                    if SpfyEcomSalesDocPrcssr.GetShopifyLogEntry(EcomSalesHeader, SpfyEventLogEntry) then
+                        ShopifyStoreCode := SpfyEventLogEntry."Store Code";
         end;
         exit(CopyStr(ShopifyStoreCode, 1, 20));
     end;

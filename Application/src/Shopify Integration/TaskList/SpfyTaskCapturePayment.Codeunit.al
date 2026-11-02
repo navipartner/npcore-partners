@@ -165,9 +165,12 @@ codeunit 6151485 "NPR Spfy Task Capture Payment"
         xPaymentLine: Record "NPR Magento Payment Line";
         JobQueueManagement: Codeunit "NPR Job Queue Management";
         Delay: Duration;
+        CaptureFound: Boolean;
     begin
         xPaymentLine := PaymentLine;
-        Success := TryCaptureShopifyPayment(PaymentLine, SpfyTask, Response);
+        Success := TryCaptureShopifyPayment(PaymentLine, SpfyTask, Response, CaptureFound);
+        if Success then
+            _SpfyPaymentGatewayHdlr.RegisterBillingEventsOnCapture(PaymentLine, xPaymentLine, Response, CaptureFound);
         if Format(PaymentLine) <> Format(xPaymentLine) then
             PaymentLine.Modify();
         if Success then
@@ -182,7 +185,7 @@ codeunit 6151485 "NPR Spfy Task Capture Payment"
     end;
 
     [TryFunction]
-    local procedure TryCaptureShopifyPayment(var PaymentLine: Record "NPR Magento Payment Line"; var SpfyTask: Record "NPR Spfy Task"; var Response: Record "NPR PG Payment Response")
+    local procedure TryCaptureShopifyPayment(var PaymentLine: Record "NPR Magento Payment Line"; var SpfyTask: Record "NPR Spfy Task"; var Response: Record "NPR PG Payment Response"; var CaptureFound: Boolean)
     var
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         ShopifyResponse: JsonToken;
@@ -194,7 +197,7 @@ codeunit 6151485 "NPR Spfy Task Capture Payment"
         Response."Reported Operation Status" := Enum::"NPR PG Operation Status"::Failure;
         ClearLastError();
 
-        SendToShopify := PrepareShopifyPaymentCaptureRequest(PaymentLine, SpfyTask);
+        SendToShopify := PrepareShopifyPaymentCaptureRequest(PaymentLine, SpfyTask, CaptureFound);
         if not SendToShopify then begin  //already captured or capture already requested
             Response."Response Body" := SpfyTask.Response;
             exit;
@@ -295,7 +298,7 @@ codeunit 6151485 "NPR Spfy Task Capture Payment"
             Error(GetLastErrorText);
     end;
 
-    local procedure PrepareShopifyPaymentCaptureRequest(var PaymentLine: Record "NPR Magento Payment Line"; var SpfyTask: Record "NPR Spfy Task") SendToShopify: Boolean
+    local procedure PrepareShopifyPaymentCaptureRequest(var PaymentLine: Record "NPR Magento Payment Line"; var SpfyTask: Record "NPR Spfy Task"; var CaptureFound: Boolean) SendToShopify: Boolean
     var
         SpfyPaymentGateway: Record "NPR Spfy Payment Gateway";
         EcomSalesDocProcess: Codeunit "NPR EcomSalesDocProcess";
@@ -320,7 +323,7 @@ codeunit 6151485 "NPR Spfy Task Capture Payment"
             EcomSalesDocProcess.UpdateSalesDocPaymentLineCaptureInformation(PaymentLine);
             exit;
         end;
-        if TransactionAlreadyCaptured(SpfyTask, TransactionID, PaymentLine) then begin
+        if TransactionAlreadyCaptured(SpfyTask, TransactionID, PaymentLine, CaptureFound) then begin
             _SpfyIntegrationMgt.SetResponse(SpfyTask, AlreadyCapturedErr);
             EcomSalesDocProcess.UpdateSalesDocPaymentLineCaptureInformation(PaymentLine);
             exit;
@@ -347,7 +350,10 @@ codeunit 6151485 "NPR Spfy Task Capture Payment"
         SendToShopify := true;
     end;
 
-    local procedure TransactionAlreadyCaptured(SpfyTask: Record "NPR Spfy Task"; TransactionID: Text[30]; var PaymentLine: Record "NPR Magento Payment Line"): Boolean
+    /// <summary>
+    /// Whether no capture request should be sent for the line: Shopify already captured it, or a capture is pending. CaptureFound tells whether Shopify took the money.
+    /// </summary>
+    local procedure TransactionAlreadyCaptured(SpfyTask: Record "NPR Spfy Task"; TransactionID: Text[30]; var PaymentLine: Record "NPR Magento Payment Line"; var CaptureFound: Boolean): Boolean
     var
         ShopifyResponse: JsonToken;
         Transaction: JsonToken;
@@ -370,6 +376,7 @@ codeunit 6151485 "NPR Spfy Task Capture Payment"
                                 begin
                                     SetDateCaptured(Transaction, PaymentLine);
                                     EnsureCaptureDateIsSet(PaymentLine);
+                                    CaptureFound := true;
                                     exit(true);
                                 end;
                             else begin
@@ -391,7 +398,8 @@ codeunit 6151485 "NPR Spfy Task Capture Payment"
 #pragma warning restore AA0139
                     if PaymentLine."Posting Date" = 0D then
                         PaymentLine."Posting Date" := Today();
-                    exit(SetPmtLineAsCaptured(Transaction, Transactions.AsArray(), '', TransactionID, PaymentLine));
+                    CaptureFound := SetPmtLineAsCaptured(Transaction, Transactions.AsArray(), '', TransactionID, PaymentLine);
+                    exit(PaymentLine."Date Captured" <> 0D);
                 end;
         end;
     end;
@@ -625,7 +633,10 @@ codeunit 6151485 "NPR Spfy Task Capture Payment"
                             if HasPaymentLine then begin
                                 if PaymentLine."Posting Date" = 0D then
                                     PaymentLine."Posting Date" := PaymentLineParam."Posting Date";
-                                SetPmtLineAsCaptured(Transaction, OrderTransactions, SpfyTransactionBuffer.Kind, SpfyTransactionBuffer."Transaction ID", PaymentLine);
+                                if SetPmtLineAsCaptured(Transaction, OrderTransactions, SpfyTransactionBuffer.Kind, SpfyTransactionBuffer."Transaction ID", PaymentLine) then begin
+                                    _SpfyPaymentGatewayHdlr.RegisterBillingEventsOnConfirmedCapture(PaymentLine);
+                                    PaymentLine.Modify();
+                                end;
                             end;
                         end;
                     end;
@@ -804,10 +815,14 @@ codeunit 6151485 "NPR Spfy Task Capture Payment"
         _SpfyIntegrationEvents.OnAfterSetPaymentCardDetails(Transaction, PaymentLine);
     end;
 
+    /// <summary>
+    /// Marks the line captured when Shopify settled its transaction, and returns whether Shopify took the money for it.
+    /// </summary>
     local procedure SetPmtLineAsCaptured(CurrentTransaction: JsonToken; Transactions: JsonArray; ShopifyTransactionKind: Text; CurrentTransactionID: Text[30]; var PaymentLine: Record "NPR Magento Payment Line"): Boolean
     var
         ShopifyOrderTransaction: JsonToken;
         ShopifyOrderTransactionsAsArray: JsonArray;
+        CaptureFound: Boolean;
     begin
         if (PaymentLine."Payment Type" <> PaymentLine."Payment Type"::"Payment Method") or (PaymentLine."Date Captured" <> 0D) then
             exit;
@@ -828,9 +843,13 @@ codeunit 6151485 "NPR Spfy Task Capture Payment"
                     foreach ShopifyOrderTransaction in ShopifyOrderTransactionsAsArray do
                         if _JsonHelper.GetJText(ShopifyOrderTransaction, 'kind', false).ToUpper() = 'CAPTURE' then
                             if _JsonHelper.GetJText(ShopifyOrderTransaction, 'status', false).ToUpper() = 'SUCCESS' then
-                                if _SpfyIntegrationMgt.RemoveUntil(_JsonHelper.GetJText(ShopifyOrderTransaction, 'parentTransaction.id', false), '/') = CurrentTransactionID then
+                                if _SpfyIntegrationMgt.RemoveUntil(_JsonHelper.GetJText(ShopifyOrderTransaction, 'parentTransaction.id', false), '/') = CurrentTransactionID then begin
                                     SetDateCaptured(ShopifyOrderTransaction, PaymentLine);
+                                    CaptureFound := true;
+                                end;
                     EnsureCaptureDateIsSet(PaymentLine);
+                    // Nothing unsettled and no successful capture: voided or expired. Marked captured so no capture is requested, but no money was taken.
+                    exit(CaptureFound);
                 end;
 
             else

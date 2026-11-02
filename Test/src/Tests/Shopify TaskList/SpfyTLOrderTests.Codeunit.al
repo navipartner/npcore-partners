@@ -8,6 +8,7 @@ codeunit 85395 "NPR Spfy TL Order Tests"
     var
         _Assert: Codeunit Assert;
         _Lib: Codeunit "NPR Spfy RowVer Test Lib";
+        _LibBilling: Codeunit "NPR Library - Spfy Billing";
         _LibFulfillment: Codeunit "NPR Library - Spfy Fulfillment";
         _BndMock: Codeunit "NPR Spfy TL Bnd Mock";
         _SpfyTaskProcessor: Codeunit "NPR Spfy Task Processor";
@@ -1002,6 +1003,211 @@ codeunit 85395 "NPR Spfy TL Order Tests"
 
         // [THEN] No capture request reached Shopify.
         _Assert.AreEqual(0, MockClient.CountRequestsContaining(_TransactionCreateTok), 'A refused capture must never send the capture mutation');
+    end;
+
+    [Test]
+    procedure GivenSucceededCapture_WhenCaptureSiblingRuns_ThenOneAmountBillingEventPerCurrencyIsQueued()
+    var
+        SalesInvHeader: Record "Sales Invoice Header";
+        PaymentLine: Record "NPR Magento Payment Line";
+        SpfyTask: Record "NPR Spfy Task";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        CapturePayment: Codeunit "NPR Spfy Task Capture Payment";
+        RecRef: RecordRef;
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+        StartEntryNo: BigInteger;
+    begin
+        // [SCENARIO] A capture Shopify reports as succeeded queues the order amount billing events in presentment and shop currency for the payment line, keyed by ids stored on the line.
+        Initialize();
+        StoreCode := CreateOrderStore();
+
+        // [GIVEN] A claimed stage-2 capture task for a Shopify payment line of 500, worth 400 in the shop currency.
+        CreateInvoiceWithPaymentLine(SalesInvHeader, PaymentLine, ShopifyGatewayCode());
+        PaymentLine."Amount (Store Currency)" := 400;
+        PaymentLine."Store Currency Code" := 'EUR';
+        PaymentLine.Modify(false);
+        _Assert.AreNotEqual('EUR', PaymentLine.TransactionCurrencyCode(false), 'Precondition: the presentment and the shop currency must differ, or the currency of each event cannot be told apart');
+        RecRef.GetTable(PaymentLine);
+        TaskEntryNo := EnqueueTask(StoreCode, RecRef, PaymentLine.RecordId(), '5501', "NPR Spfy Task Op"::Insert, CurrentDateTime());
+        GetTask(TaskEntryNo, SpfyTask);
+        _Assert.IsTrue(_SpfyTaskQueue.ClaimSingle(SpfyTask), 'The stage-2 task must be claimable');
+        MockOrderTransactionsEmpty(MockClient);
+        MockCaptureStatus(MockClient, 'SUCCESS');
+        StartEntryNo := _LibBilling.LastBillingQueueEntryNo();
+
+        // [WHEN] The capture sibling runs and Shopify reports the capture succeeded.
+        CapturePayment.SetGraphQLClient(MockClient);
+        CapturePayment.Run(SpfyTask);
+
+        // [THEN] The line carries one stored event id per currency, and the billing queue holds exactly one entry for each.
+        PaymentLine.Find();
+        _Assert.IsFalse(IsNullGuid(PaymentLine."NPR Spfy Ord.Amt.PCY Event Id"), 'A succeeded capture must store the presentment currency event id on the payment line');
+        _Assert.IsFalse(IsNullGuid(PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id"), 'A succeeded capture must store the shop currency event id on the payment line');
+        _LibBilling.AssertSingleAmountQueueEntry(PaymentLine."NPR Spfy Ord.Amt.PCY Event Id", "NPR Billing Event Type"::ECOM_SHOPIFY_ORDERS_AMOUNT_PRESENTMENT, 500);
+        _LibBilling.AssertSingleAmountQueueEntry(PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id", "NPR Billing Event Type"::ECOM_SHOPIFY_ORDERS_AMOUNT_SHOP, 400);
+        _Assert.AreEqual(2, _LibBilling.AmountQueueEntriesSince(StartEntryNo), 'A succeeded capture must queue exactly two order amount billing events');
+        // [THEN] Each event names its own currency: the document's for the presentment event, the shop's for the shop currency event.
+        _Assert.AreEqual(PaymentLine.TransactionCurrencyCode(false), _LibBilling.AmountQueueEntryMetadata(PaymentLine."NPR Spfy Ord.Amt.PCY Event Id", 'currency'), 'The presentment currency event must carry the currency of the document');
+        _Assert.AreEqual('EUR', _LibBilling.AmountQueueEntryMetadata(PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id", 'currency'), 'The shop currency event must carry the shop currency');
+    end;
+
+    [Test]
+    procedure GivenPendingCapture_WhenCaptureSiblingRuns_ThenNoAmountBillingEventIsQueued()
+    var
+        SalesInvHeader: Record "Sales Invoice Header";
+        PaymentLine: Record "NPR Magento Payment Line";
+        SpfyTask: Record "NPR Spfy Task";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        CapturePayment: Codeunit "NPR Spfy Task Capture Payment";
+        RecRef: RecordRef;
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+        StartEntryNo: BigInteger;
+    begin
+        // [SCENARIO] A capture Shopify only reports as pending is not confirmed yet, so no order amount billing event is queued for it.
+        Initialize();
+        StoreCode := CreateOrderStore();
+
+        // [GIVEN] A claimed stage-2 capture task for a Shopify payment line of 500.
+        CreateInvoiceWithPaymentLine(SalesInvHeader, PaymentLine, ShopifyGatewayCode());
+        RecRef.GetTable(PaymentLine);
+        TaskEntryNo := EnqueueTask(StoreCode, RecRef, PaymentLine.RecordId(), '5501', "NPR Spfy Task Op"::Insert, CurrentDateTime());
+        GetTask(TaskEntryNo, SpfyTask);
+        _Assert.IsTrue(_SpfyTaskQueue.ClaimSingle(SpfyTask), 'The stage-2 task must be claimable');
+        MockOrderTransactionsEmpty(MockClient);
+        MockCaptureStatus(MockClient, 'PENDING');
+        StartEntryNo := _LibBilling.LastBillingQueueEntryNo();
+
+        // [WHEN] The capture sibling runs and Shopify reports the capture pending.
+        CapturePayment.SetGraphQLClient(MockClient);
+        CapturePayment.Run(SpfyTask);
+
+        // [THEN] Nothing is billed yet and the line has no event id.
+        PaymentLine.Find();
+        _Assert.AreEqual(0, _LibBilling.AmountQueueEntriesSince(StartEntryNo), 'A pending capture must not queue an order amount billing event');
+        _Assert.IsTrue(IsNullGuid(PaymentLine."NPR Spfy Ord.Amt.PCY Event Id"), 'A pending capture must not store an event id on the payment line');
+    end;
+
+    [Test]
+    procedure GivenCaptureAlreadySettledInShopify_WhenCaptureSiblingRuns_ThenOneAmountBillingEventPerCurrencyIsQueued()
+    var
+        SalesInvHeader: Record "Sales Invoice Header";
+        PaymentLine: Record "NPR Magento Payment Line";
+        SpfyTask: Record "NPR Spfy Task";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        CapturePayment: Codeunit "NPR Spfy Task Capture Payment";
+        RecRef: RecordRef;
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+        StartEntryNo: BigInteger;
+    begin
+        // [SCENARIO] A capture that an earlier request left pending and Shopify has since settled is confirmed when the follow-up finds it, and the line is billed then, without a second capture request.
+        Initialize();
+        StoreCode := CreateOrderStore();
+
+        // [GIVEN] A claimed capture task for a Shopify payment line of 500, worth 400 in the shop currency, whose capture request 555 is still recorded as pending
+        CreateInvoiceWithPaymentLine(SalesInvHeader, PaymentLine, ShopifyGatewayCode());
+        PaymentLine."Amount (Store Currency)" := 400;
+        PaymentLine."Store Currency Code" := 'EUR';
+        PaymentLine."Charge ID" := '555';
+        PaymentLine."Capture Requested" := true;
+        PaymentLine.Modify(false);
+        RecRef.GetTable(PaymentLine);
+        TaskEntryNo := EnqueueTask(StoreCode, RecRef, PaymentLine.RecordId(), '5501', "NPR Spfy Task Op"::Insert, CurrentDateTime());
+        GetTask(TaskEntryNo, SpfyTask);
+        _Assert.IsTrue(_SpfyTaskQueue.ClaimSingle(SpfyTask), 'The stage-2 task must be claimable');
+        // [GIVEN] Shopify now reports capture 555 as succeeded
+        MockClient.AddResponse(_OrderTransactionsTok, '{"data":{"order":{"transactions":[{"id":"gid://shopify/OrderTransaction/555","kind":"CAPTURE","status":"SUCCESS","processedAt":"2026-10-20T10:00:00Z"}]}}}');
+        StartEntryNo := _LibBilling.LastBillingQueueEntryNo();
+
+        // [WHEN] The capture sibling runs
+        CapturePayment.SetGraphQLClient(MockClient);
+        CapturePayment.Run(SpfyTask);
+
+        // [THEN] The line is captured without a new capture request
+        PaymentLine.Find();
+        _Assert.AreNotEqual(0D, PaymentLine."Date Captured", 'A capture Shopify reports as settled must mark the line captured');
+        _Assert.AreEqual(0, MockClient.CountRequestsContaining(_TransactionCreateTok), 'A capture Shopify already settled must not be requested again');
+        // [THEN] One amount event per currency is queued under the ids stored on the line
+        _LibBilling.AssertSingleAmountQueueEntry(PaymentLine."NPR Spfy Ord.Amt.PCY Event Id", "NPR Billing Event Type"::ECOM_SHOPIFY_ORDERS_AMOUNT_PRESENTMENT, 500);
+        _LibBilling.AssertSingleAmountQueueEntry(PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id", "NPR Billing Event Type"::ECOM_SHOPIFY_ORDERS_AMOUNT_SHOP, 400);
+        _Assert.AreEqual(2, _LibBilling.AmountQueueEntriesSince(StartEntryNo), 'A confirmed capture must queue exactly two order amount billing events');
+    end;
+
+    [Test]
+    procedure GivenLineAlreadyCaptured_WhenCaptureSiblingRunsAgain_ThenNoAmountBillingEventIsQueued()
+    var
+        SalesInvHeader: Record "Sales Invoice Header";
+        PaymentLine: Record "NPR Magento Payment Line";
+        SpfyTask: Record "NPR Spfy Task";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        CapturePayment: Codeunit "NPR Spfy Task Capture Payment";
+        RecRef: RecordRef;
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+        StartEntryNo: BigInteger;
+    begin
+        // [SCENARIO] A capture task for a line that was already captured before it ran confirms nothing new, so it bills nothing; the capture was billed when it was confirmed, or is billed at posting.
+        Initialize();
+        StoreCode := CreateOrderStore();
+
+        // [GIVEN] A claimed capture task for a Shopify payment line that is already marked captured
+        CreateInvoiceWithPaymentLine(SalesInvHeader, PaymentLine, ShopifyGatewayCode());
+        PaymentLine."Date Captured" := Today();
+        PaymentLine.Modify(false);
+        RecRef.GetTable(PaymentLine);
+        TaskEntryNo := EnqueueTask(StoreCode, RecRef, PaymentLine.RecordId(), '5501', "NPR Spfy Task Op"::Insert, CurrentDateTime());
+        GetTask(TaskEntryNo, SpfyTask);
+        _Assert.IsTrue(_SpfyTaskQueue.ClaimSingle(SpfyTask), 'The stage-2 task must be claimable');
+        StartEntryNo := _LibBilling.LastBillingQueueEntryNo();
+
+        // [WHEN] The capture sibling runs
+        CapturePayment.SetGraphQLClient(MockClient);
+        CapturePayment.Run(SpfyTask);
+
+        // [THEN] Nothing is billed and the line gets no event id
+        PaymentLine.Find();
+        _Assert.AreEqual(0, _LibBilling.AmountQueueEntriesSince(StartEntryNo), 'A capture task on a line captured before it ran must not queue an order amount billing event');
+        _Assert.IsTrue(IsNullGuid(PaymentLine."NPR Spfy Ord.Amt.PCY Event Id"), 'A capture task on a line captured before it ran must not store an event id');
+    end;
+
+    [Test]
+    procedure GivenVoidedAuthorization_WhenCaptureSiblingRuns_ThenNoAmountBillingEventIsQueued()
+    var
+        SalesInvHeader: Record "Sales Invoice Header";
+        PaymentLine: Record "NPR Magento Payment Line";
+        SpfyTask: Record "NPR Spfy Task";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        CapturePayment: Codeunit "NPR Spfy Task Capture Payment";
+        RecRef: RecordRef;
+        StoreCode: Code[20];
+        TaskEntryNo: BigInteger;
+        StartEntryNo: BigInteger;
+    begin
+        // [SCENARIO] A capture task that finds the authorization with nothing unsettled and nothing captured from it (voided or expired) requests no capture, but bills nothing, since Shopify took no money.
+        Initialize();
+        StoreCode := CreateOrderStore();
+
+        // [GIVEN] A claimed capture task for a Shopify payment line of 500 on authorization 777
+        CreateInvoiceWithPaymentLine(SalesInvHeader, PaymentLine, ShopifyGatewayCode());
+        RecRef.GetTable(PaymentLine);
+        TaskEntryNo := EnqueueTask(StoreCode, RecRef, PaymentLine.RecordId(), '5501', "NPR Spfy Task Op"::Insert, CurrentDateTime());
+        GetTask(TaskEntryNo, SpfyTask);
+        _Assert.IsTrue(_SpfyTaskQueue.ClaimSingle(SpfyTask), 'The stage-2 task must be claimable');
+        // [GIVEN] Shopify reports authorization 777 with nothing unsettled and no capture from it
+        MockClient.AddResponse(_OrderTransactionsTok, '{"data":{"order":{"transactions":[{"id":"gid://shopify/OrderTransaction/777","kind":"AUTHORIZATION","status":"SUCCESS","processedAt":"2026-10-20T10:00:00Z","totalUnsettledSet":{"presentmentMoney":{"amount":"0.0","currencyCode":"DKK"}}}]}}}');
+        StartEntryNo := _LibBilling.LastBillingQueueEntryNo();
+
+        // [WHEN] The capture sibling runs
+        CapturePayment.SetGraphQLClient(MockClient);
+        CapturePayment.Run(SpfyTask);
+
+        // [THEN] No capture is requested and nothing is billed
+        PaymentLine.Find();
+        _Assert.AreEqual(0, MockClient.CountRequestsContaining(_TransactionCreateTok), 'An authorization with nothing left to capture must not be sent a capture request');
+        _Assert.AreEqual(0, _LibBilling.AmountQueueEntriesSince(StartEntryNo), 'A line of an authorization Shopify took no money from must not queue an order amount billing event');
+        _Assert.IsTrue(IsNullGuid(PaymentLine."NPR Spfy Ord.Amt.PCY Event Id"), 'A line of an authorization Shopify took no money from must not store an event id');
     end;
     #endregion
 
