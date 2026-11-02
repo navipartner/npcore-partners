@@ -95,7 +95,7 @@
         if FlowStatusCode <> '' then
             TempFlowStatus.SetRange(Code, FlowStatusCode);
 
-        if not BufferWPadLinesForSending(WaiterPad, WaiterPadLineIn, PrintType, TempFlowStatus, ForceResend, TempWPadLineBuffer) then begin
+        if not BufferWPadLinesForSending(WaiterPad, WaiterPadLineIn, PrintType, TempFlowStatus, ForceResend, FlowStatusCode <> '', TempWPadLineBuffer) then begin
             if ShowNothingToSendErr then
                 Error(NothingToSendLbl);
             exit(false);
@@ -171,7 +171,7 @@
             SendToPrintViaRPTemplate(PrintTemplateBuffer);
     end;
 
-    local procedure BufferWPadLinesForSending(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; var FlowStatus: Record "NPR NPRE Flow Status"; ForceResend: Boolean; var WPadLineBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer"): Boolean
+    local procedure BufferWPadLinesForSending(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; var FlowStatus: Record "NPR NPRE Flow Status"; ForceResend: Boolean; StepSpecificRequest: Boolean; var WPadLineBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer"): Boolean
     var
         TempPrintCategory: Record "NPR NPRE Print/Prod. Cat." temporary;
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
@@ -217,8 +217,182 @@
                   WaiterPadLine, OutputType, PrintType, FlowStatus, TempPrintCategory, ForceResend, AskResendConfirmation, WPadLineBuffer);
         end;
 
+        if PrintType = _PrintTemplate."Print Type"::"Serving Request" then
+            if StepSpecificRequest then
+                BufferUnroutedAddOnsWithMainLine(WaiterPad."No.", WPadLineBuffer)
+            else
+                if not ForceResend then
+                    RemoveAddOnsAlreadySentWithMainLine(WaiterPad."No.", WPadLineBuffer);
+
         Span.Finish();
         exit(not WPadLineBuffer.IsEmpty());
+    end;
+
+    local procedure BufferUnroutedAddOnsWithMainLine(WaiterPadNo: Code[20]; var WPadLineBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer")
+    var
+        TempParentRow: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary;
+        ParentLine: Record "NPR NPRE Waiter Pad Line";
+        AddOnLine: Record "NPR NPRE Waiter Pad Line";
+        NextEntryNo: Integer;
+    begin
+        //Add-ons with no serving steps or print categories are buffered only for the blank serving step, which a step-specific
+        //serving request does not evaluate, so they go on their main line's ticket here. KDS sends add-ons as modifiers already.
+        WPadLineBuffer.Reset();
+        if not WPadLineBuffer.FindLast() then
+            exit;
+        NextEntryNo := WPadLineBuffer."Entry No." + 1;
+
+        TempParentRow.Copy(WPadLineBuffer, true);
+        TempParentRow.SetRange("Output Type", TempParentRow."Output Type"::Print);
+        TempParentRow.SetFilter("Entry No.", '<%1', NextEntryNo);
+        if not TempParentRow.FindSet() then
+            exit;
+
+        ParentLine.SetLoadFields("Attached to Line No.");
+        AddOnLine.SetCurrentKey("Waiter Pad No.", "Attached to Line No.");
+        AddOnLine.SetRange("Waiter Pad No.", WaiterPadNo);
+        AddOnLine.SetFilter("Line Type", '<>%1', AddOnLine."Line Type"::Comment);
+        AddOnLine.SetLoadFields("Waiter Pad No.", "Line No.");
+        repeat
+            if ParentLine.Get(WaiterPadNo, TempParentRow."Waiter Pad Line No.") and (ParentLine."Attached to Line No." = 0) then begin
+                AddOnLine.SetRange("Attached to Line No.", ParentLine."Line No.");
+                if AddOnLine.FindSet() then
+                    repeat
+                        if (AddOnLine.TotalNoOfServingSteps() = 0) and (AddOnLine.TotalNoOfPrintCategories() = 0) then begin
+                            WPadLineBuffer.Init();
+                            WPadLineBuffer."Entry No." := NextEntryNo;
+                            NextEntryNo += 1;
+                            WPadLineBuffer."Output Type" := WPadLineBuffer."Output Type"::Print;
+                            WPadLineBuffer."Waiter Pad No." := WaiterPadNo;
+                            WPadLineBuffer."Waiter Pad Line No." := AddOnLine."Line No.";
+                            WPadLineBuffer."Print Category Code" := TempParentRow."Print Category Code";
+                            WPadLineBuffer."Serving Step" := TempParentRow."Serving Step";
+                            WPadLineBuffer.Insert();
+                        end;
+                    until AddOnLine.Next() = 0;
+            end;
+        until TempParentRow.Next() = 0;
+    end;
+
+    local procedure RemoveAddOnsAlreadySentWithMainLine(WaiterPadNo: Code[20]; var WPadLineBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer")
+    var
+        TempAddOnRow: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary;
+        AddOnLine: Record "NPR NPRE Waiter Pad Line";
+        EntryNosToDelete: List of [Integer];
+        EntryNo: Integer;
+    begin
+        //A blank-step serving request would print an add-on a second time when it already went out on its main line's ticket.
+        //Drop it unless its quantity changed since, it has a serving ticket of its own, its main line now goes out at a step
+        //it has not gone out with, or the request resends every line.
+        TempAddOnRow.Copy(WPadLineBuffer, true);
+        TempAddOnRow.SetRange("Output Type", TempAddOnRow."Output Type"::Print);
+        TempAddOnRow.SetRange("Serving Step", '');
+        TempAddOnRow.SetRange("Print Category Code", '');
+        if not TempAddOnRow.FindSet() then
+            exit;
+
+        AddOnLine.SetLoadFields("Attached to Line No.", "Quantity (Base)");
+        repeat
+            if AddOnLine.Get(WaiterPadNo, TempAddOnRow."Waiter Pad Line No.") and (AddOnLine."Attached to Line No." <> 0) then
+                if not HasOwnServingTicket(AddOnLine) then
+                    if SentWithMainLineAtCurrentQty(AddOnLine) then
+                        if not MainLineGoesOutWhereAddOnWasNot(AddOnLine, WPadLineBuffer) then
+                            EntryNosToDelete.Add(TempAddOnRow."Entry No.");
+        until TempAddOnRow.Next() = 0;
+
+        if EntryNosToDelete.Count() = 0 then
+            exit;
+        if PrintPassForced(WPadLineBuffer) then
+            exit;
+
+        foreach EntryNo in EntryNosToDelete do begin
+            TempAddOnRow.Get(EntryNo);
+            TempAddOnRow.Delete();
+        end;
+    end;
+
+    local procedure PrintPassForced(var WPadLineBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer"): Boolean
+    var
+        TempPrintRow: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary;
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+    begin
+        TempPrintRow.Copy(WPadLineBuffer, true);
+        TempPrintRow.SetRange("Output Type", TempPrintRow."Output Type"::Print);
+        if not TempPrintRow.FindSet() then
+            exit(false);
+
+        WaiterPadLine.SetLoadFields("Quantity (Base)");
+        repeat
+            if WaiterPadLine.Get(TempPrintRow."Waiter Pad No.", TempPrintRow."Waiter Pad Line No.") then begin
+                WaiterPadLine.SetRange("Print Type Filter", WaiterPadLine."Print Type Filter"::"Serving Request");
+                WaiterPadLine.SetRange("Output Type Filter", WaiterPadLine."Output Type Filter"::Print);
+                WaiterPadLine.SetRange("Serving Step Filter", TempPrintRow."Serving Step");
+                WaiterPadLine.SetRange("Print Category Filter", TempPrintRow."Print Category Code");
+                WaiterPadLine.CalcFields("Sent to Kitchen", "Sent to Kitchen Qty. (Base)");
+                if WaiterPadLine."Sent to Kitchen" and (WaiterPadLine."Quantity (Base)" = WaiterPadLine."Sent to Kitchen Qty. (Base)") then
+                    exit(true);
+            end;
+        until TempPrintRow.Next() = 0;
+        exit(false);
+    end;
+
+    local procedure HasOwnServingTicket(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"): Boolean
+    begin
+        WaiterPadLine.SetRange("Output Type Filter", WaiterPadLine."Output Type Filter"::Print);
+        WaiterPadLine.SetRange("Serving Step Filter", '');
+        WaiterPadLine.SetRange("Print Category Filter", '');
+        WaiterPadLine.CalcFields("Serving Requested");
+        exit(WaiterPadLine."Serving Requested");
+    end;
+
+    local procedure SentWithMainLineAtCurrentQty(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"): Boolean
+    var
+        PrintLogEntry: Record "NPR NPRE W.Pad Prnt LogEntry";
+    begin
+        PrintLogEntry.SetCurrentKey("Waiter Pad No.", "Waiter Pad Line No.", "Print Type", "Print Category Code", "Flow Status Object", "Flow Status Code", "Output Type");
+        PrintLogEntry.SetRange("Waiter Pad No.", WaiterPadLine."Waiter Pad No.");
+        PrintLogEntry.SetRange("Waiter Pad Line No.", WaiterPadLine."Line No.");
+        PrintLogEntry.SetRange("Print Type", PrintLogEntry."Print Type"::"Serving Request");
+        PrintLogEntry.SetRange("Flow Status Object", PrintLogEntry."Flow Status Object"::WaiterPadLineMealFlow);
+        PrintLogEntry.SetFilter("Flow Status Code", '<>%1', '');
+        PrintLogEntry.SetRange("Output Type", PrintLogEntry."Output Type"::Print);
+        PrintLogEntry.SetLoadFields("Print Category Code", "Flow Status Code");
+        if not PrintLogEntry.FindSet() then
+            exit(false);
+
+        WaiterPadLine.SetRange("Print Type Filter", WaiterPadLine."Print Type Filter"::"Serving Request");
+        WaiterPadLine.SetRange("Output Type Filter", WaiterPadLine."Output Type Filter"::Print);
+        repeat
+            WaiterPadLine.SetRange("Serving Step Filter", PrintLogEntry."Flow Status Code");
+            WaiterPadLine.SetRange("Print Category Filter", PrintLogEntry."Print Category Code");
+            WaiterPadLine.CalcFields("Sent to Kitchen Qty. (Base)");
+            if WaiterPadLine."Quantity (Base)" = WaiterPadLine."Sent to Kitchen Qty. (Base)" then
+                exit(true);
+        until PrintLogEntry.Next() = 0;
+        exit(false);
+    end;
+
+    local procedure MainLineGoesOutWhereAddOnWasNot(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; var WPadLineBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer"): Boolean
+    var
+        TempMainLineRow: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary;
+    begin
+        TempMainLineRow.Copy(WPadLineBuffer, true);
+        TempMainLineRow.SetRange("Output Type", TempMainLineRow."Output Type"::Print);
+        TempMainLineRow.SetRange("Waiter Pad No.", WaiterPadLine."Waiter Pad No.");
+        TempMainLineRow.SetRange("Waiter Pad Line No.", WaiterPadLine."Attached to Line No.");
+        if not TempMainLineRow.FindSet() then
+            exit(false);
+
+        WaiterPadLine.SetRange("Print Type Filter", WaiterPadLine."Print Type Filter"::"Serving Request");
+        WaiterPadLine.SetRange("Output Type Filter", WaiterPadLine."Output Type Filter"::Print);
+        repeat
+            WaiterPadLine.SetRange("Serving Step Filter", TempMainLineRow."Serving Step");
+            WaiterPadLine.SetRange("Print Category Filter", TempMainLineRow."Print Category Code");
+            WaiterPadLine.CalcFields("Sent to Kitchen Qty. (Base)");
+            if WaiterPadLine."Quantity (Base)" <> WaiterPadLine."Sent to Kitchen Qty. (Base)" then
+                exit(true);
+        until TempMainLineRow.Next() = 0;
+        exit(false);
     end;
 
     local procedure BufferEligibleForSendingWPadLines(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; OutputType: Integer; PrintType: Integer; var FlowStatus: Record "NPR NPRE Flow Status"; var PrintCategory: Record "NPR NPRE Print/Prod. Cat."; ForceResend: Boolean; AskResendConfirmation: Boolean; var WPadLineBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer")
