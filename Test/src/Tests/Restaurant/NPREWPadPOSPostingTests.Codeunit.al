@@ -112,6 +112,51 @@ codeunit 85406 "NPR NPRE W/Pad Posting Tests"
         _Assert.AreEqual(WaiterPad."Close Reason"::"Finished Sale", WaiterPad."Close Reason", 'The pad should record that it closed because the sale finished.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RecalledPadWithRemovedDish_Paid_NoZeroLinePostedAndLinksReleased()
+    var
+        Item: Record Item;
+        RemovedItem: Record Item;
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        POSEntryWaiterPadLink: Record "NPR POS Entry Waiter Pad Link";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        RemovedLine: Record "NPR NPRE Waiter Pad Line";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        // [SCENARIO] Paying a table posts what was paid, without a 0 line for a dish removed from the table
+        // [GIVEN] A pad with a removed dish at 0 and a dish to pay, recalled into a sale
+        Initialize();
+        ConfigureProfile("NPR NPRE Serv.Flow Close W/Pad"::Manual);
+        CreateItem(Item);
+        CreateItem(RemovedItem);
+        CreatePad(WaiterPad);
+        AddPadLine(WaiterPad, RemovedItem."No.", 0, RemovedLine);
+        AddPadLine(WaiterPad, Item."No.", 1, WaiterPadLine);
+        RecallPadIntoNewSale(WaiterPad, POSSession);
+
+        // [WHEN] The sale is paid and posted
+        PayAndPost(POSSession);
+
+        // [THEN] The dish to pay is billed, and the posted entry has no line for the removed dish
+        WaiterPadLine.Find();
+        _Assert.AreEqual(1, WaiterPadLine."Billed Quantity", 'The dish that was paid should be billed.');
+        POSEntryWaiterPadLink.SetRange("Waiter Pad No.", WaiterPad."No.");
+        POSEntryWaiterPadLink.SetRange("Waiter Pad Line No.", WaiterPadLine."Line No.");
+        _Assert.IsTrue(POSEntryWaiterPadLink.FindFirst(), 'The paid dish should be linked to the posted entry.');
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntryWaiterPadLink."POS Entry No.");
+        POSEntrySalesLine.SetRange("No.", RemovedItem."No.");
+        _Assert.IsTrue(POSEntrySalesLine.IsEmpty(), 'The posted entry should not carry a 0 line for the removed dish.');
+
+        // [THEN] The removed dish has no link to the posted entry and is released when the sale ends
+        POSEntryWaiterPadLink.SetRange("Waiter Pad Line No.", RemovedLine."Line No.");
+        _Assert.IsTrue(POSEntryWaiterPadLink.IsEmpty(), 'The removed dish should not be linked to the posted entry.');
+        RemovedLine.Find();
+        _Assert.AreEqual(0, RemovedLine."Billed Quantity", 'The removed dish should not be billed.');
+        _Assert.IsTrue(IsNullGuid(RemovedLine."Sale Retail ID"), 'The removed dish should be released when the sale ends.');
+    end;
+
     #endregion
 
     #region Cancelling a sale

@@ -137,24 +137,26 @@
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
         LinesSpan: Codeunit "NPR Sentry Span";
+        HiddenLineNos: List of [Integer];
         SaleLinesExist: Boolean;
     begin
         Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.save-from-pos');
 
         FilterSupportedSaleLines(SalePOS, SaleLinePOS);
-        SaleLinesExist := not SaleLinePOS.IsEmpty();
+        GetHiddenLineNos(SalePOS, WaiterPad, HiddenLineNos);
+        SaleLinesExist := not SaleLinePOS.IsEmpty() or (HiddenLineNos.Count() <> 0);
 
         if SaleLinesExist then begin
             TempTouchedWaiterPadLine.DeleteAll();
             UpdateWPHdrFromSaleHdr(SalePOS, WaiterPad);
-            SaleLinePOS.FindSet(CleanupSale);
-            CopySaleHdrPOSInfo(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", WaiterPad."No.", true);
+            CopySaleHdrPOSInfo(SalePOS."Register No.", SalePOS."Sales Ticket No.", WaiterPad."No.", true);
             Sentry.StartSpan(LinesSpan, 'bc.restaurant.waiterpad.save-from-pos.move-lines');
-            repeat
-                MoveSaleLineFromPOSToWaiterPad(SalePOS, SaleLinePOS, WaiterPad, WaiterPadLine, TempLineRelation);
-                TempTouchedWaiterPadLine := WaiterPadLine;
-                TempTouchedWaiterPadLine.Insert();
-            until SaleLinePOS.Next() = 0;
+            if SaleLinePOS.FindSet(CleanupSale) then
+                repeat
+                    MoveSaleLineFromPOSToWaiterPad(SalePOS, SaleLinePOS, WaiterPad, WaiterPadLine, TempLineRelation);
+                    TempTouchedWaiterPadLine := WaiterPadLine;
+                    TempTouchedWaiterPadLine.Insert();
+                until SaleLinePOS.Next() = 0;
             LinesSpan.Finish();
 
             WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
@@ -164,7 +166,10 @@
                 repeat
                     TempTouchedWaiterPadLine := WaiterPadLine;
                     if not TempTouchedWaiterPadLine.Find() then
-                        CleanupWaiterPadLine(WaiterPadLine, true);
+                        if HiddenLineNos.Contains(WaiterPadLine."Line No.") then
+                            ClearAmounts(WaiterPadLine)
+                        else
+                            CleanupWaiterPadLine(WaiterPadLine, true);
                 until WaiterPadLine.Next() = 0;
 
             KitchenOrderMgt.RefreshWaiterPadKitchenRequestModifiers(WaiterPad);
@@ -177,7 +182,7 @@
                     POSSaleLine.DeleteAll();
                 end;
                 ClearSaleHdrNPREPresetFields(SalePOS, true);
-                RemoveSaleHdrPOSInfo(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
+                RemoveSaleHdrPOSInfo(SalePOS."Register No.", SalePOS."Sales Ticket No.");
                 SaleCleanupSuccessful := true;
             end;
         if not SaleLinesExist then begin
@@ -231,6 +236,9 @@
         then begin
             if WaiterPadLine.Quantity > WaiterPadLine."Billed Quantity" then begin
                 WaiterPadLine.Validate(Quantity, WaiterPadLine."Billed Quantity");
+                WaiterPadLine."Amount Excl. VAT" := 0;
+                WaiterPadLine."Amount Incl. VAT" := 0;
+                WaiterPadLine."Discount Amount" := 0;
                 WaiterPadLine.Modify();
                 if MarkTouched then
                     WaiterPadLine.Mark := true;
@@ -405,13 +413,17 @@
         if WaiterPadLine.FindSet(true) then begin
             Sentry.StartSpan(CopyLinesSpan, 'bc.restaurant.waiterpad.load-to-pos.copy-lines');
             repeat
-                POSSaleLine.GetNewSaleLine(SaleLinePOS);
-                GetSaleLineFromWaiterPadToPOS(SalePOS, SaleLinePOS, WaiterPad, WaiterPadLine, POSSaleLine, TempLineRelation);
+                if HideOnPOSSale(WaiterPadLine) then
+                    HideLineInSale(SalePOS, WaiterPadLine)
+                else begin
+                    POSSaleLine.GetNewSaleLine(SaleLinePOS);
+                    GetSaleLineFromWaiterPadToPOS(SalePOS, SaleLinePOS, WaiterPad, WaiterPadLine, POSSaleLine, TempLineRelation);
+                end;
             until (0 = WaiterPadLine.Next());
             CopyLinesSpan.Finish();
         end;
 
-        CopySaleHdrPOSInfo(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", WaiterPad."No.", false);
+        CopySaleHdrPOSInfo(SalePOS."Register No.", SalePOS."Sales Ticket No.", WaiterPad."No.", false);
 
         LoadSpan.Finish();
     end;
@@ -470,6 +482,88 @@
         WaiterPadLine."Sale Retail ID" := SalePOS.SystemId;
         WaiterPadLine."Sale Line Retail ID" := SaleLinePOS.SystemId;
         WaiterPadLine.Modify();
+    end;
+
+    local procedure HideOnPOSSale(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"): Boolean
+    var
+        ParentWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+    begin
+        if WaiterPadLine."Line Type" = WaiterPadLine."Line Type"::Item then
+            exit(NothingLeftToBill(WaiterPadLine));
+        if WaiterPadLine."Attached to Line No." = 0 then
+            exit(false);
+        if not ParentWaiterPadLine.Get(WaiterPadLine."Waiter Pad No.", WaiterPadLine."Attached to Line No.") then
+            exit(false);
+        if ParentWaiterPadLine."Line Type" <> ParentWaiterPadLine."Line Type"::Item then
+            exit(false);
+        exit(NothingLeftToBill(ParentWaiterPadLine));
+    end;
+
+    local procedure NothingLeftToBill(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"): Boolean
+    begin
+        if HasQtyLeftToBill(WaiterPadLine) then
+            exit(false);
+        exit(not HasAttachedLineToBill(WaiterPadLine));
+    end;
+
+    local procedure HasQtyLeftToBill(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"): Boolean
+    begin
+        if WaiterPadLine.Quantity > 0 then
+            exit(WaiterPadLine.RemainingQtyToBill() > 0);
+        if WaiterPadLine.Quantity < 0 then
+            exit(WaiterPadLine.RemainingQtyToBill() < 0);
+        exit(false);
+    end;
+
+    local procedure HasAttachedLineToBill(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"): Boolean
+    var
+        AttachedWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+    begin
+        AttachedWaiterPadLine.SetCurrentKey("Waiter Pad No.", "Attached to Line No.");
+        AttachedWaiterPadLine.SetRange("Waiter Pad No.", WaiterPadLine."Waiter Pad No.");
+        AttachedWaiterPadLine.SetRange("Attached to Line No.", WaiterPadLine."Line No.");
+        AttachedWaiterPadLine.SetFilter("Line No.", '>%1', WaiterPadLine."Line No.");
+        AttachedWaiterPadLine.SetRange("Line Type", AttachedWaiterPadLine."Line Type"::Item);
+        if AttachedWaiterPadLine.FindSet() then
+            repeat
+                if HasQtyLeftToBill(AttachedWaiterPadLine) then
+                    exit(true);
+                if HasAttachedLineToBill(AttachedWaiterPadLine) then
+                    exit(true);
+            until AttachedWaiterPadLine.Next() = 0;
+        exit(false);
+    end;
+
+    local procedure HideLineInSale(SalePOS: Record "NPR POS Sale"; WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
+    begin
+        WaiterPadLine."Sale Retail ID" := SalePOS.SystemId;
+        WaiterPadLine.Modify();
+    end;
+
+    local procedure ClearAmounts(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
+    begin
+        if (WaiterPadLine."Amount Excl. VAT" = 0) and (WaiterPadLine."Amount Incl. VAT" = 0) and (WaiterPadLine."Discount Amount" = 0) then
+            exit;
+        WaiterPadLine."Amount Excl. VAT" := 0;
+        WaiterPadLine."Amount Incl. VAT" := 0;
+        WaiterPadLine."Discount Amount" := 0;
+        WaiterPadLine.Modify();
+    end;
+
+    local procedure GetHiddenLineNos(SalePOS: Record "NPR POS Sale"; WaiterPad: Record "NPR NPRE Waiter Pad"; var HiddenLineNos: List of [Integer])
+    var
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+    begin
+        if IsNullGuid(SalePOS.SystemId) then
+            exit;
+        WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
+        WaiterPadLine.SetRange("Sale Retail ID", SalePOS.SystemId);
+        WaiterPadLine.SetRange("Sale Line Retail ID", GetNullGuid());
+        if WaiterPadLine.FindSet() then
+            repeat
+                if HideOnPOSSale(WaiterPadLine) then
+                    HiddenLineNos.Add(WaiterPadLine."Line No.");
+            until WaiterPadLine.Next() = 0;
     end;
 
     local procedure WaiterPadExistsForSeating(SeatingCode: Code[20]; OpenOnly: Boolean; ExcludeWaiterPadNo: Code[20]): Boolean

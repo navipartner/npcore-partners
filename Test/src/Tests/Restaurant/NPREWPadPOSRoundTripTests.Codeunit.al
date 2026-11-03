@@ -619,6 +619,495 @@ codeunit 85405 "NPR NPRE W/Pad RoundTripTests"
         _Assert.AreEqual(POSInfoValueTok, POSInfoTransaction."POS Info", 'The recalled POS Info should keep its value.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SentLineRemovedAndSaved_PadRecalled_RemovedLineNotOnSale()
+    var
+        Item: Record Item;
+        OtherItem: Record Item;
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        OtherPadLine: Record "NPR NPRE Waiter Pad Line";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        POSSession: Codeunit "NPR POS Session";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+    begin
+        // [SCENARIO] A dish removed after it was sent to the kitchen is not shown again when the table is recalled
+        // [GIVEN] A pad with a sent dish and a second dish, where the sent dish was deleted in POS and the sale saved back
+        Initialize();
+        CreateRoutedItem(Item);
+        CreateItem(OtherItem);
+        CreatePad(WaiterPad);
+        AddPadLine(WaiterPad, Item."No.", 1, WaiterPadLine);
+        AddPadLine(WaiterPad, OtherItem."No.", 1, OtherPadLine);
+        SendPadToKitchen(WaiterPad);
+        StartEmptySale(POSSession, SalePOS);
+        WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(WaiterPad, POSSession);
+        SalePOS.Find();
+        DeleteSaleLineForItem(SalePOS, Item."No.");
+        WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, WaiterPad, true);
+        WaiterPadLine.Find();
+        _Assert.AreEqual(0, WaiterPadLine.Quantity, 'Test prerequisite: the removed dish should be kept on the pad at quantity 0.');
+
+        // [WHEN] The pad is recalled into a new sale
+        StartEmptySale(POSSession, SalePOS);
+        WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(WaiterPad, POSSession);
+
+        // [THEN] Only the dish that still has to be paid is on the sale
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        _Assert.AreEqual(1, SaleLinePOS.Count(), 'Only the dish that still has to be paid should be recalled.');
+        FindSaleLineForItem(SalePOS, OtherItem."No.", SaleLinePOS);
+
+        // [THEN] The removed dish stays on the pad at 0, held by the sale without a sale line of its own
+        WaiterPadLine.Find();
+        _Assert.AreEqual(0, WaiterPadLine.Quantity, 'The removed dish should stay on the pad at quantity 0.');
+        _Assert.AreEqual(SalePOS.SystemId, WaiterPadLine."Sale Retail ID", 'The hidden line should be held by the sale the pad was recalled into.');
+        _Assert.IsTrue(IsNullGuid(WaiterPadLine."Sale Line Retail ID"), 'The hidden line should have no POS sale line.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure PadWithBillingEdgeCases_Recalled_OnlyLinesLeftToBillShown()
+    var
+        PaidItem: Record Item;
+        PartlyPaidItem: Record Item;
+        ReturnItem: Record Item;
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        POSSession: Codeunit "NPR POS Session";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        CommentTok: Label 'Birthday table', Locked = true;
+    begin
+        // [SCENARIO] Only lines with something left to bill reach the sale, and a comment on no dish always does
+        // [GIVEN] A pad with a paid line, a partly paid line, a line with a negative quantity and a comment on no dish
+        Initialize();
+        CreateItem(PaidItem);
+        CreateItem(PartlyPaidItem);
+        CreateItem(ReturnItem);
+        CreatePad(WaiterPad);
+        AddPadLine(WaiterPad, PaidItem."No.", 1, WaiterPadLine);
+        _LibraryRestaurant.SetWaiterPadLineBilledQuantity(WaiterPadLine, 1);
+        AddPadLine(WaiterPad, PartlyPaidItem."No.", 2, WaiterPadLine);
+        _LibraryRestaurant.SetWaiterPadLineBilledQuantity(WaiterPadLine, 1);
+        AddPadLine(WaiterPad, ReturnItem."No.", -1, WaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadCommentLine(WaiterPad."No.", CommentTok, 0, WaiterPadLine);
+
+        // [WHEN] The pad is recalled into a sale
+        StartEmptySale(POSSession, SalePOS);
+        WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(WaiterPad, POSSession);
+
+        // [THEN] The paid line stays off the sale
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange("No.", PaidItem."No.");
+        _Assert.IsTrue(SaleLinePOS.IsEmpty(), 'A line that is paid in full should not be recalled.');
+
+        // [THEN] The other lines come back with what is left to bill, and so does the comment
+        FindSaleLineForItem(SalePOS, PartlyPaidItem."No.", SaleLinePOS);
+        _Assert.AreEqual(1, SaleLinePOS.Quantity, 'A partly paid line should be recalled with the quantity still to pay.');
+        FindSaleLineForItem(SalePOS, ReturnItem."No.", SaleLinePOS);
+        _Assert.AreEqual(-1, SaleLinePOS.Quantity, 'A line with a negative quantity is not settled and should be recalled.');
+        SaleLinePOS.Reset();
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Comment);
+        _Assert.AreEqual(1, SaleLinePOS.Count(), 'A comment on no dish should always be recalled.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ZeroDishWithAddOnChainToBill_PadRecalled_WholeChainOnSale()
+    var
+        AddOnItem: Record Item;
+        DishItem: Record Item;
+        SubAddOnItem: Record Item;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        SalePOS: Record "NPR POS Sale";
+        AddOnSaleLinePOS: Record "NPR POS Sale Line";
+        DishSaleLinePOS: Record "NPR POS Sale Line";
+        SubAddOnSaleLinePOS: Record "NPR POS Sale Line";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        AddOnLine: Record "NPR NPRE Waiter Pad Line";
+        DishLine: Record "NPR NPRE Waiter Pad Line";
+        SubAddOnLine: Record "NPR NPRE Waiter Pad Line";
+        POSSession: Codeunit "NPR POS Session";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+    begin
+        // [SCENARIO] A dish at 0 stays on the sale while an add-on further down its chain still has to be paid
+        // [GIVEN] A dish at 0 with an add-on at 0, and under that add-on a second add-on still to pay
+        Initialize();
+        CreateItem(DishItem);
+        CreateItem(AddOnItem);
+        CreateItem(SubAddOnItem);
+        _LibraryRestaurant.CreateItemAddon(ItemAddOn);
+        CreatePad(WaiterPad);
+        AddPadLine(WaiterPad, DishItem."No.", 0, DishLine);
+        AddAddOnPadLine(WaiterPad, AddOnItem."No.", 0, DishLine."Line No.", ItemAddOn."No.", AddOnLine);
+        AddAddOnPadLine(WaiterPad, SubAddOnItem."No.", 1, AddOnLine."Line No.", ItemAddOn."No.", SubAddOnLine);
+
+        // [WHEN] The pad is recalled into a sale
+        StartEmptySale(POSSession, SalePOS);
+        WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(WaiterPad, POSSession);
+
+        // [THEN] The whole chain is on the sale, each add-on attached to the line above it
+        FindSaleLineForItem(SalePOS, DishItem."No.", DishSaleLinePOS);
+        FindSaleLineForItem(SalePOS, AddOnItem."No.", AddOnSaleLinePOS);
+        FindSaleLineForItem(SalePOS, SubAddOnItem."No.", SubAddOnSaleLinePOS);
+        _Assert.AreEqual(DishSaleLinePOS."Line No.", AppliesToSaleLineNo(AddOnSaleLinePOS), 'The add-on should be attached to the dish on the sale.');
+        _Assert.AreEqual(AddOnSaleLinePOS."Line No.", AppliesToSaleLineNo(SubAddOnSaleLinePOS), 'The second add-on should be attached to the first add-on on the sale.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CommentOnPaidDish_RecalledAndSavedBack_HiddenAndKept()
+    var
+        OpenItem: Record Item;
+        PaidItem: Record Item;
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        CommentLine: Record "NPR NPRE Waiter Pad Line";
+        OpenLine: Record "NPR NPRE Waiter Pad Line";
+        PaidLine: Record "NPR NPRE Waiter Pad Line";
+        POSSession: Codeunit "NPR POS Session";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        CommentTok: Label 'No onions', Locked = true;
+    begin
+        // [SCENARIO] A comment goes with its dish: hidden while the dish is paid, and still on the pad for the kitchen
+        // [GIVEN] A paid dish with a comment numbered before it, and a dish still to pay
+        Initialize();
+        CreateItem(PaidItem);
+        CreateItem(OpenItem);
+        CreatePad(WaiterPad);
+        AddPadLine(WaiterPad, PaidItem."No.", 1, PaidLine);
+        _LibraryRestaurant.SetWaiterPadLineBilledQuantity(PaidLine, 1);
+        AddCommentNumberedBefore(PaidLine, CommentTok, CommentLine);
+        AddPadLine(WaiterPad, OpenItem."No.", 1, OpenLine);
+
+        // [WHEN] The pad is recalled into a sale
+        StartEmptySale(POSSession, SalePOS);
+        WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(WaiterPad, POSSession);
+
+        // [THEN] Only the dish still to pay is on the sale
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        _Assert.AreEqual(1, SaleLinePOS.Count(), 'Neither the paid dish nor its comment should be recalled.');
+        FindSaleLineForItem(SalePOS, OpenItem."No.", SaleLinePOS);
+
+        // [WHEN] The sale is saved back onto the pad
+        SalePOS.Find();
+        WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, WaiterPad, true);
+
+        // [THEN] The comment is still on the pad
+        _Assert.IsTrue(CommentLine.Find(), 'Saving the sale back should not delete a comment the recall hid.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure PadWithOnlyHiddenLines_RecalledAndCancelled_PadClosed()
+    var
+        Item: Record Item;
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        POSSession: Codeunit "NPR POS Session";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+    begin
+        // [SCENARIO] A table with nothing left to bill opens as an empty sale, and cancelling that sale frees the table
+        // [GIVEN] A pad whose only dish was sent to the kitchen and then taken down to 0
+        Initialize();
+        CreateRoutedItem(Item);
+        CreatePad(WaiterPad);
+        AddPadLine(WaiterPad, Item."No.", 1, WaiterPadLine);
+        SendPadToKitchen(WaiterPad);
+        WaiterPadLine.Find();
+        WaiterPadLine.Validate(Quantity, 0);
+        WaiterPadLine.Modify(true);
+
+        // [WHEN] The pad is recalled into a sale
+        StartEmptySale(POSSession, SalePOS);
+        WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(WaiterPad, POSSession);
+
+        // [THEN] The sale has no lines but still belongs to the table
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        _Assert.IsTrue(SaleLinePOS.IsEmpty(), 'A table with nothing left to bill should be recalled into an empty sale.');
+        SalePOS.Find();
+        _Assert.AreEqual(WaiterPad."No.", SalePOS."NPRE Pre-Set Waiter Pad No.", 'The empty sale should still be pre-set to the table''s waiter pad.');
+
+        // [WHEN] The sale is cancelled
+        WaiterPad.Find();
+        WaiterPadPOSMgt.CleanupWaiterPadOnSaleCancel(SalePOS, WaiterPad);
+
+        // [THEN] The pad is closed by the cancelled sale
+        WaiterPad.Find();
+        _Assert.IsTrue(WaiterPad.Closed, 'Cancelling the sale should close a pad with nothing left to bill.');
+        _Assert.AreEqual(WaiterPad."Close Reason"::"Cancelled Sale", WaiterPad."Close Reason", 'The pad should record that a cancelled sale closed it.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure PadWithOnlyHiddenLines_RecalledAndSaved_HeaderPOSInfoAndLinesIntact()
+    var
+        Item: Record Item;
+        POSInfo: Record "NPR POS Info";
+        POSInfoTransaction: Record "NPR POS Info Transaction";
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        CommentLine: Record "NPR NPRE Waiter Pad Line";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        POSSession: Codeunit "NPR POS Session";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        CommentTok: Label 'No onions', Locked = true;
+        POSInfoValueTok: Label 'Table for six', Locked = true;
+    begin
+        // [SCENARIO] A table with nothing left to bill can be opened and put back without losing or leaking anything
+        // [GIVEN] A pad holding header POS Info and only a dish at 0 with a comment on it
+        Initialize();
+        CreateItem(Item);
+        CreatePOSInfo(POSInfo);
+        CreatePad(WaiterPad);
+        AddPadHeaderPOSInfo(WaiterPad, POSInfo.Code, POSInfoValueTok);
+        AddPadLine(WaiterPad, Item."No.", 0, WaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadCommentLine(WaiterPad."No.", CommentTok, WaiterPadLine."Line No.", CommentLine);
+
+        // [WHEN] The pad is recalled into a sale
+        StartEmptySale(POSSession, SalePOS);
+        WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(WaiterPad, POSSession);
+
+        // [THEN] The header POS Info is on the sale, and nothing was written without a register
+        POSInfoTransaction.SetRange("POS Info Code", POSInfo.Code);
+        POSInfoTransaction.SetRange("Register No.", '');
+        _Assert.IsTrue(POSInfoTransaction.IsEmpty(), 'Recalling the pad should not write POS Info without a register number.');
+        FilterSaleHeaderPOSInfo(SalePOS, POSInfo.Code, POSInfoTransaction);
+        _Assert.IsTrue(POSInfoTransaction.FindFirst(), 'The pad''s header POS Info should be on the recalled sale.');
+        _Assert.AreEqual(POSInfoValueTok, POSInfoTransaction."POS Info", 'The header POS Info should keep its value.');
+
+        // [WHEN] The sale is saved back onto the pad
+        SalePOS.Find();
+        WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, WaiterPad, true);
+
+        // [THEN] The header POS Info is off the sale again
+        _Assert.IsTrue(POSInfoTransaction.IsEmpty(), 'Saving the sale back should take the pad''s header POS Info off the sale.');
+
+        // [THEN] The pad lines are untouched and released from the sale
+        WaiterPadLine.Find();
+        _Assert.AreEqual(0, WaiterPadLine.Quantity, 'The dish should stay on the pad at quantity 0.');
+        _Assert.IsTrue(IsNullGuid(WaiterPadLine."Sale Retail ID"), 'Saving with cleanup should release the dish from the sale.');
+        _Assert.IsTrue(CommentLine.Find(), 'Saving the sale back should not delete the comment the recall hid.');
+        _Assert.IsTrue(IsNullGuid(CommentLine."Sale Retail ID"), 'Saving with cleanup should release the comment from the sale.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure HiddenDishOnPad_LastVisibleDishDeletedAndSaved_KitchenRequestCancelled()
+    var
+        Item: Record Item;
+        RemovedItem: Record Item;
+        KitchenRequest: Record "NPR NPRE Kitchen Request";
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        RemovedPadLine: Record "NPR NPRE Waiter Pad Line";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        POSSession: Codeunit "NPR POS Session";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        RequestNo: BigInteger;
+    begin
+        // [SCENARIO] Deleting the last dish shown for a table reaches the kitchen, also when the table holds a dish removed earlier
+        // [GIVEN] A pad with a removed dish at 0 and a sent dish, recalled into a sale where the sent dish is then deleted
+        Initialize();
+        CreateItem(RemovedItem);
+        CreateRoutedItem(Item);
+        CreatePad(WaiterPad);
+        AddPadLine(WaiterPad, RemovedItem."No.", 0, RemovedPadLine);
+        AddPadLine(WaiterPad, Item."No.", 1, WaiterPadLine);
+        SendPadToKitchen(WaiterPad);
+        RequestNo := GetOnlyKitchenRequestNo(WaiterPad."No.");
+        StartEmptySale(POSSession, SalePOS);
+        WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(WaiterPad, POSSession);
+        SalePOS.Find();
+        DeleteSaleLineForItem(SalePOS, Item."No.");
+
+        // [WHEN] The sale, now without lines, is saved back onto the pad
+        WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, WaiterPad, true);
+
+        // [THEN] The deleted dish is reduced to 0 and its kitchen request is cancelled
+        WaiterPadLine.Find();
+        _Assert.AreEqual(0, WaiterPadLine.Quantity, 'Deleting the last shown dish should reduce it to 0 on the pad.');
+        KitchenRequest.Get(RequestNo);
+        _Assert.AreEqual(KitchenRequest."Line Status"::Cancelled, KitchenRequest."Line Status", 'Deleting the last shown dish should cancel its kitchen request.');
+
+        // [THEN] The dish removed earlier is still on the pad
+        _Assert.IsTrue(RemovedPadLine.Find(), 'The dish removed earlier should stay on the pad.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RemovedAndPaidDishes_PadRecalledAndSaved_PreReceiptTotalOnlyOpenDish()
+    var
+        OpenItem: Record Item;
+        PaidItem: Record Item;
+        RemovedItem: Record Item;
+        TempRestaurantPrintHeader: Record "NPR NPRE Rest. Print Header" temporary;
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        OpenLine: Record "NPR NPRE Waiter Pad Line";
+        PaidLine: Record "NPR NPRE Waiter Pad Line";
+        RemovedLine: Record "NPR NPRE Waiter Pad Line";
+        KitchenPrintMgt: Codeunit "NPR NPRE Kitchen Print Mgt";
+        POSSession: Codeunit "NPR POS Session";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+    begin
+        // [SCENARIO] The pre-receipt of a reopened table charges only the dishes still to pay
+        // [GIVEN] A pad with a removed dish and a paid dish that both still carry their old amounts, and a dish still to pay
+        Initialize();
+        CreateItem(RemovedItem);
+        CreateItem(PaidItem);
+        CreateItem(OpenItem);
+        CreatePad(WaiterPad);
+        AddPadLine(WaiterPad, RemovedItem."No.", 0, RemovedLine);
+        SetPadLinePrice(RemovedLine, 15);
+        AddPadLine(WaiterPad, PaidItem."No.", 1, PaidLine);
+        _LibraryRestaurant.SetWaiterPadLineBilledQuantity(PaidLine, 1);
+        SetPadLinePrice(PaidLine, 20);
+        AddPadLine(WaiterPad, OpenItem."No.", 1, OpenLine);
+        SetPadLinePrice(OpenLine, 12);
+
+        // [WHEN] The pad is recalled and saved back, as Print Pre-Receipt does before it prints
+        StartEmptySale(POSSession, SalePOS);
+        WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(WaiterPad, POSSession);
+        SalePOS.Find();
+        WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, WaiterPad, false);
+
+        // [THEN] The pre-receipt total is the amount of the dish still to pay
+        OpenLine.Find();
+        _Assert.AreNotEqual(0, OpenLine."Amount Incl. VAT", 'Test prerequisite: the dish still to pay should carry an amount.');
+        KitchenPrintMgt.GetPrintHeader(WaiterPad."No.", false, TempRestaurantPrintHeader);
+        _Assert.AreEqual(OpenLine."Amount Incl. VAT", TempRestaurantPrintHeader."Total Amount Incl. VAT", 'The pre-receipt total should not include dishes that were removed or already paid.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure PaidDish_PadRecalledWithoutSaving_StoredAmountKept()
+    var
+        OpenItem: Record Item;
+        PaidItem: Record Item;
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        OpenLine: Record "NPR NPRE Waiter Pad Line";
+        PaidLine: Record "NPR NPRE Waiter Pad Line";
+        POSSession: Codeunit "NPR POS Session";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+    begin
+        // [SCENARIO] Opening a table and leaving without saving does not change what is stored on its waiter pad
+        // [GIVEN] A pad with a paid dish that still carries its amount, and a dish still to pay
+        Initialize();
+        CreateItem(PaidItem);
+        CreateItem(OpenItem);
+        CreatePad(WaiterPad);
+        AddPadLine(WaiterPad, PaidItem."No.", 1, PaidLine);
+        _LibraryRestaurant.SetWaiterPadLineBilledQuantity(PaidLine, 1);
+        SetPadLinePrice(PaidLine, 20);
+        AddPadLine(WaiterPad, OpenItem."No.", 1, OpenLine);
+
+        // [WHEN] The pad is recalled into a sale and nothing is saved back
+        StartEmptySale(POSSession, SalePOS);
+        WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(WaiterPad, POSSession);
+
+        // [THEN] The paid dish keeps its stored amount
+        PaidLine.Find();
+        _Assert.AreEqual(20, PaidLine."Amount Incl. VAT", 'Opening a table without saving should not change the stored amount of a paid dish.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SentDishDeletedAndSavedInSameSale_PreReceiptTotalOnlyOpenDish()
+    var
+        Item: Record Item;
+        OtherItem: Record Item;
+        TempRestaurantPrintHeader: Record "NPR NPRE Rest. Print Header" temporary;
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        OtherPadLine: Record "NPR NPRE Waiter Pad Line";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        KitchenPrintMgt: Codeunit "NPR NPRE Kitchen Print Mgt";
+        POSSession: Codeunit "NPR POS Session";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+    begin
+        // [SCENARIO] Removing a sent dish and printing the pre-receipt in the same sale does not charge the removed dish
+        // [GIVEN] A pad with a sent dish and a second dish, both priced, recalled into a sale where the sent dish is deleted
+        Initialize();
+        CreateRoutedItem(Item);
+        CreateItem(OtherItem);
+        CreatePad(WaiterPad);
+        AddPadLine(WaiterPad, Item."No.", 1, WaiterPadLine);
+        SetPadLinePrice(WaiterPadLine, 15);
+        AddPadLine(WaiterPad, OtherItem."No.", 1, OtherPadLine);
+        SetPadLinePrice(OtherPadLine, 12);
+        SendPadToKitchen(WaiterPad);
+        StartEmptySale(POSSession, SalePOS);
+        WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(WaiterPad, POSSession);
+        SalePOS.Find();
+        DeleteSaleLineForItem(SalePOS, Item."No.");
+
+        // [WHEN] The sale is saved back without leaving it, as Print Pre-Receipt does before it prints
+        WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, WaiterPad, false);
+
+        // [THEN] The removed dish stays on the pad at 0 without its amount, and the pre-receipt total is the other dish only
+        WaiterPadLine.Find();
+        _Assert.AreEqual(0, WaiterPadLine.Quantity, 'Test prerequisite: the removed dish should be kept on the pad at quantity 0.');
+        _Assert.AreEqual(0, WaiterPadLine."Amount Incl. VAT", 'A dish removed in the sale should not keep its amount on the pad.');
+        OtherPadLine.Find();
+        KitchenPrintMgt.GetPrintHeader(WaiterPad."No.", false, TempRestaurantPrintHeader);
+        _Assert.AreEqual(OtherPadLine."Amount Incl. VAT", TempRestaurantPrintHeader."Total Amount Incl. VAT", 'The pre-receipt total should not include the dish removed in the same sale.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure OverBilledLines_PadRecalled_NotRecalledAsRefunds()
+    var
+        OpenItem: Record Item;
+        OverBilledItem: Record Item;
+        ZeroedPaidItem: Record Item;
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        POSSession: Codeunit "NPR POS Session";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+    begin
+        // [SCENARIO] A line paid more than it was ordered is settled and must not come back as a refund
+        // [GIVEN] A pad with a paid line an earlier save set to 0 ordered, a line paid twice for one ordered, and a dish still to pay
+        Initialize();
+        CreateItem(ZeroedPaidItem);
+        CreateItem(OverBilledItem);
+        CreateItem(OpenItem);
+        CreatePad(WaiterPad);
+        AddPadLine(WaiterPad, ZeroedPaidItem."No.", 0, WaiterPadLine);
+        _LibraryRestaurant.SetWaiterPadLineBilledQuantity(WaiterPadLine, 1);
+        AddPadLine(WaiterPad, OverBilledItem."No.", 1, WaiterPadLine);
+        _LibraryRestaurant.SetWaiterPadLineBilledQuantity(WaiterPadLine, 2);
+        AddPadLine(WaiterPad, OpenItem."No.", 1, WaiterPadLine);
+
+        // [WHEN] The pad is recalled into a sale
+        StartEmptySale(POSSession, SalePOS);
+        WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(WaiterPad, POSSession);
+
+        // [THEN] Nothing is recalled as a refund, and only the dish still to pay is on the sale
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetFilter(Quantity, '<0');
+        _Assert.IsTrue(SaleLinePOS.IsEmpty(), 'A line paid more than it was ordered should not be recalled as a refund.');
+        SaleLinePOS.SetRange(Quantity);
+        _Assert.AreEqual(1, SaleLinePOS.Count(), 'Only the dish still to pay should be recalled.');
+        FindSaleLineForItem(SalePOS, OpenItem."No.", SaleLinePOS);
+    end;
+
     #endregion
 
     #region Setup helpers
@@ -839,6 +1328,66 @@ codeunit 85405 "NPR NPRE W/Pad RoundTripTests"
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPadNo);
         WaiterPadLine.SetRange("No.", ItemNo);
         _Assert.IsTrue(WaiterPadLine.FindFirst(), 'The waiter pad should hold a line for the item.');
+    end;
+
+    local procedure AddAddOnPadLine(WaiterPad: Record "NPR NPRE Waiter Pad"; ItemNo: Code[20]; Quantity: Decimal; AttachedToLineNo: Integer; AddOnNo: Code[20]; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
+    begin
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", ItemNo, Quantity, AttachedToLineNo, WaiterPadLine);
+        WaiterPadLine."AddOn No." := AddOnNo;
+        WaiterPadLine."AddOn Line No." := 10000;
+        WaiterPadLine.Modify();
+    end;
+
+    local procedure AddCommentNumberedBefore(DishLine: Record "NPR NPRE Waiter Pad Line"; CommentText: Text; var CommentLine: Record "NPR NPRE Waiter Pad Line")
+    begin
+        CommentLine.Init();
+        CommentLine."Waiter Pad No." := DishLine."Waiter Pad No.";
+        CommentLine."Line No." := DishLine."Line No." - 1;
+        CommentLine."Line Type" := CommentLine."Line Type"::Comment;
+        CommentLine.Description := CopyStr(CommentText, 1, MaxStrLen(CommentLine.Description));
+        CommentLine."Attached to Line No." := DishLine."Line No.";
+        CommentLine.Indentation := 1;
+        CommentLine.Insert(true);
+    end;
+
+    local procedure AppliesToSaleLineNo(SaleLinePOS: Record "NPR POS Sale Line"): Integer
+    var
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+    begin
+        SaleLinePOSAddOn.SetRange("Register No.", SaleLinePOS."Register No.");
+        SaleLinePOSAddOn.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
+        SaleLinePOSAddOn.SetRange("Sale Line No.", SaleLinePOS."Line No.");
+        _Assert.IsTrue(SaleLinePOSAddOn.FindFirst(), 'The recalled add-on line should carry an add-on link.');
+        exit(SaleLinePOSAddOn."Applies-to Line No.");
+    end;
+
+    local procedure AddPadHeaderPOSInfo(WaiterPad: Record "NPR NPRE Waiter Pad"; POSInfoCode: Code[20]; POSInfoValue: Text)
+    var
+        POSInfoWaiterPadLink: Record "NPR POS Info NPRE Waiter Pad";
+    begin
+        POSInfoWaiterPadLink.Init();
+        POSInfoWaiterPadLink."Waiter Pad No." := WaiterPad."No.";
+        POSInfoWaiterPadLink."Waiter Pad Line No." := 0;
+        POSInfoWaiterPadLink."POS Info Code" := POSInfoCode;
+        POSInfoWaiterPadLink."POS Info" := CopyStr(POSInfoValue, 1, MaxStrLen(POSInfoWaiterPadLink."POS Info"));
+        POSInfoWaiterPadLink.Insert();
+    end;
+
+    local procedure FilterSaleHeaderPOSInfo(SalePOS: Record "NPR POS Sale"; POSInfoCode: Code[20]; var POSInfoTransaction: Record "NPR POS Info Transaction")
+    begin
+        POSInfoTransaction.Reset();
+        POSInfoTransaction.SetRange("Register No.", SalePOS."Register No.");
+        POSInfoTransaction.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        POSInfoTransaction.SetRange("Sales Line No.", 0);
+        POSInfoTransaction.SetRange("POS Info Code", POSInfoCode);
+    end;
+
+    local procedure SetPadLinePrice(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; Price: Decimal)
+    begin
+        WaiterPadLine."Unit Price" := Price;
+        WaiterPadLine."Amount Excl. VAT" := Price;
+        WaiterPadLine."Amount Incl. VAT" := Price;
+        WaiterPadLine.Modify();
     end;
 
     #endregion
