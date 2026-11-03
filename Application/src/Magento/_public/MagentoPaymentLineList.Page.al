@@ -209,6 +209,7 @@
                     PaymentLine: Record "NPR Magento Payment Line";
                     MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
                     ConfirmManagement: Codeunit "Confirm Management";
+                    CaptureAgain: Boolean;
                 begin
                     if not Rec.Find() then
                         exit;
@@ -220,6 +221,7 @@
                     if Rec."Date Captured" <> 0D then begin
                         if not Confirm(CapturePaymentAgainQst, false) then
                             exit;
+                        CaptureAgain := true;
                         Rec."Date Captured" := 0D;
                         // An Adyen line keeps Capture Requested after an async capture; clear it so the line does not look in flight.
                         if MagentoPmtMgt.IsCaptureInFlight(Rec) then
@@ -231,6 +233,9 @@
 
                     PaymentLine := Rec;
                     MagentoPmtMgt.CapturePaymentLine(PaymentLine);
+                    // A repeat capture is not billed: when the provider reports success again, "Captured Amount" counts the line twice.
+                    if (not CaptureAgain) and (PaymentLine."Document Table No." = Database::"Sales Invoice Header") then
+                        MagentoPmtMgt.RegisterEcomBillingAfterCapture(PaymentLine."Document No.");
                     CurrPage.Update(false);
                 end;
             }

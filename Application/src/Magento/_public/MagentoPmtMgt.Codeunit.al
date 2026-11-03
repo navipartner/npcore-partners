@@ -1773,10 +1773,10 @@
     end;
 
     /// <summary>
-    /// Registers the captured amount for an ecom-linked Sales Invoice, ISOLATED from the
-    /// Sales-Post transaction.
+    /// Bills the part of the captured amount of the posted invoice's Entria order that is not billed yet.
+    /// Commits the open transaction first. Does nothing for other ecommerce channels.
     /// </summary>
-    local procedure RegisterEcomBillingAfterCapture(SalesInvHdrNo: Code[20])
+    internal procedure RegisterEcomBillingAfterCapture(SalesInvHdrNo: Code[20])
     var
         SalesInvHeader: Record "Sales Invoice Header";
         EcomSalesHeader: Record "NPR Ecom Sales Header";

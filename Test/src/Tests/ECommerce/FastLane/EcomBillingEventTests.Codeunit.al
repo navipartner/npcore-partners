@@ -1158,6 +1158,278 @@ codeunit 85420 "NPR Ecom Billing Event Tests"
             'The event billed from the posting hook must be queued - an unqueued row charges nothing and is not counted as progress, so the next posting would register the same amount again.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('MessageHandler,ConfirmHandlerYes')]
+    procedure ManualCaptureOnPaymentLineListBillsWhatPostingFailedToCapture()
+    var
+        EcomBillingEvent: Record "NPR Ecom Billing Event";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
+        PaymentLine: Record "NPR Magento Payment Line";
+        PostedPaymentLine: Record "NPR Magento Payment Line";
+        SalesHeader: Record "Sales Header";
+        SalesPost: Codeunit "Sales-Post";
+        PGCITestIntegration: Codeunit "NPR PG CI Test Integration";
+        PaymentLineList: TestPage "NPR Magento Payment Line List";
+        OrdersArr: JsonArray;
+        OrderCreatedAt: DateTime;
+        GatewayCode: Code[10];
+        QueueBaselineEntryNo: BigInteger;
+        CapturedTotal: Decimal;
+    begin
+        // [SCENARIO] The capture during posting fails, so posting bills nothing. A manual capture from the payment
+        //            line list that fails again must bill nothing, and one that succeeds must bill what it captured.
+
+        // [GIVEN] An enabled Entria store and an imported Entria order with one payment line
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        OrderCreatedAt := CreateDateTime(DMY2Date(5, 3, 2024), 090000T);
+        _LibraryEntria.BuildOrderArrayWithPayments(OrdersArr, 'ZZ-BILL-PLLMAN', 'medusa-bill-pllman', OrderCreatedAt, OrderCreatedAt, 100, 100, 'PSP-BILL-PLLMAN');
+        ImportPrebuiltOrder('ZZ-BILL-PLLMAN', OrdersArr, EcomSalesHeader);
+        EcomSalesPmtLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesPmtLine.FindFirst();
+
+        // [GIVEN] A CI gateway whose capture fails
+        GatewayCode := _LibPaymentGateway.CreatePaymentGateway(Enum::"NPR PG Integrations"::"CI Test Integration");
+        PGCITestIntegration.SetShouldError();
+
+        // [GIVEN] A sales order linked to the ecommerce order and to its payment line
+        _LibSales.CreateSalesOrder(SalesHeader);
+        SalesHeader."NPR Inc Ecom Sale Id" := EcomSalesHeader.SystemId;
+        SalesHeader.Modify();
+        _LibPaymentGateway.CreatePaymentLineForSalesHeader(SalesHeader, GatewayCode, PaymentLine);
+        PaymentLine."NPR Inc Ecom Sale Id" := EcomSalesHeader.SystemId;
+        PaymentLine."NPR Inc Ecom Sales Pmt Line Id" := EcomSalesPmtLine.SystemId;
+        PaymentLine.Modify();
+        Commit();
+
+        // [GIVEN] The sales order is posted and the capture during posting fails
+        SalesHeader.Ship := true;
+        SalesHeader.Invoice := true;
+        SalesPost.Run(SalesHeader);
+        _Assert.IsTrue(PostedPaymentLine.Get(Database::"Sales Invoice Header", 0, SalesHeader."Last Posting No.", PaymentLine."Line No."),
+            'Setup: posting must have created the payment line of the posted invoice.');
+        _Assert.AreEqual(0D, PostedPaymentLine."Date Captured",
+            'Setup: the capture during posting must have failed, otherwise nothing is left to capture manually.');
+        EcomSalesHeader.Find();
+        EcomSalesHeader.CalcFields("Captured Payment Amount");
+        _Assert.AreEqual(0, EcomSalesHeader."Captured Payment Amount",
+            'Setup: a failed capture during posting must write nothing back to "Captured Amount".');
+        _Assert.AreEqual(0, CountAmountEvents('ZZ-BILL-PLLMAN'),
+            'Setup: posting must bill nothing when its capture failed.');
+
+        // [GIVEN] The gateway still fails
+        PGCITestIntegration.Reset();
+        PGCITestIntegration.SetShouldError();
+        QueueBaselineEntryNo := LastBillingQueueEntryNo();
+
+        // [WHEN] Capture Payment is run on the posted line from the payment line list
+        PaymentLineList.OpenView();
+        _Assert.IsTrue(PaymentLineList.GoToRecord(PostedPaymentLine), 'The posted payment line should be shown on the payment line list.');
+        PaymentLineList."Capture Payment".Invoke();
+
+        // [THEN] The capture was attempted, failed, and nothing was billed or queued
+        _Assert.IsTrue(PGCITestIntegration.GetDidCapture(),
+            'Setup: the manual capture must have reached the gateway, otherwise the assertions below prove nothing.');
+        PostedPaymentLine.Find();
+        _Assert.AreEqual(0D, PostedPaymentLine."Date Captured", 'A failed manual capture must leave the line uncaptured.');
+        _Assert.AreEqual(0, CountAmountEvents('ZZ-BILL-PLLMAN'), 'A failed manual capture must bill nothing.');
+        AssertNoEcomBillingQueueEntryAfter(QueueBaselineEntryNo, 'A failed manual capture must queue no billing event.');
+
+        // [GIVEN] The gateway now captures successfully
+        PGCITestIntegration.Reset();
+
+        // [WHEN] Capture Payment is run on the same line again, still as a first capture
+        _Assert.IsTrue(PaymentLineList.GoToRecord(PostedPaymentLine), 'The posted payment line should be shown on the payment line list.');
+        PaymentLineList."Capture Payment".Invoke();
+        PaymentLineList.Close();
+
+        // [THEN] Exactly the captured amount was billed and queued
+        EcomSalesHeader.Find();
+        EcomSalesHeader.CalcFields("Captured Payment Amount");
+        CapturedTotal := EcomSalesHeader."Captured Payment Amount";
+        _Assert.AreNotEqual(0, CapturedTotal,
+            'Setup: the manual capture must have written back to "Captured Amount", otherwise billing nothing would be correct.');
+        _Assert.AreEqual(PostedPaymentLine.Amount, CapturedTotal, 'The manual capture must write back exactly the amount of the captured payment line.');
+        FindSingleEventOfType(EcomBillingEvent, 'ZZ-BILL-PLLMAN', Enum::"NPR Billing Event Type"::ECOM_ENTRIA_ORDERS_AMOUNT_SHOP);
+        _Assert.AreEqual(CapturedTotal, EcomBillingEvent.Amount, 'A manual capture from the payment line list must bill exactly what it captured.');
+        AssertEventIsQueued(EcomBillingEvent, 'The amount billed after a manual capture must be queued.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('ConfirmHandlerYes')]
+    procedure CaptureAgainOnPaymentLineListDoesNotBillTheRepeat()
+    var
+        EcomBillingEvent: Record "NPR Ecom Billing Event";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
+        PaymentLine: Record "NPR Magento Payment Line";
+        PostedPaymentLine: Record "NPR Magento Payment Line";
+        SalesHeader: Record "Sales Header";
+        SalesPost: Codeunit "Sales-Post";
+        PGCITestIntegration: Codeunit "NPR PG CI Test Integration";
+        PaymentLineList: TestPage "NPR Magento Payment Line List";
+        OrdersArr: JsonArray;
+        OrderCreatedAt: DateTime;
+        GatewayCode: Code[10];
+        QueueBaselineEntryNo: BigInteger;
+        BilledAmount: Decimal;
+    begin
+        // [SCENARIO] The capture during posting succeeds and is billed. Capturing the line again from the payment
+        //            line list must not bill a second time.
+
+        // [GIVEN] An enabled Entria store and an imported Entria order with one payment line
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        OrderCreatedAt := CreateDateTime(DMY2Date(6, 3, 2024), 090000T);
+        _LibraryEntria.BuildOrderArrayWithPayments(OrdersArr, 'ZZ-BILL-PLLAGAIN', 'medusa-bill-pllagain', OrderCreatedAt, OrderCreatedAt, 100, 100, 'PSP-BILL-PLLAGAIN');
+        ImportPrebuiltOrder('ZZ-BILL-PLLAGAIN', OrdersArr, EcomSalesHeader);
+        EcomSalesPmtLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesPmtLine.FindFirst();
+
+        // [GIVEN] A CI gateway whose capture succeeds, and a sales order linked to the ecommerce order and to its payment line
+        GatewayCode := _LibPaymentGateway.CreatePaymentGateway(Enum::"NPR PG Integrations"::"CI Test Integration");
+        _LibSales.CreateSalesOrder(SalesHeader);
+        SalesHeader."NPR Inc Ecom Sale Id" := EcomSalesHeader.SystemId;
+        SalesHeader.Modify();
+        _LibPaymentGateway.CreatePaymentLineForSalesHeader(SalesHeader, GatewayCode, PaymentLine);
+        PaymentLine."NPR Inc Ecom Sale Id" := EcomSalesHeader.SystemId;
+        PaymentLine."NPR Inc Ecom Sales Pmt Line Id" := EcomSalesPmtLine.SystemId;
+        PaymentLine.Modify();
+        Commit();
+
+        // [GIVEN] The sales order is posted, the capture during posting succeeds and is billed once
+        SalesHeader.Ship := true;
+        SalesHeader.Invoice := true;
+        SalesPost.Run(SalesHeader);
+        FindSingleEventOfType(EcomBillingEvent, 'ZZ-BILL-PLLAGAIN', Enum::"NPR Billing Event Type"::ECOM_ENTRIA_ORDERS_AMOUNT_SHOP);
+        BilledAmount := EcomBillingEvent.Amount;
+        _Assert.IsTrue(PostedPaymentLine.Get(Database::"Sales Invoice Header", 0, SalesHeader."Last Posting No.", PaymentLine."Line No."),
+            'Setup: posting must have created the payment line of the posted invoice.');
+        QueueBaselineEntryNo := LastBillingQueueEntryNo();
+        PGCITestIntegration.Reset();
+
+        // [WHEN] Capture Payment is run on the captured line from the payment line list and the user confirms capturing again
+        PaymentLineList.OpenEdit();
+        _Assert.IsTrue(PaymentLineList.GoToRecord(PostedPaymentLine), 'The posted payment line should be shown on the payment line list.');
+        PaymentLineList."Capture Payment".Invoke();
+        PaymentLineList.Close();
+
+        // [THEN] The repeat capture reached the gateway and counted the line again in "Captured Amount"
+        _Assert.IsTrue(PGCITestIntegration.GetDidCapture(),
+            'Setup: the repeat capture must have reached the gateway, otherwise the assertions below prove nothing.');
+        EcomSalesHeader.Find();
+        EcomSalesHeader.CalcFields("Captured Payment Amount");
+        _Assert.IsTrue(EcomSalesHeader."Captured Payment Amount" > BilledAmount,
+            'Setup: the repeat capture must have raised "Captured Payment Amount" above the billed amount, otherwise billing nothing would be correct anyway.');
+
+        // [THEN] Nothing more was billed or queued
+        FindSingleEventOfType(EcomBillingEvent, 'ZZ-BILL-PLLAGAIN', Enum::"NPR Billing Event Type"::ECOM_ENTRIA_ORDERS_AMOUNT_SHOP);
+        _Assert.AreEqual(BilledAmount, EcomBillingEvent.Amount, 'A repeat capture must leave the billed amount unchanged.');
+        AssertNoEcomBillingQueueEntryAfter(QueueBaselineEntryNo, 'A repeat capture must queue no billing event.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('MessageHandler')]
+    procedure CaptureSalesInvoiceApiBillsWhatPostingFailedToCapture()
+    var
+        EcomBillingEvent: Record "NPR Ecom Billing Event";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
+        PaymentLine: Record "NPR Magento Payment Line";
+        PostedPaymentLine: Record "NPR Magento Payment Line";
+        SalesHeader: Record "Sales Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesPost: Codeunit "Sales-Post";
+        PaymentLineMgt: Codeunit "NPR Payment Line Mgt.";
+        PGCITestIntegration: Codeunit "NPR PG CI Test Integration";
+        OrdersArr: JsonArray;
+        OrderCreatedAt: DateTime;
+        GatewayCode: Code[10];
+        QueueBaselineEntryNo: BigInteger;
+        CapturedTotal: Decimal;
+    begin
+        // [SCENARIO] The capture during posting fails, so posting bills nothing. Capturing the posted invoice through
+        //            the public CaptureSalesInvoice must bill nothing while the capture fails, and bill what it
+        //            captured once it succeeds.
+
+        // [GIVEN] An enabled Entria store and an imported Entria order with one payment line
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        OrderCreatedAt := CreateDateTime(DMY2Date(7, 3, 2024), 090000T);
+        _LibraryEntria.BuildOrderArrayWithPayments(OrdersArr, 'ZZ-BILL-APICAP', 'medusa-bill-apicap', OrderCreatedAt, OrderCreatedAt, 100, 100, 'PSP-BILL-APICAP');
+        ImportPrebuiltOrder('ZZ-BILL-APICAP', OrdersArr, EcomSalesHeader);
+        EcomSalesPmtLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesPmtLine.FindFirst();
+
+        // [GIVEN] A CI gateway whose capture fails
+        GatewayCode := _LibPaymentGateway.CreatePaymentGateway(Enum::"NPR PG Integrations"::"CI Test Integration");
+        PGCITestIntegration.SetShouldError();
+
+        // [GIVEN] A sales order linked to the ecommerce order and to its payment line
+        _LibSales.CreateSalesOrder(SalesHeader);
+        SalesHeader."NPR Inc Ecom Sale Id" := EcomSalesHeader.SystemId;
+        SalesHeader.Modify();
+        _LibPaymentGateway.CreatePaymentLineForSalesHeader(SalesHeader, GatewayCode, PaymentLine);
+        PaymentLine."NPR Inc Ecom Sale Id" := EcomSalesHeader.SystemId;
+        PaymentLine."NPR Inc Ecom Sales Pmt Line Id" := EcomSalesPmtLine.SystemId;
+        PaymentLine.Modify();
+        Commit();
+
+        // [GIVEN] The sales order is posted and the capture during posting fails
+        SalesHeader.Ship := true;
+        SalesHeader.Invoice := true;
+        SalesPost.Run(SalesHeader);
+        _Assert.IsTrue(PostedPaymentLine.Get(Database::"Sales Invoice Header", 0, SalesHeader."Last Posting No.", PaymentLine."Line No."),
+            'Setup: posting must have created the payment line of the posted invoice.');
+        _Assert.AreEqual(0D, PostedPaymentLine."Date Captured",
+            'Setup: the capture during posting must have failed, otherwise nothing is left to capture manually.');
+        EcomSalesHeader.Find();
+        EcomSalesHeader.CalcFields("Captured Payment Amount");
+        _Assert.AreEqual(0, EcomSalesHeader."Captured Payment Amount",
+            'Setup: a failed capture during posting must write nothing back to "Captured Amount".');
+        _Assert.AreEqual(0, CountAmountEvents('ZZ-BILL-APICAP'),
+            'Setup: posting must bill nothing when its capture failed.');
+        SalesInvoiceHeader.Get(SalesHeader."Last Posting No.");
+
+        // [GIVEN] The gateway still fails
+        PGCITestIntegration.Reset();
+        PGCITestIntegration.SetShouldError();
+        QueueBaselineEntryNo := LastBillingQueueEntryNo();
+
+        // [WHEN] The posted invoice is captured through CaptureSalesInvoice
+        PaymentLineMgt.CaptureSalesInvoice(SalesInvoiceHeader);
+
+        // [THEN] The capture was attempted, failed, and nothing was billed or queued
+        _Assert.IsTrue(PGCITestIntegration.GetDidCapture(),
+            'Setup: the capture must have reached the gateway, otherwise the assertions below prove nothing.');
+        PostedPaymentLine.Find();
+        _Assert.AreEqual(0D, PostedPaymentLine."Date Captured", 'A failed capture must leave the line uncaptured.');
+        _Assert.AreEqual(0, CountAmountEvents('ZZ-BILL-APICAP'), 'A failed capture through CaptureSalesInvoice must bill nothing.');
+        AssertNoEcomBillingQueueEntryAfter(QueueBaselineEntryNo, 'A failed capture through CaptureSalesInvoice must queue no billing event.');
+
+        // [GIVEN] The gateway now captures successfully
+        PGCITestIntegration.Reset();
+
+        // [WHEN] The posted invoice is captured through CaptureSalesInvoice again
+        PaymentLineMgt.CaptureSalesInvoice(SalesInvoiceHeader);
+
+        // [THEN] Exactly the captured amount was billed and queued
+        EcomSalesHeader.Find();
+        EcomSalesHeader.CalcFields("Captured Payment Amount");
+        CapturedTotal := EcomSalesHeader."Captured Payment Amount";
+        _Assert.AreNotEqual(0, CapturedTotal,
+            'Setup: the capture must have written back to "Captured Amount", otherwise billing nothing would be correct.');
+        PostedPaymentLine.Find();
+        _Assert.AreEqual(PostedPaymentLine.Amount, CapturedTotal, 'The capture must write back exactly the amount of the captured payment line.');
+        FindSingleEventOfType(EcomBillingEvent, 'ZZ-BILL-APICAP', Enum::"NPR Billing Event Type"::ECOM_ENTRIA_ORDERS_AMOUNT_SHOP);
+        _Assert.AreEqual(CapturedTotal, EcomBillingEvent.Amount, 'A capture through CaptureSalesInvoice must bill exactly what it captured.');
+        AssertEventIsQueued(EcomBillingEvent, 'The amount billed after a capture through CaptureSalesInvoice must be queued.');
+    end;
+
     /// <summary>
     /// The only test that reaches the fast-lane call site. Every other test that talks about the fast lane calls
     /// the engine directly, so deleting the call at EcomSaleDocCaptureProcess.OnRun - "if _Success then
@@ -1264,6 +1536,7 @@ codeunit 85420 "NPR Ecom Billing Event Tests"
     var
         EcomBillingEvent: Record "NPR Ecom Billing Event";
         EcomSalesHeader: Record "NPR Ecom Sales Header";
+        PGCITestIntegration: Codeunit "NPR PG CI Test Integration";
     begin
         // Per test, not once per run: TestIsolation = Codeunit rolls back once, at the END of the codeunit, so an
         // event row or an ecommerce document an earlier test left behind - and while the intake path called here
@@ -1278,6 +1551,8 @@ codeunit 85420 "NPR Ecom Billing Event Tests"
         EcomSalesHeader.DeleteAll(true);
         EcomBillingEvent.SetRange("Store Code", _StoreCodeLbl);
         EcomBillingEvent.DeleteAll();
+        // The CI gateway is SingleInstance, so its error flag outlives each test.
+        PGCITestIntegration.Reset();
 
         if not _Initialized then begin
             _Initialized := true;
