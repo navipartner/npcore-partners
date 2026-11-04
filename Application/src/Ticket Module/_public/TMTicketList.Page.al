@@ -444,7 +444,7 @@
                 }
                 Action(Navigate)
                 {
-                    ToolTip = 'Finds the web invoice or POS Sale.';
+                    ToolTip = 'Opens the POS sale, invoice, sales order, ecommerce document or Channel Manager order the ticket was sold on.';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Find Sales Transaction';
                     Image = Navigate;
@@ -815,6 +815,7 @@
         SalesInvHeader: Record "Sales Invoice Header";
         PosEntry: Record "NPR Pos Entry";
         TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+        NoSalesTransactionMsg: Label 'No sales transaction was found for %1 %2.', Comment = '%1 = External Ticket No. field caption, %2 = External Ticket No.';
     begin
         if (Ticket."Sales Receipt No." <> '') then begin
             PosEntry.SetFilter("Document No.", '=%1', Ticket."Sales Receipt No.");
@@ -839,8 +840,131 @@
                     Page.Run(Page::"Posted Sales Invoice", SalesInvHeader);
                     exit;
                 end;
+
+                if (OpenPostedInvoiceForShopifyOrder(TicketReservationReq."External Order No.")) then
+                    exit;
+
+                if (OpenSalesDocument(TicketReservationReq."External Order No.")) then
+                    exit;
             end;
+
+            if (OpenEcomSalesDocument(TicketReservationReq)) then
+                exit;
+
+            if (OpenChannelManagerOrder(TicketReservationReq)) then
+                exit;
         end;
+
+        Message(NoSalesTransactionMsg, Ticket.FieldCaption("External Ticket No."), Ticket."External Ticket No.");
+    end;
+
+    local procedure OpenPostedInvoiceForShopifyOrder(ShopifyOrderId: Code[20]): Boolean
+    var
+        SalesInvHeader: Record "Sales Invoice Header";
+        SpfyAssignedID: Record "NPR Spfy Assigned ID";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt.";
+    begin
+        SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"Sales Invoice Header", "NPR Spfy ID Type"::"Entry ID", ShopifyOrderId, SpfyAssignedID);
+        SpfyAssignedID.SetLoadFields("BC Record ID");
+        if (not SpfyAssignedID.FindFirst()) then
+            exit(false);
+        if (not SalesInvHeader.Get(SpfyAssignedID."BC Record ID")) then
+            exit(false);
+
+        Page.Run(Page::"Posted Sales Invoice", SalesInvHeader);
+        exit(true);
+    end;
+
+    local procedure OpenSalesDocument(ExternalOrderNo: Code[20]): Boolean
+    var
+        SalesHeader: Record "Sales Header";
+        SpfyAssignedID: Record "NPR Spfy Assigned ID";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt.";
+    begin
+        SalesHeader.SetFilter("Document Type", '%1|%2', SalesHeader."Document Type"::Order, SalesHeader."Document Type"::Invoice);
+        SalesHeader.SetRange("NPR External Order No.", ExternalOrderNo);
+        if (not SalesHeader.FindFirst()) then begin
+            SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"Sales Header", "NPR Spfy ID Type"::"Entry ID", ExternalOrderNo, SpfyAssignedID);
+            SpfyAssignedID.SetLoadFields("BC Record ID");
+            if (not SpfyAssignedID.FindFirst()) then
+                exit(false);
+            SalesHeader.Reset();
+            if (not SalesHeader.Get(SpfyAssignedID."BC Record ID")) then
+                exit(false);
+        end;
+
+        case SalesHeader."Document Type" of
+            SalesHeader."Document Type"::Order:
+                Page.Run(Page::"Sales Order", SalesHeader);
+            SalesHeader."Document Type"::Invoice:
+                Page.Run(Page::"Sales Invoice", SalesHeader);
+            else
+                exit(false);
+        end;
+        exit(true);
+    end;
+
+    local procedure OpenEcomSalesDocument(TicketReservationReq: Record "NPR TM Ticket Reservation Req."): Boolean
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+    begin
+        if (not IsNullGuid(TicketReservationReq."Ecom Sales Id")) then
+            if (EcomSalesHeader.GetBySystemId(TicketReservationReq."Ecom Sales Id")) then begin
+                Page.Run(Page::"NPR Ecom Sales Document", EcomSalesHeader);
+                exit(true);
+            end;
+
+        if (TicketReservationReq."External Order No." = '') then
+            exit(false);
+
+        EcomSalesHeader.SetCurrentKey("Document Type", "External No.");
+        EcomSalesHeader.SetRange("Document Type", EcomSalesHeader."Document Type"::Order);
+        EcomSalesHeader.SetRange("External No.", TicketReservationReq."External Order No.");
+        if (not EcomSalesHeader.FindFirst()) then
+            exit(false);
+
+        Page.Run(Page::"NPR Ecom Sales Document", EcomSalesHeader);
+        exit(true);
+    end;
+
+    local procedure OpenChannelManagerOrder(TicketReservationReq: Record "NPR TM Ticket Reservation Req."): Boolean
+    var
+        OriginalRequest: Record "NPR TM Ticket Reservation Req.";
+        ImportTicketHeader: Record "NPR TM ImportTicketHeader";
+        CMOrder: Record "NPR CMOrder";
+        Steps: Integer;
+    begin
+        OriginalRequest := TicketReservationReq;
+        OriginalRequest.SetLoadFields("Session Token ID", "Superseeds Entry No.");
+        while (OriginalRequest."Superseeds Entry No." <> 0) do begin
+            Steps += 1;
+            if (Steps > 1000) then
+                exit(false);
+            if (not OriginalRequest.Get(OriginalRequest."Superseeds Entry No.")) then
+                exit(false);
+        end;
+
+        if (OriginalRequest."Session Token ID" = '') then
+            exit(false);
+
+        ImportTicketHeader.SetCurrentKey(TicketRequestToken);
+        ImportTicketHeader.SetRange(TicketRequestToken, OriginalRequest."Session Token ID");
+        ImportTicketHeader.SetLoadFields(JobId);
+        if (not ImportTicketHeader.FindFirst()) then
+            exit(false);
+        if (ImportTicketHeader.JobId = '') then
+            exit(false);
+
+        CMOrder.SetCurrentKey(JobId);
+        CMOrder.SetRange(JobId, ImportTicketHeader.JobId);
+        if (not CMOrder.FindFirst()) then
+            exit(false);
+
+        if (CMOrder.PartnerType = CMOrder.PartnerType::TourBooking) then
+            Page.Run(Page::"NPR CMTourBookingCard", CMOrder)
+        else
+            Page.Run(Page::"NPR CMOrderCard", CMOrder);
+        exit(true);
     end;
 
     local procedure ShowWalletForAsset(Ticket: Record "NPR TM Ticket")
