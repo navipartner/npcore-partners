@@ -1186,14 +1186,44 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
     var
         TicketReservationLineId: Guid;
         ShopifyLineItemGid: Text;
+        LineIdText: Text;
         MissingReservationLineErr: Label 'No ticket reservation line was found for Shopify line item "%1". The order cannot be imported until ticket processing provides a reservation line for every ticket line.', Comment = '%1 = Shopify line item GID';
+        MissingLineIdPropertyErr: Label 'No %1 was found in the _lineId property of Shopify line item "%2". The order cannot be imported until every ticket line has a _lineId property.', Comment = '%1 = Ticket Reservation Line Id field caption, %2 = Shopify line item GID. Do not translate _lineId.';
+        InvalidReservationLineIdErr: Label 'The %1 "%2" for Shopify line item "%3" is invalid.', Comment = '%1 = Ticket Reservation Line Id field caption, %2 = reservation line ID, %3 = Shopify line item GID';
     begin
         ShopifyLineItemGid := JsonHelper.GetJText(SalesLineJsonToken, 'id', true);
 
-        if not _TicketReservationLineIds.Get(ShopifyLineItemGid, TicketReservationLineId) then
-            Error(MissingReservationLineErr, ShopifyLineItemGid);
+        if _TicketLineIdsFromAttributes then begin
+            LineIdText := GetCustomAttributeValue(SalesLineJsonToken, '_lineId');
+            if LineIdText = '' then
+                Error(MissingLineIdPropertyErr, EcomSalesLine.FieldCaption("Ticket Reservation Line Id"), ShopifyLineItemGid);
+            if (not Evaluate(TicketReservationLineId, LineIdText)) or IsNullGuid(TicketReservationLineId) then
+                Error(InvalidReservationLineIdErr, EcomSalesLine.FieldCaption("Ticket Reservation Line Id"), LineIdText, ShopifyLineItemGid);
+        end else
+            if not _TicketReservationLineIds.Get(ShopifyLineItemGid, TicketReservationLineId) then
+                Error(MissingReservationLineErr, ShopifyLineItemGid);
 
         EcomSalesLine."Ticket Reservation Line Id" := TicketReservationLineId;
+    end;
+
+    local procedure GetCustomAttributeValue(ParentToken: JsonToken; AttributeKey: Text): Text
+    var
+        AttributesToken: JsonToken;
+        AttributeToken: JsonToken;
+        AttributeValue: Text;
+    begin
+        // OrderMgt.GetOrderLineProperties is not used here: it parses any json_data attribute and fails on invalid JSON.
+        if not ParentToken.SelectToken('customAttributes', AttributesToken) then
+            exit('');
+        if not AttributesToken.IsArray() then
+            exit('');
+
+        foreach AttributeToken in AttributesToken.AsArray() do
+            if JsonHelper.GetJText(AttributeToken, 'key', false).ToLower() = AttributeKey.ToLower() then begin
+                AttributeValue := JsonHelper.GetJText(AttributeToken, 'value', false).Trim();
+                if AttributeValue <> '' then
+                    exit(AttributeValue);
+            end;
     end;
 
     local procedure PopulateItemLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesLineJsonToken: JsonToken; var IncEcomSalesLine: Record "NPR Ecom Sales Line"; LogEntry: Record "NPR Spfy Event Log Entry"; var FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache")
@@ -1810,8 +1840,19 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
     end;
 
     local procedure ParseTicketMetafields(OrderToken: JsonToken; var EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        ReservationToken: Text;
     begin
         Clear(_TicketReservationLineIds);
+
+        // Token and line IDs always come from the same source: the reservationToken order attribute with a _lineId
+        // property on each ticket line, or, when that attribute is missing, the np-ticket metafields.
+        ReservationToken := GetCustomAttributeValue(OrderToken, 'reservationToken');
+        _TicketLineIdsFromAttributes := ReservationToken <> '';
+        if _TicketLineIdsFromAttributes then begin
+            EcomSalesHeader."Ticket Reservation Token" := CopyStr(ReservationToken, 1, MaxStrLen(EcomSalesHeader."Ticket Reservation Token"));
+            exit;
+        end;
 
         EcomSalesHeader."Ticket Reservation Token" := CopyStr(JsonHelper.GetJText(OrderToken, 'reservationToken.value', false), 1, MaxStrLen(EcomSalesHeader."Ticket Reservation Token"));
         if EcomSalesHeader."Ticket Reservation Token" = '' then
@@ -1838,12 +1879,13 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
 
     local procedure ParseTicketLineItemData(LineItemsData: JsonObject; ShopifyLineItemGid: Text)
     var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
         LineItemDataToken: JsonToken;
         LineIdToken: JsonToken;
         TicketReservationLineId: Guid;
         LineIdText: Text;
         MissingReservationLineIdErr: Label 'The Ticket line item data for Shopify line item "%1" does not contain a reservation line ID.', Comment = '%1 = Shopify line item GID';
-        InvalidReservationLineIdErr: Label 'The ticket reservation line ID "%1" for Shopify line item "%2" is invalid.', Comment = '%1 = reservation line ID, %2 = Shopify line item GID';
+        InvalidReservationLineIdErr: Label 'The %1 "%2" for Shopify line item "%3" is invalid.', Comment = '%1 = Ticket Reservation Line Id field caption, %2 = reservation line ID, %3 = Shopify line item GID';
     begin
         if not LineItemsData.Get(ShopifyLineItemGid, LineItemDataToken) then
             exit;
@@ -1861,7 +1903,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         if LineIdText = '' then
             Error(MissingReservationLineIdErr, ShopifyLineItemGid);
         if not Evaluate(TicketReservationLineId, LineIdText) then
-            Error(InvalidReservationLineIdErr, LineIdText, ShopifyLineItemGid);
+            Error(InvalidReservationLineIdErr, EcomSalesLine.FieldCaption("Ticket Reservation Line Id"), LineIdText, ShopifyLineItemGid);
 
         _TicketReservationLineIds.Set(ShopifyLineItemGid, TicketReservationLineId);
     end;
@@ -2083,6 +2125,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         OrderMgt: Codeunit "NPR Spfy Order Mgt.";
         _TicketReservationLineIds: Dictionary of [Text, Guid];
+        _TicketLineIdsFromAttributes: Boolean;
         GLSetupRetrieved: Boolean;
         NoArrayErr: Label 'The %1 property is not an array.', Locked = true;
         VirtualItemExtraErr: Label 'It is not possible to change virtual items (gift cards, tickets, memberships) after the document has already been created. Item: %1, new quantity: %2. Please handle this change manually.', Comment = '%1 = item number or line name, %2 = new quantity reported by Shopify';

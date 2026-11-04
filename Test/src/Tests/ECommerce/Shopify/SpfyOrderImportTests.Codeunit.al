@@ -316,6 +316,419 @@ codeunit 85389 "NPR Spfy Order Import Tests"
     end;
 
     [Test]
+    procedure CreateEcomDoc_Ticket_TokenAndLineIdFromCustomAttributes()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        OrderResponse: JsonToken;
+        TicketItemNo: Code[20];
+        ShopifyId: Text[30];
+    begin
+        // [SCENARIO] Token and line ID are read from the order and line custom attributes of a storefront payload.
+        // [GIVEN] order attributes _npReservationKey, expiresAt and a null-valued attribute listed before reservationToken
+        // [GIVEN] ticket line properties _ticket_item_no and _selected_schedule listed before _lineId, no metafields
+        ShopifyId := '926380000001';
+        TicketItemNo := SetupTicketOrder(ShopifyId, LogEntry);
+        OrderResponse := BuildTicketOrderJson(
+            ShopifyId, '926381000001', TicketItemNo,
+            '[{"key":"_npReservationKey","value":"662d54ca-83eb-454e-b757-0da93788025c"},{"key":"expiresAt","value":"2026-10-29T15:33:19.287Z"},{"key":"giftNote","value":null},{"key":"reservationToken","value":"D282766FD1F84CB1A9EDF4009EF0318D"}]',
+            '[{"key":"_ticket_item_no","value":"' + TicketItemNo + '"},{"key":"_selected_schedule","value":"2026-10-30 10:00"},{"key":"_lineId","value":"69f4a389-aad3-f111-a057-70a8a55deb46"}]',
+            '', '');
+
+        // [WHEN] the create path runs from the order JSON
+        _Assert.IsTrue(SpfyEcomSalesDocImport.CreateEcommerceDocumentFromJson(LogEntry, OrderResponse, EcomSalesHeader), 'CreateEcommerceDocumentFromJson should succeed.');
+
+        // [THEN] the header token is the reservationToken value and the ticket line ID is the _lineId value
+        AssertTicketReservation(EcomSalesHeader, 'D282766FD1F84CB1A9EDF4009EF0318D', '69f4a389-aad3-f111-a057-70a8a55deb46');
+    end;
+
+    [Test]
+    procedure CreateEcomDoc_Ticket_LineIdKeyCasingIgnored()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        OrderResponse: JsonToken;
+        TicketItemNo: Code[20];
+        ShopifyId: Text[30];
+    begin
+        // [SCENARIO] The line property key is matched without regard to casing.
+        // [GIVEN] order attribute reservationToken and a ticket line property named _lineID
+        ShopifyId := '926380000002';
+        TicketItemNo := SetupTicketOrder(ShopifyId, LogEntry);
+        OrderResponse := BuildTicketOrderJson(
+            ShopifyId, '926381000002', TicketItemNo,
+            '[{"key":"reservationToken","value":"TOKEN2638A2"}]',
+            '[{"key":"_lineID","value":"2638a002-0000-4000-8000-000000000002"}]',
+            '', '');
+
+        // [WHEN] the create path runs from the order JSON
+        _Assert.IsTrue(SpfyEcomSalesDocImport.CreateEcommerceDocumentFromJson(LogEntry, OrderResponse, EcomSalesHeader), 'CreateEcommerceDocumentFromJson should succeed.');
+
+        // [THEN] the ticket line ID is the _lineID value
+        AssertTicketReservation(EcomSalesHeader, 'TOKEN2638A2', '2638a002-0000-4000-8000-000000000002');
+    end;
+
+    [Test]
+    procedure CreateEcomDoc_Ticket_NoOrderAttribute_MetafieldPairUsed()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        OrderResponse: JsonToken;
+        TicketItemNo: Code[20];
+        ShopifyId: Text[30];
+    begin
+        // [SCENARIO] Without the reservationToken order attribute, token and line ID come from the np-ticket metafields.
+        // [GIVEN] np-ticket metafields only, no order or line custom attributes
+        ShopifyId := '926380000003';
+        TicketItemNo := SetupTicketOrder(ShopifyId, LogEntry);
+        OrderResponse := BuildTicketOrderJson(
+            ShopifyId, '926381000003', TicketItemNo,
+            '', '',
+            'TOKEN2638M3', '2638b003-0000-4000-8000-000000000003');
+
+        // [WHEN] the create path runs from the order JSON
+        _Assert.IsTrue(SpfyEcomSalesDocImport.CreateEcommerceDocumentFromJson(LogEntry, OrderResponse, EcomSalesHeader), 'CreateEcommerceDocumentFromJson should succeed.');
+
+        // [THEN] token and ticket line ID are the metafield values
+        AssertTicketReservation(EcomSalesHeader, 'TOKEN2638M3', '2638b003-0000-4000-8000-000000000003');
+    end;
+
+    [Test]
+    procedure CreateEcomDoc_Ticket_BothSources_CustomAttributesWin()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        OrderResponse: JsonToken;
+        TicketItemNo: Code[20];
+        ShopifyId: Text[30];
+    begin
+        // [SCENARIO] When both sources are present, token and line ID both come from the custom attributes.
+        // [GIVEN] custom attributes with token T1 and line ID G1, np-ticket metafields with token T2 and line ID G2
+        ShopifyId := '926380000004';
+        TicketItemNo := SetupTicketOrder(ShopifyId, LogEntry);
+        OrderResponse := BuildTicketOrderJson(
+            ShopifyId, '926381000004', TicketItemNo,
+            '[{"key":"reservationToken","value":"TOKEN2638A4"}]',
+            '[{"key":"_lineId","value":"2638a004-0000-4000-8000-000000000004"}]',
+            'TOKEN2638M4', '2638b004-0000-4000-8000-000000000004');
+
+        // [WHEN] the create path runs from the order JSON
+        _Assert.IsTrue(SpfyEcomSalesDocImport.CreateEcommerceDocumentFromJson(LogEntry, OrderResponse, EcomSalesHeader), 'CreateEcommerceDocumentFromJson should succeed.');
+
+        // [THEN] token is T1 and the ticket line ID is G1
+        AssertTicketReservation(EcomSalesHeader, 'TOKEN2638A4', '2638a004-0000-4000-8000-000000000004');
+    end;
+
+    [Test]
+    procedure CreateEcomDoc_Ticket_AttributeToken_LineWithoutLineId_Errors()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        OrderResponse: JsonToken;
+        TicketItemNo: Code[20];
+        ShopifyId: Text[30];
+        MissingLineIdPropertyErr: Label 'No %1 was found in the _lineId property of Shopify line item "%2"', Locked = true;
+    begin
+        // [SCENARIO] With the reservationToken order attribute, a ticket line without _lineId fails the import even
+        // when the metafield map holds an ID for that line.
+        // [GIVEN] order attribute reservationToken, ticket line properties without _lineId, metafields with the line GID
+        ShopifyId := '926380000005';
+        TicketItemNo := SetupTicketOrder(ShopifyId, LogEntry);
+        OrderResponse := BuildTicketOrderJson(
+            ShopifyId, '926381000005', TicketItemNo,
+            '[{"key":"reservationToken","value":"TOKEN2638A5"}]',
+            '[{"key":"_ticket_item_no","value":"' + TicketItemNo + '"},{"key":"_admission_code","value":"ADM2638"}]',
+            'TOKEN2638M5', '2638b005-0000-4000-8000-000000000005');
+
+        // [WHEN] the create path runs from the order JSON
+        asserterror SpfyEcomSalesDocImport.CreateEcommerceDocumentFromJson(LogEntry, OrderResponse, EcomSalesHeader);
+
+        // [THEN] the import stops on the missing _lineId property
+        _Assert.ExpectedError(StrSubstNo(MissingLineIdPropertyErr, EcomSalesLine.FieldCaption("Ticket Reservation Line Id"), 'gid://shopify/LineItem/926381000005'));
+    end;
+
+    [Test]
+    procedure CreateEcomDoc_Ticket_AttributeToken_InvalidLineId_Errors()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        OrderResponse: JsonToken;
+        TicketItemNo: Code[20];
+        ShopifyId: Text[30];
+        InvalidReservationLineIdErr: Label 'The %1 "%2" for Shopify line item "%3" is invalid.', Locked = true;
+    begin
+        // [SCENARIO] A _lineId value that is not a GUID fails the import.
+        // [GIVEN] order attribute reservationToken and a ticket line with _lineId = abc
+        ShopifyId := '926380000006';
+        TicketItemNo := SetupTicketOrder(ShopifyId, LogEntry);
+        OrderResponse := BuildTicketOrderJson(
+            ShopifyId, '926381000006', TicketItemNo,
+            '[{"key":"reservationToken","value":"TOKEN2638A6"}]',
+            '[{"key":"_lineId","value":"abc"}]',
+            '', '');
+
+        // [WHEN] the create path runs from the order JSON
+        asserterror SpfyEcomSalesDocImport.CreateEcommerceDocumentFromJson(LogEntry, OrderResponse, EcomSalesHeader);
+
+        // [THEN] the import stops on the invalid line ID
+        _Assert.ExpectedError(StrSubstNo(InvalidReservationLineIdErr, EcomSalesLine.FieldCaption("Ticket Reservation Line Id"), 'abc', 'gid://shopify/LineItem/926381000006'));
+    end;
+
+    [Test]
+    procedure CreateEcomDoc_Ticket_AttributeToken_NullGuidLineId_Errors()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        OrderResponse: JsonToken;
+        TicketItemNo: Code[20];
+        ShopifyId: Text[30];
+        InvalidReservationLineIdErr: Label 'The %1 "%2" for Shopify line item "%3" is invalid.', Locked = true;
+    begin
+        // [SCENARIO] A _lineId value that is the empty GUID fails the import.
+        // [GIVEN] order attribute reservationToken and a ticket line with _lineId = 00000000-0000-0000-0000-000000000000
+        ShopifyId := '926380000007';
+        TicketItemNo := SetupTicketOrder(ShopifyId, LogEntry);
+        OrderResponse := BuildTicketOrderJson(
+            ShopifyId, '926381000007', TicketItemNo,
+            '[{"key":"reservationToken","value":"TOKEN2638A7"}]',
+            '[{"key":"_lineId","value":"00000000-0000-0000-0000-000000000000"}]',
+            '', '');
+
+        // [WHEN] the create path runs from the order JSON
+        asserterror SpfyEcomSalesDocImport.CreateEcommerceDocumentFromJson(LogEntry, OrderResponse, EcomSalesHeader);
+
+        // [THEN] the import stops on the invalid line ID
+        _Assert.ExpectedError(StrSubstNo(InvalidReservationLineIdErr, EcomSalesLine.FieldCaption("Ticket Reservation Line Id"), '00000000-0000-0000-0000-000000000000', 'gid://shopify/LineItem/926381000007'));
+    end;
+
+    [Test]
+    procedure CreateEcomDoc_Ticket_BlankAttributeToken_MetafieldPairUsed()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        OrderResponse: JsonToken;
+        TicketItemNo: Code[20];
+        ShopifyId: Text[30];
+    begin
+        // [SCENARIO] A reservationToken order attribute holding only whitespace counts as missing.
+        // [GIVEN] order attribute reservationToken = two spaces, metafields with token T2 and line ID G2, no _lineId
+        ShopifyId := '926380000008';
+        TicketItemNo := SetupTicketOrder(ShopifyId, LogEntry);
+        OrderResponse := BuildTicketOrderJson(
+            ShopifyId, '926381000008', TicketItemNo,
+            '[{"key":"reservationToken","value":"  "}]',
+            '',
+            'TOKEN2638M8', '2638b008-0000-4000-8000-000000000008');
+
+        // [WHEN] the create path runs from the order JSON
+        _Assert.IsTrue(SpfyEcomSalesDocImport.CreateEcommerceDocumentFromJson(LogEntry, OrderResponse, EcomSalesHeader), 'CreateEcommerceDocumentFromJson should succeed.');
+
+        // [THEN] token is T2 and the ticket line ID is G2
+        AssertTicketReservation(EcomSalesHeader, 'TOKEN2638M8', '2638b008-0000-4000-8000-000000000008');
+    end;
+
+    [Test]
+    procedure CreateEcomDoc_Ticket_AttributeToken_InvalidMetafieldIgnored()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        OrderResponse: JsonToken;
+        TicketItemNo: Code[20];
+        ShopifyId: Text[30];
+    begin
+        // [SCENARIO] With the reservationToken attribute present, the np-ticket metafields are not read, so an invalid metafield line ID does not stop the import.
+        // [GIVEN] custom attributes with token T1 and line ID G1, np-ticket metafields with token T2 and line ID not-a-guid
+        ShopifyId := '926380000009';
+        TicketItemNo := SetupTicketOrder(ShopifyId, LogEntry);
+        OrderResponse := BuildTicketOrderJson(
+            ShopifyId, '926381000009', TicketItemNo,
+            '[{"key":"reservationToken","value":"TOKEN2638A9"}]',
+            '[{"key":"_lineId","value":"2638a009-0000-4000-8000-000000000009"}]',
+            'TOKEN2638M9', 'not-a-guid');
+
+        // [WHEN] the create path runs from the order JSON
+        _Assert.IsTrue(SpfyEcomSalesDocImport.CreateEcommerceDocumentFromJson(LogEntry, OrderResponse, EcomSalesHeader), 'CreateEcommerceDocumentFromJson should succeed.');
+
+        // [THEN] token is T1 and the ticket line ID is G1
+        AssertTicketReservation(EcomSalesHeader, 'TOKEN2638A9', '2638a009-0000-4000-8000-000000000009');
+    end;
+
+    [Test]
+    procedure CreateEcomDoc_Ticket_NoOrderAttribute_InvalidMetafieldLineId_Errors()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        OrderResponse: JsonToken;
+        TicketItemNo: Code[20];
+        ShopifyId: Text[30];
+        InvalidReservationLineIdErr: Label 'The %1 "%2" for Shopify line item "%3" is invalid.', Locked = true;
+    begin
+        // [SCENARIO] Without the reservationToken order attribute, an invalid metafield line ID fails the import.
+        // [GIVEN] np-ticket metafields with token T2 and line ID not-a-guid, no order or line custom attributes
+        ShopifyId := '926380000010';
+        TicketItemNo := SetupTicketOrder(ShopifyId, LogEntry);
+        OrderResponse := BuildTicketOrderJson(
+            ShopifyId, '926381000010', TicketItemNo,
+            '', '',
+            'TOKEN2638M10', 'not-a-guid');
+
+        // [WHEN] the create path runs from the order JSON
+        asserterror SpfyEcomSalesDocImport.CreateEcommerceDocumentFromJson(LogEntry, OrderResponse, EcomSalesHeader);
+
+        // [THEN] the import stops on the invalid metafield line ID
+        _Assert.ExpectedError(StrSubstNo(InvalidReservationLineIdErr, EcomSalesLine.FieldCaption("Ticket Reservation Line Id"), 'not-a-guid', 'gid://shopify/LineItem/926381000010'));
+    end;
+
+    [Test]
+    procedure CreateEcomDoc_Ticket_AttributeToken_TwoTicketLinesAndItemLine_EachLineOwnLineId()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        OrderResponse: JsonToken;
+        TicketItemNo: Code[20];
+        StoreCode: Code[20];
+        PlainSku: Code[20];
+        PlainItemNo: Code[20];
+        ShopifyId: Text[30];
+    begin
+        // [SCENARIO] In attribute mode each ticket line keeps its own _lineId, and a non-ticket line on the same order imports without one.
+        // [GIVEN] two lines of the same ticket item with line IDs G1 and G2, one plain item line, and token T1 as an order attribute
+        ShopifyId := '926380000011';
+        TicketItemNo := SetupTicketOrder(ShopifyId, LogEntry);
+        LibrarySpfyImport.SetupSimpleItemOrder(StoreCode, PlainSku, PlainItemNo);
+        OrderResponse := LibrarySpfyImport.WrapOrderText(ShopifyId,
+            '[' + LibrarySpfyImport.ItemLineNodeText('926381000011', TicketItemNo, 100, 1, '[]') +
+            ',' + LibrarySpfyImport.ItemLineNodeText('926381000012', TicketItemNo, 100, 1, '[]') +
+            ',' + LibrarySpfyImport.ItemLineNodeText('926381000013', PlainSku, 50, 1, '[]') + ']', '[]');
+        AddCustomAttributes(OrderResponse, 'data.order', '[{"key":"reservationToken","value":"TOKEN2638A11"}]');
+        AddCustomAttributes(OrderResponse, 'data.order.lineItems[0].node', '[{"key":"_lineId","value":"2638a011-0000-4000-8000-000000000011"}]');
+        AddCustomAttributes(OrderResponse, 'data.order.lineItems[1].node', '[{"key":"_lineId","value":"2638a012-0000-4000-8000-000000000012"}]');
+
+        // [WHEN] the create path runs from the order JSON
+        _Assert.IsTrue(SpfyEcomSalesDocImport.CreateEcommerceDocumentFromJson(LogEntry, OrderResponse, EcomSalesHeader), 'CreateEcommerceDocumentFromJson should succeed.');
+
+        // [THEN] token is T1, the ticket lines get G1 and G2, and the plain line has no line ID
+        _Assert.IsTrue(EcomSalesHeader.Find(), 'Ecom header should exist.');
+        _Assert.AreEqual('TOKEN2638A11', EcomSalesHeader."Ticket Reservation Token", 'Ticket Reservation Token.');
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        _Assert.AreEqual(3, EcomSalesLine.Count(), 'Exactly three ecom sales lines expected.');
+        AssertLineReservation(EcomSalesHeader, '926381000011', '2638a011-0000-4000-8000-000000000011', EcomSalesLine.Subtype::Ticket);
+        AssertLineReservation(EcomSalesHeader, '926381000012', '2638a012-0000-4000-8000-000000000012', EcomSalesLine.Subtype::Ticket);
+        AssertLineReservation(EcomSalesHeader, '926381000013', '', EcomSalesLine.Subtype::Item);
+    end;
+
+    local procedure SetupTicketOrder(ShopifyId: Text[30]; var LogEntry: Record "NPR Spfy Event Log Entry"): Code[20]
+    var
+        TicketItem: Record Item;
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        LibraryInventory: Codeunit "Library - Inventory";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        ItemNo: Code[20];
+    begin
+        LibrarySpfyImport.SetupSimpleItemOrder(StoreCode, Sku, ItemNo);
+        LibrarySpfyImport.InitLogEntry(LogEntry, StoreCode, ShopifyId);
+        LibraryInventory.CreateItem(TicketItem);
+        LibrarySpfyImport.MakeItemATicketItem(TicketItem."No.");
+        exit(TicketItem."No.");
+    end;
+
+    local procedure BuildTicketOrderJson(ShopifyId: Text; LineId: Text; Sku: Code[20]; OrderAttributesText: Text; LineAttributesText: Text; MetafieldToken: Text; MetafieldLineId: Text) OrderResponse: JsonToken
+    var
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        OrderToken: JsonToken;
+        LineToken: JsonToken;
+        OrderAttributes: JsonArray;
+        LineAttributes: JsonArray;
+        ReservationTokenMetafield: JsonObject;
+        LineItemsDataMetafield: JsonObject;
+        LineItemsData: JsonObject;
+        LineItemData: JsonObject;
+        LineItemsDataText: Text;
+    begin
+        OrderResponse := LibrarySpfyImport.WrapOrderText(ShopifyId, '[' + LibrarySpfyImport.ItemLineNodeText(LineId, Sku, 100, 1, '[]') + ']', '[]');
+        OrderResponse.SelectToken('data.order', OrderToken);
+
+        if OrderAttributesText <> '' then begin
+            OrderAttributes.ReadFrom(OrderAttributesText);
+            OrderToken.AsObject().Add('customAttributes', OrderAttributes);
+        end;
+
+        if MetafieldToken <> '' then begin
+            ReservationTokenMetafield.Add('value', MetafieldToken);
+            OrderToken.AsObject().Add('reservationToken', ReservationTokenMetafield);
+            LineItemData.Add('lineId', MetafieldLineId);
+            LineItemsData.Add('gid://shopify/LineItem/' + LineId, LineItemData);
+            LineItemsData.WriteTo(LineItemsDataText);
+            LineItemsDataMetafield.Add('value', LineItemsDataText);
+            OrderToken.AsObject().Add('lineItemsData', LineItemsDataMetafield);
+        end;
+
+        if LineAttributesText <> '' then begin
+            LineAttributes.ReadFrom(LineAttributesText);
+            OrderResponse.SelectToken('data.order.lineItems[0].node', LineToken);
+            LineToken.AsObject().Add('customAttributes', LineAttributes);
+        end;
+    end;
+
+    local procedure AssertTicketReservation(EcomSalesHeader: Record "NPR Ecom Sales Header"; ExpectedToken: Text; ExpectedLineIdText: Text)
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        ExpectedLineId: Guid;
+    begin
+        Evaluate(ExpectedLineId, ExpectedLineIdText);
+        _Assert.IsTrue(EcomSalesHeader.Find(), 'Ecom header should exist.');
+        _Assert.AreEqual(ExpectedToken, EcomSalesHeader."Ticket Reservation Token", 'Ticket Reservation Token.');
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        _Assert.AreEqual(1, EcomSalesLine.Count(), 'Exactly one ecom sales line expected.');
+        EcomSalesLine.FindFirst();
+        _Assert.AreEqual(ExpectedLineId, EcomSalesLine."Ticket Reservation Line Id", 'Ticket Reservation Line Id.');
+    end;
+
+    local procedure AddCustomAttributes(OrderResponse: JsonToken; TokenPath: Text; AttributesText: Text)
+    var
+        Token: JsonToken;
+        AttributesArray: JsonArray;
+    begin
+        AttributesArray.ReadFrom(AttributesText);
+        OrderResponse.SelectToken(TokenPath, Token);
+        Token.AsObject().Add('customAttributes', AttributesArray);
+    end;
+
+    local procedure AssertLineReservation(EcomSalesHeader: Record "NPR Ecom Sales Header"; ShopifyLineId: Text[30]; ExpectedLineIdText: Text; ExpectedSubtype: Enum "NPR Ecom Sales Line Subtype")
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        ExpectedLineId: Guid;
+    begin
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetRange("Shopify ID", ShopifyLineId);
+        _Assert.IsTrue(EcomSalesLine.FindFirst(), StrSubstNo('Ecom sales line for Shopify line %1 should exist.', ShopifyLineId));
+        if ExpectedLineIdText <> '' then
+            Evaluate(ExpectedLineId, ExpectedLineIdText)
+        else
+            Clear(ExpectedLineId);
+        _Assert.AreEqual(ExpectedLineId, EcomSalesLine."Ticket Reservation Line Id", StrSubstNo('Ticket Reservation Line Id of Shopify line %1.', ShopifyLineId));
+        _Assert.AreEqual(ExpectedSubtype, EcomSalesLine.Subtype, StrSubstNo('Subtype of Shopify line %1.', ShopifyLineId));
+    end;
+
+    [Test]
     procedure CreatesEcomDocumentWithLineDiscount()
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
