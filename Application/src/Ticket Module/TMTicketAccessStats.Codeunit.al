@@ -3,7 +3,7 @@
     Access = Internal;
     trigger OnRun()
     begin
-        BuildCompressedStatistics(Today);
+        BuildCompressedStatistics(Today, false);
     end;
 
     var

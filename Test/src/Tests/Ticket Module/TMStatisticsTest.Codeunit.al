@@ -586,6 +586,47 @@ codeunit 85113 "NPR TM Statistics Test"
         Assert.AreEqual(AdmissionCount - 1, TempTicketStatistics."Admission Count (Re-Entry)", 'Re-Entry count must be zero when revisit policy is Never');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RunFromJobQueue_BuildsStatisticsWithoutDialog()
+    var
+        TmpCreatedTickets: Record "NPR TM Ticket" temporary;
+        TicketStatistics: Record "NPR TM Ticket Access Stats";
+        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
+        Assert: Codeunit "Assert";
+        ItemNo: Code[20];
+        ResponseToken: Text[100];
+        ResponseMessage: Text;
+        ApiOk: Boolean;
+    begin
+        // [SCENARIO] The job queue runs codeunit "NPR TM Ticket Access Stats", and it builds the statistics without asking the user anything
+        // [GIVEN] A ticket with an External Order No., so it is valid for arrival, and one arrival at 10:10 today that is not in the statistics yet
+        ItemNo := SelectStatisticsScenario(_RevisitPolicy::NEVER);
+
+        ApiOk := TicketApiLibrary.MakeReservation(1, ItemNo, 1, '', '', ResponseToken, ResponseMessage);
+        Assert.IsTrue(ApiOk, ResponseMessage);
+
+        ApiOk := TicketApiLibrary.ConfirmTicketReservation(ResponseToken, '', 'abc', '', TmpCreatedTickets, ResponseMessage);
+        Assert.IsTrue(ApiOk, ResponseMessage);
+
+        TmpCreatedTickets.FindFirst();
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, Today(), 101000T);
+
+        // [WHEN] The codeunit runs the way the job queue starts it, and the test has no ConfirmHandler, so any confirm dialog fails the test
+        Codeunit.Run(Codeunit::"NPR TM Ticket Access Stats");
+
+        // [THEN] The arrival is in the statistics
+        TicketStatistics.SetFilter("Item No.", '=%1', ItemNo);
+        TicketStatistics.SetFilter("Admission Date", '=%1', Today());
+        TicketStatistics.SetFilter("Admission Hour", '=%1', 10);
+        TicketStatistics.SetAutoCalcFields("Sum Admission Count");
+        TicketStatistics.SetFilter("Item No. Filter", '=%1', ItemNo);
+        TicketStatistics.SetFilter("Admission Date Filter", '=%1', Today());
+        TicketStatistics.SetFilter("Admission Hour Filter", '=%1', 10);
+        TicketStatistics.FindFirst();
+        Assert.AreEqual(1, TicketStatistics."Sum Admission Count", 'The job run did not add the arrival to the statistics.');
+    end;
+
     [Normal]
     local procedure ValidateTicketForArrival(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; EventDate: Date; EventTime: Time)
     var
