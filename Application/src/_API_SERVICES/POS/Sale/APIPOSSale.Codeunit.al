@@ -479,6 +479,7 @@ codeunit 6248632 "NPR API POS Sale"
 
     local procedure POSEntryAsJson(POSEntry: Record "NPR POS Entry") Json: Codeunit "NPR Json Builder"
     var
+        KitchenPrintMgt: Codeunit "NPR NPRE Kitchen Print Mgt";
         KitchenOrderNo: BigInteger;
         KitchenOrderSystemId: Guid;
     begin
@@ -488,7 +489,7 @@ codeunit 6248632 "NPR API POS Sale"
             .AddProperty('documentNo', POSEntry."Document No.")
             .AddProperty('totalAmountInclVat', POSEntry."Amount Incl. Tax");
 
-        KitchenOrderNo := GetKitchenOrderNoFromPOSEntry(POSEntry."Entry No.", KitchenOrderSystemId);
+        KitchenOrderNo := KitchenPrintMgt.GetKitchenOrderId(POSEntry."Entry No.", KitchenOrderSystemId);
         if KitchenOrderNo <> 0 then begin
             Json.AddProperty('kitchenOrderNo', Format(KitchenOrderNo));
             if not IsNullGuid(KitchenOrderSystemId) then
@@ -633,32 +634,6 @@ codeunit 6248632 "NPR API POS Sale"
         NPREServFlowProfile.Get(Restaurant."Service Flow Profile");
         NPREServFlowProfile.TestField("AutoSave to W/Pad on Sale End", true);
         NPREServFlowProfile.TestField("Close Waiter Pad On", NPREServFlowProfile."Close Waiter Pad On"::"Payment if Served");
-    end;
-
-    local procedure GetKitchenOrderNoFromPOSEntry(POSEntryNo: Integer; var KitchenOrderSystemId: Guid): BigInteger
-    var
-        POSEntryWaiterPadLink: Record "NPR POS Entry Waiter Pad Link";
-        KitchenReqSrcLink: Record "NPR NPRE Kitchen Req.Src. Link";
-        KitchenRequest: Record "NPR NPRE Kitchen Request";
-        KitchenOrder: Record "NPR NPRE Kitchen Order";
-    begin
-        POSEntryWaiterPadLink.SetRange("POS Entry No.", POSEntryNo);
-        if not POSEntryWaiterPadLink.FindFirst() then
-            exit(0);
-
-        KitchenReqSrcLink.SetRange("Source Document Type", KitchenReqSrcLink."Source Document Type"::"Waiter Pad");
-        KitchenReqSrcLink.SetRange("Source Document No.", POSEntryWaiterPadLink."Waiter Pad No.");
-        if not KitchenReqSrcLink.FindFirst() then
-            exit(0);
-
-        if not KitchenRequest.Get(KitchenReqSrcLink."Request No.") then
-            exit(0);
-
-        KitchenOrder.SetRange("Order ID", KitchenRequest."Order ID");
-        if KitchenOrder.FindFirst() then
-            KitchenOrderSystemId := KitchenOrder.SystemId;
-
-        exit(KitchenRequest."Order ID");
     end;
 
     local procedure GetJsonText(Body: JsonToken; PropertyName: Text; var Value: Text): Boolean

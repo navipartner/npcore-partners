@@ -39,6 +39,72 @@ codeunit 6151178 "NPR NPRE Kitchen Print Mgt"
         GetPrintHeader(WaiterPadNo, IncludeReceiptLogo, RestaurantPrintHeader);
     end;
 
+    internal procedure GetKitchenOrderIds(POSEntryNo: Integer; var KitchenOrderIds: List of [BigInteger])
+    var
+        POSEntryWaiterPadLink: Record "NPR POS Entry Waiter Pad Link";
+        VisitedWaiterPadLines: List of [Text];
+        WaiterPadLineKey: Text;
+    begin
+        Clear(KitchenOrderIds);
+
+        POSEntryWaiterPadLink.SetRange("POS Entry No.", POSEntryNo);
+        POSEntryWaiterPadLink.SetLoadFields("Waiter Pad No.", "Waiter Pad Line No.");
+        if not POSEntryWaiterPadLink.FindSet() then
+            exit;
+
+        repeat
+            WaiterPadLineKey := StrSubstNo('%1:%2', POSEntryWaiterPadLink."Waiter Pad No.", POSEntryWaiterPadLink."Waiter Pad Line No.");
+            if not VisitedWaiterPadLines.Contains(WaiterPadLineKey) then begin
+                VisitedWaiterPadLines.Add(WaiterPadLineKey);
+                AddKitchenOrderIdsOfWaiterPadLine(POSEntryWaiterPadLink."Waiter Pad No.", POSEntryWaiterPadLink."Waiter Pad Line No.", KitchenOrderIds);
+            end;
+        until POSEntryWaiterPadLink.Next() = 0;
+    end;
+
+    internal procedure GetKitchenOrderId(POSEntryNo: Integer; var KitchenOrderSystemId: Guid): BigInteger
+    var
+        KitchenOrder: Record "NPR NPRE Kitchen Order";
+        KitchenOrderIds: List of [BigInteger];
+        KitchenOrderId: BigInteger;
+    begin
+        Clear(KitchenOrderSystemId);
+
+        GetKitchenOrderIds(POSEntryNo, KitchenOrderIds);
+        if KitchenOrderIds.Count() = 0 then
+            exit(0);
+
+        KitchenOrderId := KitchenOrderIds.Get(1);
+        if KitchenOrder.Get(KitchenOrderId) then
+            KitchenOrderSystemId := KitchenOrder.SystemId;
+        exit(KitchenOrderId);
+    end;
+
+    local procedure AddKitchenOrderIdsOfWaiterPadLine(WaiterPadNo: Code[20]; WaiterPadLineNo: Integer; var KitchenOrderIds: List of [BigInteger])
+    var
+        KitchenReqSrcLink: Record "NPR NPRE Kitchen Req.Src. Link";
+        KitchenRequest: Record "NPR NPRE Kitchen Request";
+    begin
+        KitchenReqSrcLink.SetCurrentKey(
+            "Source Document Type", "Source Document Subtype", "Source Document No.", "Source Document Line No.", "Serving Step", "Request No.");
+        KitchenReqSrcLink.SetRange("Source Document Type", KitchenReqSrcLink."Source Document Type"::"Waiter Pad");
+        KitchenReqSrcLink.SetRange("Source Document Subtype", 0);
+        KitchenReqSrcLink.SetRange("Source Document No.", WaiterPadNo);
+        KitchenReqSrcLink.SetRange("Source Document Line No.", WaiterPadLineNo);
+        KitchenReqSrcLink.SetLoadFields("Request No.");
+        if not KitchenReqSrcLink.FindSet() then
+            exit;
+
+        KitchenRequest.SetLoadFields("Order ID", "Line Status");
+        repeat
+            if KitchenRequest.Get(KitchenReqSrcLink."Request No.") then
+                if (KitchenRequest."Order ID" <> 0) and
+                   (KitchenRequest."Line Status" <> KitchenRequest."Line Status"::Cancelled) and
+                   not KitchenOrderIds.Contains(KitchenRequest."Order ID")
+                then
+                    KitchenOrderIds.Add(KitchenRequest."Order ID");
+        until KitchenReqSrcLink.Next() = 0;
+    end;
+
     procedure GetRelatedPOSEntries(WPadLineOutBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer"; var POSEntry: Record "NPR POS Entry"): Boolean
     var
         POSEntryWaiterPadLink: Record "NPR POS Entry Waiter Pad Link";

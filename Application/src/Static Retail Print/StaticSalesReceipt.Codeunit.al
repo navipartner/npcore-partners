@@ -108,6 +108,8 @@ codeunit 6248348 "NPR Static Sales Receipt"
             Printer.SetFont(A11FontLbl);
         end;
 
+        AddKitchenOrderNo(POSEntry);
+
         // Customer information
         if Customer.Get(POSEntry."Customer No.") then begin
             if Customer."Customer Price Group" <> '' then
@@ -275,5 +277,29 @@ codeunit 6248348 "NPR Static Sales Receipt"
 
         Printer.SetFont('COMMAND');
         Printer.AddLine('PAPERCUT', 0);
+    end;
+
+    local procedure AddKitchenOrderNo(POSEntry: Record "NPR POS Entry")
+    var
+        KitchenPrintMgt: Codeunit "NPR NPRE Kitchen Print Mgt";
+        KitchenOrderIds: List of [BigInteger];
+        KitchenOrderId: BigInteger;
+        A11FontLbl: Label 'A11', Locked = true;
+        B22FontLbl: Label 'B22', Locked = true;
+        OrderNoLbl: Label 'Order No.';
+    begin
+        KitchenPrintMgt.GetKitchenOrderIds(POSEntry."Entry No.", KitchenOrderIds);
+        if KitchenOrderIds.Count() = 0 then
+            exit;
+
+        Printer.SetPadChar(' ');
+        Printer.SetBold(true);
+        Printer.AddLine(OrderNoLbl, 1);
+        Printer.SetFont(B22FontLbl);
+        foreach KitchenOrderId in KitchenOrderIds do
+            Printer.AddLine(Format(KitchenOrderId, 0, 9), 1);
+        Printer.SetFont(A11FontLbl);
+        Printer.SetBold(false);
+        Printer.AddLine('', 0);
     end;
 }
