@@ -650,6 +650,221 @@ codeunit 85594 "NPR Ecom Doc V1 Tests"
     end;
 
     [Test]
+    procedure GivenBlockedLowerAndClearHigherCardOnOneEmail_WhenCreateV1_ThenTheOrderIsForTheHigherCard()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        LowerCustomer: Record Customer;
+        HigherCustomer: Record Customer;
+        Response: JsonObject;
+        ExternalNo: Code[20];
+        ItemNo: Code[20];
+        Email: Text;
+    begin
+        // [Scenario] Under E-mail mapping, a V1 order skips the lower card on the e-mail when it is blocked and is
+        //            created for the higher card that is not blocked.
+
+        // [Given] Two cards on one e-mail, the lower one blocked for Ship, and E-mail mapping
+        Initialize(1);
+        Email := NewEmail('c11');
+        CreateCustomerPair(Email, '', LowerCustomer, HigherCustomer);
+        LowerCustomer.Blocked := LowerCustomer.Blocked::Ship;
+        LowerCustomer.Modify();
+        ItemNo := _LibEcom.CreateItem();
+        SetCustomerMapping("NPR IncEcomDocCustomerMapping"::"E-mail");
+        ExternalNo := _LibEcom.NextExternalNo('V1C11');
+
+        // [When] An order for the e-mail is created dated 2025-10-18
+        Response := PostDocument(MinimalV1Body(ExternalNo, ItemNo, Email), '2025-10-18', true);
+
+        // [Then] The document is Created and the sales order is for the higher card
+        AssertCreatedWithId(Response, ExternalNo, 'id', EcomSalesHeader, '2025-10-18');
+        AssertOrderForCustomer(EcomSalesHeader, HigherCustomer."No.");
+    end;
+
+    [Test]
+    procedure GivenEveryCardOnTheEmailBlocked_WhenCreateV1_ThenTheConversionFailsOnTheLowerCard()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        LowerCustomer: Record Customer;
+        HigherCustomer: Record Customer;
+        Response: JsonObject;
+        ExternalNo: Code[20];
+        ItemNo: Code[20];
+        Email: Text;
+        ExpectedError: Text;
+        BlockedCustomerLbl: Label 'Customer %1 is blocked with type %2', Locked = true;
+    begin
+        // [Scenario] Under E-mail mapping, when every card on the e-mail is blocked for an order, V1 picks the lower card
+        //            and the conversion fails on its block.
+
+        // [Given] Two cards on one e-mail, the lower one blocked for All and the higher one for Ship, and E-mail mapping
+        Initialize(1);
+        Email := NewEmail('c12');
+        CreateCustomerPair(Email, '', LowerCustomer, HigherCustomer);
+        LowerCustomer.Blocked := LowerCustomer.Blocked::All;
+        LowerCustomer.Modify();
+        HigherCustomer.Blocked := HigherCustomer.Blocked::Ship;
+        HigherCustomer.Modify();
+        ItemNo := _LibEcom.CreateItem();
+        SetCustomerMapping("NPR IncEcomDocCustomerMapping"::"E-mail");
+        ExternalNo := _LibEcom.NextExternalNo('V1C12');
+
+        // [When] An order for the e-mail is created dated 2025-10-18
+        Response := PostDocument(MinimalV1Body(ExternalNo, ItemNo, Email), '2025-10-18', true);
+
+        // [Then] The document is Error, no sales document exists, and the error names the lower card and its block
+        AssertCreatedWithId(Response, ExternalNo, 'id', EcomSalesHeader, '2025-10-18');
+        _Assert.AreEqual(EcomSalesHeader."Creation Status"::Error, EcomSalesHeader."Creation Status", 'With a budget of 1 the failed conversion must end in Error.');
+        _Assert.AreEqual(0, _LibEcom.CountSalesDocumentsFor(EcomSalesHeader), 'A failed conversion must leave no sales document.');
+        ExpectedError := StrSubstNo(BlockedCustomerLbl, LowerCustomer."No.", Format(LowerCustomer.Blocked));
+        _Assert.IsTrue(StrPos(EcomSalesHeader."Last Error Message", ExpectedError) > 0, StrSubstNo('The error must contain ''%1''. Actual: ''%2''.', ExpectedError, EcomSalesHeader."Last Error Message"));
+    end;
+
+    [Test]
+    procedure GivenBlockedLowerCard_WhenCreateV1UnderEmailOrPhoneMapping_ThenTheOrderIsForTheHigherCard()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        LowerCustomer: Record Customer;
+        HigherCustomer: Record Customer;
+        Response: JsonObject;
+        ExternalNo: Code[20];
+        ItemNo: Code[20];
+        Email: Text;
+    begin
+        // [Scenario] Under E-mail OR Phone No. mapping, the e-mail leg skips the blocked lower card and the order is
+        //            created for the higher card.
+
+        // [Given] Two cards on one e-mail without a phone, the lower one blocked for Ship, and E-mail OR Phone No. mapping
+        Initialize(1);
+        Email := NewEmail('c13');
+        CreateCustomerPair(Email, '', LowerCustomer, HigherCustomer);
+        LowerCustomer.Blocked := LowerCustomer.Blocked::Ship;
+        LowerCustomer.Modify();
+        ItemNo := _LibEcom.CreateItem();
+        SetCustomerMapping("NPR IncEcomDocCustomerMapping"::"E-mail OR Phone No.");
+        ExternalNo := _LibEcom.NextExternalNo('V1C13');
+
+        // [When] An order for the e-mail, without a phone, is created dated 2025-10-18
+        Response := PostDocument(MinimalV1Body(ExternalNo, ItemNo, Email), '2025-10-18', true);
+
+        // [Then] The document is Created and the sales order is for the higher card
+        AssertCreatedWithId(Response, ExternalNo, 'id', EcomSalesHeader, '2025-10-18');
+        AssertOrderForCustomer(EcomSalesHeader, HigherCustomer."No.");
+    end;
+
+    [Test]
+    procedure GivenBlockedLowerCard_WhenCreateV1UnderEmailAndPhoneMapping_ThenTheOrderIsForTheHigherCard()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        LowerCustomer: Record Customer;
+        HigherCustomer: Record Customer;
+        Response: JsonObject;
+        Body: JsonObject;
+        ExternalNo: Code[20];
+        ItemNo: Code[20];
+        Email: Text;
+        PhoneNoLbl: Label '+4520304050', Locked = true;
+    begin
+        // [Scenario] Under E-mail AND Phone No. mapping, V1 skips the blocked lower card that matches both and the order
+        //            is created for the higher card.
+
+        // [Given] Two cards on one e-mail and one phone, the lower one blocked for Ship, and E-mail AND Phone No. mapping
+        Initialize(1);
+        Email := NewEmail('c14');
+        CreateCustomerPair(Email, PhoneNoLbl, LowerCustomer, HigherCustomer);
+        LowerCustomer.Blocked := LowerCustomer.Blocked::Ship;
+        LowerCustomer.Modify();
+        ItemNo := _LibEcom.CreateItem();
+        SetCustomerMapping("NPR IncEcomDocCustomerMapping"::"E-mail AND Phone No.");
+        ExternalNo := _LibEcom.NextExternalNo('V1C14');
+        Body := MinimalV1Body(ExternalNo, ItemNo, Email);
+        ObjectAt(Body, 'sellToCustomer').Add('phone', PhoneNoLbl);
+
+        // [When] An order for the e-mail and the phone is created dated 2025-10-18
+        Response := PostDocument(Body, '2025-10-18', true);
+
+        // [Then] The document is Created and the sales order is for the higher card
+        AssertCreatedWithId(Response, ExternalNo, 'id', EcomSalesHeader, '2025-10-18');
+        AssertOrderForCustomer(EcomSalesHeader, HigherCustomer."No.");
+    end;
+
+    [Test]
+    procedure GivenBlockedLowerCardOnOnePhone_WhenCreateV1UnderPhoneMapping_ThenTheOrderIsForTheHigherCard()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        Customer: Record Customer;
+        LowerCustomer: Record Customer;
+        HigherCustomer: Record Customer;
+        Response: JsonObject;
+        Body: JsonObject;
+        ExternalNo: Code[20];
+        ItemNo: Code[20];
+        PhoneNo: Text;
+    begin
+        // [Scenario] Under Phone No. mapping, V1 skips the lower card blocked for Ship and the order is created for the
+        //            higher card.
+
+        // [Given] Two cards on a new phone without an e-mail, the lower one blocked for Ship, and Phone No. mapping
+        Initialize(1);
+        PhoneNo := NewPhoneNo();
+        Customer.SetRange("Phone No.", PhoneNo);
+        _Assert.IsTrue(Customer.IsEmpty(), 'No card may have the new phone before the test creates it.');
+        CreateCustomerPair('', PhoneNo, LowerCustomer, HigherCustomer);
+        LowerCustomer.Blocked := LowerCustomer.Blocked::Ship;
+        LowerCustomer.Modify();
+        ItemNo := _LibEcom.CreateItem();
+        SetCustomerMapping("NPR IncEcomDocCustomerMapping"::"Phone No.");
+        ExternalNo := _LibEcom.NextExternalNo('V1C15');
+        Body := MinimalV1Body(ExternalNo, ItemNo, NewEmail('c15'));
+        ObjectAt(Body, 'sellToCustomer').Add('phone', PhoneNo);
+
+        // [When] An order for the phone is created dated 2025-10-18
+        Response := PostDocument(Body, '2025-10-18', true);
+
+        // [Then] The document is Created and the sales order is for the higher card
+        AssertCreatedWithId(Response, ExternalNo, 'id', EcomSalesHeader, '2025-10-18');
+        AssertOrderForCustomer(EcomSalesHeader, HigherCustomer."No.");
+    end;
+
+    [Test]
+    procedure GivenNoEmailMatchAndBlockedLowerCardOnOnePhone_WhenCreateV1UnderEmailOrPhoneMapping_ThenTheOrderIsForTheHigherCard()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        Customer: Record Customer;
+        LowerCustomer: Record Customer;
+        HigherCustomer: Record Customer;
+        Response: JsonObject;
+        Body: JsonObject;
+        ExternalNo: Code[20];
+        ItemNo: Code[20];
+        PhoneNo: Text;
+    begin
+        // [Scenario] Under E-mail OR Phone No. mapping, when no card has the order e-mail, the phone step skips the lower
+        //            card blocked for Ship and the order is created for the higher card.
+
+        // [Given] Two cards on a new phone without an e-mail, the lower one blocked for Ship, and E-mail OR Phone No. mapping
+        Initialize(1);
+        PhoneNo := NewPhoneNo();
+        Customer.SetRange("Phone No.", PhoneNo);
+        _Assert.IsTrue(Customer.IsEmpty(), 'No card may have the new phone before the test creates it.');
+        CreateCustomerPair('', PhoneNo, LowerCustomer, HigherCustomer);
+        LowerCustomer.Blocked := LowerCustomer.Blocked::Ship;
+        LowerCustomer.Modify();
+        ItemNo := _LibEcom.CreateItem();
+        SetCustomerMapping("NPR IncEcomDocCustomerMapping"::"E-mail OR Phone No.");
+        ExternalNo := _LibEcom.NextExternalNo('V1C16');
+        Body := MinimalV1Body(ExternalNo, ItemNo, NewEmail('c16'));
+        ObjectAt(Body, 'sellToCustomer').Add('phone', PhoneNo);
+
+        // [When] An order for an e-mail no card has and for the phone is created dated 2025-10-18
+        Response := PostDocument(Body, '2025-10-18', true);
+
+        // [Then] The document is Created and the sales order is for the higher card
+        AssertCreatedWithId(Response, ExternalNo, 'id', EcomSalesHeader, '2025-10-18');
+        AssertOrderForCustomer(EcomSalesHeader, HigherCustomer."No.");
+    end;
+
+    [Test]
     procedure GivenFullDocument_WhenGetByIdUnderEachV1Header_ThenEveryKeyAndValueIsPinned()
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
@@ -944,6 +1159,35 @@ codeunit 85594 "NPR Ecom Doc V1 Tests"
         _LibAPI.CreateAPIPermission(UserSecurityId(), CompanyName(), CopyStr(_EcomApiPermissionSetLbl, 1, 20));
     end;
 
+    local procedure SetCustomerMapping(CustomerMapping: Enum "NPR IncEcomDocCustomerMapping")
+    var
+        IncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
+    begin
+        _LibEcom.GetIncEcomSalesDocSetup(IncEcomSalesDocSetup);
+        IncEcomSalesDocSetup."Customer Mapping" := CustomerMapping;
+        IncEcomSalesDocSetup.Modify();
+    end;
+
+    // _LibEcom.CreateCustomer switches the mapping to Customer No., so call SetCustomerMapping after this.
+    local procedure CreateCustomerPair(Email: Text; PhoneNo: Text; var LowerCustomer: Record Customer; var HigherCustomer: Record Customer)
+    var
+        Customer: Record Customer;
+    begin
+        LowerCustomer.Get(_LibEcom.CreateCustomer());
+        HigherCustomer.Get(_LibEcom.CreateCustomer());
+        if LowerCustomer."No." > HigherCustomer."No." then begin
+            Customer := LowerCustomer;
+            LowerCustomer := HigherCustomer;
+            HigherCustomer := Customer;
+        end;
+        LowerCustomer."E-Mail" := CopyStr(Email, 1, MaxStrLen(LowerCustomer."E-Mail"));
+        LowerCustomer."Phone No." := CopyStr(PhoneNo, 1, MaxStrLen(LowerCustomer."Phone No."));
+        LowerCustomer.Modify();
+        HigherCustomer."E-Mail" := CopyStr(Email, 1, MaxStrLen(HigherCustomer."E-Mail"));
+        HigherCustomer."Phone No." := CopyStr(PhoneNo, 1, MaxStrLen(HigherCustomer."Phone No."));
+        HigherCustomer.Modify();
+    end;
+
     local procedure NewEmail(Tag: Text): Text
     begin
         exit(LowerCase('v1.' + Tag + '.' + HexText(32) + '@versioning.test'));
@@ -957,6 +1201,11 @@ codeunit 85594 "NPR Ecom Doc V1 Tests"
     local procedure HexText(Length: Integer): Text
     begin
         exit(CopyStr(DelChr(Format(CreateGuid()), '=', '{}-') + DelChr(Format(CreateGuid()), '=', '{}-'), 1, Length));
+    end;
+
+    local procedure NewPhoneNo(): Text
+    begin
+        exit('+45' + CopyStr(DelChr(Format(CreateGuid()) + Format(CreateGuid()), '=', '{}-ABCDEFabcdef'), 1, 8));
     end;
 
     local procedure MissingItemNo() ItemNo: Code[20]
@@ -1354,6 +1603,15 @@ codeunit 85594 "NPR Ecom Doc V1 Tests"
         SalesHeader.SetRange("NPR Inc Ecom Sale Id", EcomSalesHeader.SystemId);
         _Assert.AreEqual(1, SalesHeader.Count(), 'Exactly one sales order must point at the document.');
         SalesHeader.FindFirst();
+    end;
+
+    local procedure AssertOrderForCustomer(EcomSalesHeader: Record "NPR Ecom Sales Header"; CustomerNo: Code[20])
+    var
+        SalesHeader: Record "Sales Header";
+    begin
+        _Assert.AreEqual(EcomSalesHeader."Creation Status"::Created, EcomSalesHeader."Creation Status", 'The conversion must succeed. Last Error Message: ' + EcomSalesHeader."Last Error Message");
+        SalesOrderOf(EcomSalesHeader, SalesHeader);
+        _Assert.AreEqual(CustomerNo, SalesHeader."Sell-to Customer No.", 'The sales order must be for the higher card. Last Error Message: ' + EcomSalesHeader."Last Error Message");
     end;
 
     local procedure FirstLineExternalId(EcomSalesHeader: Record "NPR Ecom Sales Header"): Text

@@ -1162,6 +1162,37 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
         Customer.SetFilter("E-Mail", '%1', '@' + Email);
     end;
 
+    internal procedure FindCustomerPreferNotBlocked(var Customer: Record Customer; DocumentType: Enum "NPR Ecom Sales Doc Type"): Boolean
+    begin
+        if not Customer.FindFirst() then
+            exit(false);
+        if PassesBlockedCheck(Customer, DocumentType) then
+            exit(true);
+        // The lowest match is blocked: look for a higher one that passes.
+        if Customer.FindSet() then
+            repeat
+                if PassesBlockedCheck(Customer, DocumentType) then
+                    exit(true);
+            until Customer.Next() = 0;
+        // Every match is blocked: return the lowest-No. match so the existing blocked error is raised for that card.
+        exit(Customer.FindFirst());
+    end;
+
+    local procedure PassesBlockedCheck(Customer: Record Customer; DocumentType: Enum "NPR Ecom Sales Doc Type"): Boolean
+    begin
+        // Same rule as Customer.CheckBlockedCustOnDocs(.., false, false) and V2 CheckCustomerNotBlocked. Change them together.
+        if Customer."Privacy Blocked" then
+            exit(false);
+        case Customer.Blocked of
+            Customer.Blocked::All:
+                exit(false);
+            Customer.Blocked::Invoice,
+            Customer.Blocked::Ship:
+                exit(DocumentType <> DocumentType::Order);
+        end;
+        exit(true);
+    end;
+
     local procedure HoldsWildcard(Email: Text): Boolean
     var
         WildcardsLbl: Label '*?', Locked = true;

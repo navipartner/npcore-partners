@@ -20,6 +20,10 @@ codeunit 85422 "NPR Ecom Doc Find Tests"
         _JsonPropertyErrLbl: Label '%1 must carry %2.', Locked = true;
         _JsonSingleEntryErrLbl: Label '%1 must carry exactly the one seeded entry in %2.', Locked = true;
         _JsonNumberErrLbl: Label '%1, %2: expected the JSON number %3, got %4.', Locked = true;
+        _CustomerBlockedErrLbl: Label 'The %1 assigned to this order is blocked (%2 = %3).', Locked = true;
+        _NoSalesDocErrLbl: Label '%1 No sales document was created. Creation status: %2. Last error: %3', Locked = true;
+        _WrongSellToErrLbl: Label '%1 Last error: %2', Locked = true;
+        _WrongErrorErrLbl: Label 'The error must report the Blocked value of the lower card. Creation status: %1', Locked = true;
 
     #region Tests
 
@@ -1266,6 +1270,490 @@ codeunit 85422 "NPR Ecom Doc Find Tests"
         _Assert.IsTrue(SalesHeader.IsEmpty(), 'A document whose e-mail holds a filter wildcard must not bind to an unrelated customer card that the wildcard happens to match.');
     end;
 
+    [Test]
+    procedure GivenBlockedLowestAndTwoClearCardsOnOneEmail_WhenOrderIsConverted_ThenTheLowestClearCardIsUsed()
+    var
+        Customer: Record Customer;
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        Body: JsonObject;
+        Email: Text;
+        ExternalNo: Code[20];
+        ItemNo: Code[20];
+        LowestNo: Code[20];
+        MiddleNo: Code[20];
+    begin
+        // [SCENARIO] An order whose e-mail matches three cards goes to the lowest card that is not blocked.
+
+        // [GIVEN] three cards on one e-mail, the lowest blocked for shipping, mapping by e-mail
+        Email := NextEmail();
+        _LibEcom.ResetEcomSetupToDefaults();
+        ItemNo := _LibEcom.CreateItem();
+        CreateCustomerWithEmail(Email);
+        CreateCustomerWithEmail(Email);
+        CreateCustomerWithEmail(Email);
+        Customer.SetRange("E-Mail", Email);
+        Customer.FindSet();
+        LowestNo := Customer."No.";
+        Customer.Next();
+        MiddleNo := Customer."No.";
+        Customer.Get(LowestNo);
+        Customer.Blocked := Customer.Blocked::Ship;
+        Customer.Modify();
+        SetCustomerMappingByEmailAndCreateOnly();
+
+        ExternalNo := _LibEcom.NextExternalNo('TIVBLK');
+        Body := BuildV2BodyForItem(ExternalNo, Email, ItemNo);
+        _LibEcom.SubmitEcomDocumentBody(Body, ExternalNo, EcomSalesHeader);
+
+        // [WHEN] the order job queue converts the order
+        _LibEcom.RunEcomJobQueueOnce(Codeunit::"NPR EcomSalesOrderProcJQ", EcomSalesHeader);
+
+        // [THEN] the middle card is the sell-to customer
+        AssertConvertedToCustomer(EcomSalesHeader, Enum::"Sales Document Type"::Order, MiddleNo, 'The lowest card that is not blocked must be used.');
+    end;
+
+    [Test]
+    procedure GivenClearLowerAndBlockedHigherCardOnOneEmail_WhenOrderIsConverted_ThenTheLowerCardIsUsed()
+    var
+        Customer: Record Customer;
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        Body: JsonObject;
+        Email: Text;
+        ExternalNo: Code[20];
+        ItemNo: Code[20];
+        LowerNo: Code[20];
+    begin
+        // [SCENARIO] A blocked card above a clear one does not move the order away from the lower card.
+
+        // [GIVEN] two cards on one e-mail, the higher blocked for everything, mapping by e-mail
+        Email := NextEmail();
+        _LibEcom.ResetEcomSetupToDefaults();
+        ItemNo := _LibEcom.CreateItem();
+        CreateCustomerWithEmail(Email);
+        CreateCustomerWithEmail(Email);
+        Customer.SetRange("E-Mail", Email);
+        Customer.FindFirst();
+        LowerNo := Customer."No.";
+        Customer.FindLast();
+        Customer.Blocked := Customer.Blocked::All;
+        Customer.Modify();
+        SetCustomerMappingByEmailAndCreateOnly();
+
+        ExternalNo := _LibEcom.NextExternalNo('TIVBLK');
+        Body := BuildV2BodyForItem(ExternalNo, Email, ItemNo);
+        _LibEcom.SubmitEcomDocumentBody(Body, ExternalNo, EcomSalesHeader);
+
+        // [WHEN] the order job queue converts the order
+        _LibEcom.RunEcomJobQueueOnce(Codeunit::"NPR EcomSalesOrderProcJQ", EcomSalesHeader);
+
+        // [THEN] the lower card is the sell-to customer
+        AssertConvertedToCustomer(EcomSalesHeader, Enum::"Sales Document Type"::Order, LowerNo, 'The clear lower card must be used.');
+    end;
+
+    [Test]
+    procedure GivenEveryCardOnTheEmailBlocked_WhenOrderIsConverted_ThenTheBlockedErrorNamesTheLowerCard()
+    var
+        Customer: Record Customer;
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        Body: JsonObject;
+        Email: Text;
+        ExpectedError: Text;
+        ExternalNo: Code[20];
+        ItemNo: Code[20];
+        LowerNo: Code[20];
+    begin
+        // [SCENARIO] When every card on the e-mail is blocked, the order fails on the lower card and no new card is created.
+
+        // [GIVEN] two cards on one e-mail, the lower blocked for everything and the higher for shipping, mapping by e-mail with Update Mode Create
+        Email := NextEmail();
+        _LibEcom.ResetEcomSetupToDefaults();
+        ItemNo := _LibEcom.CreateItem();
+        CreateCustomerWithEmail(Email);
+        CreateCustomerWithEmail(Email);
+        Customer.SetRange("E-Mail", Email);
+        Customer.FindLast();
+        Customer.Blocked := Customer.Blocked::Ship;
+        Customer.Modify();
+        Customer.FindFirst();
+        LowerNo := Customer."No.";
+        Customer.Blocked := Customer.Blocked::All;
+        Customer.Modify();
+        SetCustomerMappingByEmailAndCreateOnly();
+
+        ExternalNo := _LibEcom.NextExternalNo('TIVBLK');
+        Body := BuildV2BodyForItem(ExternalNo, Email, ItemNo);
+        _LibEcom.SubmitEcomDocumentBody(Body, ExternalNo, EcomSalesHeader);
+
+        // [WHEN] the order job queue tries to convert the order
+        _LibEcom.RunEcomJobQueueOnce(Codeunit::"NPR EcomSalesOrderProcJQ", EcomSalesHeader);
+
+        // [THEN] no sales document exists, the error reports the lower card's Blocked value, and the e-mail still has two cards
+        EcomSalesHeader.Get(EcomSalesHeader."Entry No.");
+        _Assert.AreEqual(0, _LibEcom.CountSalesDocumentsFor(EcomSalesHeader), 'No sales document may be created when every card on the e-mail is blocked.');
+        Customer.Get(LowerNo);
+        ExpectedError := StrSubstNo(_CustomerBlockedErrLbl, Customer.TableCaption(), Customer.FieldCaption(Blocked), Format(Customer.Blocked));
+        _Assert.AreEqual(CopyStr(ExpectedError, 1, MaxStrLen(EcomSalesHeader."Last Error Message")), EcomSalesHeader."Last Error Message", StrSubstNo(_WrongErrorErrLbl, EcomSalesHeader."Creation Status"));
+        Customer.Reset();
+        Customer.SetRange("E-Mail", Email);
+        _Assert.AreEqual(2, Customer.Count(), 'No new card may be created when every card on the e-mail is blocked.');
+    end;
+
+    [Test]
+    procedure GivenPrivacyBlockedLowerCard_WhenOrderIsConverted_ThenTheHigherCardIsUsed()
+    var
+        Customer: Record Customer;
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        Body: JsonObject;
+        Email: Text;
+        ExternalNo: Code[20];
+        HigherNo: Code[20];
+        ItemNo: Code[20];
+    begin
+        // [SCENARIO] A privacy-blocked lower card is skipped in favor of the higher clear card.
+
+        // [GIVEN] two cards on one e-mail, the lower privacy blocked with Blocked left blank, mapping by e-mail
+        Email := NextEmail();
+        _LibEcom.ResetEcomSetupToDefaults();
+        ItemNo := _LibEcom.CreateItem();
+        CreateCustomerWithEmail(Email);
+        CreateCustomerWithEmail(Email);
+        Customer.SetRange("E-Mail", Email);
+        Customer.FindLast();
+        HigherNo := Customer."No.";
+        Customer.FindFirst();
+        Customer."Privacy Blocked" := true;
+        Customer.Modify();
+        SetCustomerMappingByEmailAndCreateOnly();
+
+        ExternalNo := _LibEcom.NextExternalNo('TIVBLK');
+        Body := BuildV2BodyForItem(ExternalNo, Email, ItemNo);
+        _LibEcom.SubmitEcomDocumentBody(Body, ExternalNo, EcomSalesHeader);
+
+        // [WHEN] the order job queue converts the order
+        _LibEcom.RunEcomJobQueueOnce(Codeunit::"NPR EcomSalesOrderProcJQ", EcomSalesHeader);
+
+        // [THEN] the higher card is the sell-to customer
+        AssertConvertedToCustomer(EcomSalesHeader, Enum::"Sales Document Type"::Order, HigherNo, 'The privacy-blocked lower card must be skipped.');
+    end;
+
+    [Test]
+    procedure GivenShipBlockedLowerCard_WhenReturnOrderIsConverted_ThenTheLowerCardIsKept()
+    var
+        Customer: Record Customer;
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        Body: JsonObject;
+        Email: Text;
+        ExternalNo: Code[20];
+        ItemNo: Code[20];
+        LowerNo: Code[20];
+    begin
+        // [SCENARIO] A return order keeps the lower card when it is blocked only for shipping.
+
+        // [GIVEN] two cards on one e-mail, the lower blocked for shipping, mapping by e-mail
+        Email := NextEmail();
+        _LibEcom.ResetEcomSetupToDefaults();
+        ItemNo := _LibEcom.CreateItem();
+        CreateCustomerWithEmail(Email);
+        CreateCustomerWithEmail(Email);
+        Customer.SetRange("E-Mail", Email);
+        Customer.FindFirst();
+        LowerNo := Customer."No.";
+        Customer.Blocked := Customer.Blocked::Ship;
+        Customer.Modify();
+        SetCustomerMappingByEmailAndCreateOnly();
+
+        // [GIVEN] a return order on that e-mail
+        ExternalNo := _LibEcom.NextExternalNo('TIVBLK');
+        Body := BuildV2BodyForItem(ExternalNo, Email, ItemNo);
+        Body.Replace('documentType', 'returnOrder');
+        _LibEcom.SubmitEcomDocumentBody(Body, ExternalNo, EcomSalesHeader);
+
+        // [WHEN] the return-order job queue converts it
+        _LibEcom.RunEcomJobQueueOnce(Codeunit::"NPR EcomSalesRetOrderProcJQ", EcomSalesHeader);
+
+        // [THEN] the lower card is the sell-to customer of the sales return order
+        AssertConvertedToCustomer(EcomSalesHeader, Enum::"Sales Document Type"::"Return Order", LowerNo, 'A return order must keep the lower card blocked only for shipping.');
+    end;
+
+    [Test]
+    procedure GivenBlockedLowerCard_WhenConvertedUnderEmailOrPhoneMapping_ThenTheHigherCardIsUsed()
+    var
+        Customer: Record Customer;
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        Body: JsonObject;
+        Email: Text;
+        ExternalNo: Code[20];
+        HigherNo: Code[20];
+        ItemNo: Code[20];
+    begin
+        // [SCENARIO] Under the e-mail or phone mapping, an order skips the lower card blocked for invoicing.
+
+        // [GIVEN] two cards on one e-mail, the lower blocked for invoicing, mapping by e-mail or phone
+        Email := NextEmail();
+        _LibEcom.ResetEcomSetupToDefaults();
+        ItemNo := _LibEcom.CreateItem();
+        CreateCustomerWithEmail(Email);
+        CreateCustomerWithEmail(Email);
+        Customer.SetRange("E-Mail", Email);
+        Customer.FindLast();
+        HigherNo := Customer."No.";
+        Customer.FindFirst();
+        Customer.Blocked := Customer.Blocked::Invoice;
+        Customer.Modify();
+        SetCustomerMappingAndCreateOnly(Enum::"NPR IncEcomDocCustomerMapping"::"E-mail or Phone No.");
+
+        ExternalNo := _LibEcom.NextExternalNo('TIVBLK');
+        Body := BuildV2BodyForItem(ExternalNo, Email, ItemNo);
+        _LibEcom.SubmitEcomDocumentBody(Body, ExternalNo, EcomSalesHeader);
+
+        // [WHEN] the order job queue converts the order
+        _LibEcom.RunEcomJobQueueOnce(Codeunit::"NPR EcomSalesOrderProcJQ", EcomSalesHeader);
+
+        // [THEN] the higher card is the sell-to customer
+        AssertConvertedToCustomer(EcomSalesHeader, Enum::"Sales Document Type"::Order, HigherNo, 'The blocked lower card must be skipped under the e-mail or phone mapping.');
+    end;
+
+    [Test]
+    procedure GivenBlockedLowerCard_WhenConvertedUnderEmailAndPhoneMapping_ThenTheHigherCardIsUsed()
+    var
+        Customer: Record Customer;
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        Body: JsonObject;
+        SellTo: JsonToken;
+        Email: Text;
+        PhoneNo: Text[30];
+        ExternalNo: Code[20];
+        HigherNo: Code[20];
+        ItemNo: Code[20];
+    begin
+        // [SCENARIO] Under the e-mail and phone mapping, an order skips the lower card blocked for shipping.
+
+        // [GIVEN] two cards with the same e-mail and phone number, the lower blocked for shipping, mapping by e-mail and phone
+        Email := NextEmail();
+        PhoneNo := '+4512345678';
+        _LibEcom.ResetEcomSetupToDefaults();
+        ItemNo := _LibEcom.CreateItem();
+        CreateCustomerWithEmail(Email);
+        CreateCustomerWithEmail(Email);
+        Customer.SetRange("E-Mail", Email);
+        Customer.ModifyAll("Phone No.", PhoneNo);
+        Customer.FindLast();
+        HigherNo := Customer."No.";
+        Customer.FindFirst();
+        Customer.Blocked := Customer.Blocked::Ship;
+        Customer.Modify();
+        SetCustomerMappingAndCreateOnly(Enum::"NPR IncEcomDocCustomerMapping"::"E-mail and Phone No.");
+
+        // [GIVEN] an order carrying the same e-mail and phone number
+        ExternalNo := _LibEcom.NextExternalNo('TIVBLK');
+        Body := BuildV2BodyForItem(ExternalNo, Email, ItemNo);
+        Body.Get('sellToCustomer', SellTo);
+        SellTo.AsObject().Add('phone', PhoneNo);
+        Body.Replace('sellToCustomer', SellTo);
+        _LibEcom.SubmitEcomDocumentBody(Body, ExternalNo, EcomSalesHeader);
+
+        // [WHEN] the order job queue converts the order
+        _LibEcom.RunEcomJobQueueOnce(Codeunit::"NPR EcomSalesOrderProcJQ", EcomSalesHeader);
+
+        // [THEN] the higher card is the sell-to customer
+        AssertConvertedToCustomer(EcomSalesHeader, Enum::"Sales Document Type"::Order, HigherNo, 'The blocked lower card must be skipped under the e-mail and phone mapping.');
+    end;
+
+    [Test]
+    procedure GivenAllBlockedLowerCard_WhenReturnOrderIsConverted_ThenTheHigherCardIsUsed()
+    var
+        Customer: Record Customer;
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        Body: JsonObject;
+        Email: Text;
+        ExternalNo: Code[20];
+        HigherNo: Code[20];
+        ItemNo: Code[20];
+    begin
+        // [SCENARIO] A return order skips the lower card when it is blocked for everything.
+
+        // [GIVEN] two cards on one e-mail, the lower blocked for everything, mapping by e-mail
+        Email := NextEmail();
+        _LibEcom.ResetEcomSetupToDefaults();
+        ItemNo := _LibEcom.CreateItem();
+        CreateCustomerWithEmail(Email);
+        CreateCustomerWithEmail(Email);
+        Customer.SetRange("E-Mail", Email);
+        Customer.FindLast();
+        HigherNo := Customer."No.";
+        Customer.FindFirst();
+        Customer.Blocked := Customer.Blocked::All;
+        Customer.Modify();
+        SetCustomerMappingByEmailAndCreateOnly();
+
+        // [GIVEN] a return order on that e-mail
+        ExternalNo := _LibEcom.NextExternalNo('TIVBLK');
+        Body := BuildV2BodyForItem(ExternalNo, Email, ItemNo);
+        Body.Replace('documentType', 'returnOrder');
+        _LibEcom.SubmitEcomDocumentBody(Body, ExternalNo, EcomSalesHeader);
+
+        // [WHEN] the return-order job queue converts it
+        _LibEcom.RunEcomJobQueueOnce(Codeunit::"NPR EcomSalesRetOrderProcJQ", EcomSalesHeader);
+
+        // [THEN] the higher card is the sell-to customer of the sales return order
+        AssertConvertedToCustomer(EcomSalesHeader, Enum::"Sales Document Type"::"Return Order", HigherNo, 'A return order must skip the lower card blocked for everything.');
+    end;
+
+    [Test]
+    procedure GivenBlockedLowerCardOnOnePhone_WhenConvertedUnderPhoneMapping_ThenTheHigherCardIsUsed()
+    var
+        Customer: Record Customer;
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        Body: JsonObject;
+        SellTo: JsonToken;
+        PhoneNo: Text[30];
+        ExternalNo: Code[20];
+        HigherNo: Code[20];
+        ItemNo: Code[20];
+    begin
+        // [SCENARIO] Under the phone mapping, an order skips the lower card blocked for shipping.
+
+        // [GIVEN] a phone number no card carries yet
+        PhoneNo := NextPhoneNo();
+        Customer.SetRange("Phone No.", PhoneNo);
+        _Assert.IsTrue(Customer.IsEmpty(), 'The generated phone number must not be on any card yet.');
+
+        // [GIVEN] two cards on that phone number, the lower blocked for shipping, mapping by phone
+        _LibEcom.ResetEcomSetupToDefaults();
+        ItemNo := _LibEcom.CreateItem();
+        CreateCustomerWithPhone(PhoneNo);
+        CreateCustomerWithPhone(PhoneNo);
+        Customer.FindLast();
+        HigherNo := Customer."No.";
+        Customer.FindFirst();
+        Customer.Blocked := Customer.Blocked::Ship;
+        Customer.Modify();
+        SetCustomerMappingAndCreateOnly(Enum::"NPR IncEcomDocCustomerMapping"::"Phone No.");
+
+        // [GIVEN] an order carrying that phone number
+        ExternalNo := _LibEcom.NextExternalNo('TIVBLK');
+        Body := BuildV2BodyForItem(ExternalNo, NextEmail(), ItemNo);
+        Body.Get('sellToCustomer', SellTo);
+        SellTo.AsObject().Add('phone', PhoneNo);
+        Body.Replace('sellToCustomer', SellTo);
+        _LibEcom.SubmitEcomDocumentBody(Body, ExternalNo, EcomSalesHeader);
+
+        // [WHEN] the order job queue converts the order
+        _LibEcom.RunEcomJobQueueOnce(Codeunit::"NPR EcomSalesOrderProcJQ", EcomSalesHeader);
+
+        // [THEN] the higher card is the sell-to customer
+        AssertConvertedToCustomer(EcomSalesHeader, Enum::"Sales Document Type"::Order, HigherNo, 'The blocked lower card must be skipped under the phone mapping.');
+    end;
+
+    [Test]
+    procedure GivenNoEmailMatchAndBlockedLowerCardOnOnePhone_WhenConvertedUnderEmailOrPhoneMapping_ThenTheHigherCardIsUsed()
+    var
+        Customer: Record Customer;
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        Body: JsonObject;
+        SellTo: JsonToken;
+        PhoneNo: Text[30];
+        ExternalNo: Code[20];
+        HigherNo: Code[20];
+        ItemNo: Code[20];
+    begin
+        // [SCENARIO] Under the e-mail or phone mapping, when no card has the e-mail, the phone step skips the lower card blocked for shipping.
+
+        // [GIVEN] a phone number no card carries yet
+        PhoneNo := NextPhoneNo();
+        Customer.SetRange("Phone No.", PhoneNo);
+        _Assert.IsTrue(Customer.IsEmpty(), 'The generated phone number must not be on any card yet.');
+
+        // [GIVEN] two cards on that phone number, the lower blocked for shipping, mapping by e-mail or phone
+        _LibEcom.ResetEcomSetupToDefaults();
+        ItemNo := _LibEcom.CreateItem();
+        CreateCustomerWithPhone(PhoneNo);
+        CreateCustomerWithPhone(PhoneNo);
+        Customer.FindLast();
+        HigherNo := Customer."No.";
+        Customer.FindFirst();
+        Customer.Blocked := Customer.Blocked::Ship;
+        Customer.Modify();
+        SetCustomerMappingAndCreateOnly(Enum::"NPR IncEcomDocCustomerMapping"::"E-mail or Phone No.");
+
+        // [GIVEN] an order carrying that phone number and an e-mail no card has
+        ExternalNo := _LibEcom.NextExternalNo('TIVBLK');
+        Body := BuildV2BodyForItem(ExternalNo, NextEmail(), ItemNo);
+        Body.Get('sellToCustomer', SellTo);
+        SellTo.AsObject().Add('phone', PhoneNo);
+        Body.Replace('sellToCustomer', SellTo);
+        _LibEcom.SubmitEcomDocumentBody(Body, ExternalNo, EcomSalesHeader);
+
+        // [WHEN] the order job queue converts the order
+        _LibEcom.RunEcomJobQueueOnce(Codeunit::"NPR EcomSalesOrderProcJQ", EcomSalesHeader);
+
+        // [THEN] the higher card is the sell-to customer
+        AssertConvertedToCustomer(EcomSalesHeader, Enum::"Sales Document Type"::Order, HigherNo, 'The phone step must skip the blocked lower card under the e-mail or phone mapping.');
+    end;
+
+    [Test]
+    procedure GivenEveryEmailMatchBlockedAndClearCardOnPhone_WhenConvertedUnderEmailOrPhoneMapping_ThenTheBlockedErrorIsRaised()
+    var
+        Customer: Record Customer;
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        Body: JsonObject;
+        SellTo: JsonToken;
+        Email: Text;
+        ExpectedError: Text;
+        PhoneNo: Text[30];
+        ExternalNo: Code[20];
+        ItemNo: Code[20];
+        LowerNo: Code[20];
+    begin
+        // [SCENARIO] Under the e-mail or phone mapping, when every card on the e-mail is blocked, the order fails on the lower e-mail card and the phone step is not tried.
+
+        // [GIVEN] a phone number no card carries yet
+        PhoneNo := NextPhoneNo();
+        Customer.SetRange("Phone No.", PhoneNo);
+        _Assert.IsTrue(Customer.IsEmpty(), 'The generated phone number must not be on any card yet.');
+
+        // [GIVEN] two cards on one e-mail, the lower blocked for everything and the higher for shipping
+        Email := NextEmail();
+        _LibEcom.ResetEcomSetupToDefaults();
+        ItemNo := _LibEcom.CreateItem();
+        CreateCustomerWithEmail(Email);
+        CreateCustomerWithEmail(Email);
+        Customer.Reset();
+        Customer.SetRange("E-Mail", Email);
+        Customer.FindLast();
+        Customer.Blocked := Customer.Blocked::Ship;
+        Customer.Modify();
+        Customer.FindFirst();
+        LowerNo := Customer."No.";
+        Customer.Blocked := Customer.Blocked::All;
+        Customer.Modify();
+
+        // [GIVEN] a clear card on the phone number without an e-mail, mapping by e-mail or phone
+        CreateCustomerWithPhone(PhoneNo);
+        SetCustomerMappingAndCreateOnly(Enum::"NPR IncEcomDocCustomerMapping"::"E-mail or Phone No.");
+
+        // [GIVEN] an order carrying that e-mail and that phone number
+        ExternalNo := _LibEcom.NextExternalNo('TIVBLK');
+        Body := BuildV2BodyForItem(ExternalNo, Email, ItemNo);
+        Body.Get('sellToCustomer', SellTo);
+        SellTo.AsObject().Add('phone', PhoneNo);
+        Body.Replace('sellToCustomer', SellTo);
+        _LibEcom.SubmitEcomDocumentBody(Body, ExternalNo, EcomSalesHeader);
+
+        // [WHEN] the order job queue tries to convert the order
+        _LibEcom.RunEcomJobQueueOnce(Codeunit::"NPR EcomSalesOrderProcJQ", EcomSalesHeader);
+
+        // [THEN] no sales document exists, the error reports the lower e-mail card's Blocked value, and the e-mail still has two cards
+        EcomSalesHeader.Get(EcomSalesHeader."Entry No.");
+        _Assert.AreEqual(0, _LibEcom.CountSalesDocumentsFor(EcomSalesHeader), 'No sales document may be created when every card on the e-mail is blocked.');
+        Customer.Get(LowerNo);
+        ExpectedError := StrSubstNo(_CustomerBlockedErrLbl, Customer.TableCaption(), Customer.FieldCaption(Blocked), Format(Customer.Blocked));
+        _Assert.AreEqual(CopyStr(ExpectedError, 1, MaxStrLen(EcomSalesHeader."Last Error Message")), EcomSalesHeader."Last Error Message", StrSubstNo(_WrongErrorErrLbl, EcomSalesHeader."Creation Status"));
+        Customer.Reset();
+        Customer.SetRange("E-Mail", Email);
+        _Assert.AreEqual(2, Customer.Count(), 'No new card may be created when every card on the e-mail is blocked.');
+    end;
+
 
     #endregion
 
@@ -2501,6 +2989,53 @@ codeunit 85422 "NPR Ecom Doc Find Tests"
         IncEcomSalesDocSetup."Customer Mapping" := IncEcomSalesDocSetup."Customer Mapping"::"E-mail";
         IncEcomSalesDocSetup."Customer Update Mode" := IncEcomSalesDocSetup."Customer Update Mode"::"Create and Update";
         IncEcomSalesDocSetup.Modify();
+    end;
+
+    local procedure SetCustomerMappingAndCreateOnly(CustomerMapping: Enum "NPR IncEcomDocCustomerMapping")
+    var
+        IncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
+    begin
+        _LibEcom.GetIncEcomSalesDocSetup(IncEcomSalesDocSetup);
+        IncEcomSalesDocSetup."Customer Mapping" := CustomerMapping;
+        IncEcomSalesDocSetup."Customer Update Mode" := IncEcomSalesDocSetup."Customer Update Mode"::Create;
+        IncEcomSalesDocSetup.Modify();
+    end;
+
+    // Built on the library card so posting groups are complete; CreateCustomer resets Customer Mapping, so set the mapping afterwards.
+    local procedure CreateCustomerWithEmail(Email: Text)
+    var
+        Customer: Record Customer;
+    begin
+        Customer.Get(_LibEcom.CreateCustomer());
+        Customer."E-Mail" := CopyStr(Email, 1, MaxStrLen(Customer."E-Mail"));
+        Customer.Modify();
+    end;
+
+    // Built on the library card so posting groups are complete; CreateCustomer resets Customer Mapping, so set the mapping afterwards.
+    local procedure CreateCustomerWithPhone(PhoneNo: Text)
+    var
+        Customer: Record Customer;
+    begin
+        Customer.Get(_LibEcom.CreateCustomer());
+        Customer."Phone No." := CopyStr(PhoneNo, 1, MaxStrLen(Customer."Phone No."));
+        Customer.Modify();
+    end;
+
+    // The runner rolls back per codeunit, so every test owns its own search phone number.
+    local procedure NextPhoneNo(): Text[30]
+    begin
+        exit('+45' + CopyStr(DelChr(Format(CreateGuid()) + Format(CreateGuid()), '=', '{}-ABCDEFabcdef'), 1, 8));
+    end;
+
+    local procedure AssertConvertedToCustomer(EcomSalesHeader: Record "NPR Ecom Sales Header"; DocumentType: Enum "Sales Document Type"; ExpectedCustomerNo: Code[20]; Reason: Text)
+    var
+        SalesHeader: Record "Sales Header";
+    begin
+        EcomSalesHeader.Get(EcomSalesHeader."Entry No.");
+        SalesHeader.SetRange("Document Type", DocumentType);
+        SalesHeader.SetRange("NPR Inc Ecom Sale Id", EcomSalesHeader.SystemId);
+        _Assert.IsTrue(SalesHeader.FindFirst(), StrSubstNo(_NoSalesDocErrLbl, Reason, EcomSalesHeader."Creation Status", EcomSalesHeader."Last Error Message"));
+        _Assert.AreEqual(ExpectedCustomerNo, SalesHeader."Sell-to Customer No.", StrSubstNo(_WrongSellToErrLbl, Reason, EcomSalesHeader."Last Error Message"));
     end;
 
     // The production batch size: a smaller one would make run time depend on the container's autoincrement history.

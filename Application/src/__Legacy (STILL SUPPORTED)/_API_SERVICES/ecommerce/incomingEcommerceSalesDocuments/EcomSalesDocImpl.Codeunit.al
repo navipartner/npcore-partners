@@ -382,33 +382,38 @@ codeunit 6248616 "NPR Ecom Sales Doc Impl"
 
         Clear(Customer);
 
+        // A blank e-mail or phone is not looked up: its filter would only match cards with that
+        // field blank, and the found-record checks reject those anyway.
         case IncEcomSalesDocSetup."Customer Mapping" of
             IncEcomSalesDocSetup."Customer Mapping"::"E-mail":
-                begin
+                if EcomSalesHeader."Sell-to Email" <> '' then begin
                     EcomSalesDocUtils.SetCustomerEmailFilter(Customer, EcomSalesHeader."Sell-to Email");
-                    Found := Customer.FindFirst() and (Customer."E-Mail" <> '');
+                    Found := EcomSalesDocUtils.FindCustomerPreferNotBlocked(Customer, EcomSalesHeader."Document Type") and (Customer."E-Mail" <> '');
                 end;
             IncEcomSalesDocSetup."Customer Mapping"::"Phone No.":
-                begin
+                if EcomSalesHeader."Sell-to Phone No." <> '' then begin
                     Customer.SetRange("Phone No.", EcomSalesHeader."Sell-to Phone No.");
-                    Found := Customer.FindFirst() and (Customer."Phone No." <> '');
+                    Found := EcomSalesDocUtils.FindCustomerPreferNotBlocked(Customer, EcomSalesHeader."Document Type") and (Customer."Phone No." <> '');
                 end;
             IncEcomSalesDocSetup."Customer Mapping"::"E-mail AND Phone No.":
-                begin
+                if (EcomSalesHeader."Sell-to Email" <> '') and (EcomSalesHeader."Sell-to Phone No." <> '') then begin
                     EcomSalesDocUtils.SetCustomerEmailFilter(Customer, EcomSalesHeader."Sell-to Email");
                     Customer.SetRange("Phone No.", EcomSalesHeader."Sell-to Phone No.");
-                    Found := Customer.FindFirst() and (Customer."E-Mail" <> '') and (Customer."Phone No." <> '');
+                    Found := EcomSalesDocUtils.FindCustomerPreferNotBlocked(Customer, EcomSalesHeader."Document Type") and (Customer."E-Mail" <> '') and (Customer."Phone No." <> '');
                 end;
             IncEcomSalesDocSetup."Customer Mapping"::"E-mail OR Phone No.":
                 begin
-                    EcomSalesDocUtils.SetCustomerEmailFilter(Customer, EcomSalesHeader."Sell-to Email");
-                    Found := Customer.FindFirst() and (Customer."E-Mail" <> '');
-                    if Found then
-                        exit;
-
-                    Customer.SetRange("E-Mail");
-                    Customer.SetRange("Phone No.", EcomSalesHeader."Sell-to Phone No.");
-                    Found := Customer.FindFirst() and (Customer."Phone No." <> '');
+                    if EcomSalesHeader."Sell-to Email" <> '' then begin
+                        EcomSalesDocUtils.SetCustomerEmailFilter(Customer, EcomSalesHeader."Sell-to Email");
+                        Found := EcomSalesDocUtils.FindCustomerPreferNotBlocked(Customer, EcomSalesHeader."Document Type") and (Customer."E-Mail" <> '');
+                        if Found then
+                            exit;
+                        Customer.SetRange("E-Mail");
+                    end;
+                    if EcomSalesHeader."Sell-to Phone No." <> '' then begin
+                        Customer.SetRange("Phone No.", EcomSalesHeader."Sell-to Phone No.");
+                        Found := EcomSalesDocUtils.FindCustomerPreferNotBlocked(Customer, EcomSalesHeader."Document Type") and (Customer."Phone No." <> '');
+                    end;
                 end;
             IncEcomSalesDocSetup."Customer Mapping"::"Customer No.":
                 begin
