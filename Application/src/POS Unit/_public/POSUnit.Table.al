@@ -478,6 +478,20 @@ table 6150615 "NPR POS Unit"
         exit(POSTicketProfile.Get("POS Ticket Profile"));
     end;
 
+    internal procedure HasRestaurantProfileAssigned(): Boolean
+    var
+        POSStore: Record "NPR POS Store";
+    begin
+        if "POS Restaurant Profile" <> '' then
+            exit(true);
+
+        POSStore.SetLoadFields("POS Restaurant Profile");
+        if not POSStore.Get("POS Store Code") then
+            exit(false);
+
+        exit(POSStore."POS Restaurant Profile" <> '');
+    end;
+
     internal procedure GetCurrentPOSUnit(): Code[10]
     var
         UserSetup: Record "User Setup";

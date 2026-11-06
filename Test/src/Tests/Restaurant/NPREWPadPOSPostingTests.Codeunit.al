@@ -17,6 +17,166 @@ codeunit 85406 "NPR NPRE W/Pad Posting Tests"
         _POSInitialized: Boolean;
         _RestaurantInitialized: Boolean;
 
+    #region Posting without an initialized POS session
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure OfflineSaleWithoutPOSSession_CreatesEntryAndLines()
+    var
+        Item: Record Item;
+        UserSetup: Record "User Setup";
+        POSUnit: Record "NPR POS Unit";
+        POSStore: Record "NPR POS Store";
+        SalePOS: Record "NPR POS Sale";
+        POSEntry: Record "NPR POS Entry";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        POSEntryWaiterPadLink: Record "NPR POS Entry Waiter Pad Link";
+        POSSession: Codeunit "NPR POS Session";
+        POSSale: Codeunit "NPR POS Sale";
+        POSCreateEntry: Codeunit "NPR POS Create Entry";
+    begin
+        // [SCENARIO] An offline sale can be recorded without opening a POS session.
+        // [GIVEN] A paid sale with no waiter-pad links and no initialized POS session.
+        Initialize();
+        // Keep the shared restaurant unit intact for the other tests in this codeunit.
+        CreateUnitWithoutRestaurantProfile(POSUnit);
+        POSStore.Get(POSUnit."POS Store Code");
+        _LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        _LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+        _LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 2);
+        PreparePaymentForEntryCreation(POSSession, SalePOS);
+        WaiterPadLine.SetRange("Sale Retail ID", SalePOS.SystemId);
+        _Assert.IsTrue(WaiterPadLine.IsEmpty(), 'The offline sale must have no linked waiter-pad lines.');
+        POSSession.ClearAll();
+        SetUserPOSUnit('');
+        _Assert.IsFalse(POSSession.IsInitialized(), 'Posting must start without an initialized POS session.');
+
+        // [WHEN] The importer creates the POS entry directly.
+        // Before the fix this raises the missing-session error in the waiter-pad subscriber.
+        POSCreateEntry.Run(SalePOS);
+        _Assert.IsFalse(POSSession.IsInitialized(), 'Posting must not initialize a POS session.');
+        UserSetup.Get(UserId());
+        _Assert.AreEqual('', UserSetup."NPR POS Unit No.", 'Posting must not assign a POS unit to the user.');
+
+        // [THEN] The entry, item quantity and payment are recorded successfully.
+        _Assert.IsTrue(POSEntry.GetBySystemId(SalePOS.SystemId), 'The offline sale must create a POS entry.');
+        _Assert.AreEqual(SalePOS."Register No.", POSEntry."POS Unit No.", 'The entry must use the imported sale register.');
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntrySalesLine.SetRange("No.", Item."No.");
+        _Assert.AreEqual(1, POSEntrySalesLine.Count(), 'The entry must contain the imported item once.');
+        POSEntrySalesLine.FindFirst();
+        _Assert.AreEqual(2, POSEntrySalesLine.Quantity, 'The imported quantity must be preserved.');
+        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntryPaymentLine.SetRange("POS Payment Method Code", _POSPaymentMethod.Code);
+        _Assert.AreEqual(1, POSEntryPaymentLine.Count(), 'The entry must contain the imported payment once.');
+        POSEntryPaymentLine.FindFirst();
+        _Assert.AreEqual(SalePOS."Amount Including VAT", POSEntryPaymentLine.Amount, 'The full payment must be preserved.');
+        POSEntryWaiterPadLink.SetRange("POS Entry No.", POSEntry."Entry No.");
+        _Assert.IsTrue(POSEntryWaiterPadLink.IsEmpty(), 'An offline sale without a waiter pad must not create waiter-pad links.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure LinkedPadWithoutPOSSession_CreatesEntryAndBillsLine()
+    var
+        Item: Record Item;
+        SalePOS: Record "NPR POS Sale";
+        POSEntry: Record "NPR POS Entry";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        POSEntryWaiterPadLink: Record "NPR POS Entry Waiter Pad Link";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        POSSession: Codeunit "NPR POS Session";
+        POSCreateEntry: Codeunit "NPR POS Create Entry";
+    begin
+        // [SCENARIO] Posting without a POS session still bills linked waiter-pad lines.
+        // [GIVEN] An unbilled pad line recalled into a paid sale, then the POS session is cleared.
+        Initialize();
+        ConfigureProfile("NPR NPRE Serv.Flow Close W/Pad"::Manual);
+        CreateItem(Item);
+        CreatePad(WaiterPad);
+        AddPadLine(WaiterPad, Item."No.", 2, WaiterPadLine);
+        RecallPadIntoNewSale(WaiterPad, POSSession);
+        PreparePaymentForEntryCreation(POSSession, SalePOS);
+        WaiterPadLine.Find();
+        _Assert.AreEqual(SalePOS.SystemId, WaiterPadLine."Sale Retail ID", 'The waiter-pad line must belong to the sale being posted.');
+        _Assert.AreEqual(0, WaiterPadLine."Billed Quantity", 'The waiter-pad line must not already be billed.');
+        POSSession.ClearAll();
+        _Assert.IsFalse(POSSession.IsInitialized(), 'Posting must start without an initialized POS session.');
+
+        // [WHEN] The POS entry is created directly, expecting successful posting rather than an error.
+        POSCreateEntry.Run(SalePOS);
+        _Assert.IsFalse(POSSession.IsInitialized(), 'Billing linked pad lines must not initialize a POS session.');
+
+        // [THEN] The pad line is billed and linked to the actual entry sales line.
+        _Assert.IsTrue(POSEntry.GetBySystemId(SalePOS.SystemId), 'The linked sale must create a POS entry.');
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntrySalesLine.SetRange("No.", Item."No.");
+        _Assert.AreEqual(1, POSEntrySalesLine.Count(), 'The entry must contain the recalled item once.');
+        POSEntrySalesLine.FindFirst();
+        _Assert.AreEqual(2, POSEntrySalesLine.Quantity, 'The recalled quantity must be preserved.');
+        WaiterPadLine.Find();
+        _Assert.AreEqual(2, WaiterPadLine."Billed Quantity", 'Posting must bill the linked line even without a POS session.');
+        POSEntryWaiterPadLink.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntryWaiterPadLink.SetRange("POS Entry Sales Line No.", POSEntrySalesLine."Line No.");
+        POSEntryWaiterPadLink.SetRange("Waiter Pad No.", WaiterPad."No.");
+        POSEntryWaiterPadLink.SetRange("Waiter Pad Line No.", WaiterPadLine."Line No.");
+        _Assert.AreEqual(1, POSEntryWaiterPadLink.Count(), 'The billed line must link to the created entry sales line.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleUnitDiffersFromUserUnit_PreSetPadClosed()
+    begin
+        // [SCENARIO] Posting without a session uses the restaurant profile of the sale's own POS unit, not the user's unit.
+        VerifyPreSetPadPostingWithDifferentUserUnit(false);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleUnitUsesStoreRestaurantProfile_PreSetPadClosed()
+    begin
+        VerifyPreSetPadPostingWithDifferentUserUnit(true);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DifferentUnitsPostedInOneSession_ProfilesNotReused()
+    var
+        OtherPOSUnit: Record "NPR POS Unit";
+        SaleA: Record "NPR POS Sale";
+        SaleB: Record "NPR POS Sale";
+        POSEntry: Record "NPR POS Entry";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSSession: Codeunit "NPR POS Session";
+        POSCreateEntry: Codeunit "NPR POS Create Entry";
+    begin
+        // [SCENARIO] Sales from different POS units posted in one session each use their own unit's restaurant profile.
+        // [GIVEN] Two prepared sales: A has no restaurant profile, B has a pre-set empty pad.
+        Initialize();
+        _POSUnit.Find();
+        _POSUnit.TestField("POS Restaurant Profile");
+        CreateUnitWithoutRestaurantProfile(OtherPOSUnit);
+        PreparePaidSaleForUnit(OtherPOSUnit, SaleA);
+        PreparePaidSaleWithPreSetPad(_POSUnit, SaleB, WaiterPad);
+        POSSession.ClearAll();
+        SetUserPOSUnit(OtherPOSUnit."No.");
+
+        // [WHEN] Both entries are created in the same session, without resetting it between calls.
+        POSCreateEntry.Run(SaleA);
+        POSCreateEntry.Run(SaleB);
+
+        // [THEN] Both entries exist and B's own profile allows the pre-set pad to close.
+        _Assert.IsTrue(POSEntry.GetBySystemId(SaleA.SystemId), 'The first sale must create an entry.');
+        _Assert.IsTrue(POSEntry.GetBySystemId(SaleB.SystemId), 'The second sale must create an entry.');
+        AssertPreSetPadClosed(WaiterPad);
+        _Assert.IsFalse(POSSession.IsInitialized(), 'Batch posting must not leave a POS session initialized.');
+    end;
+
+    #endregion
+
     #region Posting a sale recalled from a waiter pad
 
     [Test]
@@ -286,6 +446,106 @@ codeunit 85406 "NPR NPRE W/Pad Posting Tests"
 
     #region Setup helpers
 
+    local procedure SetUserPOSUnit(POSUnitNo: Code[10])
+    var
+        UserSetup: Record "User Setup";
+    begin
+        UserSetup.Get(UserId());
+        UserSetup."NPR POS Unit No." := POSUnitNo;
+        UserSetup.Modify();
+    end;
+
+    local procedure CreateUnitWithoutRestaurantProfile(var POSUnit: Record "NPR POS Unit")
+    var
+        POSStore: Record "NPR POS Store";
+    begin
+        _LibraryPOSMasterData.CreatePOSStore(POSStore, _POSStore."POS Posting Profile");
+        _LibraryPOSMasterData.CreatePOSUnit(POSUnit, POSStore.Code, POSStore."POS Posting Profile");
+        POSUnit."POS Audit Profile" := _POSUnit."POS Audit Profile";
+        POSUnit.Modify();
+        POSUnit.TestField("POS Restaurant Profile", '');
+        POSStore.TestField("POS Restaurant Profile", '');
+    end;
+
+    local procedure PreparePaidSaleForUnit(POSUnit: Record "NPR POS Unit"; var SalePOS: Record "NPR POS Sale")
+    var
+        Item: Record Item;
+        POSStore: Record "NPR POS Store";
+        POSSession: Codeunit "NPR POS Session";
+        POSSale: Codeunit "NPR POS Sale";
+    begin
+        POSStore.Get(POSUnit."POS Store Code");
+        _LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        _LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+        _LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+        PreparePaymentForEntryCreation(POSSession, SalePOS);
+    end;
+
+    local procedure PreparePaidSaleWithPreSetPad(POSUnit: Record "NPR POS Unit"; var SalePOS: Record "NPR POS Sale"; var WaiterPad: Record "NPR NPRE Waiter Pad")
+    var
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+    begin
+        PreparePaidSaleForUnit(POSUnit, SalePOS);
+        CreatePad(WaiterPad);
+        _Assert.IsFalse(WaiterPad.Closed, 'The pre-set pad must start open.');
+        SalePOS."NPRE Pre-Set Waiter Pad No." := WaiterPad."No.";
+        SalePOS.Modify();
+        WaiterPadLine.SetRange("Sale Retail ID", SalePOS.SystemId);
+        _Assert.IsTrue(WaiterPadLine.IsEmpty(), 'No linked lines may bypass the restaurant-profile check.');
+    end;
+
+    local procedure VerifyPreSetPadPostingWithDifferentUserUnit(UseStoreProfile: Boolean)
+    var
+        OtherPOSUnit: Record "NPR POS Unit";
+        POSUnit: Record "NPR POS Unit";
+        POSStore: Record "NPR POS Store";
+        SalePOS: Record "NPR POS Sale";
+        POSEntry: Record "NPR POS Entry";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        UserSetup: Record "User Setup";
+        POSSession: Codeunit "NPR POS Session";
+        POSCreateEntry: Codeunit "NPR POS Create Entry";
+    begin
+        // [GIVEN] The user's unit has no profile; the sale's unit or store does.
+        Initialize();
+        _POSUnit.Find();
+        _POSUnit.TestField("POS Restaurant Profile");
+        CreateUnitWithoutRestaurantProfile(OtherPOSUnit);
+        // Use a separate unit and store so the fallback scenario cannot change the shared fixture.
+        CreateUnitWithoutRestaurantProfile(POSUnit);
+        if UseStoreProfile then begin
+            POSStore.Get(POSUnit."POS Store Code");
+            POSStore."POS Restaurant Profile" := _POSUnit."POS Restaurant Profile";
+            POSStore.Modify();
+            POSStore.TestField("POS Restaurant Profile");
+            POSUnit.TestField("POS Restaurant Profile", '');
+        end else begin
+            POSUnit."POS Restaurant Profile" := _POSUnit."POS Restaurant Profile";
+            POSUnit.Modify();
+            POSUnit.TestField("POS Restaurant Profile");
+        end;
+        PreparePaidSaleWithPreSetPad(POSUnit, SalePOS, WaiterPad);
+        POSSession.ClearAll();
+        SetUserPOSUnit(OtherPOSUnit."No.");
+
+        // [WHEN] Posting without a POS session.
+        POSCreateEntry.Run(SalePOS);
+
+        // [THEN] The sale's profile is used without changing the user's setup or session.
+        _Assert.IsTrue(POSEntry.GetBySystemId(SalePOS.SystemId), 'The sale must create an entry.');
+        AssertPreSetPadClosed(WaiterPad);
+        _Assert.IsFalse(POSSession.IsInitialized(), 'Posting must not initialize a POS session.');
+        UserSetup.Get(UserId());
+        _Assert.AreEqual(OtherPOSUnit."No.", UserSetup."NPR POS Unit No.", 'Posting must preserve the user''s assigned POS unit.');
+    end;
+
+    local procedure AssertPreSetPadClosed(var WaiterPad: Record "NPR NPRE Waiter Pad")
+    begin
+        WaiterPad.Find();
+        _Assert.IsTrue(WaiterPad.Closed, 'The sale''s restaurant profile must allow its empty pre-set pad to close.');
+        _Assert.AreEqual(WaiterPad."Close Reason"::"Finished Sale", WaiterPad."Close Reason", 'The pad must close because the sale finished.');
+    end;
+
     local procedure Initialize()
     var
         POSRestProfile: Record "NPR POS NPRE Rest. Profile";
@@ -388,6 +648,21 @@ codeunit 85406 "NPR NPRE W/Pad Posting Tests"
     begin
         StartEmptySale(POSSession, SalePOS);
         WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(WaiterPad, POSSession);
+    end;
+
+    local procedure PreparePaymentForEntryCreation(POSSession: Codeunit "NPR POS Session"; var SalePOS: Record "NPR POS Sale")
+    var
+        PaymentSaleLine: Record "NPR POS Sale Line";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+    begin
+        GetCurrentSale(POSSession, SalePOS);
+        SalePOS.CalcFields("Amount Including VAT");
+        POSSession.GetPaymentLine(POSPaymentLine);
+        POSPaymentLine.GetPaymentLine(PaymentSaleLine);
+        PaymentSaleLine."No." := _POSPaymentMethod.Code;
+        PaymentSaleLine."Amount Including VAT" := SalePOS."Amount Including VAT";
+        PaymentSaleLine.Amount := SalePOS."Amount Including VAT";
+        _Assert.IsTrue(POSPaymentLine.InsertPaymentLine(PaymentSaleLine, 0), 'The fixture payment must be inserted before clearing the POS session.');
     end;
 
     local procedure PayAndPost(POSSession: Codeunit "NPR POS Session")

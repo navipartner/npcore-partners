@@ -1346,14 +1346,12 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSEntry', '', true, false)]
     local procedure UpdateWaiterPadOnAfterPOSEntryCreate(var POSEntry: Record "NPR POS Entry"; var SalePOS: Record "NPR POS Sale")
     var
-        POSRestaurantProfile: Record "NPR POS NPRE Rest. Profile";
+        POSUnit: Record "NPR POS Unit";
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
-        POSSession: Codeunit "NPR POS Session";
-        POSSetup: Codeunit "NPR POS Setup";
     begin
-        POSSession.GetSetup(POSSetup);
-        POSSetup.GetPOSRestProfile(POSRestaurantProfile);
-        if POSRestaurantProfile.Code = '' then begin
+        POSUnit.SetLoadFields("POS Restaurant Profile", "POS Store Code");
+        POSUnit.Get(SalePOS."Register No.");
+        if not POSUnit.HasRestaurantProfileAssigned() then begin
             WaiterPadLine.SetCurrentKey("Sale Retail ID");
             WaiterPadLine.SetRange("Sale Retail ID", SalePOS.SystemId);
             if WaiterPadLine.IsEmpty() then
