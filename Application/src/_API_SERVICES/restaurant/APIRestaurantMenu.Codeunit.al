@@ -388,7 +388,7 @@ codeunit 6248644 "NPR API Restaurant Menu"
         if Upsell.FindSet() then
             repeat
                 if UpsellMenuItem.GetBySystemId(Upsell."Menu Item System Id") then
-                    if IsShownOnMenu(UpsellMenuItem) then
+                    if UpsellMenuItem.IsShownOnMenu() then
                         BuildUpsellItem(UpsellMenuItem, Upsell."Sort Key", PosUnitCode, VATBusPostingGroup, Json);
             until Upsell.Next() = 0;
     end;
@@ -407,19 +407,9 @@ codeunit 6248644 "NPR API Restaurant Menu"
         if Upsell.FindSet() then
             repeat
                 if UpsellMenuItem.GetBySystemId(Upsell."Menu Item System Id") then
-                    if IsShownOnMenu(UpsellMenuItem) then
+                    if UpsellMenuItem.IsShownOnMenu() then
                         BuildUpsellItem(UpsellMenuItem, Upsell."Sort Key", PosUnitCode, VATBusPostingGroup, Json);
             until Upsell.Next() = 0;
-    end;
-
-    local procedure IsShownOnMenu(MenuItem: Record "NPR NPRE Menu Item"): Boolean
-    var
-        MenuCategory: Record "NPR NPRE Menu Category";
-    begin
-        if MenuItem.Status = MenuItem.Status::"Inactive Hidden" then
-            exit(false);
-        MenuCategory.ReadIsolation := IsolationLevel::ReadCommitted;
-        exit(MenuCategory.Get(MenuItem."Restaurant Code", MenuItem."Menu Code", MenuItem."Category Code"));
     end;
 
     local procedure BuildUpsellItem(MenuItem: Record "NPR NPRE Menu Item"; SortKey: Integer; PosUnitCode: Code[10]; VATBusPostingGroup: Code[20]; var Json: Codeunit "NPR JSON Builder")

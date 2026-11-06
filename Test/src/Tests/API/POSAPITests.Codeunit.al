@@ -24,6 +24,8 @@ codeunit 85157 "NPR POS API Tests"
         _VisaPaymentMethod: Record "NPR POS Payment Method";
         _MastercardPaymentMethod: Record "NPR POS Payment Method";
         _EFTMappingInitialized: Boolean;
+        _LookupMenuItem: Record "NPR NPRE Menu Item";
+        _MessageCount: Integer;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
@@ -1786,6 +1788,68 @@ codeunit 85157 "NPR POS API Tests"
         Assert.AreEqual('Active', GetUpsellStatus(Upsells, ActiveItemNo), 'Wrong status on the Active item upsell');
     end;
 
+    [Test]
+    [HandlerFunctions('PickMenuItemModalPageHandler,CountMessageHandler')]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_CheckoutUpsellLookup_WarnsOnlyForHiddenItem()
+    var
+        Assert: Codeunit Assert;
+        Menu: Record "NPR NPRE Menu";
+        MainMenuItem: Record "NPR NPRE Menu Item";
+        UpsellList: TestPage "NPR NPRE Upsell List";
+        HiddenItemNo: Code[20];
+        VisibleItemNo: Code[20];
+        ActiveItemNo: Code[20];
+        RemovedItemNo: Code[20];
+    begin
+        // [SCENARIO] Picking a checkout upsell warns when the menu API will not send it, and only then
+        // [GIVEN] A menu with an Inactive (visible) item and an Inactive (hidden) item, and its checkout upsell list open
+        CreateMenuWithUpsells(Enum::"NPR NPRE Upsell Table"::Menu, Menu, MainMenuItem, HiddenItemNo, VisibleItemNo, ActiveItemNo, RemovedItemNo);
+        OpenUpsellList(Enum::"NPR NPRE Upsell Table"::Menu, Menu.SystemId, UpsellList);
+        _MessageCount := 0;
+
+        // [WHEN] The Inactive (visible) item is picked in the lookup
+        PickUpsellMenuItem(UpsellList, Menu, VisibleItemNo);
+
+        // [THEN] No warning is shown
+        Assert.AreEqual(0, _MessageCount, 'Picking an item the menu shows must not warn');
+
+        // [WHEN] The Inactive (hidden) item is picked in the lookup
+        PickUpsellMenuItem(UpsellList, Menu, HiddenItemNo);
+
+        // [THEN] One warning is shown
+        Assert.AreEqual(1, _MessageCount, 'Picking an Inactive (hidden) item must warn once');
+        UpsellList.Close();
+    end;
+
+    [Test]
+    [HandlerFunctions('PickMenuItemModalPageHandler,CountMessageHandler')]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_ItemUpsellLookup_ItemFromDeletedCategory_Warns()
+    var
+        Assert: Codeunit Assert;
+        Menu: Record "NPR NPRE Menu";
+        MainMenuItem: Record "NPR NPRE Menu Item";
+        UpsellList: TestPage "NPR NPRE Upsell List";
+        HiddenItemNo: Code[20];
+        VisibleItemNo: Code[20];
+        ActiveItemNo: Code[20];
+        RemovedItemNo: Code[20];
+    begin
+        // [SCENARIO] Picking an item upsell warns when the picked item's category was deleted from the menu
+        // [GIVEN] A menu item, an item left behind by a deleted category, and the menu item's upsell list open
+        CreateMenuWithUpsells(Enum::"NPR NPRE Upsell Table"::MenuItem, Menu, MainMenuItem, HiddenItemNo, VisibleItemNo, ActiveItemNo, RemovedItemNo);
+        OpenUpsellList(Enum::"NPR NPRE Upsell Table"::MenuItem, MainMenuItem.SystemId, UpsellList);
+        _MessageCount := 0;
+
+        // [WHEN] The item from the deleted category is picked in the lookup
+        PickUpsellMenuItem(UpsellList, Menu, RemovedItemNo);
+
+        // [THEN] One warning is shown
+        Assert.AreEqual(1, _MessageCount, 'Picking an item from a deleted category must warn once');
+        UpsellList.Close();
+    end;
+
     local procedure CreateMenuWithUpsells(UpsellTable: Enum "NPR NPRE Upsell Table"; var Menu: Record "NPR NPRE Menu"; var MainMenuItem: Record "NPR NPRE Menu Item"; var HiddenItemNo: Code[20]; var VisibleItemNo: Code[20]; var ActiveItemNo: Code[20]; var RemovedItemNo: Code[20])
     var
         LibraryRestaurant: Codeunit "NPR Library - Restaurant";
@@ -1847,6 +1911,43 @@ codeunit 85157 "NPR POS API Tests"
         Upsell."Menu Item System Id" := MenuItem.SystemId;
         Upsell.Insert(true);
         exit(Item."No.");
+    end;
+
+    local procedure OpenUpsellList(UpsellTable: Enum "NPR NPRE Upsell Table"; UpsellOwnerId: Guid; var UpsellList: TestPage "NPR NPRE Upsell List")
+    var
+        Upsell: Record "NPR NPRE Upsell";
+    begin
+        Upsell.SetRange("External Table", UpsellTable);
+        Upsell.SetRange("External System Id", UpsellOwnerId);
+        UpsellList.Trap();
+        Page.Run(Page::"NPR NPRE Upsell List", Upsell);
+    end;
+
+    local procedure PickUpsellMenuItem(var UpsellList: TestPage "NPR NPRE Upsell List"; Menu: Record "NPR NPRE Menu"; ItemNo: Code[20])
+    var
+        MenuItem: Record "NPR NPRE Menu Item";
+    begin
+        MenuItem.SetRange("Restaurant Code", Menu."Restaurant Code");
+        MenuItem.SetRange("Menu Code", Menu.Code);
+        MenuItem.SetRange("Item No.", ItemNo);
+        MenuItem.FindFirst();
+        _LookupMenuItem := MenuItem;
+
+        UpsellList.New();
+        UpsellList."Menu Item".Lookup();
+    end;
+
+    [ModalPageHandler]
+    procedure PickMenuItemModalPageHandler(var MenuItems: TestPage "NPR NPRE Menu Items")
+    begin
+        MenuItems.GoToRecord(_LookupMenuItem);
+        MenuItems.OK().Invoke();
+    end;
+
+    [MessageHandler]
+    procedure CountMessageHandler(Message: Text[1024])
+    begin
+        _MessageCount += 1;
     end;
 
     local procedure GetMenuContent(Menu: Record "NPR NPRE Menu") MenuContent: JsonObject

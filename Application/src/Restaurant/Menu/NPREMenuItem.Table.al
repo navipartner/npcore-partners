@@ -198,5 +198,15 @@ table 6151269 "NPR NPRE Menu Item"
         NPREMenuItem.Modify();
     end;
 
+    procedure IsShownOnMenu(): Boolean
+    var
+        MenuCategory: Record "NPR NPRE Menu Category";
+    begin
+        if Rec.Status = Rec.Status::"Inactive Hidden" then
+            exit(false);
+        MenuCategory.ReadIsolation := IsolationLevel::ReadCommitted;
+        exit(MenuCategory.Get(Rec."Restaurant Code", Rec."Menu Code", Rec."Category Code"));
+    end;
+
 }
 #endif

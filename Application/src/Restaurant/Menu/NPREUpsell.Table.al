@@ -25,6 +25,17 @@ table 6151266 "NPR NPRE Upsell"
             Caption = 'Menu Item';
             TableRelation = "NPR NPRE Menu Item".SystemId;
 
+            trigger OnValidate()
+            var
+                MenuItem: Record "NPR NPRE Menu Item";
+                UpsellNotShownMsg: Label 'Guests will not see this upsell, because item %1 in category ''%2'' is not shown on menu %3. An item is shown only when its %4 is not %5 and its %6 is a category on the menu.', Comment = '%1 = Item No., %2 = Category Code, %3 = Menu Code, %4 = Status field caption, %5 = Inactive (hidden), %6 = Category Code field caption';
+            begin
+                if not MenuItem.GetBySystemId("Menu Item System Id") then
+                    exit;
+                if not MenuItem.IsShownOnMenu() then
+                    Message(UpsellNotShownMsg, MenuItem."Item No.", MenuItem."Category Code", MenuItem."Menu Code", MenuItem.FieldCaption(Status), MenuItem.Status::"Inactive Hidden", MenuItem.FieldCaption("Category Code"));
+            end;
+
             trigger OnLookup()
             var
                 MenuItem: Record "NPR NPRE Menu Item";
@@ -38,7 +49,7 @@ table 6151266 "NPR NPRE Upsell"
                             MenuItem.SetRange("Restaurant Code", MenuItem2."Restaurant Code");
                             MenuItem.SetRange("Menu Code", MenuItem2."Menu Code");
                             if Page.RunModal(Page::"NPR NPRE Menu Items", MenuItem) = ACTION::LookupOK then
-                                "Menu Item System Id" := MenuItem.SystemId;
+                                Validate("Menu Item System Id", MenuItem.SystemId);
                         end;
                     Enum::"NPR NPRE Upsell Table"::Menu:
                         begin
@@ -46,7 +57,7 @@ table 6151266 "NPR NPRE Upsell"
                             MenuItem.SetRange("Restaurant Code", Menu."Restaurant Code");
                             MenuItem.SetRange("Menu Code", Menu."Code");
                             if Page.RunModal(Page::"NPR NPRE Menu Items", MenuItem) = ACTION::LookupOK then
-                                "Menu Item System Id" := MenuItem.SystemId;
+                                Validate("Menu Item System Id", MenuItem.SystemId);
                         end;
                 end;
             end;
@@ -59,7 +70,7 @@ table 6151266 "NPR NPRE Upsell"
         }
         field(11; "Menu Item Item Description"; Text[100])
         {
-            Caption = 'Item No.';
+            Caption = 'Item Description';
             FieldClass = FlowField;
             CalcFormula = lookup(Item.Description where("No." = field("Menu Item Item No.")));
         }
