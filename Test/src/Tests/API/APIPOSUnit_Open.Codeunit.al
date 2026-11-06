@@ -520,6 +520,138 @@ codeunit 85222 "NPR APIPOSUnit Open"
         Assert.IsFalse(JToken.AsValue().AsBoolean(), 'digitalReceiptEnabled should be false when the global Digital Receipt Setup is disabled');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GetCurrentPOSUnit_UnitRestaurantProfile_ReturnsRestaurantCode()
+    var
+        Assert: Codeunit Assert;
+        Restaurant: Record "NPR NPRE Restaurant";
+        POSRestProfile: Record "NPR POS NPRE Rest. Profile";
+        JToken: JsonToken;
+    begin
+        Initialize();
+        CreateRestaurantWithProfile(Restaurant, POSRestProfile);
+        SetRestaurantProfiles(POSRestProfile.Code, '');
+
+        JToken := GetCurrentPOSUnitRestaurantCode();
+
+        Assert.AreEqual(Restaurant.Code, JToken.AsValue().AsText(), 'restaurantCode should come from the POS Unit restaurant profile');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GetCurrentPOSUnit_StoreRestaurantProfile_ReturnsRestaurantCode()
+    var
+        Assert: Codeunit Assert;
+        Restaurant: Record "NPR NPRE Restaurant";
+        POSRestProfile: Record "NPR POS NPRE Rest. Profile";
+        JToken: JsonToken;
+    begin
+        Initialize();
+        CreateRestaurantWithProfile(Restaurant, POSRestProfile);
+        SetRestaurantProfiles('', POSRestProfile.Code);
+
+        JToken := GetCurrentPOSUnitRestaurantCode();
+
+        Assert.AreEqual(Restaurant.Code, JToken.AsValue().AsText(), 'restaurantCode should come from the POS Store restaurant profile');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GetCurrentPOSUnit_NoRestaurantProfile_ReturnsNull()
+    var
+        Assert: Codeunit Assert;
+        JToken: JsonToken;
+    begin
+        Initialize();
+        SetRestaurantProfiles('', '');
+
+        JToken := GetCurrentPOSUnitRestaurantCode();
+
+        Assert.IsTrue(JToken.AsValue().IsNull(), 'restaurantCode should be null when neither the unit nor the store has a restaurant profile');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GetCurrentPOSUnit_ProfileWithoutRestaurant_ReturnsNull()
+    var
+        Assert: Codeunit Assert;
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        StoreRestaurant: Record "NPR NPRE Restaurant";
+        POSRestProfile: Record "NPR POS NPRE Rest. Profile";
+        StoreRestProfile: Record "NPR POS NPRE Rest. Profile";
+        JToken: JsonToken;
+    begin
+        Initialize();
+        LibraryRestaurant.CreatePOSRestaurantProfile(POSRestProfile, '');
+        CreateRestaurantWithProfile(StoreRestaurant, StoreRestProfile);
+        SetRestaurantProfiles(POSRestProfile.Code, StoreRestProfile.Code);
+
+        JToken := GetCurrentPOSUnitRestaurantCode();
+
+        Assert.IsTrue(JToken.AsValue().IsNull(), 'restaurantCode should be null when the unit profile has no Restaurant Code, without falling back to the store profile');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GetCurrentPOSUnit_UnitAndStoreProfiles_PrefersUnit()
+    var
+        Assert: Codeunit Assert;
+        UnitRestaurant: Record "NPR NPRE Restaurant";
+        StoreRestaurant: Record "NPR NPRE Restaurant";
+        UnitRestProfile: Record "NPR POS NPRE Rest. Profile";
+        StoreRestProfile: Record "NPR POS NPRE Rest. Profile";
+        JToken: JsonToken;
+    begin
+        Initialize();
+        CreateRestaurantWithProfile(UnitRestaurant, UnitRestProfile);
+        CreateRestaurantWithProfile(StoreRestaurant, StoreRestProfile);
+        SetRestaurantProfiles(UnitRestProfile.Code, StoreRestProfile.Code);
+
+        JToken := GetCurrentPOSUnitRestaurantCode();
+
+        Assert.AreEqual(UnitRestaurant.Code, JToken.AsValue().AsText(), 'restaurantCode should come from the POS Unit profile when both the unit and the store have one');
+    end;
+
+    local procedure CreateRestaurantWithProfile(var Restaurant: Record "NPR NPRE Restaurant"; var POSRestProfile: Record "NPR POS NPRE Rest. Profile")
+    var
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        RestaurantSetup: Record "NPR NPRE Restaurant Setup";
+        ServFlowProfile: Record "NPR NPRE Serv.Flow Profile";
+    begin
+        LibraryRestaurant.CreateRestaurantSetup(RestaurantSetup);
+        LibraryRestaurant.CreateServiceFlowProfile(ServFlowProfile);
+        LibraryRestaurant.CreateRestaurant(Restaurant, ServFlowProfile.Code);
+        LibraryRestaurant.CreatePOSRestaurantProfile(POSRestProfile, Restaurant.Code);
+    end;
+
+    local procedure SetRestaurantProfiles(UnitProfileCode: Code[20]; StoreProfileCode: Code[20])
+    begin
+        _POSUnit.Find();
+        _POSUnit."POS Restaurant Profile" := UnitProfileCode;
+        _POSUnit.Modify();
+        _POSStore.Find();
+        _POSStore."POS Restaurant Profile" := StoreProfileCode;
+        _POSStore.Modify();
+        Commit();
+    end;
+
+    local procedure GetCurrentPOSUnitRestaurantCode() JToken: JsonToken
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        ResponseBody: JsonObject;
+    begin
+        Response := LibraryNPRetailAPI.CallApi('GET', '/pos/unit/me', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'GET /pos/unit/me should succeed');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        Assert.IsTrue(ResponseBody.Get('restaurantCode', JToken), 'Response should contain restaurantCode');
+    end;
+
     local procedure Initialize()
     var
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";

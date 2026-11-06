@@ -110,13 +110,23 @@ codeunit 6248434 "NPR APIPOSUnit"
     var
         SSProfile: Record "NPR SS Profile";
         SelfserviceProfileJson: JsonObject;
+        NullValue: JsonValue;
         EFTIntegrationType: Code[20];
+        RestaurantCode: Code[20];
     begin
         Json.Add('id', Format(POSUnit.SystemId, 0, 4).ToLower());
         Json.Add('code', POSUnit."No.");
         Json.Add('name', POSUnit.Name);
         Json.Add('posStoreCode', POSUnit."POS Store Code");
         Json.Add('digitalReceiptEnabled', IsDigitalReceiptEnabled(POSUnit."POS Receipt Profile"));
+
+        RestaurantCode := FindRestaurantCode(POSUnit);
+        if RestaurantCode <> '' then
+            Json.Add('restaurantCode', RestaurantCode)
+        else begin
+            NullValue.SetValueToNull();
+            Json.Add('restaurantCode', NullValue);
+        end;
 
         if (POSUnit."POS Self Service Profile" <> '') and SSProfile.Get(POSUnit."POS Self Service Profile") then begin
             SelfserviceProfileJson.Add('qrCardPaymentMethod', SSProfile."QR Card Payment Method");
@@ -126,6 +136,27 @@ codeunit 6248434 "NPR APIPOSUnit"
                 SelfserviceProfileJson.Add('selfserviceCardEftIntegrationType', EFTIntegrationType);
             Json.Add('selfserviceProfile', SelfserviceProfileJson);
         end;
+    end;
+
+    local procedure FindRestaurantCode(POSUnit: Record "NPR POS Unit"): Code[20]
+    var
+        POSStore: Record "NPR POS Store";
+        POSRestaurantProfile: Record "NPR POS NPRE Rest. Profile";
+        ProfileCode: Code[20];
+    begin
+        ProfileCode := POSUnit."POS Restaurant Profile";
+        if ProfileCode = '' then begin
+            POSStore.SetLoadFields("POS Restaurant Profile");
+            if POSStore.Get(POSUnit."POS Store Code") then
+                ProfileCode := POSStore."POS Restaurant Profile";
+        end;
+        if ProfileCode = '' then
+            exit('');
+
+        POSRestaurantProfile.SetLoadFields("Restaurant Code");
+        if not POSRestaurantProfile.Get(ProfileCode) then
+            exit('');
+        exit(POSRestaurantProfile."Restaurant Code");
     end;
 
     local procedure IsDigitalReceiptEnabled(POSReceiptProfileCode: Code[20]): Boolean
