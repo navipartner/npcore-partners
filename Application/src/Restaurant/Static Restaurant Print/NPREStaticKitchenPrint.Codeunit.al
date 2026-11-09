@@ -15,19 +15,27 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
     var
         TempPrinterDeviceSettings: Record "NPR Printer Device Settings" temporary;
         KitchenPrintMgt: Codeunit "NPR NPRE Kitchen Print Mgt";
+        KitchenOrderIDs: List of [BigInteger];
+        KitchenStationDescriptions: List of [Text];
     begin
+        //Kitchen order and station are read from the lines as they were dispatched, before merging drops repeated lines.
+        KitchenOrderIDs := KitchenPrintMgt.GetLatestKDSOrderIDsFromSendLog(TempWPadLineOutBuffer);
+        KitchenStationDescriptions := KitchenPrintMgt.GetKitchenStationDescriptions(TempWPadLineOutBuffer);
         KitchenPrintMgt.GetPrintLines(TempWPadLineOutBuffer);
+        KitchenPrintMgt.MergeIdenticalLines(TempWPadLineOutBuffer);
+        if not TempWPadLineOutBuffer.FindFirst() then
+            exit;
 
         Printer.SetAutoLineBreak(true);
         Printer.SetTwoColumnDistribution(0.15, 0.85);
         Printer.SetThreeColumnDistribution(0.33, 0.33, 0.33);
 
-        AddReceiptInformation(TempWPadLineOutBuffer);
+        AddReceiptInformation(TempWPadLineOutBuffer, KitchenOrderIDs, KitchenStationDescriptions);
 
         Printer.ProcessBuffer(OutputCodeunitId, Enum::"NPR Line Printer Device"::Epson, TempPrinterDeviceSettings);
     end;
 
-    local procedure AddReceiptInformation(var WPadLineOutBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer")
+    local procedure AddReceiptInformation(var WPadLineOutBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer"; KitchenOrderIDs: List of [BigInteger]; KitchenStationDescriptions: List of [Text])
     var
         TempRestaurantPrintHeader: Record "NPR NPRE Rest. Print Header" temporary;
         KitchenPrintMgt: Codeunit "NPR NPRE Kitchen Print Mgt";
@@ -36,14 +44,15 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
         B12FontLbl: Label 'B12', Locked = true;
         NumberOfGuestsLbl: Label 'Number of Guests: ';
         TableNoLbl: Label 'Table No.';
+        KitchenOrderNoLbl: Label 'Order No. %1', Comment = '%1 = kitchen order no.';
+        WaiterPadNoLbl: Label 'Waiter Pad No. %1', Comment = '%1 = waiter pad no.';
+        KitchenStationDescription: Text;
+        KitchenOrderID: BigInteger;
         KitchenDescriptionLineMaxLength: Integer;
         LastLineNo: Integer;
         BottomMarginLineCount: Integer;
         i: Integer;
     begin
-        if WPadLineOutBuffer.IsEmpty() then
-            exit;
-
         KitchenPrintMgt.GetPrintHeader(WPadLineOutBuffer."Waiter Pad No.", false, TempRestaurantPrintHeader);
 
         KitchenDescriptionLineMaxLength := 20; // B22/B12 on 80mm paper = 28 chars/line; col 2 gets 85% = ~20
@@ -53,6 +62,14 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
         Printer.AddLine('', 0);
         Printer.AddLine('', 0);
         Printer.AddLine('', 0);
+
+        // Kitchen station(s) preparing the order
+        Printer.SetBold(true);
+        foreach KitchenStationDescription in KitchenStationDescriptions do
+            Printer.AddLine(KitchenStationDescription, 1);
+        Printer.SetBold(false);
+        if KitchenStationDescriptions.Count() > 0 then
+            Printer.AddLine('', 0);
 
         // Table (seating) no. - printed large and bold so the waiter knows where to serve.
         // Caption and value on separate lines: AddLine truncates to page width (B22 = 21 chars on 58mm), and Seating No. is up to 20 chars.
@@ -65,6 +82,16 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
             Printer.SetFont(B21FontLbl);
             Printer.AddLine('', 0);
         end;
+
+        // Kitchen order no. (KDS) and waiter pad no. One order per line: several joined on one line overflow the printer
+        // width (Font B21 fits 28 chars) and the last order no. gets cut mid-number.
+        if KitchenOrderIDs.Count() > 0 then begin
+            Printer.SetBold(true);
+            foreach KitchenOrderID in KitchenOrderIDs do
+                Printer.AddLine(StrSubstNo(KitchenOrderNoLbl, Format(KitchenOrderID, 0, 9)), 1);
+            Printer.SetBold(false);
+        end;
+        Printer.AddLine(StrSubstNo(WaiterPadNoLbl, TempRestaurantPrintHeader."Waiter Pad No."), 1);
 
         //CurrentDateTime
         Printer.AddLine(Format(TempRestaurantPrintHeader."Print Date Time"), 1);

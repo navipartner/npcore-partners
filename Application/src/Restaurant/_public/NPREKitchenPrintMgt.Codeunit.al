@@ -188,6 +188,111 @@ codeunit 6151178 "NPR NPRE Kitchen Print Mgt"
         until WaiterPadLine.Next() = 0;
     end;
 
+    internal procedure MergeIdenticalLines(var WPadLineOutBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary)
+    var
+        FirstPlainLineEntryNos: Dictionary of [Text, Integer];
+        PlainLineEntryNos: List of [Integer];
+        EntryNo: Integer;
+        FirstEntryNo: Integer;
+        AddedQuantity: Decimal;
+        AddedAmountExclVAT: Decimal;
+        AddedAmountInclVAT: Decimal;
+        LineKey: Text;
+    begin
+        //Only dishes with no add-on and no comment are bulked. A customised dish keeps its own line at its real quantity,
+        //so the kitchen never has to read a combined add-on quantity off a bulked line (is "2 x cheese" two per burger or
+        //two in total?). Repeated plain items - the main source of over-long tickets - still collapse to one line.
+        CollectPlainMainLineEntryNos(WPadLineOutBuffer, PlainLineEntryNos);
+
+        foreach EntryNo in PlainLineEntryNos do begin
+            WPadLineOutBuffer.Get(EntryNo);
+            LineKey := StrSubstNo('%1|%2|%3|%4', WPadLineOutBuffer."No.", WPadLineOutBuffer."Variant Code", WPadLineOutBuffer."Unit of Measure Code", WPadLineOutBuffer.Description);
+            if FirstPlainLineEntryNos.Get(LineKey, FirstEntryNo) then begin
+                AddedQuantity := WPadLineOutBuffer.Quantity;
+                AddedAmountExclVAT := WPadLineOutBuffer."Amount Excl. VAT";
+                AddedAmountInclVAT := WPadLineOutBuffer."Amount Incl. VAT";
+                WPadLineOutBuffer.Delete();
+                WPadLineOutBuffer.Get(FirstEntryNo);
+                WPadLineOutBuffer.Quantity += AddedQuantity;
+                WPadLineOutBuffer."Amount Excl. VAT" += AddedAmountExclVAT;
+                WPadLineOutBuffer."Amount Incl. VAT" += AddedAmountInclVAT;
+                WPadLineOutBuffer.Modify();
+            end else
+                FirstPlainLineEntryNos.Add(LineKey, EntryNo);
+        end;
+    end;
+
+    internal procedure GetLatestKDSOrderIDsFromSendLog(var WPadLineOutBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary) KitchenOrderIDs: List of [BigInteger]
+    var
+        WPadLinePrintLogEntry: Record "NPR NPRE W.Pad Prnt LogEntry";
+    begin
+        //Distinct from GetKitchenOrderIds(POSEntryNo): this reads the latest KDS order each dispatched line was sent as, from
+        //the print log, for the kitchen ticket header. The POS-entry overload reads kitchen requests for the sales receipt.
+        if not WPadLineOutBuffer.FindSet() then
+            exit;
+
+        WPadLinePrintLogEntry.SetRange("Output Type", WPadLinePrintLogEntry."Output Type"::KDS);
+        WPadLinePrintLogEntry.SetFilter("Kitchen Order ID", '<>%1', 0);
+        WPadLinePrintLogEntry.SetLoadFields("Kitchen Order ID");
+        repeat
+            WPadLinePrintLogEntry.SetRange("Waiter Pad No.", WPadLineOutBuffer."Waiter Pad No.");
+            WPadLinePrintLogEntry.SetRange("Waiter Pad Line No.", WPadLineOutBuffer."Waiter Pad Line No.");
+            if WPadLinePrintLogEntry.FindLast() then
+                if not KitchenOrderIDs.Contains(WPadLinePrintLogEntry."Kitchen Order ID") then
+                    KitchenOrderIDs.Add(WPadLinePrintLogEntry."Kitchen Order ID");
+        until WPadLineOutBuffer.Next() = 0;
+    end;
+
+    internal procedure GetKitchenStationDescriptions(var WPadLineOutBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary) KitchenStationDescriptions: List of [Text]
+    var
+        KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link";
+        KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station";
+        KitchenStation: Record "NPR NPRE Kitchen Station";
+        ProcessedRequests: List of [BigInteger];
+        KitchenStationDescription: Text;
+    begin
+        //Stations are read from the kitchen requests the dispatched lines created, not from the config-based resolver (which
+        //does a bare Seating.Get that errors on the print path if the seating was deleted while the pad was still linked).
+        //When the print job is split by serving step the lookup is narrowed to that step, so a starter ticket does not also
+        //list a later course's station. A print-only restaurant creates no requests and gets no station line.
+        if not WPadLineOutBuffer.FindSet() then
+            exit;
+
+        //Constant filters and the key are set once so the per-line read seeks on the full key. Source Document Subtype is
+        //always 0 for a waiter pad (InitSource writes 0); without it SQL cannot seek past Source Document Type.
+        KitchenReqSourceLink.SetCurrentKey("Source Document Type", "Source Document Subtype", "Source Document No.", "Source Document Line No.", "Serving Step", "Request No.");
+        KitchenReqSourceLink.SetRange("Source Document Type", KitchenReqSourceLink."Source Document Type"::"Waiter Pad");
+        KitchenReqSourceLink.SetRange("Source Document Subtype", 0);
+        KitchenReqSourceLink.SetLoadFields("Request No.");
+        KitchenRequestStation.SetLoadFields("Production Restaurant Code", "Kitchen Station");
+        KitchenStation.SetLoadFields(Description);
+        repeat
+            KitchenReqSourceLink.SetRange("Source Document No.", WPadLineOutBuffer."Waiter Pad No.");
+            KitchenReqSourceLink.SetRange("Source Document Line No.", WPadLineOutBuffer."Waiter Pad Line No.");
+            if WPadLineOutBuffer."Serving Step" <> '' then
+                KitchenReqSourceLink.SetRange("Serving Step", WPadLineOutBuffer."Serving Step")
+            else
+                KitchenReqSourceLink.SetRange("Serving Step");
+            if KitchenReqSourceLink.FindSet() then
+                repeat
+                    if not ProcessedRequests.Contains(KitchenReqSourceLink."Request No.") then begin
+                        ProcessedRequests.Add(KitchenReqSourceLink."Request No.");
+                        KitchenRequestStation.SetRange("Request No.", KitchenReqSourceLink."Request No.");
+                        if KitchenRequestStation.FindSet() then
+                            repeat
+                                if KitchenStation.Get(KitchenRequestStation."Production Restaurant Code", KitchenRequestStation."Kitchen Station") then begin
+                                    KitchenStationDescription := KitchenStation.Description;
+                                    if KitchenStationDescription = '' then
+                                        KitchenStationDescription := KitchenRequestStation."Kitchen Station";
+                                    if not KitchenStationDescriptions.Contains(KitchenStationDescription) then
+                                        KitchenStationDescriptions.Add(KitchenStationDescription);
+                                end;
+                            until KitchenRequestStation.Next() = 0;
+                    end;
+                until KitchenReqSourceLink.Next() = 0;
+        until WPadLineOutBuffer.Next() = 0;
+    end;
+
     internal procedure AddComments(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
     var
         WaiterPadLine2: Record "NPR NPRE Waiter Pad Line";
@@ -198,6 +303,58 @@ codeunit 6151178 "NPR NPRE Kitchen Print Mgt"
             WaiterPadLine := WaiterPadLine2;
             WaiterPadLine.Mark := true;
         end;
+    end;
+
+    local procedure CollectPlainMainLineEntryNos(var WPadLineOutBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary; var PlainLineEntryNos: List of [Integer])
+    var
+        MainLineNosWithAddOn: List of [Integer];
+        CurrentMainEntryNo: Integer;
+        CurrentMainWaiterPadLineNo: Integer;
+        CurrentMainQuantity: Decimal;
+        CurrentMainHasComment: Boolean;
+    begin
+        //First pass: which main lines carry an add-on, matched by "Attached to Line No." rather than by print order. Split-bill
+        //moves all main lines to the top of the pad and appends the add-on lines at the end, so an add-on is not always printed
+        //directly below its dish; relying on adjacency would misread such a pad and bulk a customised dish.
+        WPadLineOutBuffer.Reset();
+        if WPadLineOutBuffer.FindSet() then
+            repeat
+                if (WPadLineOutBuffer."Attached to Line No." <> 0) and not MainLineNosWithAddOn.Contains(WPadLineOutBuffer."Attached to Line No.") then
+                    MainLineNosWithAddOn.Add(WPadLineOutBuffer."Attached to Line No.");
+            until WPadLineOutBuffer.Next() = 0;
+
+        //Second pass: a main line is plain when it has no add-on and no comment. Comment lines carry no attachment link, so
+        //they are matched to the main line printed above them.
+        WPadLineOutBuffer.Reset();
+        if not WPadLineOutBuffer.FindSet() then
+            exit;
+        repeat
+            if (WPadLineOutBuffer."Attached to Line No." = 0) and (WPadLineOutBuffer."Line Type" = WPadLineOutBuffer."Line Type"::Item) then begin
+                AddPlainMainLineEntryNo(CurrentMainEntryNo, CurrentMainWaiterPadLineNo, CurrentMainQuantity, CurrentMainHasComment, MainLineNosWithAddOn, PlainLineEntryNos);
+                CurrentMainEntryNo := WPadLineOutBuffer."Entry No.";
+                CurrentMainWaiterPadLineNo := WPadLineOutBuffer."Waiter Pad Line No.";
+                CurrentMainQuantity := WPadLineOutBuffer.Quantity;
+                CurrentMainHasComment := false;
+            end else
+                if (WPadLineOutBuffer."Line Type" = WPadLineOutBuffer."Line Type"::Comment) and (CurrentMainEntryNo <> 0) then
+                    CurrentMainHasComment := true;
+        until WPadLineOutBuffer.Next() = 0;
+        AddPlainMainLineEntryNo(CurrentMainEntryNo, CurrentMainWaiterPadLineNo, CurrentMainQuantity, CurrentMainHasComment, MainLineNosWithAddOn, PlainLineEntryNos);
+    end;
+
+    local procedure AddPlainMainLineEntryNo(MainEntryNo: Integer; MainWaiterPadLineNo: Integer; MainQuantity: Decimal; HasComment: Boolean; MainLineNosWithAddOn: List of [Integer]; var PlainLineEntryNos: List of [Integer])
+    begin
+        if MainEntryNo = 0 then
+            exit;
+        //A line reduced to zero or below (a removed line kept as a zero-quantity cancellation, or a reversal) must keep its own
+        //line so the kitchen still sees the cancellation; bulking it would net it off against a new line of the same item.
+        if MainQuantity <= 0 then
+            exit;
+        if HasComment then
+            exit;
+        if MainLineNosWithAddOn.Contains(MainWaiterPadLineNo) then
+            exit;
+        PlainLineEntryNos.Add(MainEntryNo);
     end;
 
     local procedure FillLineData(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; PrintCategoryCode: Code[20]; ServingStep: Code[10]; var WPadLineOutBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary)
