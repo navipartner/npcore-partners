@@ -1296,6 +1296,51 @@
         PreWorkflows.Add('RUN_W/PAD_ACTION', ActionParameters);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR End Sale Events", 'OnAddPostWorkflowsToRun', '', false, false)]
+    local procedure AddShowKitchenOrderNoWorkflowOnEndSale(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup"; EndSaleSuccess: Boolean; var PostWorkflows: JsonObject)
+    var
+        POSEntry: Record "NPR POS Entry";
+    begin
+        if not EndSaleSuccess then
+            exit;
+        Sale.GetLastSalePOSEntry(POSEntry);
+        AddShowKitchenOrderNoWorkflow(Setup.RestaurantCode(), POSEntry."Entry No.", PostWorkflows);
+    end;
+
+    internal procedure AddShowKitchenOrderNoWorkflow(RestaurantCode: Code[20]; POSEntryNo: Integer; var PostWorkflows: JsonObject)
+    var
+        POSEntryWaiterPadLink: Record "NPR POS Entry Waiter Pad Link";
+        ServiceFlowProfile: Record "NPR NPRE Serv.Flow Profile";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        KitchenPrintMgt: Codeunit "NPR NPRE Kitchen Print Mgt";
+        SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+        ActionParameters: JsonObject;
+        CustomParameters: JsonObject;
+        KitchenOrderSystemId: Guid;
+        KitchenOrderNo: BigInteger;
+        KitchenOrderNoLbl: Label 'Kitchen order no.';
+    begin
+        POSEntryWaiterPadLink.SetRange("POS Entry No.", POSEntryNo);
+        if not POSEntryWaiterPadLink.FindFirst() then
+            exit;
+        WaiterPad.Get(POSEntryWaiterPadLink."Waiter Pad No.");
+        WaiterPad.CalcFields("Current Seating FF");
+        if WaiterPad."Current Seating FF" <> '' then
+            SetupProxy.SetSeating(WaiterPad."Current Seating FF")
+        else
+            SetupProxy.SetRestaurant(RestaurantCode);
+        SetupProxy.GetServiceFlowProfile(ServiceFlowProfile);
+        if not ServiceFlowProfile."AutoSave to W/Pad on Sale End" then
+            exit;
+        KitchenOrderNo := KitchenPrintMgt.GetKitchenOrderId(POSEntryNo, KitchenOrderSystemId);
+        if KitchenOrderNo = 0 then
+            exit;
+        CustomParameters.Add('title', KitchenOrderNoLbl);
+        CustomParameters.Add('message', Format(KitchenOrderNo));
+        ActionParameters.Add('customParameters', CustomParameters);
+        PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::SHOW_MESSAGE), ActionParameters);
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale", 'OnAfterDeleteEvent', '', true, false)]
     local procedure ClearWPadLinksOnSaleHdrDelete(var Rec: Record "NPR POS Sale"; RunTrigger: Boolean)
     begin

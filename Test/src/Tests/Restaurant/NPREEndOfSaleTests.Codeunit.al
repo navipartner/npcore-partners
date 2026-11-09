@@ -497,6 +497,102 @@ codeunit 85376 "NPR NPRE End Of Sale Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure EndSale_FastFoodKitchenOrder_QueuesTheKitchenOrderNoMessage()
+    var
+        Item: Record Item;
+        KitchenReqSrcLink: Record "NPR NPRE Kitchen Req.Src. Link";
+        KitchenRequest: Record "NPR NPRE Kitchen Request";
+        POSEntry: Record "NPR POS Entry";
+        Seating: Record "NPR NPRE Seating";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        PostWorkflows: JsonObject;
+        JToken: JsonToken;
+        WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Close w/out Saving";
+    begin
+        // [SCENARIO] A paid fast-food sale tells the cashier the kitchen order no. of what went to the kitchen
+
+        // [GIVEN] A fast-food sale of a kitchen-routed item, sent to the kitchen and paid
+        InitializeFastFoodScenario(Seating, WaiterPad);
+        CreateSaleItem(Item);
+        _LibraryRestaurant.SetupItemForKitchenOrders(Item);
+        _LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        PreSetWaiterPadOnCurrentSale(WaiterPad, Seating);
+        _LibraryRestaurant.RunWaiterPadAction(_POSSession, WPadAction::"Request Next Serving", false);
+        EndCurrentSale(POSEntry);
+
+        // [WHEN] The end-of-sale post-workflows are collected
+        CollectEndOfSalePostWorkflows(PostWorkflows);
+
+        // [THEN] A message with the kitchen order no. of the sent waiter pad is queued
+        KitchenReqSrcLink.SetRange("Source Document Type", KitchenReqSrcLink."Source Document Type"::"Waiter Pad");
+        KitchenReqSrcLink.SetRange("Source Document No.", WaiterPad."No.");
+        KitchenReqSrcLink.FindFirst();
+        KitchenRequest.Get(KitchenReqSrcLink."Request No.");
+        _Assert.IsTrue(PostWorkflows.Get('SHOW_MESSAGE', JToken), 'The kitchen order no. message was not queued.');
+        JToken.AsObject().Get('customParameters', JToken);
+        JToken.AsObject().Get('message', JToken);
+        _Assert.AreEqual(Format(KitchenRequest."Order ID"), JToken.AsValue().AsText(), 'The queued message does not carry the kitchen order no.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure EndSale_RestaurantWithoutAutoSave_QueuesNoKitchenOrderNoMessage()
+    var
+        Item: Record Item;
+        POSEntry: Record "NPR POS Entry";
+        Seating: Record "NPR NPRE Seating";
+        ServiceFlowProfile: Record "NPR NPRE Serv.Flow Profile";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        PostWorkflows: JsonObject;
+        WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Close w/out Saving";
+    begin
+        // [SCENARIO] A restaurant that does not auto-save sales to waiter pads shows no kitchen order no.
+
+        // [GIVEN] A restaurant without auto-save on sale end, and a waiter pad sent to the kitchen and paid
+        InitializeFastFoodScenario(Seating, WaiterPad);
+        _LibraryRestaurant.GetPOSUnitServiceFlowProfile(_POSUnit, ServiceFlowProfile);
+        _LibraryRestaurant.SetAutoSaveToWaiterPadOnSaleEnd(ServiceFlowProfile.Code, false);
+        CreateSaleItem(Item);
+        _LibraryRestaurant.SetupItemForKitchenOrders(Item);
+        _LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        PreSetWaiterPadOnCurrentSale(WaiterPad, Seating);
+        _LibraryRestaurant.RunWaiterPadAction(_POSSession, WPadAction::"Request Next Serving", false);
+        EndCurrentSale(POSEntry);
+
+        // [WHEN] The end-of-sale post-workflows are collected
+        CollectEndOfSalePostWorkflows(PostWorkflows);
+
+        // [THEN] No kitchen order no. message is queued
+        _Assert.IsFalse(PostWorkflows.Contains('SHOW_MESSAGE'), 'A restaurant without auto-save must not show the kitchen order no.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure EndSale_FastFoodWithoutKitchenItems_QueuesNoKitchenOrderNoMessage()
+    var
+        Item: Record Item;
+        POSEntry: Record "NPR POS Entry";
+        Seating: Record "NPR NPRE Seating";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        PostWorkflows: JsonObject;
+    begin
+        // [SCENARIO] A fast-food sale with nothing for the kitchen shows no kitchen order no.
+
+        // [GIVEN] A fast-food sale of an item without kitchen routing, paid
+        InitializeFastFoodScenario(Seating, WaiterPad);
+        CreateItemSaleLine(Item, 1);
+        PreSetWaiterPadOnCurrentSale(WaiterPad, Seating);
+        EndCurrentSale(POSEntry);
+
+        // [WHEN] The end-of-sale post-workflows are collected
+        CollectEndOfSalePostWorkflows(PostWorkflows);
+
+        // [THEN] No kitchen order no. message is queued
+        _Assert.IsFalse(PostWorkflows.Contains('SHOW_MESSAGE'), 'A sale with nothing for the kitchen must not show a kitchen order no.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure EndSale_PreSetWaiterPadWithNothingOrdered_IsClosedAnyway()
     var
         Item: Record Item;
@@ -1200,6 +1296,23 @@ codeunit 85376 "NPR NPRE End Of Sale Tests"
           _LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, SalesAmount, ''),
           'The restaurant sale did not end.');
         POSEntry.GetBySystemId(SalePOS.SystemId);
+    end;
+
+    local procedure CollectEndOfSalePostWorkflows(var PostWorkflows: JsonObject)
+    var
+        Context: Codeunit "NPR POS JSON Helper";
+        EndSaleEvents: Codeunit "NPR End Sale Events";
+        FrontEnd: Codeunit "NPR POS Front End Management";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSetup: Codeunit "NPR POS Setup";
+    begin
+        _POSSession.GetSale(POSSale);
+        _POSSession.GetSaleLine(POSSaleLine);
+        _POSSession.GetPaymentLine(POSPaymentLine);
+        _POSSession.GetSetup(POSSetup);
+        EndSaleEvents.OnAddPostWorkflowsToRun('', Context, FrontEnd, POSSale, POSSaleLine, POSPaymentLine, POSSetup, true, PostWorkflows);
     end;
 
     local procedure AssertExactWaiterPadLink(POSEntry: Record "NPR POS Entry"; SourceSaleLineSystemId: Guid; WaiterPadLine: Record "NPR NPRE Waiter Pad Line")

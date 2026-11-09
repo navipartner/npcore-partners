@@ -1326,4 +1326,9 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'TOUR_BOOKING_PICKUP', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR CMPOSActionTourPickup";
     }
+    value(6248749; SHOW_MESSAGE)
+    {
+        Caption = 'SHOW_MESSAGE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Show Message";
+    }
 }
