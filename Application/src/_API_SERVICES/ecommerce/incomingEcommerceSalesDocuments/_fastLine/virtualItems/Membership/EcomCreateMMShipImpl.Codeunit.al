@@ -959,6 +959,40 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         exit(MMMembershipSalesSetup.Get(MMMembershipSalesSetup.Type::ITEM, ItemNo));
     end;
 
+    internal procedure CollectMembershipAlterationSetup(var TempMembersAlterSetup: Record "NPR MM Members. Alter. Setup" temporary)
+    var
+        MMMembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
+    begin
+        MMMembershipAlterationSetup.ReadIsolation := IsolationLevel::ReadCommitted;
+        MMMembershipAlterationSetup.SetLoadFields("Sales Item No.");
+        if MMMembershipAlterationSetup.FindSet() then
+            repeat
+                TempMembersAlterSetup.Init();
+                TempMembersAlterSetup."Alteration Type" := MMMembershipAlterationSetup."Alteration Type";
+                TempMembersAlterSetup."From Membership Code" := MMMembershipAlterationSetup."From Membership Code";
+                TempMembersAlterSetup."Sales Item No." := MMMembershipAlterationSetup."Sales Item No.";
+                TempMembersAlterSetup.Insert();
+            until MMMembershipAlterationSetup.Next() = 0;
+    end;
+
+    internal procedure CollectMembershipSaleItemNos(var ItemNos: List of [Code[20]])
+    var
+        MMMembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+    begin
+        MMMembershipSalesSetup.ReadIsolation := IsolationLevel::ReadCommitted;
+        SetMembershipSaleItemFilter(MMMembershipSalesSetup);
+        MMMembershipSalesSetup.SetLoadFields("No.");
+        if MMMembershipSalesSetup.FindSet() then
+            repeat
+                ItemNos.Add(MMMembershipSalesSetup."No.");
+            until MMMembershipSalesSetup.Next() = 0;
+    end;
+
+    internal procedure SetMembershipSaleItemFilter(var MMMembershipSalesSetup: Record "NPR MM Members. Sales Setup")
+    begin
+        MMMembershipSalesSetup.SetRange(Type, MMMembershipSalesSetup.Type::ITEM);
+    end;
+
     internal procedure ShowRelatedMembershipsAction(EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
         TempMembership: Record "NPR MM Membership" temporary;

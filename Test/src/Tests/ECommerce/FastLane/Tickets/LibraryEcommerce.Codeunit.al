@@ -495,16 +495,18 @@ codeunit 85161 "NPR Library Ecommerce"
     // specifically a type this helper would never create, such as one carrying an unsupported issue module.
     // That is the whole reason the two halves are separate: a single procedure that always creates an
     // ON-ECOM-SALE type could not serve the negative tests.
-    //
-    // No "does this mapping already exist" guard, deliberately. ItemNo is minted immediately above, so a row
-    // for it cannot exist; a guard would only be able to hide a fixture collision that should fail loudly.
     procedure CreateEcomCouponItemForType(CouponTypeCode: Code[20]) ItemNo: Code[20]
     var
-        EcomSalesCouponSetupLine: Record "NPR NpDc Iss.OnEcomSale S.Line";
         LibraryInventory: Codeunit "NPR Library - Inventory";
     begin
         ItemNo := LibraryInventory.CreateItemNo();
+        CreateEcomCouponLine(CouponTypeCode, ItemNo);
+    end;
 
+    procedure CreateEcomCouponLine(CouponTypeCode: Code[20]; ItemNo: Code[20])
+    var
+        EcomSalesCouponSetupLine: Record "NPR NpDc Iss.OnEcomSale S.Line";
+    begin
         // FindLast before Init: Init preserves primary-key fields, and the key is ("Coupon Type", "Line No."),
         // so the found line number survives into the increment.
         EcomSalesCouponSetupLine.SetRange("Coupon Type", CouponTypeCode);

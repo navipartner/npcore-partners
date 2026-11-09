@@ -34,10 +34,12 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
         Item: Record Item;
         EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
         JsonBuilder: Codeunit "NPR Json Builder";
+        SetupProductTypes: Dictionary of [Code[20], Text];
         ItemId: Text;
         WithAttributes: Boolean;
         WithVariants: Boolean;
         EntriaEnabled: Boolean;
+        SetupProductTypesLoaded: Boolean;
     begin
         ItemId := Request.Paths().Get(3);
         Item.ReadIsolation := IsolationLevel::ReadCommitted;
@@ -52,30 +54,52 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
             WithVariants := (Request.QueryParams().Get('withVariants').ToLower() = 'true');
 
         EntriaEnabled := EntriaIntegrationMgt.HasEnabledStore();
-        exit(Response.RespondOK(ItemToJson(JsonBuilder, Item, WithAttributes, WithVariants, true, EntriaEnabled).Build()));
+        exit(Response.RespondOK(ItemToJson(JsonBuilder, Item, WithAttributes, WithVariants, true, EntriaEnabled, SetupProductTypes, SetupProductTypesLoaded, GetSyncRowVersion(Item)).Build()));
     end;
 
     procedure ListItems(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         Item: Record "Item";
         EntriaIntegrationMgt: Codeunit "NPR Entria Integration Mgt.";
+        ChangeTrackerMgt: Codeunit "NPR Change Tracker Mgt";
         RecRef: RecordRef;
         JsonBuilder: Codeunit "NPR Json Builder";
         Parameters: Dictionary of [Text, Text];
+        SetupProductTypes: Dictionary of [Code[20], Text];
         JsonObject: JsonObject;
         PageKey: Text;
+        SharedPageKey: Text;
         Limit: Integer;
         EntryCount: Integer;
+        Boundary: BigInteger;
+        LastRowVersion: BigInteger;
+        StartRowVersion: BigInteger;
+        ContinuationRowVersion: BigInteger;
         PageContinuation: Boolean;
+        HasWindowBoundary: Boolean;
         DataFound: Boolean;
         MoreRecords: Boolean;
         WithAttributes: Boolean;
         WithVariants: Boolean;
         Sync: Boolean;
         EntriaEnabled: Boolean;
+        SetupProductTypesLoaded: Boolean;
         WithVariantsSyncErr: Label 'withVariants cannot be combined with sync=true. Use /inventory/itemvariant with sync=true to keep variants up to date.', Locked = true;
+        InvalidPageKeyErr: Label 'pageKey is not valid. Start the sync again without pageKey.', Locked = true;
+        InvalidLastRowVersionErr: Label 'lastRowVersion is not valid. Pass the rowVersion of the last item your previous sync returned, or omit lastRowVersion for a full sync.', Locked = true;
     begin
         Parameters := Request.QueryParams();
+
+        // Cursor parameters are checked before any key, filter or page position is applied.
+        if Parameters.ContainsKey('sync') then
+            Evaluate(Sync, Parameters.Get('sync'));
+        if Sync and Parameters.ContainsKey('lastRowVersion') then
+            if not Evaluate(LastRowVersion, Parameters.Get('lastRowVersion'), 9) then
+                exit(Response.RespondBadRequest(InvalidLastRowVersionErr));
+        PageContinuation := Parameters.ContainsKey('pageKey');
+        if PageContinuation then
+            if not SplitPageKey(Parameters.Get('pageKey'), SharedPageKey, Boundary, HasWindowBoundary) then
+                exit(Response.RespondBadRequest(InvalidPageKeyErr));
 
         if (Parameters.ContainsKey('withAttributes')) then
             WithAttributes := (Parameters.Get('withAttributes').ToLower() = 'true');
@@ -97,20 +121,23 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
             if (Limit < 1) or (Limit > 20000) then
                 Limit := 20000;
 
-        if (Parameters.ContainsKey('pageKey')) then begin
-            Request.ApplyPageKey(Parameters.Get('pageKey'), RecRef);
-            PageContinuation := true;
+        if PageContinuation then begin
+            Request.ApplyPageKey(SharedPageKey, RecRef);
+            ContinuationRowVersion := RecRef.Field(0).Value;
         end;
 
         if Parameters.ContainsKey('sync') then begin
-            Evaluate(Sync, Parameters.Get('sync'));
             if Sync then begin
                 // Error if table is missing a key that starts with rowVersion for efficient data replication.
                 Request.SetKeyToRowVersion(RecRef);
             end;
 
+            // Only sync=true validates lastRowVersion. sync=false filters on the raw text.
             if Parameters.ContainsKey('lastRowVersion') then begin
-                RecRef.Field(0).SetFilter('>%1', Parameters.Get('lastRowVersion'));
+                if Sync then
+                    RecRef.Field(0).SetFilter('>%1', LastRowVersion)
+                else
+                    RecRef.Field(0).SetFilter('>%1', Parameters.Get('lastRowVersion'));
             end;
         end;
 
@@ -119,25 +146,39 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
 
         RecRef.SetTable(Item);
         Item.ReadIsolation := IsolationLevel::ReadCommitted;
+        EntriaEnabled := EntriaIntegrationMgt.HasEnabledStore();
 
         JsonBuilder.StartArray();
 
-        if PageContinuation then
-            DataFound := Item.Find('>')
-        else
-            DataFound := Item.Find('-');
+        if Sync then begin
+            // A request whose pageKey carries no boundary starts a new window.
+            if not HasWindowBoundary then
+                Boundary := ChangeTrackerMgt.CommittedBoundary();
+            StartRowVersion := LastRowVersion;
+            if PageContinuation then
+                StartRowVersion := ContinuationRowVersion;
+            // The window (StartRowVersion, Boundary] is empty, so this page reads nothing and ends it.
+            if StartRowVersion >= Boundary then
+                MoreRecords := false
+            else
+                MoreRecords := AddSyncPage(Request, Item, StartRowVersion, Boundary, Limit, WithAttributes, EntriaEnabled, SetupProductTypes, SetupProductTypesLoaded, JsonBuilder, PageKey);
+        end else begin
+            if PageContinuation then
+                DataFound := Item.Find('>')
+            else
+                DataFound := Item.Find('-');
 
-        EntriaEnabled := EntriaIntegrationMgt.HasEnabledStore();
-        if DataFound then
-            repeat
-                JsonBuilder.AddObject(ItemToJson(JsonBuilder, Item, WithAttributes, WithVariants, false, Sync, EntriaEnabled));
-                EntryCount += 1;
-                if (EntryCount = Limit) then begin
-                    RecRef.GetTable(Item);
-                    PageKey := Request.GetPageKey(RecRef);
-                end;
-                MoreRecords := Item.Next() <> 0;
-            until (not MoreRecords) or (EntryCount = Limit);
+            if DataFound then
+                repeat
+                    JsonBuilder.AddObject(ItemToJson(JsonBuilder, Item, WithAttributes, WithVariants, false, Sync, EntriaEnabled, SetupProductTypes, SetupProductTypesLoaded, Item.SystemRowVersion));
+                    EntryCount += 1;
+                    if (EntryCount = Limit) then begin
+                        RecRef.GetTable(Item);
+                        PageKey := Request.GetPageKey(RecRef);
+                    end;
+                    MoreRecords := Item.Next() <> 0;
+                until (not MoreRecords) or (EntryCount = Limit);
+        end;
 
         JsonBuilder.EndArray();
 
@@ -149,12 +190,14 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
         exit(Response.RespondOK(JsonObject));
     end;
 
-    local procedure ItemToJson(var JsonBuilder: Codeunit "NPR Json Builder"; var Item: Record Item; WithAttributes: Boolean; WithVariants: Boolean; SingleItem: Boolean; EntriaEnabled: Boolean): Codeunit "NPR Json Builder"
+    local procedure ItemToJson(var JsonBuilder: Codeunit "NPR Json Builder"; var Item: Record Item; WithAttributes: Boolean; WithVariants: Boolean; SingleItem: Boolean; EntriaEnabled: Boolean; var SetupProductTypes: Dictionary of [Code[20], Text]; var SetupProductTypesLoaded: Boolean; RowVersion: BigInteger): Codeunit "NPR Json Builder"
     begin
-        exit(ItemToJson(JsonBuilder, Item, WithAttributes, WithVariants, SingleItem, true, EntriaEnabled));
+        exit(ItemToJson(JsonBuilder, Item, WithAttributes, WithVariants, SingleItem, true, EntriaEnabled, SetupProductTypes, SetupProductTypesLoaded, RowVersion));
     end;
 
-    local procedure ItemToJson(var JsonBuilder: Codeunit "NPR Json Builder"; var Item: Record Item; WithAttributes: Boolean; WithVariants: Boolean; SingleItem: Boolean; Sync: Boolean; EntriaEnabled: Boolean): Codeunit "NPR Json Builder"
+    local procedure ItemToJson(var JsonBuilder: Codeunit "NPR Json Builder"; var Item: Record Item; WithAttributes: Boolean; WithVariants: Boolean; SingleItem: Boolean; Sync: Boolean; EntriaEnabled: Boolean; var SetupProductTypes: Dictionary of [Code[20], Text]; var SetupProductTypesLoaded: Boolean; RowVersion: BigInteger): Codeunit "NPR Json Builder"
+    var
+        EntriaProdTypeMgt: Codeunit "NPR Entria Prod. Type Mgt.";
     begin
         JsonBuilder.StartObject().AddProperty('id', Format(Item.SystemId, 0, 4).ToLower())
                                  .AddProperty('code', Item."No.")
@@ -178,14 +221,17 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
                                  .AddProperty('varietyGroup', Item."NPR Variety Group")
                                  .AddProperty('crossVarietyNo', CrossVarietyNoName(Item."NPR Cross Variety No."));
 
-        if EntriaEnabled then
+        if EntriaEnabled then begin
             JsonBuilder.AddProperty('entriaProduct', Item."NPR Entria Product");
+            if Item."NPR Entria Product" then
+                JsonBuilder.AddProperty('productType', EntriaProdTypeMgt.GetProductType(Item, SetupProductTypes, SetupProductTypesLoaded));
+        end;
 
         if SingleItem then
             JsonBuilder.AddProperty('inventory', Item.Inventory)
                        .AddProperty('hasVariants', Item."NPR Has Variants");
         if Sync then
-            JsonBuilder.AddProperty('rowVersion', Format(Item.SystemRowVersion, 0, 9));
+            JsonBuilder.AddProperty('rowVersion', Format(RowVersion, 0, 9));
 
         if WithAttributes then begin
             JsonBuilder.StartObject('attributes');
@@ -278,6 +324,148 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
             until ItemAttributeValueMapping.Next() = 0;
         end;
         exit(JsonBuilder);
+    end;
+
+    local procedure AddSyncPage(var Request: Codeunit "NPR API Request"; var Item: Record Item; StartRowVersion: BigInteger; Boundary: BigInteger; Limit: Integer; WithAttributes: Boolean; EntriaEnabled: Boolean; var SetupProductTypes: Dictionary of [Code[20], Text]; var SetupProductTypesLoaded: Boolean; var JsonBuilder: Codeunit "NPR Json Builder"; var PageKey: Text) MoreRecords: Boolean
+    var
+        ItemChange: Record "NPR Inventory Item Change";
+        ChangedItem: Record Item;
+        RecRef: RecordRef;
+        ChangeRowVersions: Dictionary of [Code[20], BigInteger];
+        Position: BigInteger;
+        ChangeRowVersion: BigInteger;
+        LastItemNo: Code[20];
+        EntryCount: Integer;
+        ChangeLookupMode: Option NotLoaded,Map,PerRow;
+        ItemFound: Boolean;
+        ChangeFound: Boolean;
+    begin
+        // Item and change rows share one cursor: SystemRowVersion is a database-wide counter, so they never tie.
+        Position := StartRowVersion;
+        Item.SetFilter(SystemRowVersion, '>%1&<=%2', StartRowVersion, Boundary);
+        ItemFound := Item.Find('-');
+        ItemChange.SetCurrentKey(SystemRowVersion);
+        ItemChange.SetFilter(SystemRowVersion, '>%1&<=%2', StartRowVersion, Boundary);
+        Item.CopyFilter("No.", ItemChange."Item No.");
+        ItemChange.ReadIsolation := IsolationLevel::ReadCommitted;
+        ChangeFound := ItemChange.FindSet();
+        ChangedItem.ReadIsolation := IsolationLevel::ReadCommitted;
+
+        // A full page stops at the next item it would return, which sets MoreRecords. The next page reads on from the last returned item.
+        while ItemFound or ChangeFound do
+            if ItemFound and not (ChangeFound and (ItemChange.SystemRowVersion < Item.SystemRowVersion)) then begin
+                // With the change stream exhausted, every change row in the window is older than this Item row.
+                ChangeRowVersion := 0;
+                if ChangeFound then
+                    ChangeRowVersion := GetWindowChangeRowVersion(ItemChange, Item."No.", Limit, ChangeRowVersions, ChangeLookupMode);
+                // A newer change row inside the window returns the item at its own position.
+                if (ChangeRowVersion <= Item.SystemRowVersion) or (ChangeRowVersion > Boundary) then begin
+                    if EntryCount = Limit then begin
+                        MoreRecords := true;
+                        break;
+                    end;
+                    Position := Item.SystemRowVersion;
+                    JsonBuilder.AddObject(ItemToJson(JsonBuilder, Item, WithAttributes, false, false, true, EntriaEnabled, SetupProductTypes, SetupProductTypesLoaded, Position));
+                    EntryCount += 1;
+                    LastItemNo := Item."No.";
+                end;
+                ItemFound := Item.Next() <> 0;
+            end else begin
+                if IsChangedItemDue(ChangedItem, ItemChange) then begin
+                    if EntryCount = Limit then begin
+                        MoreRecords := true;
+                        break;
+                    end;
+                    Position := ItemChange.SystemRowVersion;
+                    JsonBuilder.AddObject(ItemToJson(JsonBuilder, ChangedItem, WithAttributes, false, false, true, EntriaEnabled, SetupProductTypes, SetupProductTypesLoaded, Position));
+                    EntryCount += 1;
+                    LastItemNo := ChangedItem."No.";
+                end;
+                ChangeFound := ItemChange.Next() <> 0;
+            end;
+
+        if not MoreRecords then
+            exit;
+        // Same pageKey format as before: field 0 now carries the merged position.
+        RecRef.GetTable(Item);
+        RecRef.Field(0).Value := Position;
+        RecRef.Field(Item.FieldNo("No.")).Value := LastItemNo;
+        // The window boundary travels with the key, so later pages of this sync reuse it.
+        PageKey := Request.GetPageKey(RecRef) + '.' + Format(Boundary, 0, 9);
+    end;
+
+    // A change row returns its item only if the row has not moved since the page read it, the item exists, and the item's own row is older.
+    local procedure IsChangedItemDue(var ChangedItem: Record Item; var ItemChange: Record "NPR Inventory Item Change"): Boolean
+    var
+        ItemChangeMgt: Codeunit "NPR Inventory Item Change Mgt.";
+    begin
+        // A row touched after the page read it is now above the boundary. Its new position returns the item in a later call.
+        if ItemChangeMgt.GetChangeRowVersion(ItemChange."Item No.") <> ItemChange.SystemRowVersion then
+            exit(false);
+        if not ChangedItem.Get(ItemChange."Item No.") then
+            exit(false);
+        exit(ChangedItem.SystemRowVersion < ItemChange.SystemRowVersion);
+    end;
+
+    // Reads the window's change rows once per page. Above Limit rows it falls back to one read per item.
+    // A row read here can later only move above the boundary, where IsChangedItemDue skips it. Change rows are never deleted.
+    local procedure GetWindowChangeRowVersion(var ItemChangeParam: Record "NPR Inventory Item Change"; ItemNo: Code[20]; Limit: Integer; var ChangeRowVersions: Dictionary of [Code[20], BigInteger]; var ChangeLookupMode: Option NotLoaded,Map,PerRow): BigInteger
+    var
+        ItemChange: Record "NPR Inventory Item Change";
+        ItemChangeMgt: Codeunit "NPR Inventory Item Change Mgt.";
+        ChangeRowVersion: BigInteger;
+    begin
+        if ChangeLookupMode = ChangeLookupMode::NotLoaded then begin
+            ChangeLookupMode := ChangeLookupMode::Map;
+            ItemChange.SetCurrentKey(SystemRowVersion);
+            ItemChange.CopyFilters(ItemChangeParam);
+            ItemChange.ReadIsolation := IsolationLevel::ReadCommitted;
+            if ItemChange.FindSet() then
+                repeat
+                    ChangeRowVersions.Set(ItemChange."Item No.", ItemChange.SystemRowVersion);
+                    if ChangeRowVersions.Count() > Limit then begin
+                        Clear(ChangeRowVersions);
+                        ChangeLookupMode := ChangeLookupMode::PerRow;
+                    end;
+                until (ChangeLookupMode = ChangeLookupMode::PerRow) or (ItemChange.Next() = 0);
+        end;
+
+        if ChangeLookupMode = ChangeLookupMode::PerRow then
+            exit(ItemChangeMgt.GetChangeRowVersion(ItemNo));
+        if ChangeRowVersions.Get(ItemNo, ChangeRowVersion) then
+            exit(ChangeRowVersion);
+        exit(0);
+    end;
+
+    local procedure GetSyncRowVersion(var Item: Record Item): BigInteger
+    var
+        ItemChangeMgt: Codeunit "NPR Inventory Item Change Mgt.";
+        ChangeRowVersion: BigInteger;
+    begin
+        ChangeRowVersion := ItemChangeMgt.GetChangeRowVersion(Item."No.");
+        if ChangeRowVersion > Item.SystemRowVersion then
+            exit(ChangeRowVersion);
+        exit(Item.SystemRowVersion);
+    end;
+
+    // A sync pageKey is the shared key, a dot and the window boundary. Base64url never contains a dot.
+    local procedure SplitPageKey(RawPageKey: Text; var SharedPageKey: Text; var WindowBoundary: BigInteger; var HasWindowBoundary: Boolean): Boolean
+    var
+        Suffix: Text;
+        DotPos: Integer;
+    begin
+        DotPos := StrPos(RawPageKey, '.');
+        HasWindowBoundary := DotPos > 0;
+        if not HasWindowBoundary then begin
+            SharedPageKey := RawPageKey;
+            exit(true);
+        end;
+        SharedPageKey := CopyStr(RawPageKey, 1, DotPos - 1);
+        Suffix := CopyStr(RawPageKey, DotPos + 1);
+        if not Evaluate(WindowBoundary, Suffix, 9) then
+            exit(false);
+        // Accept only the text AddSyncPage writes. Format 9 also writes '-1', so the sign is checked too.
+        exit((WindowBoundary >= 0) and (Format(WindowBoundary, 0, 9) = Suffix));
     end;
 
     procedure GetItemLedgerEntry(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"

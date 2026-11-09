@@ -229,13 +229,8 @@ codeunit 6151118 "NPR EcomCreateCouponImpl"
             until WalletCouponSetup.Next() = 0;
 
         EcomSalesCouponSetupLine.SetCurrentKey(Type, "No.", "Variant Code");
-        EcomSalesCouponSetupLine.SetRange(Type, EcomSalesCouponSetupLine.Type::Item);
         EcomSalesCouponSetupLine.SetRange("No.", ItemNo);
-        if VariantCode <> '' then
-            EcomSalesCouponSetupLine.SetFilter("Variant Code", '%1|%2', '', VariantCode)
-        else
-            EcomSalesCouponSetupLine.SetRange("Variant Code", VariantCode);
-        EcomSalesCouponSetupLine.SetFilter("Coupon Type", '<>%1', '');
+        SetEcomSaleCouponLineFilter(EcomSalesCouponSetupLine, VariantCode);
         if EcomSalesCouponSetupLine.FindSet() then
             repeat
                 if GetCouponTypes then begin
@@ -254,6 +249,53 @@ codeunit 6151118 "NPR EcomCreateCouponImpl"
         exit(true);
     end;
 
+    internal procedure CollectCouponItemNos(var ItemNos: List of [Code[20]])
+    var
+        EcomSalesCouponSetupLine: Record "NPR NpDc Iss.OnEcomSale S.Line";
+        WalletCouponSetup: Record "NPR WalletCouponSetup";
+        EnabledCouponTypes: Dictionary of [Code[20], Boolean];
+    begin
+        LoadEnabledCouponTypes(EnabledCouponTypes);
+
+        WalletCouponSetup.ReadIsolation := IsolationLevel::ReadCommitted;
+        SetWalletCouponSetupFilter(WalletCouponSetup);
+        WalletCouponSetup.SetLoadFields(TriggerOnItemNo, "Coupon Type");
+        if WalletCouponSetup.FindSet() then
+            repeat
+                if EnabledCouponTypes.ContainsKey(WalletCouponSetup."Coupon Type") then
+                    ItemNos.Add(WalletCouponSetup.TriggerOnItemNo);
+            until WalletCouponSetup.Next() = 0;
+
+        EcomSalesCouponSetupLine.ReadIsolation := IsolationLevel::ReadCommitted;
+        SetEcomSaleCouponLineFilter(EcomSalesCouponSetupLine, '');
+        EcomSalesCouponSetupLine.SetLoadFields("No.", "Coupon Type");
+        if EcomSalesCouponSetupLine.FindSet() then
+            repeat
+                if EnabledCouponTypes.ContainsKey(EcomSalesCouponSetupLine."Coupon Type") then
+                    ItemNos.Add(EcomSalesCouponSetupLine."No.");
+            until EcomSalesCouponSetupLine.Next() = 0;
+    end;
+
+    internal procedure SetEcomSaleCouponLineFilter(var EcomSalesCouponSetupLine: Record "NPR NpDc Iss.OnEcomSale S.Line"; VariantCode: Code[10])
+    begin
+        EcomSalesCouponSetupLine.SetRange(Type, EcomSalesCouponSetupLine.Type::Item);
+        if VariantCode <> '' then
+            EcomSalesCouponSetupLine.SetFilter("Variant Code", '%1|%2', '', VariantCode)
+        else
+            EcomSalesCouponSetupLine.SetRange("Variant Code", VariantCode);
+        EcomSalesCouponSetupLine.SetFilter("Coupon Type", '<>%1', '');
+    end;
+
+    internal procedure SetWalletCouponSetupFilter(var WalletCouponSetup: Record "NPR WalletCouponSetup")
+    begin
+        WalletCouponSetup.SetFilter("Coupon Type", '<>%1', '');
+    end;
+
+    internal procedure SetEnabledCouponTypeFilter(var CouponType: Record "NPR NpDc Coupon Type")
+    begin
+        CouponType.SetRange(Enabled, true);
+    end;
+
     local procedure CouponTypeIsEnabled(CouponTypeCode: Code[20]): Boolean
     var
         CouponType: Record "NPR NpDc Coupon Type";
@@ -261,6 +303,19 @@ codeunit 6151118 "NPR EcomCreateCouponImpl"
         if not CouponType.Get(CouponTypeCode) then
             exit(false);
         exit(CouponType.Enabled);
+    end;
+
+    local procedure LoadEnabledCouponTypes(var EnabledCouponTypes: Dictionary of [Code[20], Boolean])
+    var
+        CouponType: Record "NPR NpDc Coupon Type";
+    begin
+        CouponType.ReadIsolation := IsolationLevel::ReadCommitted;
+        SetEnabledCouponTypeFilter(CouponType);
+        CouponType.SetLoadFields(Code);
+        if CouponType.FindSet() then
+            repeat
+                EnabledCouponTypes.Add(CouponType.Code, true);
+            until CouponType.Next() = 0;
     end;
 
     local procedure CheckCouponTypesEligible(EcomSalesLine: Record "NPR Ecom Sales Line"; var CouponTypes: List of [Code[20]])
