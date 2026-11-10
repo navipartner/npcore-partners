@@ -415,5 +415,43 @@ codeunit 6151026 "NPR NPRE Menu Last Updated Sub"
                 end;
         end;
     end;
+
+    internal procedure UpdateMenuLastUpdatedForMenuItem(MenuItemSystemId: Guid)
+    var
+        MenuItem: Record "NPR NPRE Menu Item";
+        TempMenuBuffer: Record "NPR NPRE Menu" temporary;
+    begin
+        MenuItem.SetLoadFields("Restaurant Code", "Menu Code");
+        if not MenuItem.GetBySystemId(MenuItemSystemId) then
+            exit;
+        BufferMenu(MenuItem."Restaurant Code", MenuItem."Menu Code", TempMenuBuffer);
+        CollectForUpsellTarget(MenuItemSystemId, TempMenuBuffer);
+        FlushMenuBuffer(TempMenuBuffer);
+    end;
+
+    local procedure CollectForUpsellTarget(MenuItemSystemId: Guid; var TempMenuBuffer: Record "NPR NPRE Menu" temporary)
+    var
+        Upsell: Record "NPR NPRE Upsell";
+        HostMenuItem: Record "NPR NPRE Menu Item";
+        HostMenu: Record "NPR NPRE Menu";
+    begin
+        Upsell.SetLoadFields("External Table", "External System Id");
+        Upsell.SetCurrentKey("Menu Item System Id");
+        Upsell.SetRange("Menu Item System Id", MenuItemSystemId);
+        if not Upsell.FindSet() then
+            exit;
+        HostMenuItem.SetLoadFields("Restaurant Code", "Menu Code");
+        HostMenu.SetLoadFields("Restaurant Code", Code);
+        repeat
+            case Upsell."External Table" of
+                Upsell."External Table"::MenuItem:
+                    if HostMenuItem.GetBySystemId(Upsell."External System Id") then
+                        BufferMenu(HostMenuItem."Restaurant Code", HostMenuItem."Menu Code", TempMenuBuffer);
+                Upsell."External Table"::Menu:
+                    if HostMenu.GetBySystemId(Upsell."External System Id") then
+                        BufferMenu(HostMenu."Restaurant Code", HostMenu.Code, TempMenuBuffer);
+            end;
+        until Upsell.Next() = 0;
+    end;
 }
 #endif

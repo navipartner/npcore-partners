@@ -27,10 +27,10 @@ codeunit 6248641 "NPR API Restaurant"
                     .AddProperty('primaryColor', Restaurant."Menu Primary Color")
                     .AddProperty('secondaryColor', Restaurant."Menu Secondary Color");
 
-                if LogoHandler.GetLogoUrl(Restaurant.SystemId, Enum::"NPR CloudflareMediaVariants"::MEDIUM, 57600, LogoUrl) then
+                if LogoHandler.GetLogoUrl(Restaurant.SystemId, Enum::"NPR CloudflareMediaVariants"::MEDIUM, 172800, LogoUrl) then
                     Json.AddProperty('logoUrl', LogoUrl);
 
-                if BackgroundHandler.GetBackgroundUrl(Restaurant.SystemId, Enum::"NPR CloudflareMediaVariants"::ORIGINAL, 57600, BackgroundUrl) then
+                if BackgroundHandler.GetBackgroundUrl(Restaurant.SystemId, Enum::"NPR CloudflareMediaVariants"::ORIGINAL, 172800, BackgroundUrl) then
                     Json.AddProperty('backgroundUrl', BackgroundUrl);
 
                 Json.AddProperty('seatingSetupLastUpdated', Restaurant."Seating Setup Last Modified At");
@@ -45,6 +45,7 @@ codeunit 6248641 "NPR API Restaurant"
     local procedure GetTableIds() TableIds: List of [Integer]
     begin
         TableIds.Add(Database::"NPR NPRE Restaurant");
+        TableIds.Add(Database::"NPR CloudflareMediaLink");
     end;
 }
 

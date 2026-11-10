@@ -90,6 +90,9 @@ table 6151266 "NPR NPRE Upsell"
         {
             Unique = true;
         }
+        key(Key3; "Menu Item System Id")
+        {
+        }
     }
 
     trigger OnInsert()

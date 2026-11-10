@@ -30,6 +30,7 @@ codeunit 6150991 "NPR NPREMenuItemPictureHandler" implements "NPR CloudflareMigr
     procedure PutPicture(MenuItemId: Guid; ContentType: Text[100]; ImageBase64: Text; var MediaUploadResponse: JsonObject): Boolean
     var
         MediaFacade: Codeunit "NPR CloudflareMediaFacade";
+        MenuLastUpdated: Codeunit "NPR NPRE Menu Last Updated Sub";
         MenuItem: Record "NPR NPRE Menu Item";
         PublicId: Text[100];
     begin
@@ -41,6 +42,7 @@ codeunit 6150991 "NPR NPREMenuItemPictureHandler" implements "NPR CloudflareMigr
         if (not MediaFacade.Upload(Enum::"NPR CloudflareMediaSelector"::MENU_ITEM_PICTURE, PublicId, ContentType, ImageBase64, 57600, MediaUploadResponse)) then
             exit(false);
 
+        MenuLastUpdated.UpdateMenuLastUpdatedForMenuItem(MenuItemId);
         exit(true);
     end;
 
@@ -81,7 +83,9 @@ codeunit 6150991 "NPR NPREMenuItemPictureHandler" implements "NPR CloudflareMigr
     procedure UnlinkPicture(MenuItemId: Guid): Boolean
     var
         MediaFacade: Codeunit "NPR CloudflareMediaFacade";
+        MenuLastUpdated: Codeunit "NPR NPRE Menu Last Updated Sub";
         MenuItem: Record "NPR NPRE Menu Item";
+        HadPicture: Boolean;
     begin
         if (IsNullGuid(MenuItemId)) then
             exit(false);
@@ -89,7 +93,10 @@ codeunit 6150991 "NPR NPREMenuItemPictureHandler" implements "NPR CloudflareMigr
         if (not MenuItem.GetBySystemId(MenuItemId)) then
             exit(false);
 
+        HadPicture := HavePicture(MenuItemId);
         MediaFacade.DeleteMediaKey(Database::"NPR NPRE Menu Item", MenuItemId, Enum::"NPR CloudflareMediaSelector"::MENU_ITEM_PICTURE);
+        if HadPicture then
+            MenuLastUpdated.UpdateMenuLastUpdatedForMenuItem(MenuItemId);
         exit(true);
     end;
 

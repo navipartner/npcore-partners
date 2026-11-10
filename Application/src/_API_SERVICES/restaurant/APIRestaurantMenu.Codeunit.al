@@ -553,6 +553,7 @@ codeunit 6248644 "NPR API Restaurant Menu"
         TableIds.Add(Database::"NPR NPRE Menu Item");
         TableIds.Add(Database::"NPR NPRE Menu Item Translation");
         TableIds.Add(Database::"NPR NPRE Upsell");
+        TableIds.Add(Database::"NPR CloudflareMediaLink");
         TableIds.Add(Database::"NPR NpIa Item AddOn");
         TableIds.Add(Database::"NPR NpIa Item AddOn Line");
         TableIds.Add(Database::"NPR NpIa ItemAddOn Line Opt.");

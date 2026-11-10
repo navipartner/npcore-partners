@@ -2547,6 +2547,162 @@ codeunit 85157 "NPR POS API Tests"
         RemovePricedMenuCategory();
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_LastUpdated_UpdatedOnMenuItemPictureUnlinked()
+    var
+        Assert: Codeunit Assert;
+        PictureHandler: Codeunit "NPR NPREMenuItemPictureHandler";
+        PricedItem: Record Item;
+        MenuItem: Record "NPR NPRE Menu Item";
+        Menu: Record "NPR NPRE Menu";
+        LastUpdatedBefore: DateTime;
+    begin
+        // [SCENARIO] Removing a menu item's picture through the picture handler refreshes the menu's lastUpdated.
+
+        // [GIVEN] An item on the menu with a picture
+        CreatePricedMenuItem(PricedItem, MenuItem);
+        InsertMenuItemPictureLink(MenuItem.SystemId, 'menu-item-picture-v1');
+        Commit();
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        LastUpdatedBefore := Menu."Last Updated";
+
+        // [WHEN] The picture is unlinked
+        Sleep(100);
+        Assert.IsTrue(PictureHandler.UnlinkPicture(MenuItem.SystemId), 'UnlinkPicture should succeed');
+        Commit();
+
+        // [THEN] The link is gone and the menu's Last Updated is refreshed
+        Assert.IsFalse(PictureHandler.HavePicture(MenuItem.SystemId), 'The picture link should be removed');
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        Assert.IsTrue(Menu."Last Updated" > LastUpdatedBefore,
+            'Last Updated should be refreshed after a menu item picture is unlinked');
+
+        RemovePricedMenuCategory();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_LastUpdated_NotUpdatedOnUnlinkWithoutPicture()
+    var
+        Assert: Codeunit Assert;
+        PictureHandler: Codeunit "NPR NPREMenuItemPictureHandler";
+        PricedItem: Record Item;
+        MenuItem: Record "NPR NPRE Menu Item";
+        Menu: Record "NPR NPRE Menu";
+        LastUpdatedBefore: DateTime;
+    begin
+        // [SCENARIO] Unlinking an item that has no picture is not a menu change.
+
+        // [GIVEN] An item on the menu without a picture
+        CreatePricedMenuItem(PricedItem, MenuItem);
+        Commit();
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        LastUpdatedBefore := Menu."Last Updated";
+
+        // [WHEN] Unlink is called anyway
+        Sleep(100);
+        PictureHandler.UnlinkPicture(MenuItem.SystemId);
+        Commit();
+
+        // [THEN] The menu's Last Updated is untouched
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        Assert.AreEqual(LastUpdatedBefore, Menu."Last Updated",
+            'Last Updated should not move when there was no picture to unlink');
+
+        RemovePricedMenuCategory();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_LastUpdated_UpdatedForMenuItem()
+    var
+        Assert: Codeunit Assert;
+        MenuLastUpdated: Codeunit "NPR NPRE Menu Last Updated Sub";
+        PricedItem: Record Item;
+        MenuItem: Record "NPR NPRE Menu Item";
+        Menu: Record "NPR NPRE Menu";
+        LastUpdatedBefore: DateTime;
+    begin
+        // [SCENARIO] The entry point the picture handler calls after an upload refreshes the item's menu.
+
+        // [GIVEN] An item on the menu
+        CreatePricedMenuItem(PricedItem, MenuItem);
+        Commit();
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        LastUpdatedBefore := Menu."Last Updated";
+
+        // [WHEN] The menu is refreshed for the item
+        Sleep(100);
+        MenuLastUpdated.UpdateMenuLastUpdatedForMenuItem(MenuItem.SystemId);
+        Commit();
+
+        // [THEN] The menu's Last Updated is refreshed
+        Menu.Get(MenuItem."Restaurant Code", MenuItem."Menu Code");
+        Assert.IsTrue(Menu."Last Updated" > LastUpdatedBefore,
+            'Last Updated should be refreshed for the menu item''s menu');
+
+        RemovePricedMenuCategory();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_LastUpdated_UpdatedOnUpsellTargetPictureChange()
+    var
+        Assert: Codeunit Assert;
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        PictureHandler: Codeunit "NPR NPREMenuItemPictureHandler";
+        PricedItem: Record Item;
+        MenuItem: Record "NPR NPRE Menu Item";
+        UpsellMenu: Record "NPR NPRE Menu";
+        Upsell: Record "NPR NPRE Upsell";
+        LastUpdatedBefore: DateTime;
+    begin
+        // [SCENARIO] A picture change on a menu item also refreshes every menu that upsells it.
+
+        // [GIVEN] A second menu offering the pictured item as a checkout upsell
+        CreatePricedMenuItem(PricedItem, MenuItem);
+        InsertMenuItemPictureLink(MenuItem.SystemId, 'menu-item-picture-v1');
+        LibraryRestaurant.CreateMenu(UpsellMenu, MenuItem."Restaurant Code");
+        Upsell.Init();
+        Upsell."External Table" := Upsell."External Table"::Menu;
+        Upsell."External System Id" := UpsellMenu.SystemId;
+        Upsell."Line No." := 10000;
+        Upsell."Menu Item System Id" := MenuItem.SystemId;
+        Upsell.Insert(true);
+        Commit();
+        UpsellMenu.Get(UpsellMenu."Restaurant Code", UpsellMenu.Code);
+        LastUpdatedBefore := UpsellMenu."Last Updated";
+
+        // [WHEN] The item's picture is unlinked
+        Sleep(100);
+        PictureHandler.UnlinkPicture(MenuItem.SystemId);
+        Commit();
+
+        // [THEN] The upselling menu's Last Updated is refreshed
+        UpsellMenu.Get(UpsellMenu."Restaurant Code", UpsellMenu.Code);
+        Assert.IsTrue(UpsellMenu."Last Updated" > LastUpdatedBefore,
+            'Last Updated should be refreshed on a menu that upsells the pictured item');
+
+        Upsell.Delete(true);
+        UpsellMenu.Get(UpsellMenu."Restaurant Code", UpsellMenu.Code);
+        UpsellMenu.Delete(true);
+        RemovePricedMenuCategory();
+    end;
+
+    local procedure InsertMenuItemPictureLink(MenuItemSystemId: Guid; MediaKey: Text[200])
+    var
+        MediaLink: Record "NPR CloudflareMediaLink";
+    begin
+        MediaLink.Init();
+        MediaLink.TableNumber := Database::"NPR NPRE Menu Item";
+        MediaLink.RecordId := MenuItemSystemId;
+        MediaLink.MediaSelector := Enum::"NPR CloudflareMediaSelector"::MENU_ITEM_PICTURE;
+        MediaLink.MediaKey := MediaKey;
+        MediaLink.PublicId := CopyStr(Format(MenuItemSystemId, 0, 4).ToLower(), 1, MaxStrLen(MediaLink.PublicId));
+        MediaLink.Insert();
+    end;
+
     local procedure CreatePricedMenuItem(var PricedItem: Record Item; var MenuItem: Record "NPR NPRE Menu Item")
     var
         LibraryRestaurant: Codeunit "NPR Library - Restaurant";
