@@ -7,12 +7,12 @@ codeunit 6248747 "NPR MM CFMemberRegistration"
         _ImageTokenSecretNameTok: Label 'MM-CFSignUpImage-Token', Locked = true;
         _SignupRequestUrlTok: Label '%1/internal/signup-requests', Locked = true;
         _SignupApiKeySecretNameTok: Label 'MM-CFSignUp-ApiKey', Locked = true;
+        _ShortLinkPrefixTok: Label '%1/s/', Locked = true;
         _HttpsSchemeTok: Label 'https://', Locked = true;
 
     [TryFunction]
-    internal procedure CreateSignupReference(RegistrationSetup: Record "NPR MM AzureMemberRegSetup"; DataSubjectId: Text[64])
+    internal procedure CreateSignupReference(RegistrationSetup: Record "NPR MM AzureMemberRegSetup"; DataSubjectId: Text[64]; FirstName: Text; PhoneNo: Text; var SignupUrl: Text)
     var
-        EnvironmentInformation: Codeunit "Environment Information";
         Client: HttpClient;
         Request: HttpRequestMessage;
         Response: HttpResponseMessage;
@@ -21,14 +21,12 @@ codeunit 6248747 "NPR MM CFMemberRegistration"
         Content: HttpContent;
         RequestBody: JsonObject;
         PayloadText: Text;
-        UnexpectedResponseCodeErr: Label '%1 [POST] URL:%2', Locked = true;
+        ResponseText: Text;
+        UnexpectedResponseCodeErr: Label '%1 [POST] URL:%2 %3', Locked = true;
     begin
-        RequestBody.Add('queueName', RegistrationSetup.QueueName);
-        RequestBody.Add('dataSubjectId', DataSubjectId);
-        RequestBody.Add('tenantId', TenantId());
-        RequestBody.Add('companyName', CompanyName());
-        RequestBody.Add('environmentName', EnvironmentInformation.GetEnvironmentName());
-        RequestBody.Add('aadTenantId', GetAadTenantId());
+        SignupUrl := '';
+
+        RequestBody := BuildSignupRequestBody(RegistrationSetup, DataSubjectId, FirstName, PhoneNo);
         RequestBody.WriteTo(PayloadText);
 
         Content.WriteFrom(PayloadText);
@@ -43,12 +41,81 @@ codeunit 6248747 "NPR MM CFMemberRegistration"
         Request.SetRequestUri(GetSignupRequestUrl(RegistrationSetup));
         Request.Content(Content);
 
-        Client.Timeout(5000);
+        Client.Timeout(10000);
         if (not Client.Send(Request, Response)) then
             Error(GetLastErrorText());
 
+        Response.Content().ReadAs(ResponseText);
         if (not (Response.HttpStatusCode() in [200, 201])) then
-            Error(UnexpectedResponseCodeErr, Response.HttpStatusCode(), GetSignupRequestUrl(RegistrationSetup));
+            Error(UnexpectedResponseCodeErr, Response.HttpStatusCode(), GetSignupRequestUrl(RegistrationSetup), GetResponseErrorText(ResponseText));
+
+        SignupUrl := GetSignupUrlFromResponse(RegistrationSetup, ResponseText);
+    end;
+
+    internal procedure BuildSignupRequestBody(RegistrationSetup: Record "NPR MM AzureMemberRegSetup"; DataSubjectId: Text[64]; FirstName: Text; PhoneNo: Text) RequestBody: JsonObject
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+        Prefill: JsonObject;
+    begin
+        Prefill.Add('firstName', FirstName);
+        Prefill.Add('phoneNumber', PhoneNo);
+        Prefill.Add('tos', RegistrationSetup.TermsOfServiceUrl);
+
+        RequestBody.Add('queueName', RegistrationSetup.QueueName);
+        RequestBody.Add('dataSubjectId', DataSubjectId);
+        RequestBody.Add('tenantId', TenantId());
+        RequestBody.Add('companyName', CompanyName());
+        RequestBody.Add('environmentName', EnvironmentInformation.GetEnvironmentName());
+        RequestBody.Add('aadTenantId', GetAadTenantId());
+        RequestBody.Add('prefill', Prefill);
+    end;
+
+    local procedure GetResponseErrorText(ResponseText: Text): Text
+    var
+        ResponseJson: JsonObject;
+        ErrorText: Text;
+    begin
+        if (not ResponseJson.ReadFrom(ResponseText)) then
+            exit('');
+        if (not TryGetTextValue(ResponseJson, 'error', ErrorText)) then
+            exit('');
+        exit(ErrorText);
+    end;
+
+    local procedure TryGetTextValue(Json: JsonObject; KeyName: Text; var Value: Text): Boolean
+    var
+        Token: JsonToken;
+    begin
+        Value := '';
+        if (not Json.Get(KeyName, Token)) then
+            exit(false);
+        if (not Token.IsValue()) then
+            exit(false);
+        if (Token.AsValue().IsNull() or Token.AsValue().IsUndefined()) then
+            exit(false);
+        Value := Token.AsValue().AsText();
+        exit(true);
+    end;
+
+    local procedure GetSignupUrlFromResponse(RegistrationSetup: Record "NPR MM AzureMemberRegSetup"; ResponseText: Text): Text
+    var
+        ResponseJson: JsonObject;
+        SignupUrl: Text;
+        ExpectedPrefix: Text;
+        SignupUrlNotTrustedErr: Label 'The Worker returned the signup link %1, which is not under %2.', Comment = '%1 = returned signup link, %2 = expected link prefix';
+    begin
+        if (not ResponseJson.ReadFrom(ResponseText)) then
+            exit('');
+        if (not TryGetTextValue(ResponseJson, 'url', SignupUrl)) then
+            exit('');
+        if (SignupUrl = '') then
+            exit('');
+
+        ExpectedPrefix := StrSubstNo(_ShortLinkPrefixTok, GetWorkerBaseUrl(RegistrationSetup));
+        if (not LowerCase(SignupUrl).StartsWith(LowerCase(ExpectedPrefix))) then
+            Error(SignupUrlNotTrustedErr, SignupUrl, ExpectedPrefix);
+
+        exit(SignupUrl);
     end;
 
     [TryFunction]

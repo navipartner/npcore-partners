@@ -316,28 +316,48 @@ codeunit 6151383 "NPR MM AzureMemberRegistration"
         Error(UnexpectedResponseCodeErr, Response.HttpStatusCode(), MsErrorCode);
     end;
 
-    internal procedure CreateMemberSignUpReference(AzureRegistrationSetupCode: Code[10]; DataSubjectId: Text[64]): Boolean
+    internal procedure CreateMemberSignUpReference(var MemberNotificationEntry: Record "NPR MM Member Notific. Entry"): Boolean
     var
         AzureRegistrationSetup: Record "NPR MM AzureMemberRegSetup";
         CFMemberRegistration: Codeunit "NPR MM CFMemberRegistration";
+        SignupUrl: Text;
     begin
-        AzureRegistrationSetup.Get(AzureRegistrationSetupCode);
+        AzureRegistrationSetup.Get(MemberNotificationEntry.AzureRegistrationSetupCode);
         if (not AzureRegistrationSetup.Enabled) then
             exit(false);
 
         if (AzureRegistrationSetup.Provider = AzureRegistrationSetup.Provider::Cloudflare) then begin
-            if (not GuiAllowed()) then
-                exit(CFMemberRegistration.CreateSignupReference(AzureRegistrationSetup, DataSubjectId));
+            if (GuiAllowed()) then
+                CFMemberRegistration.CreateSignupReference(AzureRegistrationSetup, MemberNotificationEntry.DataSubjectId, MemberNotificationEntry."First Name", MemberNotificationEntry."Phone No.", SignupUrl)
+            else
+                if (not CFMemberRegistration.CreateSignupReference(AzureRegistrationSetup, MemberNotificationEntry.DataSubjectId, MemberNotificationEntry."First Name", MemberNotificationEntry."Phone No.", SignupUrl)) then
+                    exit(false);
 
-            CFMemberRegistration.CreateSignupReference(AzureRegistrationSetup, DataSubjectId);
+            if (SignupUrl = '') then
+                SignupUrl := BuildSignUpUrl(AzureRegistrationSetup, MemberNotificationEntry.DataSubjectId, MemberNotificationEntry."First Name", MemberNotificationEntry."Phone No.");
+            MemberNotificationEntry.ClientSignUpUrl := CopyStr(SignupUrl, 1, MaxStrLen(MemberNotificationEntry.ClientSignUpUrl));
             exit(true);
         end;
 
         if (not GuiAllowed()) then
-            exit(CreateMemberSignUpReference(AzureRegistrationSetup.AzureStorageAccountName, AzureRegistrationSetup.QueueName, DataSubjectId));
+            exit(CreateMemberSignUpReference(AzureRegistrationSetup.AzureStorageAccountName, AzureRegistrationSetup.QueueName, MemberNotificationEntry.DataSubjectId));
 
-        CreateMemberSignUpReference(AzureRegistrationSetup.AzureStorageAccountName, AzureRegistrationSetup.QueueName, DataSubjectId);
+        CreateMemberSignUpReference(AzureRegistrationSetup.AzureStorageAccountName, AzureRegistrationSetup.QueueName, MemberNotificationEntry.DataSubjectId);
         exit(true);
+    end;
+
+    internal procedure BuildSignUpUrl(AzureRegistrationSetup: Record "NPR MM AzureMemberRegSetup"; DataSubjectId: Text[64]; FirstName: Text; PhoneNo: Text): Text
+    var
+        Base64: Codeunit "Base64 Convert";
+        MemberInfoJson: JsonObject;
+        MemberInfoText: Text;
+        SignUpUrlTok: Label '%1?PartitionKey=%2&RowKey=%3&data=%4', Locked = true;
+    begin
+        MemberInfoJson.Add('firstName', FirstName);
+        MemberInfoJson.Add('phoneNumber', PhoneNo);
+        MemberInfoJson.Add('tos', AzureRegistrationSetup.TermsOfServiceUrl);
+        MemberInfoJson.WriteTo(MemberInfoText);
+        exit(StrSubstNo(SignUpUrlTok, AzureRegistrationSetup.MemberRegistrationUrl, AzureRegistrationSetup.QueueName, DataSubjectId, Base64.ToBase64(MemberInfoText)));
     end;
 
     [TryFunction]

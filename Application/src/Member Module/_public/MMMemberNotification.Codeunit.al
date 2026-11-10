@@ -313,10 +313,8 @@
         Coupon: Record "NPR NpDc Coupon";
         AzureRegistrationSetup: Record "NPR MM AzureMemberRegSetup";
         AzureLog: Record "NPR MM AzureMemberUpdateLog";
-        Base64: Codeunit "Base64 Convert";
+        AzureMemberRegistration: Codeunit "NPR MM AzureMemberRegistration";
         EMailLbl: Label '%1?email=%2', Locked = true;
-        MemberInfoJson: JsonObject;
-        MemberInfoText: Text;
         RenewToItemNo: Code[20];
         AlterationSystemId: Guid;
         ReasonText: Text;
@@ -486,16 +484,9 @@
 
                 MemberNotificationEntry."Template Filter Value" := AzureRegistrationSetup.EmailTemplate;
 
-                MemberInfoJson.Add('firstName', Member."First Name");
-                MemberInfoJson.Add('phoneNumber', Member."Phone No.");
-                MemberInfoJson.Add('tos', AzureRegistrationSetup.TermsOfServiceUrl);
-                MemberInfoJson.WriteTo(MemberInfoText);
-                MemberInfoText := Base64.ToBase64(MemberInfoText);
-
-                MemberNotificationEntry.ClientSignUpUrl := CopyStr(
-                        StrSubstNo('%1?PartitionKey=%2&RowKey=%3&data=%4',
-                            AzureRegistrationSetup.MemberRegistrationUrl, AzureRegistrationSetup.QueueName,
-                            MembershipRole."GDPR Data Subject Id", MemberInfoText),
+                if (AzureRegistrationSetup.Provider = AzureRegistrationSetup.Provider::Azure) then
+                    MemberNotificationEntry.ClientSignUpUrl := CopyStr(
+                        AzureMemberRegistration.BuildSignUpUrl(AzureRegistrationSetup, MembershipRole."GDPR Data Subject Id", Member."First Name", Member."Phone No."),
                         1, MaxStrLen(MemberNotificationEntry.ClientSignUpUrl));
                 if (MemberNotificationEntry."Notification Method" = MemberNotificationEntry."Notification Method"::SMS) then
                     MemberNotificationEntry."Template Filter Value" := AzureRegistrationSetup.SMSTemplate;
@@ -687,6 +678,8 @@
 
                             if (SendsMessage(MemberNotificationEntry2, NpPassIssued)) then begin
                                 AzureUpdateOrAzureSkip := SendDataSubjectIdToAzure(MemberNotificationEntry2);
+                                if (not AzureUpdateOrAzureSkip) then
+                                    ResponseMessage := MemberNotificationEntry2."Failed With Message";
                                 if ((AzureUpdateOrAzureSkip) and (SendMail(MemberNotificationEntry2, ResponseMessage))) then
                                     SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
                             end;
@@ -703,6 +696,8 @@
 
                             if (SendsMessage(MemberNotificationEntry2, NpPassIssued)) then begin
                                 AzureUpdateOrAzureSkip := SendDataSubjectIdToAzure(MemberNotificationEntry2);
+                                if (not AzureUpdateOrAzureSkip) then
+                                    ResponseMessage := MemberNotificationEntry2."Failed With Message";
                                 if ((AzureUpdateOrAzureSkip) and (SendSMS(MemberNotificationEntry2, ResponseMessage))) then
                                     SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
                             end;
@@ -750,9 +745,13 @@
         if (not AzureRegistrationSetup.Enabled) then
             exit(true); // Not for Azure (disabled)
 
-        AzureInsert := AzureMemberRegistration.CreateMemberSignUpReference(MemberNotificationEntry.AzureRegistrationSetupCode, MemberNotificationEntry.DataSubjectId);
-        if (not AzureInsert) then
+        AzureInsert := AzureMemberRegistration.CreateMemberSignUpReference(MemberNotificationEntry);
+        if (not AzureInsert) then begin
             MemberNotificationEntry."Failed With Message" := CopyStr(GetLastErrorText(), 1, MaxStrLen(MemberNotificationEntry."Failed With Message"));
+            exit(false);
+        end;
+
+        MemberNotificationEntry.Modify();
 
         exit(AzureInsert);
     end;

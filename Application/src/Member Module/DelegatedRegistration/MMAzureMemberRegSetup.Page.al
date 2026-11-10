@@ -79,7 +79,7 @@ page 6151109 "NPR MM AzureMemberRegSetup"
                 field(MemberRegistrationUrl; Rec.MemberRegistrationUrl)
                 {
                     ApplicationArea = NPRMembershipAdvanced;
-                    ToolTip = 'Specifies the value of the URL user device will be directed to.';
+                    ToolTip = 'Specifies the URL of the signup app the member is directed to. The Azure provider builds the signup link from it. The Cloudflare provider receives the short signup link from the Worker and only falls back to this URL when the Worker does not return one.';
                 }
                 field(TermsOfServiceUrl; Rec.TermsOfServiceUrl)
                 {
