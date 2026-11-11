@@ -581,6 +581,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .AddProperty('walletId', Format(ValidationRequest.EntityId, 0, 4).ToLower())
             .AddProperty('referenceNumber', ValidationRequest.ReferenceNo)
             .AddProperty('originatesFromItemNo', Wallet.OriginatesFromItemNo)
+            .AddProperty('originatesFromDescription', GetItemDescription(Wallet.OriginatesFromItemNo))
             .AddObject(AddWalletPrintedDetails(ResponseJson, Wallet))
             .AddProperty('validToAdmit', ValidationRequest.ExtraEntityTableId in [Database::"NPR TM Ticket", Database::"NPR MM Member Card"]);
 
@@ -606,6 +607,17 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
 
         ResponseJson.EndObject();
         exit(ResponseJson);
+    end;
+
+    local procedure GetItemDescription(ItemNo: Code[20]): Text[100]
+    var
+        Item: Record Item;
+    begin
+        Item.SetLoadFields(Description);
+        if (not Item.Get(ItemNo)) then
+            exit('');
+
+        exit(Item.Description);
     end;
 
     local procedure AddWalletPrintedDetails(var ResponseJson: Codeunit "NPR JSON Builder"; Wallet: Record "NPR AttractionWallet"): Codeunit "NPR JSON Builder"
