@@ -65,14 +65,16 @@ codeunit 6059925 "NPR POS Layout Assistant"
         POSLayoutContent: JsonObject;
         Response: JsonObject;
         POSLayoutFilter: Text;
+        SkipBlob: Boolean;
     begin
         POSLayoutFilter := _JsonHelper.GetJText(Context.AsToken(), 'layoutId', false);
+        SkipBlob := _JsonHelper.GetJBoolean(Context.AsToken(), 'skipBlob', false);
         if POSLayoutFilter <> '' then
             POSLayout.SetFilter(Code, POSLayoutFilter);
         if POSLayout.FindSet() then
             repeat
                 Clear(POSLayoutContent);
-                AddPOSLayoutToJson(POSLayout, POSLayoutContent);
+                AddPOSLayoutToJson(POSLayout, POSLayoutContent, not SkipBlob);
                 POSLayoutList.Add(POSLayoutContent);
             until POSLayout.Next() = 0;
 
@@ -181,7 +183,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
         POSUnit.Get(POSSetup.GetPOSUnitNo());
         Response.Add('layoutId', POSUnit."POS Layout Code");
         if POSLayout.Get(POSUnit."POS Layout Code") then begin
-            AddPOSLayoutToJson(POSLayout, POSLayoutObject);
+            AddPOSLayoutToJson(POSLayout, POSLayoutObject, true);
             Response.Add('POSLayout', POSLayoutObject)
         end;
         FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
@@ -437,7 +439,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
         FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
     end;
 
-    local procedure AddPOSLayoutToJson(POSLayout: Record "NPR POS Layout"; var POSLayoutContentOut: JsonObject)
+    local procedure AddPOSLayoutToJson(POSLayout: Record "NPR POS Layout"; var POSLayoutContentOut: JsonObject; IncludeBlob: Boolean)
     var
         Instr: InStream;
         PropertiesString: Text;
@@ -445,7 +447,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
         POSLayoutContentOut.Add('id', POSLayout.Code);
         POSLayoutContentOut.Add('caption', POSLayout.Description);
         POSLayoutContentOut.Add('template', POSLayout."Template Name");
-        if POSLayout."Frontend Properties".HasValue() then begin
+        if IncludeBlob and POSLayout."Frontend Properties".HasValue() then begin
             POSLayout.CalcFields("Frontend Properties");
             POSLayout."Frontend Properties".CreateInStream(Instr, TextEncoding::UTF8);
             Instr.Read(PropertiesString);
