@@ -44,6 +44,16 @@ codeunit 85494 "NPR Library - Sentry Capture"
         exit(Matches);
     end;
 
+    procedure PayloadCount(): Integer
+    begin
+        exit(_Payloads.Count());
+    end;
+
+    procedure GetPayload(Index: Integer): Text
+    begin
+        exit(_Payloads.Get(Index));
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Sentry Transaction", 'OnBeforeSendSentryPayload', '', false, false)]
     local procedure CapturePayload(PayloadJson: Text; var Handled: Boolean)
     begin

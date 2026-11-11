@@ -224,6 +224,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", 'FixDeprecatedWebhookURL'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Entry Posting", 'UpgradePOSEntryDeferralSchedule'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Entry Posting", 'UpgradeMembershipEntryLinkDates'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Entry Posting", 'RemoveLeftoverSalesDeferralRows'));
 
 #if not BC17
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'SetDataProcessingHandlerID'));
@@ -974,6 +975,8 @@
                         exit('NPR-UpgradePOSEntryDeferralSchedule-20250924');
                     'UpgradeMembershipEntryLinkDates':
                         exit('NPR-UpgradeMembershipEntryLinkDates-20251006');
+                    'RemoveLeftoverSalesDeferralRows':
+                        exit('NPR-RemoveLeftoverSalesDeferralRows-20261110');
                 end;
 #if not BC17
             Codeunit::"NPR Spfy App Upgrade":

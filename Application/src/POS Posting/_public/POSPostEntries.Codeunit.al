@@ -111,8 +111,10 @@
         TempGenJournalLine: Record "Gen. Journal Line" temporary;
         TempPOSEntry: Record "NPR POS Entry" temporary;
         POSSalesTax: codeunit "NPR POS Sales Tax";
+        DeferralBufferDocumentNos: Dictionary of [Code[20], Boolean];
     begin
-        CreateTempRecordsToPost(POSEntry, TempPOSSalesLineToPost, TempPOSPaymentLinetoPost);
+        CreateTempRecordsToPost(POSEntry, TempPOSSalesLineToPost, TempPOSPaymentLinetoPost, DeferralBufferDocumentNos);
+        RemoveDeferralPostingBufferRows(DeferralBufferDocumentNos);
         IsSalesTaxEnabled := POSSalesTax.NALocalizationEnabled() or POSSalesTax.SalesTaxEnabled(POSEntry."Entry No.");
         if not IsSalesTaxEnabled then
             CreatePostingBufferLinesFromPOSSalesLines(TempPOSSalesLineToPost, TempPOSPostingBuffer)
@@ -141,6 +143,7 @@
         Success := CheckAndPostGenJournal(TempGenJournalLine, POSEntry, TempPOSEntry, ErrorText);
 
         if not Success then begin
+            RemoveDeferralPostingBufferRows(DeferralBufferDocumentNos);
             UpdatePOSPostingLogEntry(_POSPostingLogEntryNo, true, ErrorText);
             MarkPOSEntries(1, _POSPostingLogEntryNo, POSEntry, TempPOSEntry);
         end else begin
@@ -195,7 +198,7 @@
         Code(POSEntry);
     end;
 
-    local procedure CreateTempRecordsToPost(var POSEntry: Record "NPR POS Entry"; var POSSalesLineToPost: Record "NPR POS Entry Sales Line" temporary; var POSPaymentLineToPost: Record "NPR POS Entry Payment Line" temporary)
+    local procedure CreateTempRecordsToPost(var POSEntry: Record "NPR POS Entry"; var POSSalesLineToPost: Record "NPR POS Entry Sales Line" temporary; var POSPaymentLineToPost: Record "NPR POS Entry Payment Line" temporary; var DocumentNos: Dictionary of [Code[20], Boolean])
     var
         POSSalesLine: Record "NPR POS Entry Sales Line";
         POSPaymentLine: Record "NPR POS Entry Payment Line";
@@ -229,6 +232,8 @@
                     if (POSEntry."POS Period Register No." <> PreviousPOSPeriodRegister) and (PreviousPOSPeriodRegister <> 0) then
                         Error(TextErrorMultiple, POSEntry."POS Period Register No.", PreviousPOSPeriodRegister, POSPeriodRegister.TableCaption);
 
+                    DocumentNos.Set(POSEntry."Document No.", true);
+
                     POSSalesLine.Reset();
                     POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
                     POSSalesLine.SetRange("Exclude from Posting", false);
@@ -237,6 +242,7 @@
                             POSSalesLineToPost := POSSalesLine;
                             AssignAndCalculateDeferralSchedule(POSSalesLineToPost, POSEntry);
                             POSSalesLineToPost.Insert();
+                            DocumentNos.Set(POSSalesLineToPost."Document No.", true);
                         until POSSalesLine.Next() = 0;
 
                     POSPaymentLine.Reset();
@@ -251,6 +257,14 @@
                     PreviousPOSPeriodRegister := POSEntry."POS Period Register No.";
                 end;
             until POSEntry.Next() = 0;
+
+        if PreviousPOSPeriodRegister = 0 then
+            exit;
+        POSPeriodRegister.SetLoadFields("Document No.", "Posting Compression");
+        if not POSPeriodRegister.Get(PreviousPOSPeriodRegister) then
+            exit;
+        if GetCompressionMethod(POSPeriodRegister, PostCompressedVar) = POSPeriodRegister."Posting Compression"::"Per POS Period" then
+            DocumentNos.Set(POSPeriodRegister."Document No.", true);
     end;
 
     local procedure CreateGenJnlLinesFromPOSPostingBuffer(var POSPostingBuffer: Record "NPR POS Posting Buffer"; var GenJournalLine: Record "Gen. Journal Line")
@@ -1083,7 +1097,7 @@
                     OnBeforeModifySalesPOSPostingBufferCreatedFromPOSSalesLines(POSSalesLineToBeCompressed, POSPostingBuffer);
 
                     POSPostingBuffer.Modify();
-                    CreateCompressedDeferralBuffer(POSEntry, POSSalesLineToBeCompressed, POSPostingBuffer."Deferral Line No.");
+                    CreateDeferralPostingBufferRows(POSEntry, POSSalesLineToBeCompressed, POSPostingBuffer."Deferral Line No.", POSPostingBuffer."Document No.");
                 end;
             until POSSalesLineToBeCompressed.Next() = 0;
     end;
@@ -1443,7 +1457,6 @@
                                 end;
                                 if ProceedWithUpdate then begin
                                     POSEntry.Validate("Post Entry Status", POSEntry."Post Entry Status"::"Error while Posting");
-                                    TryRemoveDeferralPostingBuffer(POSEntry);
                                     _GLPostingErrorEntries.Add(POSEntry."Entry No.");
                                 end;
                             end;
@@ -1455,16 +1468,19 @@
             until POSEntry.Next() = 0;
     end;
 
-    local procedure TryRemoveDeferralPostingBuffer(POSEntry: Record "NPR POS Entry")
+    local procedure RemoveDeferralPostingBufferRows(DocumentNos: Dictionary of [Code[20], Boolean])
     var
         DeferralPostingBuffer: Record "Deferral Posting Buffer";
+        DocumentNo: Code[20];
     begin
-        if POSEntry."Post Entry Status" <> POSEntry."Post Entry Status"::"Error while Posting" then
-            exit;
-        DeferralPostingBuffer.SetRange("Document No.", Format(POSEntry."Entry No."));
+        DeferralPostingBuffer.SetRange("Deferral Doc. Type", Enum::"Deferral Document Type"::Sales);
         if DeferralPostingBuffer.IsEmpty() then
             exit;
-        DeferralPostingBuffer.DeleteAll();
+        foreach DocumentNo in DocumentNos.Keys do begin
+            DeferralPostingBuffer.SetRange("Document No.", DocumentNo);
+            if not DeferralPostingBuffer.IsEmpty() then
+                DeferralPostingBuffer.DeleteAll();
+        end;
     end;
 
     local procedure MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer: Record "NPR POS Posting Buffer";
@@ -1911,23 +1927,21 @@
     var
         DeferralHeader: Record "Deferral Header";
         DeferralTemplate: Record "Deferral Template";
-        GLAccount: Record "G/L Account";
-        Item: Record Item;
         DeferralUtilities: Codeunit "Deferral Utilities";
+        DefaultDeferralCode: Code[10];
     begin
         if POSSalesLineToPost."Amount Excl. VAT (LCY)" = 0 then
             exit;
-        if DeferralHeader.Get(Enum::"Deferral Document Type"::"G/L", '', '', Database::"NPR POS Entry Sales Line", Format(POSSalesLineToPost."POS Entry No."), POSSalesLineToPost."Line No.") then
-            exit;
         if POSSalesLineToPost."Deferral Code" = '' then
-            case POSSalesLineToPost.Type of
-                POSSalesLineToPost.Type::Item:
-                    if Item.Get(POSSalesLineToPost."No.") then
-                        POSSalesLineToPost."Deferral Code" := Item."Default Deferral Template Code";
-                POSSalesLineToPost.Type::"G/L Account":
-                    if GLAccount.Get(POSSalesLineToPost."No.") then
-                        POSSalesLineToPost."Deferral Code" := GLAccount."Default Deferral Template Code";
-            end;
+            DefaultDeferralCode := GetDefaultDeferralCode(POSSalesLineToPost);
+        if DeferralHeader.Get(Enum::"Deferral Document Type"::"G/L", '', '', Database::"NPR POS Entry Sales Line", Format(POSSalesLineToPost."POS Entry No."), POSSalesLineToPost."Line No.") then begin
+            if DefaultDeferralCode <> '' then
+                if DeferralTemplate.Get(DeferralHeader."Deferral Code") then
+                    POSSalesLineToPost."Deferral Code" := DeferralHeader."Deferral Code";
+            exit;
+        end;
+        if POSSalesLineToPost."Deferral Code" = '' then
+            POSSalesLineToPost."Deferral Code" := DefaultDeferralCode;
         if POSSalesLineToPost."Deferral Code" = '' then
             exit;
         DeferralTemplate.Get(POSSalesLineToPost."Deferral Code");
@@ -1936,6 +1950,27 @@
 
         if DeferralHeader.Get(Enum::"Deferral Document Type"::"G/L", '', '', Database::"NPR POS Entry Sales Line", Format(POSSalesLineToPost."POS Entry No."), POSSalesLineToPost."Line No.") then
             DeferralUtilities.RoundDeferralAmount(DeferralHeader, POSSalesLineToPost."Currency Code", 1, POSEntry."Posting Date", POSSalesLineToPost."Amount Excl. VAT", POSSalesLineToPost."Amount Excl. VAT (LCY)");
+    end;
+
+    local procedure GetDefaultDeferralCode(POSSalesLine: Record "NPR POS Entry Sales Line"): Code[10]
+    var
+        GLAccount: Record "G/L Account";
+        Item: Record Item;
+    begin
+        case POSSalesLine.Type of
+            POSSalesLine.Type::Item:
+                begin
+                    Item.SetLoadFields("Default Deferral Template Code");
+                    if Item.Get(POSSalesLine."No.") then
+                        exit(Item."Default Deferral Template Code");
+                end;
+            POSSalesLine.Type::"G/L Account":
+                begin
+                    GLAccount.SetLoadFields("Default Deferral Template Code");
+                    if GLAccount.Get(POSSalesLine."No.") then
+                        exit(GLAccount."Default Deferral Template Code");
+                end;
+        end;
     end;
 
     local procedure MoveDeferralScheduleToPosted(var POSEntrySalesLine: Record "NPR POS Entry Sales Line"; POSEntry: Record "NPR POS Entry")
@@ -2006,6 +2041,11 @@
     end;
 
     internal procedure CreateCompressedDeferralBuffer(POSEntry: Record "NPR POS Entry"; POSEntrySalesLine: Record "NPR POS Entry Sales Line"; InvDefLineNo: Integer)
+    begin
+        CreateDeferralPostingBufferRows(POSEntry, POSEntrySalesLine, InvDefLineNo, POSEntrySalesLine."Document No.");
+    end;
+
+    local procedure CreateDeferralPostingBufferRows(POSEntry: Record "NPR POS Entry"; POSEntrySalesLine: Record "NPR POS Entry Sales Line"; InvDefLineNo: Integer; DeferralDocumentNo: Code[20])
     var
         DeferralTemplate: Record "Deferral Template";
         DeferralPostingBuffer: Record "Deferral Posting Buffer";
@@ -2032,7 +2072,7 @@
             DeferralLine, Enum::"Deferral Document Type"::"G/L".AsInteger(), '', '',
             Database::"NPR POS Entry Sales Line", Format(POSEntrySalesLine."POS Entry No."), POSEntrySalesLine."Line No.");
 
-        PrepareDeferralPOSSale(DeferralPostingBuffer, POSEntrySalesLine);
+        PrepareDeferralPOSSale(DeferralPostingBuffer, POSEntrySalesLine, DeferralDocumentNo);
         DeferralPostingBuffer."Posting Date" := POSEntry."Posting Date";
         DeferralPostingBuffer.Description := POSEntry.Description;
         DeferralPostingBuffer."Period Description" := DeferralTemplate."Period Description";
@@ -2058,7 +2098,7 @@
             Error(NoDeferralScheduleErr, POSEntrySalesLine."No.", POSEntrySalesLine."Deferral Code");
         repeat
             if (DeferralLine."Amount (LCY)" <> 0) or (DeferralLine.Amount <> 0) then begin
-                PrepareDeferralPOSSale(DeferralPostingBuffer, POSEntrySalesLine);
+                PrepareDeferralPOSSale(DeferralPostingBuffer, POSEntrySalesLine, DeferralDocumentNo);
                 DeferralPostingBuffer.InitFromDeferralLine(DeferralLine);
                 DeferralPostingBuffer.ReverseAmounts();
                 DeferralPostingBuffer."G/L Account" := SalesAccount;
@@ -2075,7 +2115,7 @@
         until DeferralLine.Next() = 0
     end;
 
-    local procedure PrepareDeferralPOSSale(var DeferralPostingBuffer: Record "Deferral Posting Buffer"; POSEntrySalesLine: Record "NPR POS Entry Sales Line")
+    local procedure PrepareDeferralPOSSale(var DeferralPostingBuffer: Record "Deferral Posting Buffer"; POSEntrySalesLine: Record "NPR POS Entry Sales Line"; DeferralDocumentNo: Code[20])
     begin
         Clear(DeferralPostingBuffer);
         case POSEntrySalesLine.Type of
@@ -2097,7 +2137,7 @@
         end;
         DeferralPostingBuffer."Deferral Code" := POSEntrySalesLine."Deferral Code";
         DeferralPostingBuffer."Deferral Doc. Type" := Enum::"Deferral Document Type"::Sales;
-        DeferralPostingBuffer."Document No." := POSEntrySalesLine."Document No.";
+        DeferralPostingBuffer."Document No." := DeferralDocumentNo;
         DeferralPostingBuffer.SetRange("Deferral Doc. Type", DeferralPostingBuffer."Deferral Doc. Type");
         DeferralPostingBuffer.SetRange("Document No.", DeferralPostingBuffer."Document No.");
     end;
