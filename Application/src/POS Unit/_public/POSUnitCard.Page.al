@@ -58,6 +58,29 @@ page 6150617 "NPR POS Unit Card"
                     ToolTip = 'Specifies the type of the POS unit.';
                     ApplicationArea = NPRRetail;
                 }
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+                // Field-level Visible is fixed when the page opens; a group's Visible follows the current record.
+                group(SelfServiceSalespersonGroup)
+                {
+                    ShowCaption = false;
+                    Visible = _IsUnattended;
+                    field(SelfServiceSalesperson; _SelfServiceSalesperson)
+                    {
+                        Caption = 'Self-Service Salesperson';
+                        ToolTip = 'Specifies the salesperson that self-service sales on this unit are registered with. Set it on the User Setup of the API user assigned to this unit. Without one, self-service sales have no salesperson and are left out of salesperson-based reports.';
+                        ApplicationArea = NPRRetail;
+                        Editable = false;
+
+                        trigger OnDrillDown()
+                        var
+                            Salesperson: Record "Salesperson/Purchaser";
+                        begin
+                            if Salesperson.Get(_SelfServiceSalespersonCode) then
+                                Page.Run(Page::"Salesperson/Purchaser Card", Salesperson);
+                        end;
+                    }
+                }
+#endif
                 field(Status; Rec.Status)
                 {
                     ToolTip = 'Specifies the current status of the POS unit, updated automatically by the system.';
@@ -268,4 +291,44 @@ page 6150617 "NPR POS Unit Card"
             }
         }
     }
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+    trigger OnAfterGetCurrRecord()
+    begin
+        _IsUnattended := Rec."POS Type" = Rec."POS Type"::UNATTENDED;
+        Clear(_SelfServiceSalespersonCode);
+        Clear(_SelfServiceSalesperson);
+        if _IsUnattended then
+            FindSelfServiceSalesperson();
+    end;
+
+    local procedure FindSelfServiceSalesperson()
+    var
+        UserSetup: Record "User Setup";
+        NoneLbl: Label '(none)';
+        VariesPerUserLbl: Label 'Varies per User Setup';
+    begin
+        // Mirrors NPR API POS Sale: each API user's sales get that user's User Setup salesperson (blank if none),
+        // so show one code only when every user on this unit has the same one.
+        UserSetup.SetRange("NPR POS Unit No.", Rec."No.");
+        UserSetup.SetLoadFields("Salespers./Purch. Code");
+        if UserSetup.FindSet() then begin
+            _SelfServiceSalespersonCode := UserSetup."Salespers./Purch. Code";
+            while UserSetup.Next() <> 0 do
+                if UserSetup."Salespers./Purch. Code" <> _SelfServiceSalespersonCode then begin
+                    Clear(_SelfServiceSalespersonCode);
+                    _SelfServiceSalesperson := VariesPerUserLbl;
+                    exit;
+                end;
+        end;
+        if _SelfServiceSalespersonCode = '' then
+            _SelfServiceSalesperson := NoneLbl
+        else
+            _SelfServiceSalesperson := _SelfServiceSalespersonCode;
+    end;
+
+    var
+        _IsUnattended: Boolean;
+        _SelfServiceSalesperson: Text;
+        _SelfServiceSalespersonCode: Code[20];
+#endif
 }

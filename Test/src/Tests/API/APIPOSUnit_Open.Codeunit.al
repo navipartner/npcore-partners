@@ -276,7 +276,6 @@ codeunit 85222 "NPR APIPOSUnit Open"
         LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
         Assert: Codeunit Assert;
         POSPeriodRegister: Record "NPR POS Period Register";
-        CashPaymentMethod: Record "NPR POS Payment Method";
         Response: JsonObject;
         Body: JsonObject;
         QueryParams: Dictionary of [Text, Text];
@@ -304,28 +303,140 @@ codeunit 85222 "NPR APIPOSUnit Open"
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
 
-        // Add item line.
-        Clear(Body);
-        Body.Add('type', 'Item');
-        Body.Add('code', _Item."No.");
-        Body.Add('quantity', 1);
-        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(CreateGuid()), Body, QueryParams, Headers);
-        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Add sale line should succeed');
+        // Line + cash payment + complete -> triggers posting (this is where ERR_NO_OPEN_UNIT used to fire).
+        AddItemLineAndCompleteWithCash(SaleId);
+    end;
 
-        // Add cash payment covering the line.
-        CashPaymentMethod.SetRange("Processing Type", CashPaymentMethod."Processing Type"::CASH);
-        CashPaymentMethod.FindFirst();
-        Clear(Body);
-        Body.Add('paymentMethodCode', CashPaymentMethod.Code);
-        Body.Add('paymentType', 'Cash');
-        Body.Add('amount', _Item."Unit Price");
-        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/paymentline/' + FormatGuid(CreateGuid()), Body, QueryParams, Headers);
-        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Add payment line should succeed');
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Sale_NoUserSetupSalesperson_PostsWithoutSalesperson()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSPeriodRegister: Record "NPR POS Period Register";
+        POSEntry: Record "NPR POS Entry";
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        SaleId: Guid;
+    begin
+        // [SCENARIO] A salesperson is opt-in via the API user's User Setup. Without one, the posted sale has a blank
+        //            salesperson, as before.
+        Initialize();
+        SetUserSetupSalesperson('');
 
-        // Complete -> triggers posting (this is where ERR_NO_OPEN_UNIT used to fire).
+        _POSUnit.Find();
+        _POSUnit.Status := _POSUnit.Status::CLOSED;
+        _POSUnit.Modify();
+        POSPeriodRegister.SetRange("POS Unit No.", _POSUnit."No.");
+        POSPeriodRegister.DeleteAll();
+        Commit();
+
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/unit/' + FormatGuid(_POSUnit.SystemId) + '/open', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Open should succeed');
+
+        SaleId := CreateGuid();
         Clear(Body);
-        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/complete', Body, QueryParams, Headers);
-        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Complete sale should succeed after period repair');
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+        AddItemLineAndCompleteWithCash(SaleId);
+
+        POSEntry.SetRange("POS Unit No.", _POSUnit."No.");
+        POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
+        POSEntry.FindLast();
+        Assert.AreEqual('', POSEntry."Salesperson Code", 'Posted self-service sale should have no salesperson without a User Setup salesperson');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Sale_UserSetupSalesperson_IsUsed_AndIsReusedOnLaterRequests()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        POSSession: Codeunit "NPR POS Session";
+        Salesperson: Record "Salesperson/Purchaser";
+        POSSale: Record "NPR POS Sale";
+        POSPeriodRegister: Record "NPR POS Period Register";
+        POSEntry: Record "NPR POS Entry";
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        SaleId: Guid;
+    begin
+        // [SCENARIO] A salesperson on the API user's User Setup is stamped on the sale and ends up on the posted POS entry.
+        //            Later requests against the sale take the salesperson from the sale header, not from User Setup.
+        Initialize();
+        if not Salesperson.Get('APISSOVERRIDE') then begin
+            Salesperson.Init();
+            Salesperson.Code := 'APISSOVERRIDE';
+            Salesperson.Name := 'Override';
+            Salesperson.Insert();
+        end;
+        SetUserSetupSalesperson(Salesperson.Code);
+
+        // Earlier tests close the shared unit and delete its periods; posting needs an open period.
+        _POSUnit.Find();
+        _POSUnit.Status := _POSUnit.Status::CLOSED;
+        _POSUnit.Modify();
+        POSPeriodRegister.SetRange("POS Unit No.", _POSUnit."No.");
+        POSPeriodRegister.DeleteAll();
+        Commit();
+
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/unit/' + FormatGuid(_POSUnit.SystemId) + '/open', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Open should succeed');
+
+        SaleId := CreateGuid();
+        Clear(Body);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+        POSSale.GetBySystemId(SaleId);
+        Assert.AreEqual(Salesperson.Code, POSSale."Salesperson Code", 'User Setup salesperson should be used on the sale');
+
+        // Simulate fresh requests: drop the single-instance session state and remove the User Setup salesperson.
+        SetUserSetupSalesperson('');
+        POSSession.ClearAll();
+        AddItemLineAndCompleteWithCash(SaleId);
+
+        POSEntry.SetRange("POS Unit No.", _POSUnit."No.");
+        POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
+        POSEntry.FindLast();
+        Assert.AreEqual(Salesperson.Code, POSEntry."Salesperson Code", 'Posted POS entry should have the salesperson from the sale header');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateSale_BlockedUserSetupSalesperson_Fails()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Salesperson: Record "Salesperson/Purchaser";
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        ErrorText: Text;
+    begin
+        // [SCENARIO] A blocked User Setup salesperson stops new sales, like a blocked salesperson at an attended POS.
+        Initialize();
+        _POSUnit.Find();
+        _POSUnit.Status := _POSUnit.Status::OPEN;
+        _POSUnit.Modify();
+        if not Salesperson.Get('APISSBLOCKED') then begin
+            Salesperson.Init();
+            Salesperson.Code := 'APISSBLOCKED';
+            Salesperson.Insert();
+        end;
+        Salesperson.Blocked := true;
+        Salesperson.Modify();
+        SetUserSetupSalesperson(Salesperson.Code);
+
+        asserterror LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(CreateGuid()), Body, QueryParams, Headers);
+        ErrorText := GetLastErrorText();
+
+        // Clean up before asserting: this setup is committed and would otherwise leak into later tests.
+        SetUserSetupSalesperson('');
+        Assert.IsTrue(ErrorText.Contains('is blocked'), ErrorText);
     end;
 
     [Test]
@@ -518,6 +629,58 @@ codeunit 85222 "NPR APIPOSUnit Open"
         ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
         Assert.IsTrue(ResponseBody.Get('digitalReceiptEnabled', JToken), 'Response should contain digitalReceiptEnabled');
         Assert.IsFalse(JToken.AsValue().AsBoolean(), 'digitalReceiptEnabled should be false when the global Digital Receipt Setup is disabled');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Card_UserSetupsDisagree_ShowsVariesPerUserSetup()
+    var
+        Salesperson: Record "Salesperson/Purchaser";
+        OtherUserSetup: Record "User Setup";
+        Assert: Codeunit Assert;
+        POSUnitCard: TestPage "NPR POS Unit Card";
+        OtherUserId: Code[50];
+    begin
+        // [SCENARIO] Two API users share a self-service unit. The card shows a single salesperson only when both
+        //            have the same one on User Setup; one set and one blank is "Varies".
+        Initialize();
+        if not Salesperson.Get('SSCARDTEST') then begin
+            Salesperson.Init();
+            Salesperson.Code := 'SSCARDTEST';
+            Salesperson.Insert();
+        end;
+        SetUserSetupSalesperson('SSCARDTEST');
+        OtherUserId := 'SSCARD-OTHER-API-USER';
+        if OtherUserSetup.Get(OtherUserId) then
+            OtherUserSetup.Delete();
+        OtherUserSetup.Init();
+        OtherUserSetup."User ID" := OtherUserId;
+        OtherUserSetup."NPR POS Unit No." := _POSUnit."No.";
+        OtherUserSetup.Insert();
+        Commit();
+
+        // [THEN] One override, one blank: the users get different salespeople
+        POSUnitCard.OpenView();
+        POSUnitCard.GoToRecord(_POSUnit);
+        Assert.AreEqual('Varies per User Setup', POSUnitCard.SelfServiceSalesperson.Value(), 'Different effective salespeople must show as varying');
+        POSUnitCard.Close();
+
+        // [THEN] Same override on both: that code is shown
+        OtherUserSetup."Salespers./Purch. Code" := 'SSCARDTEST';
+        OtherUserSetup.Modify();
+        Commit();
+        POSUnitCard.OpenView();
+        POSUnitCard.GoToRecord(_POSUnit);
+        Assert.AreEqual('SSCARDTEST', POSUnitCard.SelfServiceSalesperson.Value(), 'A shared override must be shown');
+        POSUnitCard.Close();
+
+        // [THEN] No salesperson on any User Setup: shown as none
+        OtherUserSetup.Delete();
+        SetUserSetupSalesperson('');
+        POSUnitCard.OpenView();
+        POSUnitCard.GoToRecord(_POSUnit);
+        Assert.AreEqual('(none)', POSUnitCard.SelfServiceSalesperson.Value(), 'No salesperson must be shown as none');
+        POSUnitCard.Close();
     end;
 
     [Test]
@@ -767,6 +930,46 @@ codeunit 85222 "NPR APIPOSUnit Open"
         SaleId := CreateGuid();
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
         Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+    end;
+
+    local procedure AddItemLineAndCompleteWithCash(SaleId: Guid)
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        CashPaymentMethod: Record "NPR POS Payment Method";
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        Body.Add('type', 'Item');
+        Body.Add('code', _Item."No.");
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(CreateGuid()), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Add sale line should succeed');
+
+        CashPaymentMethod.SetRange("Processing Type", CashPaymentMethod."Processing Type"::CASH);
+        CashPaymentMethod.FindFirst();
+        Clear(Body);
+        Body.Add('paymentMethodCode', CashPaymentMethod.Code);
+        Body.Add('paymentType', 'Cash');
+        Body.Add('amount', _Item."Unit Price");
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/paymentline/' + FormatGuid(CreateGuid()), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Add payment line should succeed');
+
+        Clear(Body);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/complete', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Complete sale should succeed');
+    end;
+
+    local procedure SetUserSetupSalesperson(SalespersonCode: Code[20])
+    var
+        UserSetup: Record "User Setup";
+    begin
+        UserSetup.Get(UserId());
+        UserSetup."Salespers./Purch. Code" := SalespersonCode;
+        UserSetup.Modify();
+        Commit();
     end;
 
     local procedure CreateCleanupJobQueueEntry()

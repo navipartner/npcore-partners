@@ -377,6 +377,7 @@ codeunit 6248632 "NPR API POS Sale"
         OriginalTicketNo := POSQuoteEntry."Sales Ticket No.";
 
         POSSession.ConstructFromWebserviceSession(false, POSUnit."No.", '');
+        SetSelfServiceSalesperson(POSSession);
         POSSession.StartTransaction(SaleSystemId);
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(POSSaleRec);
@@ -671,10 +672,17 @@ codeunit 6248632 "NPR API POS Sale"
     procedure ReconstructSession(SaleSystemId: Guid)
     var
         POSSaleRec: Record "NPR POS Sale";
+        Salesperson: Record "Salesperson/Purchaser";
         POSSession: Codeunit "NPR POS Session";
+        POSSetup: Codeunit "NPR POS Setup";
     begin
         POSSaleRec.GetBySystemId(SaleSystemId);
         POSSession.ConstructFromWebserviceSession(false, POSSaleRec."Register No.", POSSaleRec."Sales Ticket No.");
+        if POSSaleRec."Salesperson Code" <> '' then
+            if not Salesperson.Get(POSSaleRec."Salesperson Code") then
+                Clear(Salesperson);
+        POSSession.GetSetup(POSSetup);
+        POSSetup.SetSalesperson(Salesperson);
     end;
 
     local procedure CreateSale(SaleSystemId: Guid; POSUnitNo: Code[10])
@@ -686,7 +694,29 @@ codeunit 6248632 "NPR API POS Sale"
         VerifyCleanupJobIsScheduled();
 
         POSSession.ConstructFromWebserviceSession(false, POSUnit."No.", '');
+        SetSelfServiceSalesperson(POSSession);
         POSSession.StartTransaction(SaleSystemId);
+    end;
+
+    local procedure SetSelfServiceSalesperson(POSSession: Codeunit "NPR POS Session")
+    var
+        Salesperson: Record "Salesperson/Purchaser";
+        UserSetup: Record "User Setup";
+        POSSetup: Codeunit "NPR POS Setup";
+        UserSetupSalespersonMissingErr: Label '%1 %2 does not exist. It is set as %3 in the %4 for user %5.', Comment = '%1 = Salesperson/Purchaser table caption, %2 = Salesperson Code, %3 = Salesperson field caption, %4 = User Setup table caption, %5 = User ID';
+        SalespersonBlockedErr: Label '%1 %2 - %3 is blocked, so self-service sales cannot be registered with it.', Comment = '%1 = Salesperson/Purchaser table caption, %2 = Salesperson Code, %3 = Salesperson Name';
+    begin
+        // Opt-in: only a salesperson set on the API user's User Setup is used; otherwise the sale has no salesperson.
+        // Always set it (also when blank) because POS Session is single-instance and may hold a previous request's value.
+        if UserSetup.Get(UserId()) then
+            if UserSetup."Salespers./Purch. Code" <> '' then begin
+                if not Salesperson.Get(UserSetup."Salespers./Purch. Code") then
+                    Error(UserSetupSalespersonMissingErr, Salesperson.TableCaption(), UserSetup."Salespers./Purch. Code", UserSetup.FieldCaption("Salespers./Purch. Code"), UserSetup.TableCaption(), UserSetup."User ID");
+                if Salesperson.Blocked then
+                    Error(SalespersonBlockedErr, Salesperson.TableCaption(), Salesperson.Code, Salesperson.Name);
+            end;
+        POSSession.GetSetup(POSSetup);
+        POSSetup.SetSalesperson(Salesperson);
     end;
 
     local procedure VerifyCleanupJobIsScheduled()
