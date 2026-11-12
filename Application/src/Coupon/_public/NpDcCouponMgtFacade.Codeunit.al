@@ -9,6 +9,20 @@ codeunit 6248345 "NPR NpDc Coupon Mgt. Facade"
         IfSerialNoRequired(CouponReferenceNo, Sale, SaleLine, RequireSerialNo);
     end;
 
+    procedure ArchiveCoupon(var Coupon: Record "NPR NpDc Coupon")
+    var
+        CouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
+    begin
+        CouponMgt.ArchiveCoupon(Coupon);
+    end;
+
+    procedure ResetInUseQty(Coupon: Record "NPR NpDc Coupon")
+    var
+        CouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
+    begin
+        CouponMgt.ResetInUseQty(Coupon);
+    end;
+
     #region Local Procedures
     local procedure IfSerialNoRequired(CouponReferenceNo: Text; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; var RequireSerialNo: Boolean)
     var
