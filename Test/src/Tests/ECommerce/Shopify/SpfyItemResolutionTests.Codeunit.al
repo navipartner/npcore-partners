@@ -390,6 +390,161 @@ codeunit 85363 "NPR Spfy Item Resolution Tests"
         _Assert.AreEqual(_C2SSkuLbl, Sku, 'The SKU read from the Shopify JSON must be returned to the caller.');
     end;
 
+    [Test]
+    procedure StaleVariantSku_ResolvedThroughShopifyVariantId()
+    var
+        Item: Record Item;
+        OtherItem: Record Item;
+        ItemVariant: Record "Item Variant";
+        ReusedCodeVariant: Record "Item Variant";
+        OtherItemVariant: Record "Item Variant";
+        MSLibraryInventory: Codeunit "Library - Inventory";
+        StaleSku: Text;
+        ReusedSku: Text;
+    begin
+        // [Scenario] A document line that still carries the SKU of a renamed variant resolves to the variant that owns the line's Shopify
+        // variant id, in the REST and the GraphQL line shape and through both overloads, also when another variant reuses the old code.
+        // Another item's id, an unmapped id and a plain item SKU keep today's result.
+
+        // [Given] A store that syncs items, an item whose variant was renamed away from code STALE465, with its Shopify variant id under
+        // the new code, a second variant of the same item that reuses another old code, and another item's variant with the same code and its own Shopify variant id
+        CreateShopifyStore();
+        SetStoreSyncsItems(true);
+        _LibraryInventory.CreateItem(Item);
+        MSLibraryInventory.CreateItemVariant(ItemVariant, Item."No.");
+        AssignShopifyVariantId(Item."No.", ItemVariant.Code, '465000001');
+        MSLibraryInventory.CreateItemVariant(ReusedCodeVariant, Item."No.");
+        _LibraryInventory.CreateItem(OtherItem);
+        OtherItemVariant.Init();
+        OtherItemVariant."Item No." := OtherItem."No.";
+        OtherItemVariant.Code := ItemVariant.Code;
+        OtherItemVariant.Insert(true);
+        AssignShopifyVariantId(OtherItem."No.", OtherItemVariant.Code, '465000002');
+        StaleSku := StrSubstNo('%1_%2', Item."No.", 'STALE465');
+        ReusedSku := StrSubstNo('%1_%2', Item."No.", ReusedCodeVariant.Code);
+
+        // [When] A line carries the stale SKU, or a SKU whose code another variant now uses, together with the renamed variant's Shopify id
+        // [Then] The renamed variant is resolved
+        AssertResolvedTo(CreateOrderLine(5011, StaleSku, 465000001), Item."No.", ItemVariant.Code, 'REST line with the stale SKU');
+        AssertResolvedTo(CreateGraphQLLineItem(5012, StaleSku, 'gid://shopify/ProductVariant/465000001'), Item."No.", ItemVariant.Code, 'GraphQL line with the stale SKU');
+        AssertResolvedTo(CreateOrderLine(5013, ReusedSku, 465000001), Item."No.", ItemVariant.Code, 'Line whose old code another variant reuses');
+
+        // [When] The Shopify id belongs to another item's variant or to no variant, or the SKU is the plain item number
+        // [Then] Today's result stands
+        AssertResolvedTo(CreateOrderLine(5014, StaleSku, 465000002), Item."No.", '', 'Stale SKU with another item''s variant id');
+        AssertResolvedTo(CreateOrderLine(5015, StaleSku, 465000999), Item."No.", '', 'Stale SKU with an unmapped variant id');
+        AssertResolvedTo(CreateOrderLine(5016, Item."No.", 465000001), Item."No.", '', 'Plain item SKU with a mapped variant id');
+    end;
+
+    [Test]
+    procedure StockOnlyStore_ShopifyIdWinsOverASkuNamingAnotherVariant()
+    var
+        Item: Record Item;
+        VariantA: Record "Item Variant";
+        VariantB: Record "Item Variant";
+        ResolvedVariant: Record "Item Variant";
+        MSLibraryInventory: Codeunit "Library - Inventory";
+        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        NoRelinkSnapshot: Dictionary of [Text, Guid];
+        SkuOfB: Text;
+        StaleSku: Text;
+    begin
+        // [Scenario] In a store that syncs stock only, the stock send follows the variant's stored Shopify ids, not the SKU. An order line
+        // or a product read-back that carries a stored Shopify id resolves to the variant that holds it, also when its SKU names another
+        // variant, so the order lands on the variant whose stock that Shopify variant shows. A stale SKU also falls back to the Shopify id.
+
+        // [Given] A store that does not sync items, and an item with variants A and B, where A holds Shopify variant id 465000011
+        CreateShopifyStore();
+        SetStoreSyncsItems(false);
+        _LibraryInventory.CreateItem(Item);
+        MSLibraryInventory.CreateItemVariant(VariantA, Item."No.");
+        MSLibraryInventory.CreateItemVariant(VariantB, Item."No.");
+        AssignShopifyVariantId(Item."No.", VariantA.Code, '465000011');
+        SkuOfB := StrSubstNo('%1_%2', Item."No.", VariantB.Code);
+        StaleSku := StrSubstNo('%1_%2', Item."No.", 'STALE465');
+
+        // [When] An order line and a product read-back carry A's Shopify id with B's SKU
+        // [Then] A, the owner of the Shopify id, is resolved
+        AssertResolvedTo(CreateOrderLine(5021, SkuOfB, 465000011), Item."No.", VariantA.Code, 'Order line whose SKU names another variant');
+        _Assert.IsTrue(SpfyItemMgt.ParseReadBackVariant(_StoreCodeLbl, Item."No.", CreateProductVariant('gid://shopify/ProductVariant/465000011', SkuOfB), NoRelinkSnapshot, ResolvedVariant), 'Read-back whose SKU names another variant: the variant must resolve');
+        _Assert.AreEqual(VariantA.Code, ResolvedVariant.Code, 'Read-back whose SKU names another variant must follow the Shopify id');
+
+        // [When] The same Shopify id comes with a SKU whose variant code no longer exists
+        // [Then] A, the owner of the Shopify id, is resolved
+        AssertResolvedTo(CreateOrderLine(5022, StaleSku, 465000011), Item."No.", VariantA.Code, 'Order line with a stale SKU');
+        _Assert.IsTrue(SpfyItemMgt.ParseReadBackVariant(_StoreCodeLbl, Item."No.", CreateProductVariant('gid://shopify/ProductVariant/465000011', StaleSku), NoRelinkSnapshot, ResolvedVariant), 'Read-back with a stale SKU: the variant must resolve');
+        _Assert.AreEqual(VariantA.Code, ResolvedVariant.Code, 'Read-back with a stale SKU must follow the Shopify id');
+    end;
+
+    local procedure SetStoreSyncsItems(SyncsItems: Boolean)
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        SpfyStore: Record "NPR Spfy Store";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+    begin
+        if not ShopifySetup.Get() then begin
+            ShopifySetup.Init();
+            ShopifySetup.Insert(false);
+        end;
+        ShopifySetup."Enable Integration" := true;
+        ShopifySetup.Modify(false);
+        SpfyStore.Get(_StoreCodeLbl);
+        SpfyStore.Enabled := true;
+        SpfyStore."Item List Integration" := SyncsItems;
+        SpfyStore.Modify(false);
+        SpfyIntegrationMgt.SetRereadSetup();
+    end;
+
+    local procedure AssignShopifyVariantId(ItemNo: Code[20]; VariantCode: Code[10]; ShopifyVariantId: Text[30])
+    var
+        SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        SpfyStoreItemVariantLink.Type := SpfyStoreItemVariantLink.Type::Variant;
+        SpfyStoreItemVariantLink."Item No." := ItemNo;
+        SpfyStoreItemVariantLink."Variant Code" := VariantCode;
+        SpfyStoreItemVariantLink."Shopify Store Code" := _StoreCodeLbl;
+        SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyVariantId, false);
+    end;
+
+    local procedure AssertResolvedTo(DocumentLine: JsonToken; ExpectedItemNo: Code[20]; ExpectedVariantCode: Code[10]; Context: Text)
+    var
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        Sku: Text;
+    begin
+        _Assert.IsTrue(SpfyItemMgt.ParseItemForDocumentImport(_StoreCodeLbl, DocumentLine, ItemVariant, Sku), StrSubstNo('%1: the line must resolve', Context));
+        _Assert.AreEqual(ExpectedItemNo, ItemVariant."Item No.", StrSubstNo('%1: item', Context));
+        _Assert.AreEqual(ExpectedVariantCode, ItemVariant.Code, StrSubstNo('%1: variant', Context));
+        _Assert.IsTrue(SpfyItemMgt.ParseItemForDocumentImport(_StoreCodeLbl, DocumentLine, ItemVariant, Item, Sku), StrSubstNo('%1: the line must resolve through the overload returning the item', Context));
+        _Assert.AreEqual(ExpectedItemNo, Item."No.", StrSubstNo('%1: item record from the overload returning the item', Context));
+        _Assert.AreEqual(ExpectedVariantCode, ItemVariant.Code, StrSubstNo('%1: variant from the overload returning the item', Context));
+    end;
+
+    local procedure CreateOrderLine(LineID: BigInteger; Sku: Text; ShopifyVariantId: BigInteger) OrderLine: JsonToken
+    var
+        OrderLineJson: JsonObject;
+    begin
+        OrderLine := CreateOrderLine(LineID, Sku);
+        OrderLineJson := OrderLine.AsObject();
+        OrderLineJson.Add('variant_id', ShopifyVariantId);
+        OrderLine := OrderLineJson.AsToken();
+    end;
+
+    local procedure CreateGraphQLLineItem(LineID: BigInteger; Sku: Text; ShopifyVariantGid: Text) LineItem: JsonToken
+    var
+        LineItemJson: JsonObject;
+        VariantJson: JsonObject;
+    begin
+        VariantJson.Add('id', ShopifyVariantGid);
+        LineItemJson.Add('id', StrSubstNo('gid://shopify/LineItem/%1', LineID));
+        LineItemJson.Add('sku', Sku);
+        LineItemJson.Add('name', OrderLineTitle(LineID));
+        LineItemJson.Add('variant', VariantJson);
+        LineItem := LineItemJson.AsToken();
+    end;
+
     local procedure CreateShopifyStore()
     var
         SpfyStore: Record "NPR Spfy Store";

@@ -324,7 +324,206 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
                 SpfyItemVariantModifMgt.SetDoNotTrackInventory(SpfyStoreItemVariantLink, SpfyStoreItemLink."Do Not Track Inventory", true);
         until SpfyStoreItemLink.Next() = 0;
     end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Item Variant", OnBeforeRenameEvent, '', false, false)]
+    local procedure ItemVariant_CheckRenameAndRemoveLeftovers(var Rec: Record "Item Variant"; var xRec: Record "Item Variant"; RunTrigger: Boolean)
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        ItemVariant: Record "Item Variant";
+        SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        HasShopifyVariantID: Boolean;
+        MoveToOtherItemErr: Label 'You cannot move item %1 variant %2 to another item because the variant is synced with Shopify. Create a new variant on the other item instead.', Comment = '%1 - Item No., %2 - Variant Code';
+        RemovalPendingErr: Label 'You cannot rename item %1 variant %2 while its removal from Shopify store %3 is pending. Unblock the variant or make it available in Shopify again, or wait until the removal has been sent to Shopify, and then try again. If the removal failed, find its task on the Shopify Task List or NaviConnect Task List page. If the removal is quarantined, requeue it on the Shopify Deletion Log page.', Comment = '%1 - Item No., %2 - Variant Code, %3 - Shopify Store Code';
+        EarlierVariantRemovalPendingErr: Label 'You cannot rename item %1 variant %2 to %3 while the removal of an earlier variant %3 from Shopify store %4 is pending. Wait until that removal has been sent to Shopify, and then try again. If the removal failed, find its task on the Shopify Task List or NaviConnect Task List page, or its entry on the Shopify Deletion Log page.', Comment = '%1 - Item No., %2 - Variant Code, %3 - New Variant Code, %4 - Shopify Store Code';
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if not ShopifyStore.FindSet() then
+            exit;
+        if not ItemVariant.Get(xRec."Item No.", xRec.Code) then
+            exit;
+
+        SpfyStoreItemVariantLink.Type := SpfyStoreItemVariantLink.Type::Variant;
+        SpfyStoreItemVariantLink."Item No." := ItemVariant."Item No.";
+        SpfyStoreItemVariantLink."Variant Code" := ItemVariant.Code;
+        repeat
+            SpfyStoreItemVariantLink."Shopify Store Code" := ShopifyStore.Code;
+            HasShopifyVariantID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Entry ID") <> '';
+            if Rec."Item No." <> ItemVariant."Item No." then
+                if HasShopifyVariantID or (SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID") <> '') then
+                    Error(MoveToOtherItemErr, ItemVariant."Item No.", ItemVariant.Code);
+            if HasShopifyVariantID then begin
+                if ShopifyRemovalIsPending(ItemVariant, ShopifyStore.Code) then
+                    Error(RemovalPendingErr, ItemVariant."Item No.", ItemVariant.Code, ShopifyStore.Code);
+                if EarlierVariantRemovalIsPending(Rec."Item No.", Rec.Code, ShopifyStore.Code) then
+                    Error(EarlierVariantRemovalPendingErr, ItemVariant."Item No.", ItemVariant.Code, Rec.Code, ShopifyStore.Code);
+            end;
+        until ShopifyStore.Next() = 0;
+
+        RemoveLeftoverVariantRows(Rec."Item No.", Rec.Code);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Item Variant", OnAfterRenameEvent, '', false, false)]
+    local procedure ItemVariant_MoveShopifyIDs(var Rec: Record "Item Variant"; var xRec: Record "Item Variant"; RunTrigger: Boolean)
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        OldSpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
+        NewSpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if not ShopifyStore.FindSet() then
+            exit;
+
+        OldSpfyStoreItemVariantLink.Type := OldSpfyStoreItemVariantLink.Type::Variant;
+        OldSpfyStoreItemVariantLink."Item No." := xRec."Item No.";
+        OldSpfyStoreItemVariantLink."Variant Code" := xRec.Code;
+        NewSpfyStoreItemVariantLink.Type := NewSpfyStoreItemVariantLink.Type::Variant;
+        NewSpfyStoreItemVariantLink."Item No." := Rec."Item No.";
+        NewSpfyStoreItemVariantLink."Variant Code" := Rec.Code;
+        repeat
+            OldSpfyStoreItemVariantLink."Shopify Store Code" := ShopifyStore.Code;
+            NewSpfyStoreItemVariantLink."Shopify Store Code" := ShopifyStore.Code;
+            MoveVariantShopifyData(OldSpfyStoreItemVariantLink.RecordId(), NewSpfyStoreItemVariantLink.RecordId());
+        until ShopifyStore.Next() = 0;
+        MoveVariantDeleteIntents(Rec);
+    end;
     #endregion
+
+    local procedure ShopifyRemovalIsPending(ItemVariant: Record "Item Variant"; ShopifyStoreCode: Code[20]): Boolean
+    var
+        SpfyDeletionLogMgt: Codeunit "NPR Spfy Deletion Log Mgt";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        SpfyItemVariantModifMgt: Codeunit "NPR Spfy ItemVariantModif Mgt.";
+        VariantSku: Text[50];
+    begin
+        if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items, ShopifyStoreCode) then begin
+            if SpfyItemMgt.ItemVariantIsBlocked(ItemVariant) then
+                exit(true);
+            if SpfyItemVariantModifMgt.ItemVariantNotAvailableInShopify(ItemVariant."Item No.", ItemVariant.Code, ShopifyStoreCode) then
+                exit(true);
+            if SpfyDeletionLogMgt.HasOutstandingDeleteForEntity(Database::"Item Variant", ShopifyStoreCode, ItemVariant.SystemId) then
+                exit(true);
+        end;
+
+        VariantSku := CopyStr(SpfyItemMgt.GetProductVariantSku(ItemVariant."Item No.", ItemVariant.Code), 1, MaxStrLen(VariantSku));
+        exit(HasOpenShopifyDeleteTask(VariantSku, ShopifyStoreCode));
+    end;
+
+    local procedure EarlierVariantRemovalIsPending(ItemNo: Code[20]; VariantCode: Code[10]; ShopifyStoreCode: Code[20]): Boolean
+    var
+        SpfyDeletionLog: Record "NPR Spfy Deletion Log";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        VariantSku: Text[50];
+    begin
+        if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items, ShopifyStoreCode) then begin
+            SpfyDeletionLog.SetRange("Table No.", Database::"Item Variant");
+            SpfyDeletionLog.SetRange("Shopify Store Code", ShopifyStoreCode);
+            SpfyDeletionLog.SetRange("Item No.", ItemNo);
+            SpfyDeletionLog.SetRange("Variant Code", VariantCode);
+            SpfyDeletionLog.SetFilter(Status, '%1|%2', SpfyDeletionLog.Status::Pending, SpfyDeletionLog.Status::Quarantined);
+            if not SpfyDeletionLog.IsEmpty() then
+                exit(true);
+        end;
+
+        VariantSku := CopyStr(SpfyItemMgt.GetProductVariantSku(ItemNo, VariantCode), 1, MaxStrLen(VariantSku));
+        exit(HasOpenShopifyDeleteTask(VariantSku, ShopifyStoreCode));
+    end;
+
+    local procedure HasOpenShopifyDeleteTask(VariantSku: Text[50]; ShopifyStoreCode: Code[20]): Boolean
+    var
+        NcTask: Record "NPR Nc Task";
+        SpfyTask: Record "NPR Spfy Task";
+    begin
+        NcTask.SetCurrentKey("Record Value");
+        NcTask.SetRange("Record Value", VariantSku);
+        NcTask.SetRange("Table No.", Database::"Item Variant");
+        NcTask.SetRange(Type, NcTask.Type::Delete);
+        NcTask.SetRange("Store Code", ShopifyStoreCode);
+        NcTask.SetRange(Processed, false);
+        if not NcTask.IsEmpty() then
+            exit(true);
+
+        SpfyTask.SetCurrentKey("Table No.", "Store Code", "Record Value", State);
+        SpfyTask.SetRange("Table No.", Database::"Item Variant");
+        SpfyTask.SetRange("Store Code", ShopifyStoreCode);
+        SpfyTask.SetRange("Record Value", VariantSku);
+        SpfyTask.SetFilter(State, '<>%1', SpfyTask.State::Completed);
+        SpfyTask.SetRange(Type, SpfyTask.Type::Delete);
+        exit(not SpfyTask.IsEmpty());
+    end;
+
+    local procedure RemoveLeftoverVariantRows(ItemNo: Code[20]; VariantCode: Code[10])
+    var
+        SpfyInventoryLevel: Record "NPR Spfy Inventory Level";
+        SpfyInvItemLocation: Record "NPR Spfy Inv Item Location";
+        SpfyItemPrice: Record "NPR Spfy Item Price";
+        SpfyItemVariantModif: Record "NPR Spfy Item Variant Modif.";
+    begin
+        if (ItemNo = '') or (VariantCode = '') then
+            exit;
+
+        SpfyInventoryLevel.SetCurrentKey("Item No.", "Variant Code");
+        SpfyInventoryLevel.SetRange("Item No.", ItemNo);
+        SpfyInventoryLevel.SetRange("Variant Code", VariantCode);
+        if not SpfyInventoryLevel.IsEmpty() then
+            SpfyInventoryLevel.DeleteAll();
+
+        SpfyInvItemLocation.SetRange("Item No.", ItemNo);
+        SpfyInvItemLocation.SetRange("Variant Code", VariantCode);
+        if not SpfyInvItemLocation.IsEmpty() then
+            SpfyInvItemLocation.DeleteAll();
+
+        SpfyItemPrice.SetCurrentKey("Item No.", "Variant Code");
+        SpfyItemPrice.SetRange("Item No.", ItemNo);
+        SpfyItemPrice.SetRange("Variant Code", VariantCode);
+        if not SpfyItemPrice.IsEmpty() then
+            SpfyItemPrice.DeleteAll();
+
+        SpfyItemVariantModif.SetRange("Item No.", ItemNo);
+        SpfyItemVariantModif.SetRange("Variant Code", VariantCode);
+        if not SpfyItemVariantModif.IsEmpty() then
+            SpfyItemVariantModif.DeleteAll();
+    end;
+
+    local procedure MoveVariantShopifyData(OldVariantLinkRecID: RecordId; NewVariantLinkRecID: RecordId)
+    var
+        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
+        SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
+    begin
+        ShopifyAssignedID.SetRange("Table No.", Database::"NPR Spfy Store-Item Link");
+        ShopifyAssignedID.SetRange("BC Record ID", NewVariantLinkRecID);
+        if not ShopifyAssignedID.IsEmpty() then
+            ShopifyAssignedID.DeleteAll();
+        ShopifyAssignedID.SetRange("BC Record ID", OldVariantLinkRecID);
+        if not ShopifyAssignedID.IsEmpty() then
+            ShopifyAssignedID.ModifyAll("BC Record ID", NewVariantLinkRecID);
+
+        SpfyEntityMetafield.SetRange("Table No.", Database::"NPR Spfy Store-Item Link");
+        SpfyEntityMetafield.SetRange("BC Record ID", NewVariantLinkRecID);
+        if not SpfyEntityMetafield.IsEmpty() then
+            SpfyEntityMetafield.DeleteAll();
+        SpfyEntityMetafield.SetRange("BC Record ID", OldVariantLinkRecID);
+        if not SpfyEntityMetafield.IsEmpty() then
+            SpfyEntityMetafield.ModifyAll("BC Record ID", NewVariantLinkRecID);
+    end;
+
+    local procedure MoveVariantDeleteIntents(ItemVariant: Record "Item Variant")
+    var
+        SpfyDeletionLog: Record "NPR Spfy Deletion Log";
+    begin
+        SpfyDeletionLog.SetCurrentKey("Table No.", "Entity System Id", "Shopify Store Code", Status);
+        SpfyDeletionLog.SetRange("Table No.", Database::"Item Variant");
+        SpfyDeletionLog.SetRange("Entity System Id", ItemVariant.SystemId);
+        SpfyDeletionLog.SetFilter(Status, '%1|%2', SpfyDeletionLog.Status::Pending, SpfyDeletionLog.Status::Quarantined);
+        if SpfyDeletionLog.IsEmpty() then
+            exit;
+        SpfyDeletionLog.ModifyAll("Item No.", ItemVariant."Item No.");
+        SpfyDeletionLog.ModifyAll("Variant Code", ItemVariant.Code);
+    end;
 
     internal procedure FindLocationCodeByShopifyLocationID(ShopifyStoreCode: Code[20]; ShopifyLocationID: Text[30]; var LocationCode: Code[10]): Boolean
     var

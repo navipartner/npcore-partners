@@ -188,6 +188,7 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
     var
         InventoryLevel: Record "NPR Spfy Inventory Level";
         Item: Record Item;
+        ItemVariant: Record "Item Variant";
         SpfyItemVariantModif: Record "NPR Spfy Item Variant Modif.";
         SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
@@ -199,6 +200,11 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
     begin
         if SpfyItemVariantModif.Get(InventoryLevelParam."Item No.", InventoryLevelParam."Variant Code", InventoryLevelParam."Shopify Store Code") and SpfyItemVariantModif."Do Not Track Inventory" then
             exit(false);  //inventory level is not tracked for this item variant in this store
+        if InventoryLevelParam."Variant Code" <> '' then begin
+            ItemVariant.SetLoadFields(Code);
+            if not ItemVariant.Get(InventoryLevelParam."Item No.", InventoryLevelParam."Variant Code") then
+                exit(false);
+        end;
         if InventoryLevelParam."Variant Code" = '' then begin
             if SpfyItemMgt.AvailableInShopifyVariantsExist(InventoryLevelParam."Item No.", InventoryLevelParam."Shopify Store Code") then
                 exit(false);  //Do not calculate inventory level for blank variant if there are synced variants available for the item
