@@ -4729,7 +4729,6 @@
         Ticket: Record "NPR TM Ticket";
         TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
         SalesInvHeader: Record "Sales Invoice Header";
-        RowsFound: Integer;
     begin
         if (Ticket.ReadPermission()) then begin
             if (not Ticket.SetCurrentKey("Sales Receipt No.")) then;
@@ -4738,18 +4737,10 @@
 
             CancelledTicket_InsertIntoDocEntry(DocumentEntry, DocNoFilter);
 
-            if (not TicketReservationReq.SetCurrentKey("External Order No.")) then;
             SalesInvHeader.SetFilter("No.", '%1', DocNoFilter);
-            if (SalesInvHeader.FindFirst()) then begin
-                if (SalesInvHeader."External Document No." <> '') then begin
-                    TicketReservationReq.SetFilter("External Order No.", '%1', SalesInvHeader."External Document No.");
-                end;
-                if ((RowsFound = 0) and (SalesInvHeader."NPR External Order No." <> '')) then begin
-                    TicketReservationReq.SetFilter("External Order No.", '%1', SalesInvHeader."NPR External Order No.");
-                    RowsFound := InsertIntoDocEntry(DocumentEntry, Database::"NPR TM Ticket Reservation Req.", 0, SalesInvHeader."NPR External Order No.", TicketReservationReq.TableCaption(), TicketReservationReq.Count());
-                    RowsFound := InsertIntoDocEntry(DocumentEntry, Database::"NPR TM Ticket Reservation Req.", 0, CopyStr(SalesInvHeader."External Document No.", 1, 20), TicketReservationReq.TableCaption(), TicketReservationReq.Count());
-                end;
-            end;
+            if (SalesInvHeader.FindFirst()) then
+                if (SetPostedInvoiceTicketRequestFilter(SalesInvHeader, TicketReservationReq)) then
+                    InsertIntoDocEntry(DocumentEntry, Database::"NPR TM Ticket Reservation Req.", 0, SalesInvHeader."No.", TicketReservationReq.TableCaption(), TicketReservationReq.Count());
         end;
     end;
 
@@ -4797,9 +4788,7 @@
 
         if (DocumentEntry."Table ID" = Database::"NPR TM Ticket Reservation Req.") then begin
             if (SalesInvHeader.Get(DocNoFilter)) then begin
-                if (not TicketReservationReq.SetCurrentKey("External Order No.")) then;
-                TicketReservationReq.SetFilter("External Order No.", '%1', SalesInvHeader."External Document No.");
-                if (not TicketReservationReq.IsEmpty()) then begin
+                if (SetPostedInvoiceTicketRequestFilter(SalesInvHeader, TicketReservationReq)) then begin
                     Page.Run(Page::"NPR TM Ticket Request", TicketReservationReq);
                     exit;
                 end
@@ -4815,6 +4804,25 @@
         end
     end;
 #endif
+
+    local procedure SetPostedInvoiceTicketRequestFilter(SalesInvHeader: Record "Sales Invoice Header"; var TicketReservationReq: Record "NPR TM Ticket Reservation Req."): Boolean
+    begin
+        if (not TicketReservationReq.SetCurrentKey("External Order No.")) then;
+
+        if (SalesInvHeader."NPR External Order No." <> '') then begin
+            TicketReservationReq.SetFilter("External Order No.", '%1', SalesInvHeader."NPR External Order No.");
+            if (not TicketReservationReq.IsEmpty()) then
+                exit(true);
+        end;
+
+        if ((SalesInvHeader."External Document No." <> '') and (StrLen(SalesInvHeader."External Document No.") <= MaxStrLen(TicketReservationReq."External Order No."))) then begin
+            TicketReservationReq.SetFilter("External Order No.", '%1', SalesInvHeader."External Document No.");
+            if (not TicketReservationReq.IsEmpty()) then
+                exit(true);
+        end;
+
+        exit(false);
+    end;
 
     local procedure CancelledTicket_InsertIntoDocEntry(var DocumentEntry: Record "Document Entry" temporary; DocNoFilter: Text): Integer
     var

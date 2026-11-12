@@ -180,6 +180,70 @@
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure FindEntriesOnPostedInvoiceShowsOrderTicketsOnce()
+    var
+        TmpCreatedTickets: Record "NPR TM Ticket" temporary;
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        SalesInvHeader: Record "Sales Invoice Header";
+        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
+        LibraryUtility: Codeunit "Library - Utility";
+        Assert: Codeunit "Assert";
+        NavigatePage: TestPage Navigate;
+        TicketRequestPage: TestPage "NPR TM Ticket Request";
+        ItemNo: Code[20];
+        WebshopOrderNo: Code[20];
+        MemberNumber: Code[20];
+        ScannerStation: Code[10];
+        ResponseToken: Text[100];
+        ResponseMessage: Text;
+        OrderRequestCount: Integer;
+        OpenedRequestCount: Integer;
+    begin
+        // [SCENARIO] Find Entries on a posted webshop invoice shows the ticket requests of its order on one line, and that line opens the same requests
+        ItemNo := SelectSmokeTestScenario();
+        WebshopOrderNo := CopyStr(LibraryUtility.GenerateRandomCode(TicketRequest.FieldNo("External Order No."), Database::"NPR TM Ticket Reservation Req."), 1, MaxStrLen(WebshopOrderNo));
+
+        // [GIVEN] Tickets confirmed through the ticket API for a webshop order
+        Assert.IsTrue(TicketApiLibrary.MakeReservation(1, ItemNo, 2, MemberNumber, ScannerStation, ResponseToken, ResponseMessage), ResponseMessage);
+        Assert.IsTrue(TicketApiLibrary.ConfirmTicketReservation(ResponseToken, '', WebshopOrderNo, ScannerStation, TmpCreatedTickets, ResponseMessage), ResponseMessage);
+        TicketRequest.SetFilter("External Order No.", '=%1', WebshopOrderNo);
+        OrderRequestCount := TicketRequest.Count();
+        Assert.IsTrue(OrderRequestCount > 0, 'Confirming the tickets must store the webshop order no. on the ticket requests.');
+
+        // [GIVEN] The posted invoice of that order, with the shop order name in External Document No. as Ecom Shopify writes it
+        SalesInvHeader.Init();
+        SalesInvHeader."No." := CopyStr(LibraryUtility.GenerateRandomCode(SalesInvHeader.FieldNo("No."), Database::"Sales Invoice Header"), 1, MaxStrLen(SalesInvHeader."No."));
+        SalesInvHeader."Posting Date" := WorkDate();
+        SalesInvHeader."NPR External Order No." := WebshopOrderNo;
+        SalesInvHeader."External Document No." := 'STORE-' + SalesInvHeader."No.";
+        SalesInvHeader.Insert();
+
+        // [WHEN] Find Entries runs on the invoice
+        NavigatePage.Trap();
+        SalesInvHeader.Navigate();
+
+        // [THEN] One ticket request line counts the requests of the order
+        NavigatePage.Filter.SetFilter("Table ID", Format(Database::"NPR TM Ticket Reservation Req."));
+        Assert.IsTrue(NavigatePage.First(), 'Find Entries must show the ticket requests of the order on the invoice.');
+        Assert.AreEqual(OrderRequestCount, NavigatePage."No. of Records".AsInteger(), 'The ticket request line must count the requests of the order.');
+        Assert.IsFalse(NavigatePage.Next(), 'Find Entries must show the ticket requests of the order on one line.');
+
+        // [WHEN] The line is opened
+        NavigatePage.First();
+        TicketRequestPage.Trap();
+        NavigatePage.Show.Invoke();
+
+        // [THEN] It opens exactly the requests it counted
+        Assert.IsTrue(TicketRequestPage.First(), 'Opening the line must show the requests it counted.');
+        repeat
+            Assert.AreEqual(Format(WebshopOrderNo), TicketRequestPage."External Order No.".Value(), 'Opening the line must show only requests of the order.');
+            OpenedRequestCount += 1;
+        until (not TicketRequestPage.Next());
+        Assert.AreEqual(OrderRequestCount, OpenedRequestCount, 'Opening the line must show the requests it counted.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure PreConfirmTicketReservation()
     var
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
