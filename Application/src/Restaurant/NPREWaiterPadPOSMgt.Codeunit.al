@@ -110,6 +110,7 @@
         NewWaiterPadLine."Per Unit" := false;
         NewWaiterPadLine.Mandatory := false;
         NewWaiterPadLine."Copy Serial No." := false;
+        NewWaiterPadLine."Selected Option Line No." := 0;
         NewWaiterPadLine.Indentation := 0;
         NewWaiterPadLine.Modify();
     end;
@@ -1002,6 +1003,7 @@
         WaiterPadLine."Per Unit" := SaleLinePOSAddOn."Per Unit";
         WaiterPadLine.Mandatory := SaleLinePOSAddOn.Mandatory;
         WaiterPadLine."Copy Serial No." := SaleLinePOSAddOn."Copy Serial No.";
+        WaiterPadLine."Selected Option Line No." := SaleLinePOSAddOn."Selected Option Line No.";
     end;
 
     local procedure FindItemAddOnPOSLink(SaleLinePOS: Record "NPR POS Sale Line"; var SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn"): Boolean
@@ -1076,6 +1078,7 @@
         SaleLinePOSAddOn."Per Unit" := WaiterPadLine."Per Unit";
         SaleLinePOSAddOn.Mandatory := WaiterPadLine.Mandatory;
         SaleLinePOSAddOn."Copy Serial No." := WaiterPadLine."Copy Serial No.";
+        SaleLinePOSAddOn."Selected Option Line No." := WaiterPadLine."Selected Option Line No.";
         SaleLinePOSAddOn.Insert(true);
 
         //The row the front end was sent when the line was inserted was built before this link existed, so it still says the

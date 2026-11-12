@@ -169,6 +169,103 @@ codeunit 85326 "NPR NPRE W/Pad AddOn Tests"
             'Both new add-ons must be positioned before the second main item.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RecallWaiterPad_SelectOptionOnSharedItem_KeepsTheChosenOption()
+    var
+        MainItem: Record Item;
+        OptionItem: Record Item;
+        OptionSaleLinePOS: Record "NPR POS Sale Line";
+        OptionWPLine: Record "NPR NPRE Waiter Pad Line";
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        ItemReference: Record "Item Reference";
+        Assert: Codeunit Assert;
+        FrontEnd: Codeunit "NPR POS Front End Management";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSActionInsertItem: Codeunit "NPR POS Action: Insert Item B";
+        POSSession: Codeunit "NPR POS Session";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+        AddOnNo: Code[20];
+        MainLineNo: Integer;
+    begin
+        // [SCENARIO] Saving a sale to the waiter pad and recalling it keeps the chosen Select option,
+        // also when two options share one item and variant.
+
+        // [GIVEN] A main item with a Select add-on whose options 10000 and 20000 share one item, and option 20000 chosen
+        Initialize(POSSession);
+        CreateWaiterPad(WaiterPad);
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(MainItem, _POSUnit, _POSStore);
+        POSActionInsertItem.AddItemLine(MainItem, ItemReference, 0, 1, 0, '', '', '', POSSession, FrontEnd, '');
+        MainLineNo := POSActionInsertItem.GetLineNo();
+        AddOnNo := CreateSelectAddOnOnSharedItem(OptionItem);
+        RunItemAddOnsWithOption(MainLineNo, AddOnNo, OptionItem, 20000);
+
+        // [WHEN] The sale is saved to the waiter pad
+        SaveSaleToWaiterPad(POSSession, WaiterPad, true);
+
+        // [THEN] The waiter pad line stores the chosen option
+        GetWaiterPadLine(WaiterPad, OptionItem."No.", OptionWPLine);
+        Assert.AreEqual(20000, OptionWPLine."Selected Option Line No.", 'The waiter pad line must store the chosen option.');
+
+        // [WHEN] The waiter pad is recalled to the POS
+        WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(WaiterPad, POSSession);
+
+        // [THEN] The recalled add-on line still carries the chosen option
+        GetPOSSaleLine(POSSession, OptionItem."No.", OptionSaleLinePOS);
+        ItemAddOnMgt.FilterSaleLinePOS2ItemAddOnPOSLine(OptionSaleLinePOS, SaleLinePOSAddOn);
+        Assert.IsTrue(SaleLinePOSAddOn.FindFirst(), 'The recalled option line must be linked to its add-on.');
+        Assert.AreEqual(20000, SaleLinePOSAddOn."Selected Option Line No.", 'The recalled add-on line must keep the chosen option.');
+    end;
+
+    local procedure CreateSelectAddOnOnSharedItem(var OptionItem: Record Item): Code[20]
+    var
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        ItemAddOnLineOpt: Record "NPR NpIa ItemAddOn Line Opt.";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        OptionLineNo: Integer;
+    begin
+        LibraryRestaurant.CreateItemAddon(ItemAddOn);
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(OptionItem, _POSUnit, _POSStore);
+
+        ItemAddOnLine.Init();
+        ItemAddOnLine."AddOn No." := ItemAddOn."No.";
+        ItemAddOnLine."Line No." := 10000;
+        ItemAddOnLine.Type := ItemAddOnLine.Type::Select;
+        ItemAddOnLine.Insert(true);
+
+        for OptionLineNo := 1 to 2 do begin
+            ItemAddOnLineOpt.Init();
+            ItemAddOnLineOpt."AddOn No." := ItemAddOn."No.";
+            ItemAddOnLineOpt."AddOn Line No." := ItemAddOnLine."Line No.";
+            ItemAddOnLineOpt."Line No." := OptionLineNo * 10000;
+            ItemAddOnLineOpt."Item No." := OptionItem."No.";
+            ItemAddOnLineOpt.Quantity := 1;
+            ItemAddOnLineOpt.Insert(true);
+        end;
+
+        exit(ItemAddOn."No.");
+    end;
+
+    local procedure RunItemAddOnsWithOption(BaseLineNo: Integer; AddOnNo: Code[20]; OptionItem: Record Item; OptionLineNo: Integer)
+    var
+        POSActionRunItemAddOnB: Codeunit "NPR POS Action: RunItemAddOn B";
+        OptionValue: JsonObject;
+        UserSelection: JsonObject;
+        OptionValueText: Text;
+    begin
+        // Same shape as the cashier dialog's radio value
+        OptionValue.Add('item', OptionItem."No.");
+        OptionValue.Add('variant', '');
+        OptionValue.Add('optionLineNo', OptionLineNo);
+        OptionValue.WriteTo(OptionValueText);
+        UserSelection.Add('10000', OptionValueText);
+        POSActionRunItemAddOnB.RunItemAddOns(BaseLineNo, AddOnNo, false, true, true, UserSelection.AsToken());
+    end;
+
     local procedure Initialize(var POSSession: Codeunit "NPR POS Session")
     var
         POSRestProfile: Record "NPR POS NPRE Rest. Profile";

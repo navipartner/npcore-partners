@@ -47,6 +47,86 @@ codeunit 85140 "NPR POS Act. RunItemAddOnTests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure RunItemAddOn_SelectOptionsOnSameItem_StoresTheChosenOption()
+    var
+        OptionItem: Record Item;
+        ParentItem: Record Item;
+        ParentSaleLine: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        AddOnNo: Code[20];
+    begin
+        // [SCENARIO] The cashier dialog tells apart two options on the same item and variant, and the link row follows an option change
+
+        // [GIVEN] A sale with a parent item line, and a Select add-on whose two options share one item; only option 20000 is Per Unit
+        InitializeSale(SalePOS);
+        CreateSaleItem(ParentItem, 10);
+        CreateSaleItem(OptionItem, 4);
+        AddOnNo := CreateSelectAddOn(ParentItem, OptionItem);
+        AddParentItemLine(ParentItem, 1, SalePOS, ParentSaleLine);
+
+        // [WHEN] The cashier picks option 20000
+        RunItemAddOnWithOption(ParentSaleLine, AddOnNo, OptionItem, 20000);
+
+        // [THEN] The link row stores option 20000 and its Per Unit flag
+        FindAddOnLink(ParentSaleLine, SaleLinePOSAddOn);
+        _Assert.AreEqual(20000, SaleLinePOSAddOn."Selected Option Line No.", 'The link row must store the chosen option.');
+        _Assert.IsTrue(SaleLinePOSAddOn."Per Unit", 'The link row must carry the chosen option''s Per Unit flag.');
+
+        // [WHEN] The cashier changes the same group to option 10000
+        RunItemAddOnWithOption(ParentSaleLine, AddOnNo, OptionItem, 10000);
+
+        // [THEN] The existing link row follows the change
+        FindAddOnLink(ParentSaleLine, SaleLinePOSAddOn);
+        _Assert.AreEqual(10000, SaleLinePOSAddOn."Selected Option Line No.", 'The link row must follow the option change.');
+        _Assert.IsFalse(SaleLinePOSAddOn."Per Unit", 'The link row must follow the new option''s Per Unit flag.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure AddOnDialog_SelectOptionsOnSameItem_PreSelectsTheStoredOption()
+    var
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        OptionItem: Record Item;
+        ParentItem: Record Item;
+        ParentSaleLine: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+        ConfigJObject: JsonObject;
+        JToken: JsonToken;
+        Options: JsonArray;
+        SelectedValue: Text;
+        AddOnNo: Code[20];
+    begin
+        // [SCENARIO] Reopening the cashier dialog marks the stored option, also when two options share one item and variant
+
+        // [GIVEN] A sale where the cashier picked option 20000 of a Select add-on whose two options share one item
+        InitializeSale(SalePOS);
+        CreateSaleItem(ParentItem, 10);
+        CreateSaleItem(OptionItem, 4);
+        AddOnNo := CreateSelectAddOn(ParentItem, OptionItem);
+        AddParentItemLine(ParentItem, 1, SalePOS, ParentSaleLine);
+        RunItemAddOnWithOption(ParentSaleLine, AddOnNo, OptionItem, 20000);
+
+        // [WHEN] The dialog for the parent line is built again
+        ItemAddOn.Get(AddOnNo);
+        ConfigJObject := ItemAddOnMgt.GenerateItemAddOnConfigJson(SalePOS, ParentSaleLine, ItemAddOn);
+
+        // [THEN] The Select group's value is option 20000's value, not option 10000's
+        ConfigJObject.SelectToken('settings[0].value', JToken);
+        SelectedValue := JToken.AsValue().AsText();
+        ConfigJObject.SelectToken('settings[0].options', JToken);
+        Options := JToken.AsArray();
+        Options.Get(1, JToken);
+        JToken.SelectToken('value', JToken);
+        _Assert.AreEqual(JToken.AsValue().AsText(), SelectedValue, 'The dialog must pre-select the stored option 20000.');
+        Options.Get(0, JToken);
+        JToken.SelectToken('value', JToken);
+        _Assert.AreNotEqual(JToken.AsValue().AsText(), SelectedValue, 'Option 10000 shares the item, so it must not be pre-selected.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure EndSale_ItemAddOnSale_PostsBothTheParentAndTheChildLine()
     var
         ChildItem: Record Item;
@@ -246,6 +326,72 @@ codeunit 85140 "NPR POS Act. RunItemAddOnTests"
         ParentItem.Modify();
 
         exit(ItemAddOn."No.");
+    end;
+
+    local procedure CreateSelectAddOn(var ParentItem: Record Item; OptionItem: Record Item): Code[20]
+    var
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        LibraryRandom: Codeunit "Library - Random";
+    begin
+        ItemAddOn.Init();
+        ItemAddOn.Validate("No.", LibraryRandom.RandText(20));
+        ItemAddOn.Enabled := true;
+        ItemAddOn.Insert(true);
+
+        ItemAddOnLine.Init();
+        ItemAddOnLine.Validate("AddOn No.", ItemAddOn."No.");
+        ItemAddOnLine.Validate("Line No.", 10000);
+        ItemAddOnLine.Validate(Type, ItemAddOnLine.Type::Select);
+        ItemAddOnLine.Insert(true);
+
+        CreateSelectOption(ItemAddOnLine, 10000, OptionItem, false);
+        CreateSelectOption(ItemAddOnLine, 20000, OptionItem, true);
+
+        ParentItem.Validate("NPR Item AddOn No.", ItemAddOn."No.");
+        ParentItem.Modify();
+
+        exit(ItemAddOn."No.");
+    end;
+
+    local procedure CreateSelectOption(ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; LineNo: Integer; OptionItem: Record Item; PerUnit: Boolean)
+    var
+        ItemAddOnLineOpt: Record "NPR NpIa ItemAddOn Line Opt.";
+    begin
+        ItemAddOnLineOpt.Init();
+        ItemAddOnLineOpt."AddOn No." := ItemAddOnLine."AddOn No.";
+        ItemAddOnLineOpt."AddOn Line No." := ItemAddOnLine."Line No.";
+        ItemAddOnLineOpt."Line No." := LineNo;
+        ItemAddOnLineOpt."Item No." := OptionItem."No.";
+        ItemAddOnLineOpt.Quantity := 1;
+        ItemAddOnLineOpt."Per Unit" := PerUnit;
+        ItemAddOnLineOpt.Insert(true);
+    end;
+
+    local procedure RunItemAddOnWithOption(ParentSaleLine: Record "NPR POS Sale Line"; AddOnNo: Code[20]; OptionItem: Record Item; OptionLineNo: Integer)
+    var
+        POSActionRunItemAddOn: Codeunit "NPR POS Action: RunItemAddOn B";
+        OptionValue: JsonObject;
+        UserSelection: JsonObject;
+        OptionValueText: Text;
+    begin
+        // Same shape as the cashier dialog's radio value
+        OptionValue.Add('item', OptionItem."No.");
+        OptionValue.Add('variant', '');
+        OptionValue.Add('optionLineNo', OptionLineNo);
+        OptionValue.WriteTo(OptionValueText);
+        UserSelection.Add('10000', OptionValueText);
+        POSActionRunItemAddOn.RunItemAddOns(ParentSaleLine."Line No.", AddOnNo, false, true, true, UserSelection.AsToken());
+    end;
+
+    local procedure FindAddOnLink(ParentSaleLine: Record "NPR POS Sale Line"; var SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn")
+    begin
+        SaleLinePOSAddOn.Reset();
+        SaleLinePOSAddOn.SetRange("Register No.", ParentSaleLine."Register No.");
+        SaleLinePOSAddOn.SetRange("Sales Ticket No.", ParentSaleLine."Sales Ticket No.");
+        SaleLinePOSAddOn.SetRange("Applies-to Line No.", ParentSaleLine."Line No.");
+        _Assert.AreEqual(1, SaleLinePOSAddOn.Count(), 'The Select group must have exactly one add-on line.');
+        SaleLinePOSAddOn.FindFirst();
     end;
 
     local procedure FindSaleLine(SalePOS: Record "NPR POS Sale"; ItemNo: Code[20]; var SaleLine: Record "NPR POS Sale Line")

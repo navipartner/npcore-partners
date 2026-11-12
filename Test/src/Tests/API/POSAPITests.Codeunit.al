@@ -1360,6 +1360,149 @@ codeunit 85157 "NPR POS API Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleLine_WithSelectAddon_ReturnsAddonIdentityAndPerUnit()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        Body: JsonObject;
+        OptionItem: Record Item;
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        QuantityAddOnLine: Record "NPR NpIa Item AddOn Line";
+        FirstOption: Record "NPR NpIa ItemAddOn Line Opt.";
+        ItemAddOnLineOpt: Record "NPR NpIa ItemAddOn Line Opt.";
+        SaleId: Guid;
+        SaleLineId: Guid;
+        AddonLineId: Guid;
+        QuantityAddonLineId: Guid;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        ResponseBody: JsonObject;
+        JToken: JsonToken;
+        SaleLinesArray: JsonArray;
+        SaleLineToken: JsonToken;
+        SaleLineObj: JsonObject;
+        i: Integer;
+        FoundAddon: Boolean;
+        FoundQuantityAddon: Boolean;
+    begin
+        // [SCENARIO] An add-on line created from a Select option returns the add-on identity, the chosen option and the option's Per Unit flag
+        InitializeAddon();
+
+        // [GIVEN] A Select add-on line with two options on the same item, only the second one Per Unit
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(OptionItem, _POSUnit, _POSStore);
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, _ItemAddon."No.", _AddonItem."No.",
+            ItemAddOnLine."Use Unit Price"::"Non-Zero", 0);
+        ItemAddOnLine.Type := ItemAddOnLine.Type::Select;
+        ItemAddOnLine."Item No." := '';
+        ItemAddOnLine.Modify();
+        LibraryRestaurant.CreateItemAddonLineOption(FirstOption, ItemAddOnLine, OptionItem."No.",
+            FirstOption."Use Unit Price"::"Non-Zero", 0);
+        LibraryRestaurant.CreateItemAddonLineOption(ItemAddOnLineOpt, ItemAddOnLine, OptionItem."No.",
+            ItemAddOnLineOpt."Use Unit Price"::"Non-Zero", 0);
+        ItemAddOnLineOpt."Per Unit" := true;
+        ItemAddOnLineOpt.Modify();
+
+        // [GIVEN] A Quantity add-on line
+        LibraryRestaurant.CreateItemAddonLine(QuantityAddOnLine, _ItemAddon."No.", _AddonItem."No.",
+            QuantityAddOnLine."Use Unit Price"::"Non-Zero", 0);
+        Commit();
+
+        // [GIVEN] A sale with a parent line
+        SaleId := CreateGuid();
+        SaleLineId := CreateGuid();
+        AddonLineId := CreateGuid();
+        QuantityAddonLineId := CreateGuid();
+
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        Clear(Body);
+        Body.Add('type', 'Item');
+        Body.Add('code', _Item."No.");
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create parent sale line should succeed');
+
+        // [WHEN] The second option and the Quantity add-on are added as add-on lines
+        Clear(Body);
+        Body.Add('lineId', FormatGuid(AddonLineId));
+        Body.Add('parentLineId', FormatGuid(SaleLineId));
+        Body.Add('addonNo', _ItemAddon."No.");
+        Body.Add('addonLineNo', Format(ItemAddOnLine."Line No."));
+        Body.Add('selectedOptionLineNo', Format(ItemAddOnLineOpt."Line No."));
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId) + '/addon', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create addon line should succeed');
+
+        Clear(Body);
+        Body.Add('lineId', FormatGuid(QuantityAddonLineId));
+        Body.Add('parentLineId', FormatGuid(SaleLineId));
+        Body.Add('addonNo', _ItemAddon."No.");
+        Body.Add('addonLineNo', Format(QuantityAddOnLine."Line No."));
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId) + '/addon', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create Quantity addon line should succeed');
+
+        // [THEN] The Select add-on line carries addonNo, addonLineNo, the chosen option and the option's Per Unit flag
+        QueryParams.Add('withLines', 'true');
+        Clear(Body);
+        Response := LibraryNPRetailAPI.CallApi('GET', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Get sale should succeed');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        ResponseBody.Get('saleLines', JToken);
+        SaleLinesArray := JToken.AsArray();
+
+        for i := 0 to SaleLinesArray.Count() - 1 do begin
+            SaleLinesArray.Get(i, SaleLineToken);
+            SaleLineObj := SaleLineToken.AsObject();
+            if SaleLineObj.Get('isAddon', JToken) and JToken.AsValue().AsBoolean() then begin
+                SaleLineObj.Get('addonNo', JToken);
+                Assert.AreEqual(_ItemAddon."No.", JToken.AsValue().AsText(), 'addonNo should be the add-on the line came from');
+                SaleLineObj.Get('addonLineNo', JToken);
+                if JToken.AsValue().AsInteger() = ItemAddOnLine."Line No." then begin
+                    FoundAddon := true;
+                    SaleLineObj.Get('selectedOptionLineNo', JToken);
+                    Assert.AreEqual(ItemAddOnLineOpt."Line No.", JToken.AsValue().AsInteger(), 'selectedOptionLineNo should be the chosen option');
+                    SaleLineObj.Get('perUnit', JToken);
+                    Assert.IsTrue(JToken.AsValue().AsBoolean(), 'perUnit should be the chosen option flag');
+                end else begin
+                    FoundQuantityAddon := true;
+                    Assert.AreEqual(QuantityAddOnLine."Line No.", JToken.AsValue().AsInteger(), 'addonLineNo should be the Quantity line');
+                    Assert.IsFalse(SaleLineObj.Contains('selectedOptionLineNo'), 'Quantity add-on should not carry selectedOptionLineNo');
+                end;
+            end;
+        end;
+        Assert.IsTrue(FoundAddon, 'Should find the Select addon line in sale');
+        Assert.IsTrue(FoundQuantityAddon, 'Should find the Quantity addon line in sale');
+
+        // [WHEN] The same Select group on the same parent line is changed to the first option
+        QueryParams.Remove('withLines');
+        Clear(Body);
+        Body.Add('lineId', FormatGuid(CreateGuid()));
+        Body.Add('parentLineId', FormatGuid(SaleLineId));
+        Body.Add('addonNo', _ItemAddon."No.");
+        Body.Add('addonLineNo', Format(ItemAddOnLine."Line No."));
+        Body.Add('selectedOptionLineNo', Format(FirstOption."Line No."));
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId) + '/addon', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Changing the option should succeed');
+
+        // [THEN] The existing add-on line reports the first option and its Per Unit flag
+        Clear(Body);
+        Response := LibraryNPRetailAPI.CallApi('GET', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(AddonLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Get addon line should succeed');
+        SaleLineObj := LibraryNPRetailAPI.GetResponseBody(Response);
+        SaleLineObj.Get('selectedOptionLineNo', JToken);
+        Assert.AreEqual(FirstOption."Line No.", JToken.AsValue().AsInteger(), 'selectedOptionLineNo should follow the option change');
+        SaleLineObj.Get('perUnit', JToken);
+        Assert.IsFalse(JToken.AsValue().AsBoolean(), 'perUnit should follow the option change');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure SaleLine_WithAddon_UseUnitPriceNonZero_WithPrice_Success()
     var
         LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";

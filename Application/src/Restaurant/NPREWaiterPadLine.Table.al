@@ -484,6 +484,11 @@
             Caption = 'Copy Serial No.';
             DataClassification = CustomerContent;
         }
+        field(146; "Selected Option Line No."; Integer)
+        {
+            Caption = 'Selected Option Line No.';
+            DataClassification = CustomerContent;
+        }
         field(150; Indentation; Integer)
         {
             Caption = 'Indentation';

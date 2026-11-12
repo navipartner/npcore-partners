@@ -318,6 +318,11 @@ codeunit 6248630 "NPR API POS Sale Line"
             Json.AddProperty('isAddon', true);
             ParentPOSSaleLine.Get(NpIaSaleLinePOSAddOn."Register No.", NpIaSaleLinePOSAddOn."Sales Ticket No.", NpIaSaleLinePOSAddOn."Sale Date", NpIaSaleLinePOSAddOn."Sale Type", NpIaSaleLinePOSAddOn."Applies-to Line No.");
             Json.AddProperty('appliesToLine', Format(ParentPOSSaleLine.SystemId, 0, 4).ToLower());
+            Json.AddProperty('addonNo', NpIaSaleLinePOSAddOn."AddOn No.");
+            Json.AddProperty('addonLineNo', NpIaSaleLinePOSAddOn."AddOn Line No.");
+            if NpIaSaleLinePOSAddOn."Selected Option Line No." <> 0 then
+                Json.AddProperty('selectedOptionLineNo', NpIaSaleLinePOSAddOn."Selected Option Line No.");
+            Json.AddProperty('perUnit', NpIaSaleLinePOSAddOn."Per Unit");
         end else begin
             Json.AddProperty('isAddon', false);
         end;
@@ -517,7 +522,8 @@ codeunit 6248630 "NPR API POS Sale Line"
             TempItemAddOnLine."Per Unit" := ItemAddOnLineOpt."Per Unit";
             if ItemAddOnLineOpt.Quantity <> 0 then
                 TempItemAddOnLine.Quantity := ItemAddOnLineOpt.Quantity;
-        end;
+        end else
+            SelectedOptionLineNo := 0;
 
         if TempItemAddOnLine."Fixed Quantity" then begin
             if TempItemAddOnLine.Quantity <> Quantity then
@@ -532,7 +538,7 @@ codeunit 6248630 "NPR API POS Sale Line"
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.SetPosition(ParentLine.GetPosition());
 
-        if not ItemAddOnMgt.InsertPOSAddOnLine(TempItemAddOnLine, POSSaleRec, POSSaleLine, ParentLine."Line No.", CreatedLine, AddonSaleLineId) then
+        if not ItemAddOnMgt.InsertPOSAddOnLine(TempItemAddOnLine, POSSaleRec, POSSaleLine, ParentLine."Line No.", CreatedLine, AddonSaleLineId, SelectedOptionLineNo) then
             Error('Inserting POS addon line failed');
     end;
 

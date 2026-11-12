@@ -103,6 +103,11 @@
             Caption = 'AddOn Item No.';
             DataClassification = CustomerContent;
         }
+        field(170; "Selected Option Line No."; Integer)
+        {
+            Caption = 'Selected Option Line No.';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

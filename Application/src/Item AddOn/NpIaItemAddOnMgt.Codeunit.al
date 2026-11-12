@@ -201,17 +201,13 @@
                             begin
                                 ItemAddOn_LineJObject.Add('type', 'radio');
                                 Clear(ValueJObject);
-                                if AddOnSaleLinePOS."No." <> '' then begin
-                                    ValueJObject.Add('item', AddOnSaleLinePOS."No.");
-                                    ValueJObject.Add('variant', AddOnSaleLinePOS."Variant Code");
-                                end;
+                                if AddOnSaleLinePOS."No." <> '' then
+                                    ValueJObject := SelectedOptionValue(AddOnSaleLinePOS, ItemAddOnLine);
                                 ItemAddOn_LineJObject.Add('value', JObjectToText(ValueJObject));
 
                                 Clear(ItemAddOn_LineOptionsJArray);
                                 repeat
-                                    Clear(ValueJObject);
-                                    ValueJObject.Add('item', ItemAddOnLineOption."Item No.");
-                                    ValueJObject.Add('variant', ItemAddOnLineOption."Variant Code");
+                                    ValueJObject := OptionValue(ItemAddOnLineOption);
 
                                     Clear(ItemAddOn_LineOptionJObject);
                                     if ItemAddOnLineOption.Description = '' then
@@ -295,6 +291,34 @@
             LineCaption := LineCaption + '/' + PerUnitLbl;
     end;
 
+    local procedure OptionValue(ItemAddOnLineOption: Record "NPR NpIa ItemAddOn Line Opt.") ValueJObject: JsonObject
+    begin
+        ValueJObject.Add('item', ItemAddOnLineOption."Item No.");
+        ValueJObject.Add('variant', ItemAddOnLineOption."Variant Code");
+        ValueJObject.Add('optionLineNo', ItemAddOnLineOption."Line No.");
+    end;
+
+    local procedure SelectedOptionValue(AddOnSaleLinePOS: Record "NPR POS Sale Line"; ItemAddOnLine: Record "NPR NpIa Item AddOn Line") ValueJObject: JsonObject
+    var
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        ItemAddOnLineOption: Record "NPR NpIa ItemAddOn Line Opt.";
+    begin
+        FilterSaleLinePOS2ItemAddOnPOSLine(AddOnSaleLinePOS, SaleLinePOSAddOn);
+        if SaleLinePOSAddOn.FindFirst() and (SaleLinePOSAddOn."Selected Option Line No." <> 0) then
+            if ItemAddOnLineOption.Get(ItemAddOnLine."AddOn No.", ItemAddOnLine."Line No.", SaleLinePOSAddOn."Selected Option Line No.") then begin
+                ValueJObject := OptionValue(ItemAddOnLineOption);
+                exit;
+            end;
+
+        // Lines saved before the option was stored: match by item and variant
+        ItemAddOnLineOption.SetRange("AddOn No.", ItemAddOnLine."AddOn No.");
+        ItemAddOnLineOption.SetRange("AddOn Line No.", ItemAddOnLine."Line No.");
+        ItemAddOnLineOption.SetRange("Item No.", AddOnSaleLinePOS."No.");
+        ItemAddOnLineOption.SetRange("Variant Code", AddOnSaleLinePOS."Variant Code");
+        if ItemAddOnLineOption.FindFirst() then
+            ValueJObject := OptionValue(ItemAddOnLineOption);
+    end;
+
     local procedure ItemNoAndVariantCodeAsDescription(ItemNo: Code[20]; VariantCode: Code[10]): Text
     var
         ItemNoLbl: Label 'Item: %1';
@@ -355,6 +379,9 @@
         AddonLineKey: Text;
         SelectedAddonLineKeys: List of [Text];
         LastErrorText: Text;
+        SelectedOptionLineNo: Integer;
+        SelectedOptionLineNos: Dictionary of [Integer, Integer];
+        NullGuid: Guid;
     begin
         if SelectedAddOnLines.IsValue() then
             if SelectedAddOnLines.AsValue().IsNull() then
@@ -366,9 +393,11 @@
         SelectedAddonLineKeys := SelectedAddOnLines.AsObject().Keys();
         foreach AddonLineKey in SelectedAddonLineKeys do begin
             SelectedAddOnLines.AsObject().Get(AddonLineKey, JToken);
-            if ParsePOSAddOnLine(ItemAddOn, JToken, AddonLineKey, ItemAddOnLine) then begin
+            if ParsePOSAddOnLine(ItemAddOn, JToken, AddonLineKey, ItemAddOnLine, SelectedOptionLineNo) then begin
                 TempItemAddOnLine := ItemAddOnLine;
                 TempItemAddOnLine.Insert();
+                if SelectedOptionLineNo <> 0 then
+                    SelectedOptionLineNos.Set(ItemAddOnLine."Line No.", SelectedOptionLineNo);
             end;
         end;
 
@@ -416,7 +445,9 @@
         POSSession.GetSaleLine(POSSaleLine);
         TempItemAddOnLine.FindSet();
         repeat
-            if InsertPOSAddOnLine(TempItemAddOnLine, SalePOS, POSSaleLine, AppliesToLineNo, SaleLinePOS) then
+            SelectedOptionLineNo := 0;
+            if SelectedOptionLineNos.Get(TempItemAddOnLine."Line No.", SelectedOptionLineNo) then;
+            if InsertPOSAddOnLine(TempItemAddOnLine, SalePOS, POSSaleLine, AppliesToLineNo, SaleLinePOS, NullGuid, SelectedOptionLineNo) then
                 if SelectedAddOnLines.AsObject().Get(CommentLineID(TempItemAddOnLine."Line No."), JToken) then
                     InsertPOSAddOnLineComment(JToken, ItemAddOn, SaleLinePOS);
         until TempItemAddOnLine.Next() = 0;
@@ -513,10 +544,10 @@
     var
         NullGuid: Guid;
     begin
-        exit(InsertPOSAddOnLine(ItemAddOnLine, SalePOS, POSSaleLine, AppliesToLineNo, SaleLinePOS, NullGuid));
+        exit(InsertPOSAddOnLine(ItemAddOnLine, SalePOS, POSSaleLine, AppliesToLineNo, SaleLinePOS, NullGuid, 0));
     end;
 
-    internal procedure InsertPOSAddOnLine(ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; SalePOS: Record "NPR POS Sale"; POSSaleLine: Codeunit "NPR POS Sale Line"; AppliesToLineNo: Integer; var SaleLinePOS: Record "NPR POS Sale Line"; NewLineSystemId: Guid): Boolean
+    internal procedure InsertPOSAddOnLine(ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; SalePOS: Record "NPR POS Sale"; POSSaleLine: Codeunit "NPR POS Sale Line"; AppliesToLineNo: Integer; var SaleLinePOS: Record "NPR POS Sale Line"; NewLineSystemId: Guid; SelectedOptionLineNo: Integer): Boolean
     var
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
         Item: Record Item;
@@ -612,6 +643,7 @@
             SaleLinePOSAddOn.AddOnItemNo := ItemAddOnLine."Item No.";
             SaleLinePOSAddOn.DiscountPercent := ItemAddOnLine."Discount %";
             SaleLinePOSAddOn.DiscountAmount := ItemAddOnLine.DiscountAmount;
+            SaleLinePOSAddOn."Selected Option Line No." := SelectedOptionLineNo;
             SaleLinePOSAddOn.Insert(true);
 
             POSSaleLine.SetUsePresetLineNo(true);
@@ -666,6 +698,16 @@
             POSSaleLine.RefreshCurrent();
         end;
 
+        FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
+        if SaleLinePOSAddOn.FindFirst() then begin
+            SaleLinePOSAddOn."Selected Option Line No." := SelectedOptionLineNo;
+            SaleLinePOSAddOn."Per Unit" := ItemAddOnLine."Per Unit";
+            SaleLinePOSAddOn."Fixed Quantity" := ItemAddOnLine."Fixed Quantity";
+            SaleLinePOSAddOn.AddOnItemNo := ItemAddOnLine."Item No.";
+            SaleLinePOSAddOn.DiscountPercent := ItemAddOnLine."Discount %";
+            SaleLinePOSAddOn.Modify();
+        end;
+
         exit(true);
     end;
 
@@ -708,7 +750,7 @@
         end;
     end;
 
-    local procedure ParsePOSAddOnLine(ItemAddOn: Record "NPR NpIa Item AddOn"; SelectedAddOnLine: JsonToken; AddonLineKey: Text; var ItemAddOnLine: Record "NPR NpIa Item AddOn Line"): Boolean
+    local procedure ParsePOSAddOnLine(ItemAddOn: Record "NPR NpIa Item AddOn"; SelectedAddOnLine: JsonToken; AddonLineKey: Text; var ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; var SelectedOptionLineNo: Integer): Boolean
     var
         ItemAddOnLineOption: Record "NPR NpIa ItemAddOn Line Opt.";
         JsonHelper: Codeunit "NPR Json Helper";
@@ -716,7 +758,9 @@
         ItemNo: Code[20];
         VariantCode: Code[10];
         LineNo: Integer;
+        OptionLineNo: Integer;
     begin
+        SelectedOptionLineNo := 0;
         if not Evaluate(LineNo, AddonLineKey) or (LineNo = 0) then
             exit(false);
         ItemAddOnLine.Get(ItemAddOn."No.", LineNo);
@@ -745,12 +789,18 @@
                         ItemNo := JsonHelper.GetJCode(SelectedItemVariant, 'item', MaxStrLen(ItemNo), false);
                         VariantCode := JsonHelper.GetJCode(SelectedItemVariant, 'variant', MaxStrLen(VariantCode), false);
 #pragma warning restore
-                        if ItemNo <> '' then begin
-                            ItemAddOnLineOption.SetRange("AddOn No.", ItemAddOnLine."AddOn No.");
-                            ItemAddOnLineOption.SetRange("AddOn Line No.", ItemAddOnLine."Line No.");
-                            ItemAddOnLineOption.SetRange("Item No.", ItemNo);
-                            ItemAddOnLineOption.SetRange("Variant Code", VariantCode);
-                            ItemAddOnLineOption.FindFirst();
+                        OptionLineNo := JsonHelper.GetJInteger(SelectedItemVariant, 'optionLineNo', false);
+                        if (ItemNo <> '') or (OptionLineNo <> 0) then begin
+                            if OptionLineNo <> 0 then
+                                ItemAddOnLineOption.Get(ItemAddOnLine."AddOn No.", ItemAddOnLine."Line No.", OptionLineNo)
+                            else begin
+                                ItemAddOnLineOption.SetRange("AddOn No.", ItemAddOnLine."AddOn No.");
+                                ItemAddOnLineOption.SetRange("AddOn Line No.", ItemAddOnLine."Line No.");
+                                ItemAddOnLineOption.SetRange("Item No.", ItemNo);
+                                ItemAddOnLineOption.SetRange("Variant Code", VariantCode);
+                                ItemAddOnLineOption.FindFirst();
+                            end;
+                            SelectedOptionLineNo := ItemAddOnLineOption."Line No.";
 
                             ItemAddOnLine."Item No." := ItemAddOnLineOption."Item No.";
                             ItemAddOnLine."Variant Code" := ItemAddOnLineOption."Variant Code";
