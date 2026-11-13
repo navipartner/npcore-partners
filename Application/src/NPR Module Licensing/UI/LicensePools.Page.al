@@ -4,7 +4,7 @@ page 6184518 "NPR License Pools"
     PageType = ListPart;
     SourceTable = "NPR License Pool";
     UsageCategory = None;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = All;
     Editable = false;
     Extensible = false;
 

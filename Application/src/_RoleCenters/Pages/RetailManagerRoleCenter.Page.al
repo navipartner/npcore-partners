@@ -14,7 +14,8 @@
             }
             part(Control6150616; "NPR Activities")
             {
-                ApplicationArea = NPRRetail;
+                // CORE-2396: keep this part visible so unlicensed users get the missing-license notice
+                ApplicationArea = All;
             }
             part(NPRetailPOSEntryCue; "NPR POS Entry Cue")
             {
@@ -63,6 +64,17 @@
     }
     actions
     {
+        area(embedding)
+        {
+            action(NPRLicensedUsersTop)
+            {
+                Caption = 'Licensed Users';
+                RunObject = Page "NPR Licensed Users";
+                ToolTip = 'View or edit which users have which NP module licenses.';
+                // CORE-2396: All, so an admin without an NP license can still assign licenses
+                ApplicationArea = All;
+            }
+        }
         area(reporting)
         {
             group(ActionGroup6014406)

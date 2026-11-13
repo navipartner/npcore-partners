@@ -78,6 +78,7 @@ codeunit 6151434 "NPR Feature Management Install"
         AddFeature(Feature::"Shopify Ecommerce Order Experience");
         AddFeature(Feature::"NPR Module Licensing");
         AddFeature(Feature::"Async Adyen Payment Processing");
+        AddFeature(Feature::"License-Based Module Access");
 #endif
         AddFeature(Feature::"New Attraction Print Exerience");
         AddFeature(Feature::"New Restaurant Print Experience");

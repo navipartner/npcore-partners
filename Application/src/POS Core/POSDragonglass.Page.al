@@ -22,6 +22,7 @@ page 6150750 "NPR POS (Dragonglass)"
                     POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
                     POSSession: Codeunit "NPR POS Session"; //Single instance
                     POSDragonglassRunMethod: Codeunit "NPR POS Dragonglass Run Method";
+                    LicenseMgt: Codeunit "NPR License Mgt.";
                     Sentry: Codeunit "NPR Sentry";
                     KeepAliveSpan: Codeunit "NPR Sentry Span";
                     FrameworkReadySpan: Codeunit "NPR Sentry Span";
@@ -53,6 +54,14 @@ page 6150750 "NPR POS (Dragonglass)"
                     end;
                     if method = 'FrameworkReady' then begin //once when POS frontend has loaded
                         Sentry.StartSpan(FrameworkReadySpan, 'bc.pos.framework-ready');
+
+                        // Close first: an error raised while a cached page is open crashes the web client.
+                        if not LicenseMgt.IsPOSStartAllowed() then begin
+                            FrameworkReadySpan.Finish();
+                            Sentry.FinalizeScope();
+                            CurrPage.Close();
+                            LicenseMgt.RaisePOSNotLicensedError();
+                        end;
 
                         POSBackgroundTaskAPI.Initialize(_POSBackgroundTaskManager);
                         POSSession.Constructor(POSBackgroundTaskAPI);
@@ -121,7 +130,12 @@ page 6150750 "NPR POS (Dragonglass)"
         POSSession: Codeunit "NPR POS Session";
         ClientDiagnostic: Record "NPR Client Diagnostic v2";
         UserLoginType: Enum "NPR User Login Type";
+        LicenseMgt: Codeunit "NPR License Mgt.";
     begin
+        if not LicenseMgt.CheckBackOfficeLicenseForPOSPage() then begin
+            CurrPage.Close();
+            exit;
+        end;
         _PageId := CreateGuid();
         POSSession.SetPageId(_PageId);
         TempAction.DiscoverActions();

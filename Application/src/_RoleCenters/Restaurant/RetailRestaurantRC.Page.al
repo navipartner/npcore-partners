@@ -11,7 +11,8 @@
         {
             part("NP Retail Resturant Cue"; "NPR Restaurant Activities")
             {
-                ApplicationArea = NPRRetail;
+                // CORE-2396: keep this part visible so unlicensed users get the missing-license notice
+                ApplicationArea = All;
             }
             part("Team Member Activities No Msgs"; "Team Member Activities No Msgs")
             {

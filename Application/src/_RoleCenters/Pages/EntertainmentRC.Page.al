@@ -17,7 +17,8 @@
             }
             part(Control2; "NPR Retail Enter. Act - Ticket")
             {
-                ApplicationArea = NPRRetail;
+                // CORE-2396: keep this part visible so unlicensed users get the missing-license notice
+                ApplicationArea = All;
 
             }
             part(Control20; "NPR RC Ticket Activities")

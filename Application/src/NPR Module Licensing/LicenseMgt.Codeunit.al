@@ -2,14 +2,19 @@
 // keying (the new tables carry Module), the /api/v1 base URL, the parser reading `module`,
 // the Status enum + raw "Status (API)" helper, current-period selection by date, and minimal renames
 // (POS Billing / Allowance -> License / Pool where the model changed). Everything else mirrors the legacy logic.
+// CORE-2396: only users with a POS-granting SKU (POS, Attraction POS) can use the POS; see "POS license gate" below.
+// How licensing works as a whole (model, where it is enforced, exemptions, expected behaviour): README.md here.
 codeunit 6248739 "NPR License Mgt."
 {
     Access = Internal;
     SingleInstance = true;
 
-    // The MODULE_LICENSING_INTEGRATION_DEV compiler symbol switches to the prelive API and forces the
-    // controlled-environment + feature checks on, so the integration can be exercised from a sandbox.
-    // (Kept as-is from the legacy module; rename to a licensing-specific symbol is on the follow-up list.)
+    // Developer symbols (never set by the pipeline):
+    // - MODULE_LICENSING_INTEGRATION_DEV: enforce as in a production tenant and talk to the PRELIVE portal
+    //   (integration development).
+    // - MODULE_LICENSING_LOCAL_DEV: enforce as in a production tenant but never call the portal; the rows on
+    //   NPR Licensed Users are the truth (activation, sync and the feature probe are skipped). For NpCore
+    //   development that only needs the gates. Set at most one of the two.
 
     var
 #if MODULE_LICENSING_INTEGRATION_DEV
@@ -19,11 +24,12 @@ codeunit 6248739 "NPR License Mgt."
         ApiBaseUrlTok: Label 'https://bc-pos-billing-api.npretail.app/api/v1', Locked = true;
         CustomerPortalAppUrlTok: Label 'https://portal.navipartner.com', Locked = true;
 #endif
-        UserNotLicensedErr: Label 'You are not a licensed %1 user. Please contact your administrator.', Comment = '%1 = Module';
         NotEnoughLicensesBuyMoreLicensesErr: Label 'Not enough licenses to activate this user.\Module: %1\License term: %2\Licenses purchased: %3', Comment = '%1 = Module, %2 = License Term, %3 = number of purchased licenses';
-        OpenCustomerPortalActionLbl: Label 'Open %1', Comment = '%1 = the Customer Portal product name (injected from the locked token below so it is never translated)';
+        OpenCustomerPortalActionLbl: Label 'Open %1', Comment = '%1 = what the action opens: the Customer Portal product name (locked token) or a page caption';
         CustomerPortalNameTok: Label 'Customer Portal', Locked = true;
-        UserLicenseNotActiveErr: Label 'The license for user %1 is not active. Try to activate it or contact your administrator.', Comment = '%1 = User';
+        POSNotLicensedErr: Label 'Your user has no POS license, so the POS cannot be used. Ask your administrator to assign a %1 or %2 license on the %3 page.', Comment = '%1 = "Retail POS" SKU name, %2 = "Attraction POS" SKU name, %3 = Licensed Users page caption';
+        BackOfficeNotLicensedMsg: Label 'NP Retail is hidden because your user has no NP Retail license (%1, %2, %3 or %4). Ask your administrator to assign one on the %5 page, then sign out and sign in again.', Comment = '%1..%4 = SKU names Retail POS, Retail without POS, Attraction POS, Attraction without POS, %5 = Licensed Users page caption';
+        POSPageNotLicensedMsg: Label 'The POS cannot be opened because your user has no NP Retail license. Ask your administrator to assign a %1 or %2 license on the %3 page.', Comment = '%1 = "Retail POS" SKU name, %2 = "Attraction POS" SKU name, %3 = Licensed Users page caption';
         ApiResponseErr: Label 'License verification service returned an error (Status: %1). Please contact your administrator.', Comment = '%1 = HTTP status';
         ApiCallFailedErr: Label 'Failed to send %1 request to API endpoint %2.', Comment = '%1 = HTTP method, %2 = endpoint';
         ApiResponseReadErr: Label 'Failed to read response content from API.';
@@ -38,7 +44,7 @@ codeunit 6248739 "NPR License Mgt."
         MalformedPoolDatesErr: Label 'ParsePoolsJsonToTable() pool %1: missing or unparseable validSince/validUntil.', Comment = '%1 = license pool id', Locked = true;
         AkvApiKeyTok: Label 'NpPosBillingLicenseApiKey', Locked = true;
         _PoolsLoaded: Boolean;
-        _LicenseValidationDone: Boolean;
+        _PoolsSyncAttempted: Boolean;
         _TenantId: Text;
         _ApiSecretToken: SecretText;
         _HttpClient: HttpClient;
@@ -119,10 +125,10 @@ codeunit 6248739 "NPR License Mgt."
     begin
         LicenseUser.TestField("License Term");
 
-        // License enforcement is controlled-environment-only (mirrors ProceedLicenseValidationFromPOS). Outside a
-        // controlled env (e.g. a SaaS sandbox) there is no portal to verify against, so activation is left
-        // unrestricted instead of hitting the prod portal -> 422 -> a permanent "try again later".
-        if not IsControlledEnvironment() then
+        // Pool checks need the portal. Outside a controlled env (e.g. a SaaS sandbox) there is no portal to
+        // verify against, so activation is left unrestricted instead of hitting the prod portal -> 422 -> a
+        // permanent "try again later". Same under MODULE_LICENSING_LOCAL_DEV.
+        if not IsPortalSyncEnabled() then
             exit;
 
         if not _PoolsLoaded then begin
@@ -170,7 +176,7 @@ codeunit 6248739 "NPR License Mgt."
 
     local procedure SyncTenant()
     begin
-        if not IsControlledEnvironment() then
+        if not IsPortalSyncEnabled() then
             exit;
         if _SyncTenantAttemptDone then
             exit;
@@ -225,7 +231,7 @@ codeunit 6248739 "NPR License Mgt."
 
     local procedure SyncEnvironment()
     begin
-        if not IsControlledEnvironment() then
+        if not IsPortalSyncEnabled() then
             exit;
         if (not _TenantSynced) or _EnvironmentSynced then
             exit;
@@ -280,7 +286,7 @@ codeunit 6248739 "NPR License Mgt."
 
     local procedure SyncCompany()
     begin
-        if not IsControlledEnvironment() then
+        if not IsPortalSyncEnabled() then
             exit;
         if (not _TenantSynced) or (not _EnvironmentSynced) or _CompanySynced then
             exit;
@@ -342,7 +348,7 @@ codeunit 6248739 "NPR License Mgt."
         TempLicensePool: Record "NPR License Pool" temporary;
     begin
         Clear(_LastSyncFailureReason);
-        if not IsControlledEnvironment() then begin
+        if not IsPortalSyncEnabled() then begin
             _LastSyncFailureReason := PortalSyncProductionOnlyMsg;
             exit(false);
         end;
@@ -536,7 +542,7 @@ codeunit 6248739 "NPR License Mgt."
         // DataPerCompany=false, so the portal takes MAX across companies. Best-effort
         // - never fails the sync. Every known module is reported (incl. activeSeats 0)
         // so the portal can clear a module whose last active user was just deactivated.
-        if not IsControlledEnvironment() then
+        if not IsPortalSyncEnabled() then
             exit;
         InitGlobalVars();
 
@@ -563,6 +569,12 @@ codeunit 6248739 "NPR License Mgt."
                 exit('kds');
             Module::Scanner:
                 exit('scanner');
+            Module::RetailWithoutPOS:
+                exit('retail-without-pos');
+            Module::AttractionPOS:
+                exit('attraction-pos');
+            Module::AttractionWithoutPOS:
+                exit('attraction-without-pos');
         end;
         exit('');
     end;
@@ -759,18 +771,19 @@ codeunit 6248739 "NPR License Mgt."
     end;
 
     local procedure TryMapModule(ModuleSlug: Text; var TempLicensePool: Record "NPR License Pool" temporary): Boolean
+    var
+        ModuleInt: Integer;
+        Slug: Text;
     begin
-        case LowerCase(ModuleSlug) of
-            'pos':
-                TempLicensePool.Module := TempLicensePool.Module::POS;
-            'kds':
-                TempLicensePool.Module := TempLicensePool.Module::KDS;
-            'scanner':
-                TempLicensePool.Module := TempLicensePool.Module::Scanner;
-            else
-                exit(false);
+        // ModuleSlugOf is the single slug table; iterate it instead of keeping a second case list in sync.
+        foreach ModuleInt in Enum::"NPR License Module".Ordinals() do begin
+            Slug := ModuleSlugOf(ModuleInt);
+            if (Slug <> '') and (Slug = LowerCase(ModuleSlug)) then begin
+                TempLicensePool.Module := Enum::"NPR License Module".FromInteger(ModuleInt);
+                exit(true);
+            end;
         end;
-        exit(true);
+        exit(false);
     end;
 
     local procedure MapPoolStatus(StatusText: Text; var TempLicensePool: Record "NPR License Pool" temporary)
@@ -795,12 +808,43 @@ codeunit 6248739 "NPR License Mgt."
         exit(StrSubstNo('%1|%2', Module.AsInteger(), LicenseTerm.AsInteger()));
     end;
 
-    // ----------------------------------------------------------------- POS license gate (ported, validates the POS module)
+    // ----------------------------------------------------------------- POS license gate (CORE-2396)
+    // Checked when a POS session starts (every POS host raises OnInitialize), at salesperson login and on every
+    // Dragonglass web-service request without an open sale. Reads local license rows only (README.md).
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Session", OnInitialize, '', false, false)]
     local procedure OnPOSSessionInitialize(FrontEnd: Codeunit "NPR POS Front End Management")
     begin
-        ProceedLicenseValidationFromPOS();
+        if not IsEnforcementActive() then
+            exit;
+        // Backstop for the hosts without a page; the POS page has already asked IsPOSStartAllowed.
+        if not IsPOSStartAllowed() then
+            RaisePOSNotLicensedError();
+        UpdateLastLoginForCurrentUser();
+    end;
+
+    // The POS page asks before it builds the session, so it can close itself before the error: an error raised while
+    // a page the browser has cached is open crashes the web client ("Something went wrong").
+    internal procedure IsPOSStartAllowed(): Boolean
+    begin
+        if not IsEnforcementActive() then
+            exit(true);
+        // Sync first: it can reactivate a seat the portal just restored.
+        EnsurePoolsSyncedOnce();
+        if IsPOSLicensed() then
+            exit(true);
+        // The refusal's error rolls back what the sync wrote, so a retry must sync again (as before CORE-2396);
+        // otherwise the retry would pass on the rolled-back rows.
+        _PoolsSyncAttempted := false;
+        exit(false);
+    end;
+
+    // A POS can stay open for days and a seat can be suspended meanwhile, so check again at every salesperson
+    // login. Raised before the POS unit is opened and before anything is written.
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action - Login", OnAfterFindSalesperson, '', false, false)]
+    local procedure OnPOSLoginAfterFindSalesperson(var SalespersonPurchaser: Record "Salesperson/Purchaser")
+    begin
+        CheckPOSLicense();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR License User", OnAfterValidateEvent, Status, false, false)]
@@ -815,80 +859,243 @@ codeunit 6248739 "NPR License Mgt."
             end;
     end;
 
-    local procedure ProceedLicenseValidationFromPOS()
+    // Strict: an auto-suspended row does not count here; that grace is for back-office visibility only.
+    internal procedure IsPOSLicensed(): Boolean
+    var
+        LicenseCapabilityMgt: Codeunit "NPR License Capability Mgt.";
+    begin
+        if not IsEnforcementActive() then
+            exit(true);
+        exit(LicenseCapabilityMgt.UserHasCapability(UserSecurityId(), Enum::"NPR License Capability"::POSEndOfSale));
+    end;
+
+    internal procedure CheckPOSLicense()
+    begin
+        if not IsPOSLicensed() then
+            RaisePOSNotLicensedError();
+    end;
+
+    internal procedure RaisePOSNotLicensedError()
+    var
+        ErrInfo: ErrorInfo;
+    begin
+        ErrInfo := ErrorInfo.Create(StrSubstNo(POSNotLicensedErr, Enum::"NPR License Module"::POS, Enum::"NPR License Module"::AttractionPOS, LicensedUsersPageCaption()));
+        ErrInfo.AddAction(StrSubstNo(OpenCustomerPortalActionLbl, CustomerPortalNameTok), Codeunit::"NPR License Mgt.", 'OpenCustomerPortal');
+        Error(ErrInfo);
+    end;
+
+    // Raised while a role center opens, the only moment a Notification sent from AL reliably renders (OnAfterLogin
+    // is too early; GlobalScope is rejected by BC): Microsoft's role centers raise OnBeforeShowNotifications, and the
+    // activities parts of Microsoft's and NP's role centers raise OnRoleCenterOpen. NP role centers keep that part
+    // visible (ApplicationArea = All) because all their other parts are hidden without Back Office.
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Role Center Notification Mgt.", 'OnBeforeShowNotifications', '', false, false)]
+    local procedure OnBeforeShowRoleCenterNotifications()
+    begin
+        NotifyMissingBackOfficeLicense();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Conf./Personalization Mgt.", 'OnRoleCenterOpen', '', false, false)]
+    local procedure OnRoleCenterOpen()
+    begin
+        NotifyMissingBackOfficeLicense();
+    end;
+
+    // A Notification, never a Message: no modal at every role-center open. Notifications are not subject to
+    // application areas.
+    local procedure NotifyMissingBackOfficeLicense()
     var
         LicenseUser: Record "NPR License User";
-        TempLicensePool: Record "NPR License Pool" temporary;
-        RemoteValidationSuccessful: Boolean;
-        UserIdentifier: Text;
+        LicenseCapabilityMgt: Codeunit "NPR License Capability Mgt.";
+        LicenseAppAreaFilter: Codeunit "NPR License App Area Filter";
+        SessionModules: List of [Enum "NPR License Module"];
+        MissingLicenseNotification: Notification;
+        MissingLicenseNotificationIdTok: Label '7a1f3c2e-5d64-4b0b-9c1e-1f4710470001', Locked = true;
     begin
-        if _LicenseValidationDone then
+        // Whether this session's areas are filtered, decided once per session like the areas themselves.
+        if not LicenseAppAreaFilter.IsSessionFiltered() then
+            exit;
+        // A pending assignment may already grant access. Explain that a new sign-in is needed instead of
+        // claiming that the user has no license based on the running session's seats.
+        if NotifyPendingLicenseChanges() then
+            exit;
+        // The seats this session's areas were built with, not the live rows: the notice must match what is shown.
+        if not LicenseAppAreaFilter.GetSessionModules(SessionModules) then
+            exit;
+        if LicenseCapabilityMgt.AnyModuleGrants(SessionModules, Enum::"NPR License Capability"::BackOffice) then
+            exit;
+        MissingLicenseNotification.Message(StrSubstNo(BackOfficeNotLicensedMsg, Enum::"NPR License Module"::POS, Enum::"NPR License Module"::RetailWithoutPOS, Enum::"NPR License Module"::AttractionPOS, Enum::"NPR License Module"::AttractionWithoutPOS, LicensedUsersPageCaption()));
+        // Fixed id: both events can send it while one role center opens, and the client shows a given id once.
+        MissingLicenseNotification.Id := MissingLicenseNotificationIdTok;
+        MissingLicenseNotification.Scope := NotificationScope::LocalScope;
+        // Admins get a direct way to the page; users who cannot edit license rows only get the text.
+        if LicenseUser.WritePermission() then
+            MissingLicenseNotification.AddAction(StrSubstNo(OpenCustomerPortalActionLbl, LicensedUsersPageCaption()), Codeunit::"NPR License Mgt.", 'OpenLicensedUsers');
+        MissingLicenseNotification.Send();
+    end;
+
+    local procedure LicensedUsersPageCaption(): Text
+    var
+        PageMetadata: Record "Page Metadata";
+    begin
+        if PageMetadata.Get(Page::"NPR Licensed Users") then
+            exit(PageMetadata.Caption);
+    end;
+
+    local procedure NotifyPendingLicenseChanges(): Boolean
+    var
+        LicenseAppAreaFilter: Codeunit "NPR License App Area Filter";
+        LicenseChangeNotification: Notification;
+        LicenseChangeNotificationIdTok: Label '7a1f3c2e-5d64-4b0b-9c1e-1f4710470002', Locked = true;
+        LicenseChangePendingMsg: Label 'Your module licenses have changed. They are applied at your next sign-in or with Apply changes and restart; your other Business Central sessions are then closed.';
+        ApplyAndRestartActionLbl: Label 'Apply changes and restart';
+    begin
+        if not LicenseAppAreaFilter.LicenseChangePending() then
+            exit(false);
+        LicenseChangeNotification.Id := LicenseChangeNotificationIdTok;
+        LicenseChangeNotification.Scope := NotificationScope::LocalScope;
+        LicenseChangeNotification.Message(LicenseChangePendingMsg);
+        LicenseChangeNotification.AddAction(ApplyAndRestartActionLbl, Codeunit::"NPR License Mgt.", 'ApplyLicenseChangesAndRestart');
+        LicenseChangeNotification.Send();
+        exit(true);
+    end;
+
+    procedure ApplyLicenseChangesAndRestart(LicenseChangeNotification: Notification)
+    var
+        LicenseAppAreaFilter: Codeunit "NPR License App Area Filter";
+    begin
+        LicenseAppAreaFilter.SwitchToLiveModulesAndRestart();
+    end;
+
+    procedure OpenLicensedUsers(MissingLicenseNotification: Notification)
+    begin
+        Page.Run(Page::"NPR Licensed Users");
+    end;
+
+    // POS page: the add-in control is NPRRetail-tagged, so without Back Office it never loads and the POS
+    // license check (at FrameworkReady) never runs. Explain it instead of showing a blank page. A Message, not an
+    // Error: an error in OnOpenPage crashes the web client when the browser has cached the page.
+    internal procedure CheckBackOfficeLicenseForPOSPage(): Boolean
+    var
+        LicenseCapabilityMgt: Codeunit "NPR License Capability Mgt.";
+        LicenseAppAreaFilter: Codeunit "NPR License App Area Filter";
+        SessionModules: List of [Enum "NPR License Module"];
+    begin
+        if not LicenseAppAreaFilter.IsSessionFiltered() then
+            exit(true);
+        // The seats this session's areas were built with: they decide whether the add-in is visible.
+        if not LicenseAppAreaFilter.GetSessionModules(SessionModules) then
+            exit(true);
+        if LicenseCapabilityMgt.AnyModuleGrants(SessionModules, Enum::"NPR License Capability"::BackOffice) then
+            exit(true);
+        Message(POSPageNotLicensedMsg, Enum::"NPR License Module"::POS, Enum::"NPR License Module"::AttractionPOS, LicensedUsersPageCaption());
+        exit(false);
+    end;
+
+    local procedure EnsurePoolsSyncedOnce()
+    var
+        TempLicensePool: Record "NPR License Pool" temporary;
+    begin
+        // One portal round-trip per session (a refused POS start retries it). A failed sync is tolerated: the local license rows are then the truth until the next session.
+        if _PoolsSyncAttempted then
+            exit;
+        _PoolsSyncAttempted := true;
+        if not IsPortalSyncEnabled() then
             exit;
 
-        if not IsFeatureEnabled() then begin
-            _LicenseValidationDone := true;
-            exit;
+        InitGlobalVars();
+        if GetCurrentPoolsFromApi(TempLicensePool) then begin
+            PersistPools(TempLicensePool);
+            InvalidateLicensedUsers();
         end;
-
-        if IsControlledEnvironment() and not IsDelegatedUser(UserSecurityId()) then begin
-            InitGlobalVars();
-
-            RemoteValidationSuccessful := GetCurrentPoolsFromApi(TempLicensePool);
-            if RemoteValidationSuccessful then begin
-                PersistPools(TempLicensePool);
-                InvalidateLicensedUsers();
-            end;
-
-            if not LicenseUser.Get(UserSecurityId(), LicenseUser.Module::POS) then
-                Error(UserNotLicensedErr, LicenseUser.Module::POS);
-
-            if not (LicenseUser.Status in [LicenseUser.Status::Active]) then begin
-                LicenseUser.CalcFields("User Name");
-                if LicenseUser."User Name" <> '' then
-                    UserIdentifier := LicenseUser."User Name"
-                else
-                    UserIdentifier := Format(LicenseUser."User Security ID");
-                Error(UserLicenseNotActiveErr, UserIdentifier);
-            end;
-
-            UpdateLastLogin(LicenseUser.Module::POS);
-        end;
-
-        // Set only after the gate passes, so a blocked user can't slip in on a retry. Trade-off: repeated
-        // retries re-hit the portal — could cache the remote sync separately if performance troubles occur.
-        _LicenseValidationDone := true;
     end;
 
     local procedure IsFeatureEnabled(): Boolean
     var
         ModuleLicensingFeat: Codeunit "NPR Module Licensing Feat.";
-        Result: Boolean;
     begin
-        Result := false;
-#if MODULE_LICENSING_INTEGRATION_DEV
-        Result := true;
-        ModuleLicensingFeat := ModuleLicensingFeat;
-#else
-        Result := ModuleLicensingFeat.IsFeatureEnabled();
-#endif
-        exit(Result);
+        if IsEnforcementForcedByDevSymbol() then
+            exit(true);
+        exit(ModuleLicensingFeat.IsFeatureEnabled());
+    end;
+
+    // One switch for "is licensing enforced for the current user right now". The exemptions are product choices
+    // (README.md, "Who is not enforced"); an emergency switch-off belongs first here (INF-1117).
+    internal procedure IsEnforcementActive(): Boolean
+    var
+        User: Record User;
+    begin
+        if IsEnforcementForcedForTest() then
+            exit(true);
+        if not IsFeatureEnabled() then
+            exit(false);
+        if not IsControlledEnvironment() then
+            exit(false);
+        if IsDelegatedUser(UserSecurityId()) then
+            exit(false);
+        // An Entra application user cannot sign in to a client, so a session with a UI is a person. Decided without
+        // reading User: a permission set that leaves User out must not switch off the POS page gate or the UI filter.
+        if GuiAllowed() then
+            exit(true);
+        // Without a UI (web services): fail open when User cannot be read, as a person cannot be told apart from a
+        // kiosk's application user, and refusing would stop the kiosks.
+        if not User.ReadPermission() then
+            exit(false);
+        exit(not IsApplicationUser(UserSecurityId()));
+    end;
+
+    // Test seam: the Test app binds "NPR License Enforcement Mock" to run the gates as in a licensed SaaS
+    // production tenant, whatever the container identity. It can only switch enforcement on, never off.
+    // Application code must never subscribe.
+    local procedure IsEnforcementForcedForTest() Force: Boolean
+    begin
+        OnForceEnforcementForTest(Force);
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnForceEnforcementForTest(var Force: Boolean)
+    begin
+    end;
+
+    // True when the CORE-2396 UI gates (application-area filter, role-center notice, POS page check) must
+    // enforce for the current user: the rollout feature is on in this company AND the guards above hold.
+    internal procedure IsModuleAccessEnforced(): Boolean
+    var
+        LicenseModuleAccessFeat: Codeunit "NPR License Module Access Feat";
+    begin
+        if not LicenseModuleAccessFeat.IsFeatureEnabled() then
+            exit(false);
+        exit(IsEnforcementActive());
     end;
 
     internal procedure IsControlledEnvironment(): Boolean
     var
         EnvInfo: Codeunit "Environment Information";
-        Result: Boolean;
     begin
-        Result := false;
-#if MODULE_LICENSING_INTEGRATION_DEV
-        Result := true;
-        EnvInfo := EnvInfo;
+        if IsEnforcementForcedByDevSymbol() then
+            exit(true);
+        exit(EnvInfo.IsSaaSInfrastructure() and EnvInfo.IsProduction());
+    end;
+
+    // True where the Customer Portal may be called: a controlled environment, unless the local developer
+    // symbol says the license rows are maintained by hand.
+    internal procedure IsPortalSyncEnabled(): Boolean
+    begin
+#if MODULE_LICENSING_LOCAL_DEV
+        exit(false);
 #else
-        if EnvInfo.IsSaaSInfrastructure() then
-            if EnvInfo.IsProduction() then
-                Result := true;
+        exit(IsControlledEnvironment());
 #endif
-        exit(Result);
+    end;
+
+    local procedure IsEnforcementForcedByDevSymbol(): Boolean
+    begin
+#if MODULE_LICENSING_INTEGRATION_DEV
+        exit(true);
+#elif MODULE_LICENSING_LOCAL_DEV
+        exit(true);
+#else
+        exit(false);
+#endif
     end;
 
     [TryFunction]
@@ -915,9 +1122,10 @@ codeunit 6248739 "NPR License Mgt."
         _TenantId := DelChr(_TenantId, '<>', '{}');
     end;
 
-    local procedure UpdateLastLogin(Module: Enum "NPR License Module")
+    local procedure UpdateLastLoginForCurrentUser()
     var
         LicenseUser: Record "NPR License User";
+        LicenseCapabilityMgt: Codeunit "NPR License Capability Mgt.";
         TypeHelper: Codeunit "Type Helper";
         CurrentDateTimeInUTC: DateTime;
         MarginDuration: Duration;
@@ -925,11 +1133,17 @@ codeunit 6248739 "NPR License Mgt."
         CurrentDateTimeInUTC := TypeHelper.GetCurrUTCDateTime();
         MarginDuration := 5 * 60000; // Update max. every 5 minutes to avoid excessive writes (e.g. for WS calls).
 
-        if LicenseUser.Get(UserSecurityId(), Module) then
-            if LicenseUser."Last Login (DateTime)" < CurrentDateTimeInUTC - MarginDuration then begin
-                LicenseUser."Last Login (DateTime)" := CurrentDateTimeInUTC;
-                LicenseUser.Modify(true);
-            end;
+        LicenseUser.SetRange("User Security ID", UserSecurityId());
+        LicenseUser.SetRange(Status, LicenseUser.Status::Active);
+        if LicenseUser.FindSet(true) then
+            repeat
+                // Only POS-granting SKUs: Last Login is read as "used the POS", and KDS/Scanner seats must not look used by a POS login.
+                if LicenseCapabilityMgt.GrantsCapability(LicenseUser.Module, Enum::"NPR License Capability"::POSEndOfSale) then
+                    if LicenseUser."Last Login (DateTime)" < CurrentDateTimeInUTC - MarginDuration then begin
+                        LicenseUser."Last Login (DateTime)" := CurrentDateTimeInUTC;
+                        LicenseUser.Modify(true);
+                    end;
+            until LicenseUser.Next() = 0;
     end;
 
     [TryFunction]
@@ -1089,5 +1303,14 @@ codeunit 6248739 "NPR License Mgt."
         EntraIDUserMgt: Codeunit "Azure AD User Management";
     begin
         exit(EntraIDUserMgt.IsUserDelegated(UserSecID));
+    end;
+
+    local procedure IsApplicationUser(UserSecID: Guid): Boolean
+    var
+        User: Record User;
+    begin
+        if not User.Get(UserSecID) then
+            exit(false);
+        exit(User."License Type" = User."License Type"::Application);
     end;
 }

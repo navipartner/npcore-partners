@@ -11,7 +11,8 @@ page 6059871 "NPR Retail Web Admin RC"
         {
             part(NPRETAILACTIVITIES; "NPR Activities")
             {
-                ApplicationArea = NPRRetail;
+                // CORE-2396: keep this part visible so unlicensed users get the missing-license notice
+                ApplicationArea = All;
             }
             part(Control21; "Report Inbox Part")
             {

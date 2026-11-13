@@ -4,7 +4,7 @@ codeunit 6248741 "NPR Module Licensing Feat." implements "NPR Feature Management
 
     var
         FeatureIdTok: Label 'ModuleLicensing', Locked = true, MaxLength = 50;
-        FeatureDescriptionLbl: Label 'Module Licensing (POS, KDS, Scanner)', MaxLength = 2024;
+        FeatureDescriptionLbl: Label 'Module Licensing (Retail, Attraction, KDS, Scanner)', MaxLength = 2024;
         PortalApiNotAccessibleErr: Label 'Cannot enable Module Licensing: the licensing portal API is not reachable. Verify the service and try again.';
 
     procedure AddFeature()
@@ -51,7 +51,7 @@ codeunit 6248741 "NPR Module Licensing Feat." implements "NPR Feature Management
         // MDX (formerly CDX) demo tenants are exempt from the probe so the feature stays switchable both ways for demos.
         if NewEnabled then
             if GuiAllowed() then
-                if LicenseMgt.IsControlledEnvironment() then
+                if LicenseMgt.IsPortalSyncEnabled() then
                     if not DemoTenantMgt.IsMdxEnvironment() then
                         if not LicenseMgt.IsPortalApiAccessible() then
                             Error(PortalApiNotAccessibleErr);
@@ -69,7 +69,7 @@ codeunit 6248741 "NPR Module Licensing Feat." implements "NPR Feature Management
     local procedure ConfirmModuleLicensingToggle(var Rec: Record "NPR Feature"; var xRec: Record "NPR Feature"; CurrFieldNo: Integer)
     var
         ConfirmManagement: Codeunit "Confirm Management";
-        DisableConfirmQst: Label 'Disabling Module Licensing turns off POS, KDS and Scanner license enforcement for this company. Are you sure you want to disable it?';
+        DisableConfirmQst: Label 'Disabling Module Licensing turns off license enforcement for Retail, Attraction, KDS and Scanner in this company. Are you sure you want to disable it?';
     begin
         if Rec.Id <> FeatureIdTok then
             exit;

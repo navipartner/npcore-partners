@@ -191,6 +191,24 @@ codeunit 85382 "NPR New Company Feature Test"
             'Module Licensing should be inherited by a new company when a sibling company has it on.');
     end;
 
+    [Test]
+    procedure Inherit_EnablesLicenseBasedModuleAccess()
+    var
+        NewFeatureHandler: Codeunit "NPR New Feature Handler";
+        LicenseModuleAccessFeat: Codeunit "NPR License Module Access Feat";
+        FeatureIds: List of [Text];
+    begin
+        // [Scenario] The UI hiding is off by default and enabled by NP support per company, so a company created
+        //            later only gets it from a sibling, like Module Licensing.
+        SetEnabled(LicenseModuleAccessFeat.GetFeatureId(), false);
+        FeatureIds.Add(LicenseModuleAccessFeat.GetFeatureId());
+
+        NewFeatureHandler.EnableForNewCompany(FeatureIds);
+
+        _Assert.IsTrue(IsEnabled(LicenseModuleAccessFeat.GetFeatureId()),
+            'License-Based Module Access should be inherited by a new company when a sibling company has it on.');
+    end;
+
     local procedure SetEnabled(FeatureId: Text[50]; NewEnabled: Boolean)
     var
         Feature: Record "NPR Feature";

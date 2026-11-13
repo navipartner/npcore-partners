@@ -26,6 +26,7 @@ codeunit 6060078 "NPR POS Dragonglass API"
         POSAPIStackCheck: Codeunit "NPR POS API Stack Check";
         Sentry: Codeunit "NPR Sentry";
         InvokeSpan: Codeunit "NPR Sentry Span";
+        LicenseMgt: Codeunit "NPR License Mgt.";
         ErrorText: Text;
     begin
         if not Sentry.HasActiveTransaction() then
@@ -65,6 +66,15 @@ codeunit 6060078 "NPR POS Dragonglass API"
 
         ContextJsonObject.ReadFrom(parameters);
         GetSaleKey(ContextJsonObject, POSUnitNo, SalesTicketNo);
+        // Initial = false does not raise OnInitialize, so a client that skips FrameworkReady would never be checked.
+        // Only without the user's own open sale: a running sale finishes, as on the POS page. The sale is asked first
+        // (one read), so requests during a sale skip the license check and its reads.
+        if not IsOwnSale(POSUnitNo, SalesTicketNo) then
+            if not LicenseMgt.IsPOSLicensed() then begin
+                InvokeSpan.Finish();
+                Sentry.FinalizeScope();
+                LicenseMgt.RaisePOSNotLicensedError();
+            end;
         POSSession.ConstructFromWebserviceSession(false, POSUnitNo, SalesTicketNo);
 
         JavaScript.InvokeMethod(method, ContextJsonObject, JavaScript);
@@ -106,6 +116,17 @@ codeunit 6060078 "NPR POS Dragonglass API"
             SalesTicketNoOut := TempPOSSale."Sales Ticket No.";
             exit;
         end;
+    end;
+
+    // "User ID" is stamped when the sale is started or resumed.
+    local procedure IsOwnSale(POSUnitNo: Text; SalesTicketNo: Text): Boolean
+    var
+        POSSale: Record "NPR POS Sale";
+    begin
+        POSSale.SetRange("Register No.", POSUnitNo);
+        POSSale.SetRange("Sales Ticket No.", SalesTicketNo);
+        POSSale.SetRange("User ID", UserId());
+        exit(not POSSale.IsEmpty());
     end;
 
     internal procedure InitPOSDragonglassService()

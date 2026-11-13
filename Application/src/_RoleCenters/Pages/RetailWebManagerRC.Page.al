@@ -14,7 +14,8 @@
         {
             part(NPRETAILACTIVITIES; "NPR Activities")
             {
-                ApplicationArea = NPRRetail;
+                // CORE-2396: keep this part visible so unlicensed users get the missing-license notice
+                ApplicationArea = All;
             }
             part(Control6014400; "NPR My Reports")
             {

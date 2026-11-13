@@ -3,6 +3,8 @@
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
 codeunit 85301 "NPR Module Licensing Tests"
 {
+    // [FEATURE] Module licensing: parsing portal pools, suspending and reactivating seats, usage and stats, and portal URLs (no HTTP)
+
     Subtype = Test;
     TestPermissions = Disabled;
 
@@ -81,6 +83,33 @@ codeunit 85301 "NPR Module Licensing Tests"
         TempPool.FindFirst();
         Assert.AreEqual(TempPool.Status::_, TempPool.Status, 'enum falls back to empty');
         Assert.AreEqual('frozen', TempPool."Status (API)", 'raw status preserved');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Parse_NewSkuSlugs_MappedCaseInsensitive()
+    var
+        LicenseMgt: Codeunit "NPR License Mgt.";
+        TempPool: Record "NPR License Pool" temporary;
+        Assert: Codeunit Assert;
+        Json: Text;
+    begin
+        // [SCENARIO] The three new SKU slugs map to their enum values; slug casing from the portal does not matter.
+        Initialize();
+        Json := WrapValue(
+            PoolJson('11111111-1111-1111-1111-111111111111', 'retail-without-pos', 'months12', 1, 'active') + ',' +
+            PoolJson('22222222-2222-2222-2222-222222222222', 'Attraction-POS', 'months12', 2, 'active') + ',' +
+            PoolJson('33333333-3333-3333-3333-333333333333', 'attraction-without-pos', 'months01', 3, 'active'));
+
+        Assert.IsTrue(LicenseMgt.ParsePoolsJsonToTemp(Json, TempPool), 'parse should succeed');
+        Assert.AreEqual(3, TempPool.Count(), 'three pools expected');
+
+        TempPool.SetRange(Module, TempPool.Module::RetailWithoutPOS);
+        Assert.AreEqual(1, TempPool.Count(), 'retail-without-pos mapped');
+        TempPool.SetRange(Module, TempPool.Module::AttractionPOS);
+        Assert.AreEqual(1, TempPool.Count(), 'attraction-pos mapped case-insensitively');
+        TempPool.SetRange(Module, TempPool.Module::AttractionWithoutPOS);
+        Assert.AreEqual(1, TempPool.Count(), 'attraction-without-pos mapped');
     end;
 
     [Test]
@@ -199,10 +228,13 @@ codeunit 85301 "NPR Module Licensing Tests"
 
         LicenseMgt.BuildUsageArray(UsageArray);
 
-        Assert.AreEqual(3, UsageArray.Count(), 'pos, kds and scanner all reported');
+        Assert.AreEqual(6, UsageArray.Count(), 'all six SKU modules reported');
         Assert.AreEqual(0, ActiveSeatsOf(UsageArray, 'pos'), 'pos zero');
         Assert.AreEqual(0, ActiveSeatsOf(UsageArray, 'kds'), 'kds zero');
         Assert.AreEqual(0, ActiveSeatsOf(UsageArray, 'scanner'), 'scanner zero');
+        Assert.AreEqual(0, ActiveSeatsOf(UsageArray, 'retail-without-pos'), 'retail-without-pos zero');
+        Assert.AreEqual(0, ActiveSeatsOf(UsageArray, 'attraction-pos'), 'attraction-pos zero');
+        Assert.AreEqual(0, ActiveSeatsOf(UsageArray, 'attraction-without-pos'), 'attraction-without-pos zero');
     end;
 
     [Test]

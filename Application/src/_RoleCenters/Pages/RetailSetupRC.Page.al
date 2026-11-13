@@ -15,7 +15,8 @@ page 6151245 "NPR Retail Setup RC"
             }
             part(Control1904484608; "NPR Setup Act - POS")
             {
-                ApplicationArea = NPRRetail;
+                // CORE-2396: keep this part visible so unlicensed users get the missing-license notice
+                ApplicationArea = All;
 
 
             }
@@ -56,6 +57,14 @@ page 6151245 "NPR Retail Setup RC"
 
                 ToolTip = 'View or edit the RP Template';
                 ApplicationArea = NPRRetail;
+            }
+            action(NPRLicensedUsersTop)
+            {
+                Caption = 'Licensed Users';
+                RunObject = Page "NPR Licensed Users";
+                ToolTip = 'View or edit which users have which NP module licenses.';
+                // CORE-2396: All, so an admin without an NP license can still assign licenses
+                ApplicationArea = All;
             }
         }
         area(sections)
@@ -673,6 +682,14 @@ page 6151245 "NPR Retail Setup RC"
 
                     ToolTip = 'View or edit the Gen. Posting Setup';
                     ApplicationArea = NPRRetail;
+                }
+                action(NPRLicensedUsers)
+                {
+                    Caption = 'Licensed Users';
+                    RunObject = Page "NPR Licensed Users";
+                    ToolTip = 'View or edit which users have which NP module licenses.';
+                    // CORE-2396: All, so an admin without an NP license can still assign licenses
+                    ApplicationArea = All;
                 }
             }
             group("Posting Setup")

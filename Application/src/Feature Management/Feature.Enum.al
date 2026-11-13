@@ -220,4 +220,9 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'Asynchronous Adyen Payment Processing';
         Implementation = "NPR Feature Management" = "NPR AdyenAsyncPmtProcesFeature";
     }
+    value(330; "License-Based Module Access")
+    {
+        Caption = 'License-Based Module Access';
+        Implementation = "NPR Feature Management" = "NPR License Module Access Feat";
+    }
 }

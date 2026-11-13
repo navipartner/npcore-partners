@@ -685,6 +685,8 @@ codeunit 6150632 "NPR New Feature Handler"
         PayByLinkNPEmailHandle();
         if ShouldEnableForNewCompany(Enum::"NPR Feature"::"NPR Module Licensing", EnabledInOtherCompanies) then
             ModuleLicensingHandle();
+        if ShouldEnableForNewCompany(Enum::"NPR Feature"::"License-Based Module Access", EnabledInOtherCompanies) then
+            LicenseModuleAccessHandle();
     end;
 
     local procedure ShouldEnableForNewCompany(FeatureToEnable: Enum "NPR Feature"; EnabledInOtherCompanies: List of [Text]): Boolean
@@ -735,6 +737,13 @@ codeunit 6150632 "NPR New Feature Handler"
             exit;
         Feature.Enabled := true;
         Feature.Modify();
+    end;
+
+    local procedure LicenseModuleAccessHandle()
+    var
+        LicenseModuleAccessFeat: Codeunit "NPR License Module Access Feat";
+    begin
+        LicenseModuleAccessFeat.SetFeatureEnabled(true);
     end;
 
     local procedure CurrCodeunitId(): Integer

@@ -13,7 +13,8 @@
                 ShowCaption = false;
                 part(Control6014402; "NPR Event Activities")
                 {
-                    ApplicationArea = NPRRetail;
+                    // CORE-2396: keep this part visible so unlicensed users get the missing-license notice
+                    ApplicationArea = All;
 
                 }
                 part(Control6014413; "NPR Event Events by Attributes")

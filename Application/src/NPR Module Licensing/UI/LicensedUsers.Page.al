@@ -4,12 +4,12 @@ page 6184516 "NPR Licensed Users"
     PageType = List;
     SourceTable = "NPR License User";
     UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = All;
     DelayedInsert = true;
     Extensible = false;
     AboutText = '<p>This page displays all users with a module license.</p>';
     AboutTitle = 'NPR Licensed Users';
-    AdditionalSearchTerms = 'POS, KDS, Scanner, License, User';
+    AdditionalSearchTerms = 'POS, KDS, Scanner, Retail, Attraction, License, User';
     layout
     {
         area(Content)

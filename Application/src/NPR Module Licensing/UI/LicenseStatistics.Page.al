@@ -5,7 +5,7 @@ page 6184517 "NPR License Statistics"
     SourceTable = "NPR License Stats";
     SourceTableTemporary = true;
     UsageCategory = None;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = All;
     Editable = false;
     Extensible = false;
 
