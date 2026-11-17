@@ -40,6 +40,7 @@
         ChartToStatusMap: array[7] of Integer;
         ToDate: array[24] of Date;
         FromDate: array[24] of Date;
+        PeriodValue: array[7, 24] of Decimal;
         Value: Decimal;
         TotalValue: Decimal;
         ColumnNo: Integer;
@@ -65,10 +66,13 @@
         if (CalcPeriods(FromDate, ToDate, BusChartBuf)) then begin
             BusChartBuf.AddPeriods(ToDate[1], ToDate[ArrayLen(ToDate)]);
 
+            if (MembershipBurndownSetup."Value to Calculate" = MembershipBurndownSetup."Value to Calculate"::MEMBERSHIP_COUNT) then
+                CountEntriesPerPeriod(ChartToStatusMap, ToDate, PeriodValue);
+
             for MembershipEntryContext := 1 to ArrayLen(ChartToStatusMap) do begin
                 TotalValue := 0;
                 for ColumnNo := 1 to ArrayLen(ToDate) do begin
-                    Value := GetValue(ChartToStatusMap[MembershipEntryContext], FromDate[ColumnNo], ToDate[ColumnNo]);
+                    Value := PeriodValue[MembershipEntryContext, ColumnNo];
                     case MembershipBurndownSetup."Show Change As" of
                         MembershipBurndownSetup."Show Change As"::ACK:
                             if ColumnNo = 1 then
@@ -106,46 +110,45 @@
         exit(true);
     end;
 
-    local procedure GetValue(Status: Option; FromDate: Date; ToDate: Date): Decimal
+    local procedure CountEntriesPerPeriod(var ChartToStatusMap: array[7] of Integer; var ToDate: array[24] of Date; var PeriodValue: array[7, 24] of Decimal)
+    var
+        ValidFromQuery: Query "NPR MM Burndown Valid From";
+        ValidUntilQuery: Query "NPR MM Burndown Valid Until";
+        MeasureNo: Integer;
     begin
-        if (MembershipBurndownSetup."Value to Calculate" = MembershipBurndownSetup."Value to Calculate"::MEMBERSHIP_COUNT) then
-            exit(GetCount(Status, FromDate, ToDate));
+        ValidFromQuery.SetFilter(ValidFromDate, '..%1', ToDate[ArrayLen(ToDate)]);
+        ValidFromQuery.Open();
+        while (ValidFromQuery.Read()) do begin
+            MeasureNo := FindMeasureNo(ChartToStatusMap, ValidFromQuery.Context);
+            if (MeasureNo > 0) then
+                PeriodValue[MeasureNo, FindColumnNo(ToDate, ValidFromQuery.ValidFromDate)] += ValidFromQuery.EntryCount;
+        end;
 
-        exit(GetAmount(Status, FromDate, ToDate));
+        ValidUntilQuery.SetFilter(ValidUntilDate, '..%1', ToDate[ArrayLen(ToDate)]);
+        ValidUntilQuery.Open();
+        while (ValidUntilQuery.Read()) do begin
+            MeasureNo := FindMeasureNo(ChartToStatusMap, ValidUntilQuery.Context);
+            if (MeasureNo > 0) then
+                PeriodValue[MeasureNo, FindColumnNo(ToDate, ValidUntilQuery.ValidUntilDate)] -= ValidUntilQuery.EntryCount;
+        end;
     end;
 
-    local procedure GetAmount(Status: Option; FromDate: Date; ToDate: Date): Decimal
+    local procedure FindMeasureNo(var ChartToStatusMap: array[7] of Integer; Context: Integer): Integer
     var
-        TotalAmount: Decimal;
+        MeasureNo: Integer;
     begin
-
-        MembershipEntry.Reset();
-        MembershipEntry.SetFilter(Context, '=%1', Status);
-        MembershipEntry.SetRange("Valid From Date", FromDate, ToDate);
-        MembershipEntry.SetFilter(Blocked, '=%1', false);
-
-        exit(TotalAmount);
+        for MeasureNo := 1 to ArrayLen(ChartToStatusMap) do
+            if (ChartToStatusMap[MeasureNo] = Context) then
+                exit(MeasureNo);
+        exit(0);
     end;
 
-    local procedure GetCount(Status: Option; FromDate: Date; ToDate: Date): Decimal
-    var
-        EntryCount: Integer;
+    // EntryDate must not be after the last period end.
+    local procedure FindColumnNo(var ToDate: array[24] of Date; EntryDate: Date) ColumnNo: Integer
     begin
-        EntryCount := 0;
-
-        MembershipEntry.Reset();
-        MembershipEntry.SetFilter(Context, '=%1', Status);
-        MembershipEntry.SetRange("Valid From Date", FromDate, ToDate);
-        MembershipEntry.SetFilter(Blocked, '=%1', false);
-        EntryCount := MembershipEntry.Count();
-
-        MembershipEntry.Reset();
-        MembershipEntry.SetFilter(Context, '=%1', Status);
-        MembershipEntry.SetRange("Valid Until Date", FromDate, ToDate);
-        MembershipEntry.SetFilter(Blocked, '=%1', false);
-        EntryCount -= MembershipEntry.Count();
-
-        exit(EntryCount);
+        ColumnNo := 1;
+        while (EntryDate > ToDate[ColumnNo]) do
+            ColumnNo += 1;
     end;
 
     procedure CreateMap(var Map: array[7] of Integer)
