@@ -595,6 +595,29 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
         until EcomSalesLine.Next() = 0;
     end;
 
+    internal procedure IsTicketReservationLineInToken(ReservationLineId: Guid; Token: Text[100]): Boolean
+    var
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        TicketRequest.SetLoadFields("Session Token ID");
+        if not TicketRequest.GetBySystemId(ReservationLineId) then
+            exit(false);
+        exit(TicketRequest."Session Token ID" = Token);
+    end;
+
+    internal procedure CheckTicketReservationLineForValidation(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line")
+    var
+        ConfirmedWithDifDoc: Boolean;
+        ReservationLineNotInTokenErr: Label 'Ticket line %1 cannot be processed because %2 %3 does not exist or does not belong to %4 %5.', Comment = '%1 - line no., %2 - reservation line id field caption, %3 - reservation line id, %4 - token field caption, %5 - token';
+    begin
+        if EcomSalesLine."Virtual Item Process Status" = EcomSalesLine."Virtual Item Process Status"::Processed then
+            exit;
+        if AlreadyConfirmed(EcomSalesHeader, ConfirmedWithDifDoc) then
+            exit;
+        if not IsTicketReservationLineInToken(EcomSalesLine."Ticket Reservation Line Id", EcomSalesHeader."Ticket Reservation Token") then
+            Error(ReservationLineNotInTokenErr, EcomSalesLine."Line No.", EcomSalesLine.FieldCaption("Ticket Reservation Line Id"), EcomSalesLine."Ticket Reservation Line Id", EcomSalesHeader.FieldCaption("Ticket Reservation Token"), EcomSalesHeader."Ticket Reservation Token");
+    end;
+
     local procedure UpdateTicketOnConfirm(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"; TicketRequest: Record "NPR TM Ticket Reservation Req.")
     var
         Ticket: Record "NPR TM Ticket";
@@ -682,12 +705,10 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
 
     internal procedure ChangeEcommerceTicketReservationToken(var EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
-        EcomCreateTicketProcess: Codeunit "NPR EcomCreateTicketProcess";
         TicketReservationRemap: Page "NPR Ticket Reservation Remap";
         TempRemapBuffer: Record "NPR Ticket Reservation Buffer" temporary;
-        EcomSalesLine: Record "NPR Ecom Sales Line";
         ConfirmManagement: Codeunit "Confirm Management";
-        ConfirmMsg: Label 'This action will allow assigning a different registered Ticket reservation token to this ecommerce document.\Do you want to continue?';
+        ConfirmMsg: Label 'This action will allow assigning a registered Ticket reservation token to this ecommerce document.\Do you want to continue?';
         NoSelectionErr: Label 'No reservation token was selected.';
         SuccessMsg: Label 'Ticket reservation token %1 has been successfully assigned to this document.', Comment = '%1=Session Token ID';
         NewReservationToken: Text[100];
@@ -709,6 +730,23 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
             Error(NoSelectionErr);
 
         TicketReservationRemap.GetLineMappings(TempRemapBuffer);
+        ApplyTicketReservationRemap(EcomSalesHeader, NewReservationToken, TempRemapBuffer);
+
+        Message(SuccessMsg, NewReservationToken);
+    end;
+
+    internal procedure ApplyTicketReservationRemap(var EcomSalesHeader: Record "NPR Ecom Sales Header"; NewReservationToken: Text[100]; var TempRemapBuffer: Record "NPR Ticket Reservation Buffer" temporary)
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomCreateTicketProcess: Codeunit "NPR EcomCreateTicketProcess";
+        RemapLineNotInTokenErr: Label 'Ticket line %1 cannot be mapped because %2 %3 does not belong to the new %4 %5.', Comment = '%1 - line no., %2 - reservation line id field caption, %3 - reservation line id, %4 - token field caption, %5 - new token';
+    begin
+        if TempRemapBuffer.FindSet() then
+            repeat
+                if not IsTicketReservationLineInToken(TempRemapBuffer."Ticket Reservation Line Id", NewReservationToken) then
+                    Error(RemapLineNotInTokenErr, TempRemapBuffer."Sales Line No.", EcomSalesLine.FieldCaption("Ticket Reservation Line Id"), TempRemapBuffer."Ticket Reservation Line Id", EcomSalesHeader.FieldCaption("Ticket Reservation Token"), NewReservationToken);
+            until TempRemapBuffer.Next() = 0;
+
         if TempRemapBuffer.FindSet() then
             repeat
                 EcomSalesLine.Reset();
@@ -726,8 +764,6 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
         ClearVirtualItemErrorMessagesOnLines(EcomSalesHeader);
         EcomSalesHeader.Modify(true);
         UpdateExpiryTimeBasedOnCapturedStatus(EcomSalesHeader);
-
-        Message(SuccessMsg, NewReservationToken);
     end;
 
     local procedure ClearVirtualItemErrorMessagesOnLines(EcomSalesHeader: Record "NPR Ecom Sales Header")

@@ -845,6 +845,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         MissingTicketReservationTokenErr: Label '%1 must be provided when %2 is set.', Comment = '%1 = EcomSalesHeader.FieldCaption("Ticket Reservation Token"), %2 = incoming value';
         MissingTicketReservationLineErr: Label '%1 is set, but %2 is missing on the line.', Comment = '%1 = EcomSalesHeader.FieldCaption("Ticket Reservation Token"), %2 = JSON path';
         InvalidGuidErr: Label 'Invalid value at %1: "%2". Expected a GUID.', Comment = '%1 = JSON path, %2 = incoming value';
+        ReservationLineNotInTokenErr: Label 'Invalid value at %1: "%2". No ticket reservation line with this id exists for the %3 of this document.', Comment = '%1 = JSON path, %2 = incoming value, %3 = EcomSalesHeader.FieldCaption("Ticket Reservation Token")';
     begin
         if EcomSalesHeader."Ticket Reservation Token" = '' then
             EcomCreateTicketImpl.ValidateEcommerceTicketLine(EcomSalesHeader, EcomSalesLine);
@@ -858,6 +859,8 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                 begin
                     if not Evaluate(EcomSalesLine."Ticket Reservation Line Id", TicketReservationLineTxt) then
                         Error(InvalidGuidErr, TicketReservationPath, TicketReservationLineTxt);
+                    if not EcomCreateTicketImpl.IsTicketReservationLineInToken(EcomSalesLine."Ticket Reservation Line Id", EcomSalesHeader."Ticket Reservation Token") then
+                        Error(ReservationLineNotInTokenErr, TicketReservationPath, TicketReservationLineTxt, EcomSalesHeader.FieldCaption("Ticket Reservation Token"));
                     exit;
                 end;
             (TicketReservationLineTxt <> '') and (EcomSalesHeader."Ticket Reservation Token" = ''):

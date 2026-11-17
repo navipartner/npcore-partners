@@ -131,6 +131,21 @@ codeunit 85161 "NPR Library Ecommerce"
         ProcessEcomDocument(Body, ExternalNo, EcomSalesHeader);
     end;
 
+    procedure InsertEcomDocumentWithReservationLineId(ExternalNo: Code[20]; ReservationToken: Text[100]; ItemNo: Code[20]; LineId: Guid; var EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        Body: JsonObject;
+        Lines: JsonArray;
+        Payments: JsonArray;
+    begin
+        Body := CreateHeaderJson(ExternalNo);
+        Body.Add('ticketReservationToken', ReservationToken);
+        AddDefaultSellTo(Body);
+        AddSalesLineJson(Lines, ItemNo, 1, 100, 0, LineId);
+        Body.Add('salesDocumentLines', Lines);
+        Body.Add('payments', Payments);
+        ProcessEcomDocument(Body, ExternalNo, EcomSalesHeader);
+    end;
+
     procedure InsertEcomDocumentWithMemberData(ExternalNo: Code[20]; ItemNo: Code[20]; FirstName: Text; LastName: Text; Email: Text; Quantity: Decimal; var EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
         Body: JsonObject;

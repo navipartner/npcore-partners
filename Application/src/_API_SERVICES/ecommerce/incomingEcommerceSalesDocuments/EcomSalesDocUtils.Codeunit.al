@@ -654,6 +654,7 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
     local procedure ValidateImportedLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line")
     var
         EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
         EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
         CouldNotIdentifyCouponTypeErr: Label 'The type of coupon on line %1 could not be identified. Please ensure that the item number or barcode corresponds to a valid coupon item.', Comment = '%1 - line no.';
         FractionalQtyErr: Label 'Whole numbers only are accepted as the quantity for ticket, membership or coupon lines. Received quantity on line %1: %2.', Comment = '%1 - line no., %2 - received quantity';
@@ -680,6 +681,7 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
                                     exit;
                                 if IsNullGuid(EcomSalesLine."Ticket Reservation Line Id") then
                                     Error(MissingTicketReservationLineErr, EcomSalesHeader.FieldCaption("Ticket Reservation Token"), EcomSalesLine."Line No.", EcomSalesLine.FieldCaption("Ticket Reservation Line Id"));
+                                EcomCreateTicketImpl.CheckTicketReservationLineForValidation(EcomSalesHeader, EcomSalesLine);
                             end;
                         EcomSalesLine.Subtype::Membership:
                             begin

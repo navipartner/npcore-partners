@@ -858,6 +858,78 @@ codeunit 85160 "NPR Ecommerce Ticket Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure PreMadeReservation_UnknownLineId_Error()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
+        LibTicket: Codeunit "NPR Library - Ticket Module";
+        MemberNumber: Code[20];
+        ScannerStation: Code[10];
+        ResponseToken: Text[100];
+        ResponseMessage: Text;
+        ApiOk: Boolean;
+        ItemNo: Code[20];
+        UnknownLineId: Guid;
+    begin
+        // [SCENARIO] The ecom document insertion pipeline errors when ticketReservationLineId matches no reservation request
+
+        // [GIVEN] A reservation made via the Ticket API and a line id with no reservation request
+        ScannerStation := 'TEST';
+        ItemNo := LibTicket.CreateScenario_SmokeTest();
+        ApiOk := TicketApiLibrary.MakeReservation(1, ItemNo, 1, MemberNumber, ScannerStation, ResponseToken, ResponseMessage);
+        Assert.IsTrue(ApiOk, 'MakeReservation should succeed: ' + ResponseMessage);
+        UnknownLineId := CreateGuid();
+
+        // [WHEN] The document is inserted with the token and the unknown line id
+        asserterror _Lib.InsertEcomDocumentWithReservationLineId('PREMADE-UNKLINEID', ResponseToken, ItemNo, UnknownLineId, EcomSalesHeader);
+
+        // [THEN] The error names the unknown line id
+        Assert.ExpectedError(Format(UnknownLineId));
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure PreMadeReservation_LineIdFromOtherToken_Error()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
+        LibTicket: Codeunit "NPR Library - Ticket Module";
+        MemberNumber: Code[20];
+        ScannerStation: Code[10];
+        ResponseToken: Text[100];
+        OtherResponseToken: Text[100];
+        ResponseMessage: Text;
+        ApiOk: Boolean;
+        ItemNo: Code[20];
+        ForeignLineId: Guid;
+    begin
+        // [SCENARIO] The ecom document insertion pipeline errors when ticketReservationLineId belongs to another token
+
+        // [GIVEN] Two reservations made via the Ticket API, with tokens T1 and T2
+        ScannerStation := 'TEST';
+        ItemNo := LibTicket.CreateScenario_SmokeTest();
+        ApiOk := TicketApiLibrary.MakeReservation(1, ItemNo, 1, MemberNumber, ScannerStation, ResponseToken, ResponseMessage);
+        Assert.IsTrue(ApiOk, 'MakeReservation should succeed: ' + ResponseMessage);
+        ApiOk := TicketApiLibrary.MakeReservation(1, ItemNo, 1, MemberNumber, ScannerStation, OtherResponseToken, ResponseMessage);
+        Assert.IsTrue(ApiOk, 'Second MakeReservation should succeed: ' + ResponseMessage);
+        Assert.AreNotEqual(ResponseToken, OtherResponseToken, 'Precondition: the two reservations must have different tokens');
+
+        // [GIVEN] The line id of a reservation request of T2
+        TicketRequest.SetRange("Session Token ID", OtherResponseToken);
+        TicketRequest.FindFirst();
+        ForeignLineId := TicketRequest.SystemId;
+        Assert.IsFalse(IsNullGuid(ForeignLineId), 'Precondition: the reservation request of T2 must have an id');
+
+        // [WHEN] The document is inserted with T1 and the line id of T2
+        asserterror _Lib.InsertEcomDocumentWithReservationLineId('PREMADE-FOREIGNLID', ResponseToken, ItemNo, ForeignLineId, EcomSalesHeader);
+
+        // [THEN] The error names the line id of T2
+        Assert.ExpectedError(Format(ForeignLineId));
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure PreMadeReservation_AlreadyConfirmedSameDoc_Succeeds()
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
@@ -1379,9 +1451,441 @@ codeunit 85160 "NPR Ecommerce Ticket Tests"
         until Ticket.Next() = 0;
     end;
 
+    // ---------------------------------------------------------------
+    // Ticket Reservation Line Id check in ValidateDocBySource
+    // ---------------------------------------------------------------
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ValidateDocBySource_ValidReservationLine_Passes()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+    begin
+        // [SCENARIO] A store order whose ticket line points to a reservation request of the document token passes validation
+
+        // [GIVEN] A captured store ticket order with a captured payment line
+        SetupStoreTicketDoc(EcomSalesHeader, EcomSalesLine);
+        Assert.IsFalse(IsNullGuid(EcomSalesLine."Ticket Reservation Line Id"), 'Precondition: the ticket line must reference a reservation request');
+
+        // [WHEN] The document is validated
+        EcomSalesDocUtils.ValidateDocBySource(EcomSalesHeader);
+
+        // [THEN] No error is raised
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ValidateDocBySource_ReservationLineFromOtherToken_Error()
+    var
+        EcomSalesHeaderA: Record "NPR Ecom Sales Header";
+        EcomSalesHeaderB: Record "NPR Ecom Sales Header";
+        EcomSalesLineA: Record "NPR Ecom Sales Line";
+        EcomSalesLineB: Record "NPR Ecom Sales Line";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        ForeignLineId: Guid;
+    begin
+        // [SCENARIO] A store order whose ticket line points to a reservation request of another document token fails validation
+
+        // [GIVEN] Two captured store ticket orders A and B, each with its own token and reservation request
+        SetupStoreTicketDoc(EcomSalesHeaderA, EcomSalesLineA);
+        SetupStoreTicketDoc(EcomSalesHeaderB, EcomSalesLineB);
+        EcomSalesLineB.Get(EcomSalesLineB.RecordId);
+        ForeignLineId := EcomSalesLineB."Ticket Reservation Line Id";
+        Assert.IsFalse(IsNullGuid(ForeignLineId), 'Precondition: line B must reference a reservation request');
+
+        // [GIVEN] Line A points to the reservation request of document B
+        EcomSalesLineA."Ticket Reservation Line Id" := ForeignLineId;
+        EcomSalesLineA.Modify();
+
+        // [WHEN] Document A is validated
+        asserterror EcomSalesDocUtils.ValidateDocBySource(EcomSalesHeaderA);
+
+        // [THEN] The error names the reservation line id of document B
+        Assert.ExpectedError(Format(ForeignLineId));
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ValidateDocBySource_ProcessedLineWithForeignId_Passes()
+    var
+        EcomSalesHeaderA: Record "NPR Ecom Sales Header";
+        EcomSalesHeaderB: Record "NPR Ecom Sales Header";
+        EcomSalesLineA: Record "NPR Ecom Sales Line";
+        EcomSalesLineB: Record "NPR Ecom Sales Line";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        ForeignLineId: Guid;
+    begin
+        // [SCENARIO] A ticket line that is already Processed is not checked against the document token
+
+        // [GIVEN] Two captured store ticket orders A and B
+        SetupStoreTicketDoc(EcomSalesHeaderA, EcomSalesLineA);
+        SetupStoreTicketDoc(EcomSalesHeaderB, EcomSalesLineB);
+        EcomSalesLineB.Get(EcomSalesLineB.RecordId);
+        ForeignLineId := EcomSalesLineB."Ticket Reservation Line Id";
+        Assert.IsFalse(IsNullGuid(ForeignLineId), 'Precondition: line B must reference a reservation request');
+
+        // [GIVEN] Line A is Processed and points to the reservation request of document B
+        EcomSalesLineA."Virtual Item Process Status" := EcomSalesLineA."Virtual Item Process Status"::Processed;
+        EcomSalesLineA."Ticket Reservation Line Id" := ForeignLineId;
+        EcomSalesLineA.Modify();
+
+        // [WHEN] Document A is validated
+        EcomSalesDocUtils.ValidateDocBySource(EcomSalesHeaderA);
+
+        // [THEN] No error is raised
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ValidateDocBySource_AlreadyConfirmedToken_Passes()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+    begin
+        // [SCENARIO] A ticket line of a token already confirmed for the same External No. is not checked against the token
+
+        // [GIVEN] A captured store ticket order whose token is confirmed with the document External No.
+        SetupStoreTicketDoc(EcomSalesHeader, EcomSalesLine);
+        EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+        TicketRequest.SetRange("Session Token ID", EcomSalesHeader."Ticket Reservation Token");
+        TicketRequest.SetRange("Request Status", TicketRequest."Request Status"::CONFIRMED);
+        Assert.IsFalse(TicketRequest.IsEmpty(), 'Precondition: the token must have a confirmed reservation request');
+        EcomSalesLine.Get(EcomSalesLine.RecordId);
+        Assert.IsFalse(IsNullGuid(EcomSalesLine."Ticket Reservation Line Id"), 'Precondition: the ticket line must reference a reservation request');
+
+        // [GIVEN] The unprocessed line points to an id with no reservation request
+        EcomSalesLine."Ticket Reservation Line Id" := CreateGuid();
+        EcomSalesLine.Modify();
+
+        // [WHEN] The document is validated
+        EcomSalesHeader.Get(EcomSalesHeader.RecordId);
+        EcomSalesDocUtils.ValidateDocBySource(EcomSalesHeader);
+
+        // [THEN] No error is raised
+    end;
+
+    // ---------------------------------------------------------------
+    // Ticket Reservation Line Id check in ApplyTicketReservationRemap
+    // ---------------------------------------------------------------
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyTicketReservationRemap_LineIdOfNewToken_Applied()
+    var
+        EcomSalesHeaderA: Record "NPR Ecom Sales Header";
+        EcomSalesHeaderB: Record "NPR Ecom Sales Header";
+        EcomSalesLineA: Record "NPR Ecom Sales Line";
+        EcomSalesLineB: Record "NPR Ecom Sales Line";
+        TempRemapBuffer: Record "NPR Ticket Reservation Buffer" temporary;
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        NewToken: Text[100];
+    begin
+        // [SCENARIO] Remapping a ticket line to a reservation request of the new token moves the document to that token and resets its ticket status
+
+        // [GIVEN] Two ticket documents A and B, each with its own token and reservation request
+        SetupProcessableTicketDoc(EcomSalesHeaderA, EcomSalesLineA);
+        SetupProcessableTicketDoc(EcomSalesHeaderB, EcomSalesLineB);
+        EcomSalesHeaderB.Get(EcomSalesHeaderB.RecordId);
+        EcomSalesLineB.Get(EcomSalesLineB.RecordId);
+        NewToken := EcomSalesHeaderB."Ticket Reservation Token";
+        Assert.AreNotEqual('', NewToken, 'Precondition: document B must have a reservation token');
+        Assert.IsFalse(IsNullGuid(EcomSalesLineB."Ticket Reservation Line Id"), 'Precondition: line B must reference a reservation request');
+
+        // [GIVEN] Document A failed ticket processing
+        EcomSalesHeaderA."Ticket Processing Status" := EcomSalesHeaderA."Ticket Processing Status"::Error;
+        EcomSalesHeaderA."Ticket Retry Count" := 3;
+        EcomSalesHeaderA.Modify();
+        EcomSalesLineA."Virtual Item Process ErrMsg" := 'Previous ticket processing error';
+        EcomSalesLineA.Modify();
+
+        // [GIVEN] Line A is mapped to the reservation request of document B
+        InsertRemapBufferRow(TempRemapBuffer, 1, EcomSalesLineA, EcomSalesLineB."Ticket Reservation Line Id");
+
+        // [WHEN] The remap is applied with the token of document B
+        EcomCreateTicketImpl.ApplyTicketReservationRemap(EcomSalesHeaderA, NewToken, TempRemapBuffer);
+
+        // [THEN] Line A and header A carry the new reservation, and the ticket status is reset for a new attempt
+        EcomSalesHeaderA.Get(EcomSalesHeaderA.RecordId);
+        EcomSalesLineA.Get(EcomSalesLineA.RecordId);
+        Assert.AreEqual(EcomSalesLineB."Ticket Reservation Line Id", EcomSalesLineA."Ticket Reservation Line Id", 'Line A should point to the reservation request of document B');
+        Assert.AreEqual(NewToken, EcomSalesHeaderA."Ticket Reservation Token", 'Header A should carry the token of document B');
+        Assert.AreEqual(EcomSalesHeaderA."Ticket Processing Status"::Pending, EcomSalesHeaderA."Ticket Processing Status", 'Ticket processing status should be Pending');
+        Assert.AreEqual(0, EcomSalesHeaderA."Ticket Retry Count", 'Ticket retry count should be reset');
+        Assert.AreEqual('', EcomSalesLineA."Virtual Item Process ErrMsg", 'Line A error message should be cleared');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyTicketReservationRemap_LineIdOfOtherToken_Error()
+    var
+        EcomSalesHeaderA: Record "NPR Ecom Sales Header";
+        EcomSalesHeaderB: Record "NPR Ecom Sales Header";
+        EcomSalesLineA1: Record "NPR Ecom Sales Line";
+        EcomSalesLineA2: Record "NPR Ecom Sales Line";
+        EcomSalesLineB: Record "NPR Ecom Sales Line";
+        TempRemapBuffer: Record "NPR Ticket Reservation Buffer" temporary;
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        ItemNo: Code[20];
+        NewToken: Text[100];
+    begin
+        // [SCENARIO] A remap where one line is mapped to a reservation request outside the new token fails and names that id
+
+        // [GIVEN] Document A with two captured ticket lines and reservation requests for both
+        _Lib.ResetEcomSetupToDefaults();
+        ItemNo := CreateSmokeTicketItemNo();
+        _Lib.CreateEcomSalesHeader(EcomSalesHeaderA);
+        _Lib.CreateCapturedTicketLine(EcomSalesLineA1, EcomSalesHeaderA, ItemNo);
+        _Lib.CreateCapturedTicketLine(EcomSalesLineA2, EcomSalesHeaderA, ItemNo);
+        EcomCreateTicketImpl.CreateRequestsForTicketLines(EcomSalesHeaderA);
+        EcomSalesHeaderA.Get(EcomSalesHeaderA.RecordId);
+        EcomSalesLineA1.Get(EcomSalesLineA1.RecordId);
+        EcomSalesLineA2.Get(EcomSalesLineA2.RecordId);
+        Assert.IsFalse(IsNullGuid(EcomSalesLineA2."Ticket Reservation Line Id"), 'Precondition: the second line of document A must reference a reservation request');
+
+        // [GIVEN] Document B with one ticket line and its own token
+        SetupProcessableTicketDoc(EcomSalesHeaderB, EcomSalesLineB);
+        EcomSalesHeaderB.Get(EcomSalesHeaderB.RecordId);
+        EcomSalesLineB.Get(EcomSalesLineB.RecordId);
+        NewToken := EcomSalesHeaderB."Ticket Reservation Token";
+        Assert.AreNotEqual('', NewToken, 'Precondition: document B must have a reservation token');
+        Assert.IsFalse(IsNullGuid(EcomSalesLineB."Ticket Reservation Line Id"), 'Precondition: line B must reference a reservation request');
+
+        // [GIVEN] Line 1 of A is mapped to the request of B, line 2 of A keeps its own request, which is outside the token of B
+        InsertRemapBufferRow(TempRemapBuffer, 1, EcomSalesLineA1, EcomSalesLineB."Ticket Reservation Line Id");
+        InsertRemapBufferRow(TempRemapBuffer, 2, EcomSalesLineA2, EcomSalesLineA2."Ticket Reservation Line Id");
+
+        // [WHEN] The remap is applied with the token of document B
+        asserterror EcomCreateTicketImpl.ApplyTicketReservationRemap(EcomSalesHeaderA, NewToken, TempRemapBuffer);
+
+        // [THEN] The error names the reservation line id of line 2 of A
+        Assert.ExpectedError(Format(EcomSalesLineA2."Ticket Reservation Line Id"));
+    end;
+
+    [Test]
+    [HandlerFunctions('RemapPageHandler,TokenListPageHandler,TicketRequestPageHandler,ConfirmYesHandler,SuccessMessageHandler')]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ChangeTicketReservationToken_OwnTokenAfterReservationUpdate_LinesRelinked()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        NewRequest: Record "NPR TM Ticket Reservation Req.";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        Token: Text[100];
+    begin
+        // [SCENARIO] After the reservation is updated under the same token, Change Ticket Reservation Token offers the document's own token and relinks the line to the new request
+
+        // [GIVEN] A ticket document with its own token and reservation request
+        SetupProcessableTicketDoc(EcomSalesHeader, EcomSalesLine);
+        Token := EcomSalesHeader."Ticket Reservation Token";
+        Assert.AreNotEqual('', Token, 'Precondition: the document must have a reservation token');
+
+        // [GIVEN] The reservation is updated under the same token, so the line points to a request that no longer exists
+        UpdateReservationInPlace(EcomSalesHeader, EcomSalesLine."Ticket Reservation Line Id", NewRequest);
+
+        // [GIVEN] The document failed ticket processing
+        EcomSalesHeader."Ticket Processing Status" := EcomSalesHeader."Ticket Processing Status"::Error;
+        EcomSalesHeader."Ticket Retry Count" := 3;
+        EcomSalesHeader.Modify();
+        EcomSalesLine."Virtual Item Process ErrMsg" := 'Previous ticket processing error';
+        EcomSalesLine.Modify();
+
+        // [GIVEN] The user picks the document's own token and the new request in the remap page
+        _ReservationToken := Token;
+        _NewRequestEntryNo := NewRequest."Entry No.";
+
+        // [WHEN] The ticket reservation token is changed
+        EcomCreateTicketImpl.ChangeEcommerceTicketReservationToken(EcomSalesHeader);
+
+        // [THEN] The line points to the new request, the token is kept, and the ticket status is reset for a new attempt
+        EcomSalesHeader.Get(EcomSalesHeader.RecordId);
+        EcomSalesLine.Get(EcomSalesLine.RecordId);
+        NewRequest.Get(NewRequest."Entry No.");
+        Assert.AreEqual(NewRequest.SystemId, EcomSalesLine."Ticket Reservation Line Id", 'The line should point to the new reservation request');
+        Assert.AreEqual(Token, EcomSalesHeader."Ticket Reservation Token", 'The header should keep its own token');
+        Assert.AreEqual(EcomSalesHeader."Ticket Processing Status"::Pending, EcomSalesHeader."Ticket Processing Status", 'Ticket processing status should be Pending');
+        Assert.AreEqual(0, EcomSalesHeader."Ticket Retry Count", 'Ticket retry count should be reset');
+        Assert.AreEqual('', EcomSalesLine."Virtual Item Process ErrMsg", 'The line error message should be cleared');
+        Assert.AreEqual(EcomSalesHeader.SystemId, NewRequest."Ecom Sales Id", 'The new reservation request should be linked to the document');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyTicketReservationRemap_OwnTokenAfterReservationUpdate_Applied()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        NewRequest: Record "NPR TM Ticket Reservation Req.";
+        TempRemapBuffer: Record "NPR Ticket Reservation Buffer" temporary;
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        Token: Text[100];
+    begin
+        // [SCENARIO] A remap to the document's own token is applied after the reservation was updated under that token
+
+        // [GIVEN] A ticket document with its own token and reservation request
+        SetupProcessableTicketDoc(EcomSalesHeader, EcomSalesLine);
+        Token := EcomSalesHeader."Ticket Reservation Token";
+        Assert.AreNotEqual('', Token, 'Precondition: the document must have a reservation token');
+
+        // [GIVEN] The reservation is updated under the same token, so the line points to a request that no longer exists
+        UpdateReservationInPlace(EcomSalesHeader, EcomSalesLine."Ticket Reservation Line Id", NewRequest);
+
+        // [GIVEN] The document failed ticket processing
+        EcomSalesHeader."Ticket Processing Status" := EcomSalesHeader."Ticket Processing Status"::Error;
+        EcomSalesHeader."Ticket Retry Count" := 3;
+        EcomSalesHeader.Modify();
+        EcomSalesLine."Virtual Item Process ErrMsg" := 'Previous ticket processing error';
+        EcomSalesLine.Modify();
+
+        // [GIVEN] The line is mapped to the new request of the same token
+        InsertRemapBufferRow(TempRemapBuffer, 1, EcomSalesLine, NewRequest.SystemId);
+
+        // [WHEN] The remap is applied with the document's own token
+        EcomCreateTicketImpl.ApplyTicketReservationRemap(EcomSalesHeader, Token, TempRemapBuffer);
+
+        // [THEN] The line points to the new request, the token is kept, and the ticket status is reset for a new attempt
+        EcomSalesHeader.Get(EcomSalesHeader.RecordId);
+        EcomSalesLine.Get(EcomSalesLine.RecordId);
+        NewRequest.Get(NewRequest."Entry No.");
+        Assert.AreEqual(NewRequest.SystemId, EcomSalesLine."Ticket Reservation Line Id", 'The line should point to the new reservation request');
+        Assert.AreEqual(Token, EcomSalesHeader."Ticket Reservation Token", 'The header should keep its own token');
+        Assert.AreEqual(EcomSalesHeader."Ticket Processing Status"::Pending, EcomSalesHeader."Ticket Processing Status", 'Ticket processing status should be Pending');
+        Assert.AreEqual(0, EcomSalesHeader."Ticket Retry Count", 'Ticket retry count should be reset');
+        Assert.AreEqual('', EcomSalesLine."Virtual Item Process ErrMsg", 'The line error message should be cleared');
+        Assert.AreEqual(EcomSalesHeader.SystemId, NewRequest."Ecom Sales Id", 'The new reservation request should be linked to the document');
+    end;
+
+    local procedure SetupStoreTicketDoc(var EcomSalesHeader: Record "NPR Ecom Sales Header"; var EcomSalesLine: Record "NPR Ecom Sales Line")
+    begin
+        SetupProcessableTicketDoc(EcomSalesHeader, EcomSalesLine);
+        EcomSalesHeader."Ecommerce Store Code" := 'TEST-STORE';
+        EcomSalesHeader.Modify();
+        CreateCapturedPaymentLine(EcomSalesHeader, EcomSalesLine."Line Amount");
+    end;
+
+    local procedure CreateCapturedPaymentLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; PaymentAmount: Decimal)
+    var
+        EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
+    begin
+        EcomSalesPmtLine.Init();
+        EcomSalesPmtLine."Document Entry No." := EcomSalesHeader."Entry No.";
+        EcomSalesPmtLine."Line No." := 10000;
+        EcomSalesPmtLine."Payment Method Type" := EcomSalesPmtLine."Payment Method Type"::"Payment Method";
+        EcomSalesPmtLine.Amount := PaymentAmount;
+        // Captured Amount equals Amount, so ValidateImportedPaymentLines skips the payment-method checks.
+        EcomSalesPmtLine."Captured Amount" := PaymentAmount;
+        EcomSalesPmtLine.Insert(true);
+    end;
+
+    local procedure InsertRemapBufferRow(var TempRemapBuffer: Record "NPR Ticket Reservation Buffer" temporary; EntryNo: Integer; EcomSalesLine: Record "NPR Ecom Sales Line"; ReservationLineId: Guid)
+    begin
+        TempRemapBuffer.Init();
+        TempRemapBuffer."Entry No." := EntryNo;
+        TempRemapBuffer."Document Entry No." := EcomSalesLine."Document Entry No.";
+        TempRemapBuffer."Sales Line No." := EcomSalesLine."Line No.";
+        TempRemapBuffer."Ticket Reservation Line Id" := ReservationLineId;
+        TempRemapBuffer.Insert();
+    end;
+
+    local procedure SetupProcessableTicketDoc(var EcomSalesHeader: Record "NPR Ecom Sales Header"; var EcomSalesLine: Record "NPR Ecom Sales Line")
+    var
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+    begin
+        _Lib.ResetEcomSetupToDefaults();
+        _Lib.CreateEcomSalesHeader(EcomSalesHeader);
+        _Lib.CreateCapturedTicketLine(EcomSalesLine, EcomSalesHeader, CreateSmokeTicketItemNo());
+        EcomCreateTicketImpl.CreateRequestsForTicketLines(EcomSalesHeader);
+        // CreateRequestsForTicketLines writes the reservation line id through its own record, so re-read the line.
+        EcomSalesLine.Get(EcomSalesLine.RecordId);
+        MarkTicketDocReadyForProcessing(EcomSalesHeader);
+    end;
+
+    local procedure MarkTicketDocReadyForProcessing(var EcomSalesHeader: Record "NPR Ecom Sales Header")
+    begin
+        EcomSalesHeader.Get(EcomSalesHeader.RecordId);
+        EcomSalesHeader."Tickets Exist" := true;
+        EcomSalesHeader."Capture Processing Status" := EcomSalesHeader."Capture Processing Status"::Processed;
+        EcomSalesHeader.Modify();
+    end;
+
+    local procedure UpdateReservationInPlace(EcomSalesHeader: Record "NPR Ecom Sales Header"; OldLineId: Guid; var NewRequest: Record "NPR TM Ticket Reservation Req.")
+    var
+        OldRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketingReservationAgent: Codeunit "NPR TicketingReservationAgent";
+        Lines: JsonArray;
+        Line: JsonObject;
+        Token: Text[100];
+        ResponseMessage: Text;
+        Created: Boolean;
+        Success: Boolean;
+    begin
+        OldRequest.GetBySystemId(OldLineId);
+        Line.Add('itemReference', OldRequest."Item No.");
+        Line.Add('quantity', OldRequest.Quantity);
+        Line.Add('admissionCode', OldRequest."Admission Code");
+        // -1 is what the reservation update sends when no time slot is chosen; the ecom request did not choose one either.
+        Line.Add('scheduleId', -1);
+        Line.Add('externalLineReference', OldRequest."Ext. Line Reference No.");
+        Lines.Add(Line);
+
+        Token := EcomSalesHeader."Ticket Reservation Token";
+        Created := TicketingReservationAgent.CreateReservation(Lines, Token, '', 0, Success, ResponseMessage);
+        Assert.IsTrue(Created and Success, ResponseMessage);
+        Assert.AreEqual(EcomSalesHeader."Ticket Reservation Token", Token, 'Precondition: the reservation update must keep the token');
+        Assert.IsFalse(OldRequest.GetBySystemId(OldLineId), 'Precondition: the old reservation request must be gone');
+
+        NewRequest.SetRange("Session Token ID", Token);
+        NewRequest.SetRange("Entry Type", NewRequest."Entry Type"::PRIMARY);
+        NewRequest.SetRange("Request Status", NewRequest."Request Status"::REGISTERED);
+        NewRequest.SetRange("Primary Request Line", true);
+        Assert.AreEqual(1, NewRequest.Count(), 'Precondition: the token must have exactly one new primary registered request');
+        NewRequest.FindFirst();
+    end;
+
+    [ModalPageHandler]
+    procedure RemapPageHandler(var Remap: TestPage "NPR Ticket Reservation Remap")
+    begin
+        Remap.NewTicketReservationToken.Drilldown();
+        Remap.First();
+        Remap."Ticket Reservation Line Id".Drilldown();
+        Remap.OK().Invoke();
+    end;
+
+    [ModalPageHandler]
+    procedure TokenListPageHandler(var TokenList: TestPage "NPR Ticket Reserv. Req. List")
+    begin
+        Assert.IsTrue(TokenList.FindFirstField(TokenList."Session Token ID", _ReservationToken), 'The token list must offer the document''s own token');
+        TokenList.OK().Invoke();
+    end;
+
+    [ModalPageHandler]
+    procedure TicketRequestPageHandler(var TicketRequest: TestPage "NPR TM Ticket Request")
+    begin
+        Assert.IsTrue(TicketRequest.GoToKey(_NewRequestEntryNo), 'The ticket request list must show the new reservation request');
+        TicketRequest.OK().Invoke();
+    end;
+
+    [ConfirmHandler]
+    procedure ConfirmYesHandler(Question: Text[1024]; var Reply: Boolean)
+    begin
+        Reply := true;
+    end;
+
+    [MessageHandler]
+    procedure SuccessMessageHandler(Message: Text[1024])
+    begin
+        Assert.IsTrue(Message.Contains(_ReservationToken), 'The success message must name the assigned token');
+    end;
+
     var
         _Lib: Codeunit "NPR Library Ecommerce";
         _LibTicket: Codeunit "NPR Library - Ticket Module";
+        _ReservationToken: Text[100];
+        _NewRequestEntryNo: Integer;
         Assert: Codeunit "Assert";
 }
 #endif

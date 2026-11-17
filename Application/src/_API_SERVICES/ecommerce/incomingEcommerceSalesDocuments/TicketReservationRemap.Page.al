@@ -161,7 +161,6 @@ page 6150962 "NPR Ticket Reservation Remap"
         TicketRequestTokens: Page "NPR Ticket Reserv. Req. List";
     begin
         TicketRequestTokens.LookupMode(true);
-        TicketRequestTokens.SetCurrentTicketToken(CurrentTicketReservationToken);
         if TicketRequestTokens.RunModal() = Action::LookupOK then begin
             NewTicketReservationToken := TicketRequestTokens.GetSelectedToken();
             ClearSelectedLines();

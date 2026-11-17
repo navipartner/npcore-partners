@@ -515,7 +515,7 @@ page 6248188 "NPR Ecom Sales Document"
             {
                 Caption = 'Change Ticket Reservation Token';
                 Image = Change;
-                ToolTip = 'Assign a different registered reservation token to this document if ticket wasn''t processed successfully.';
+                ToolTip = 'Assign a registered reservation token to this document if ticket wasn''t processed successfully.';
                 ApplicationArea = NPRRetail;
                 Enabled = ChangeTicketTokenEnabled;
                 trigger OnAction()

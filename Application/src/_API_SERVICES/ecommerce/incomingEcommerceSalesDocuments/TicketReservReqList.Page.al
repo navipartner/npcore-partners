@@ -58,8 +58,6 @@ page 6150963 "NPR Ticket Reserv. Req. List"
         TicketRequest.SetCurrentKey("Session Token ID");
         TicketRequest.SetRange("Entry Type", TicketRequest."Entry Type"::PRIMARY);
         TicketRequest.SetRange("Request Status", TicketRequest."Request Status"::REGISTERED);
-        if CurrentTicketToken <> '' then
-            TicketRequest.SetFilter("Session Token ID", '<>%1', CurrentTicketToken);
         if TicketRequest.FindSet() then
             repeat
                 TempNPRTicketReservationBuffer.Reset();
@@ -103,13 +101,5 @@ page 6150963 "NPR Ticket Reserv. Req. List"
         TicketRequest.SetRange("Session Token ID", Rec."Session Token ID");
         Page.Run(Page::"NPR TM Ticket Request", TicketRequest);
     end;
-
-    internal procedure SetCurrentTicketToken(CurrToken: Text[100])
-    begin
-        CurrentTicketToken := CurrToken;
-    end;
-
-    var
-        CurrentTicketToken: Text[100];
 }
 #endif
