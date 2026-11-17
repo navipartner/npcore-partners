@@ -193,6 +193,72 @@ codeunit 6151118 "NPR EcomCreateCouponImpl"
         Page.Run(Page::"NPR NpDc Coupon Card", NpDcCoupon);
     end;
 
+    [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnAfterNavigateFindRecords', '', true, true)]
+    local procedure AddPostedInvoiceCouponsToFindEntries(var DocumentEntry: Record "Document Entry"; DocNoFilter: Text; PostingDateFilter: Text)
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+    begin
+        if not GetEcomDocumentOfPostedInvoice(DocNoFilter, EcomSalesHeader) then
+            exit;
+
+        BuildCouponTempBufferForDoc(EcomSalesHeader, TempCoupon);
+        DocumentEntry.InsertIntoDocEntry(Database::"NPR NpDc Coupon", TempCoupon.TableCaption(), TempCoupon.Count());
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::Navigate, OnAfterShowRecords, '', true, true)]
+    local procedure ShowPostedInvoiceCouponsFromFindEntries(var DocumentEntry: Record "Document Entry"; DocNoFilter: Text; PostingDateFilter: Text)
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        NpDcCoupon: Record "NPR NpDc Coupon";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponFilter: Text;
+    begin
+        if DocumentEntry."Table ID" <> Database::"NPR NpDc Coupon" then
+            exit;
+        if not GetEcomDocumentOfPostedInvoice(DocNoFilter, EcomSalesHeader) then
+            exit;
+
+        BuildCouponTempBufferForDoc(EcomSalesHeader, TempCoupon);
+        case TempCoupon.Count() of
+            0:
+                exit;
+            1:
+                begin
+                    TempCoupon.FindFirst();
+                    OpenCouponCardForSystemId(TempCoupon.SystemId);
+                end;
+            else begin
+                TempCoupon.FindSet();
+                repeat
+                    CouponFilter += '|' + TempCoupon."No.";
+                until TempCoupon.Next() = 0;
+                NpDcCoupon.SetFilter("No.", CopyStr(CouponFilter, 2));
+                Page.Run(Page::"NPR NpDc Coupons", NpDcCoupon);
+            end;
+        end;
+    end;
+
+    local procedure GetEcomDocumentOfPostedInvoice(DocNoFilter: Text; var EcomSalesHeader: Record "NPR Ecom Sales Header"): Boolean
+    var
+        EcomSalesCouponLink: Record "NPR Ecom Sales Coupon Link";
+        NpDcCoupon: Record "NPR NpDc Coupon";
+        SalesInvHeader: Record "Sales Invoice Header";
+    begin
+        if not (SalesInvHeader.ReadPermission() and EcomSalesHeader.ReadPermission() and EcomSalesCouponLink.ReadPermission() and NpDcCoupon.ReadPermission()) then
+            exit(false);
+        if StrLen(DocNoFilter) > MaxStrLen(SalesInvHeader."No.") then
+            exit(false);
+
+        SalesInvHeader.SetLoadFields("NPR Inc Ecom Sale Id");
+        if not SalesInvHeader.Get(DocNoFilter) then
+            exit(false);
+        if IsNullGuid(SalesInvHeader."NPR Inc Ecom Sale Id") then
+            exit(false);
+
+        exit(EcomSalesHeader.GetBySystemId(SalesInvHeader."NPR Inc Ecom Sale Id"));
+    end;
+
     internal procedure IsCouponItem(EcomSalesLine: Record "NPR Ecom Sales Line"; CheckCouponTypes: Boolean): Boolean
     var
         DummyCouponTypeList: List of [Code[20]];

@@ -1132,6 +1132,72 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         Page.Run(Page::"NPR MM Membership Card", Membership);
     end;
 
+    [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnAfterNavigateFindRecords', '', true, true)]
+    local procedure AddPostedInvoiceMembershipsToFindEntries(var DocumentEntry: Record "Document Entry"; DocNoFilter: Text; PostingDateFilter: Text)
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        TempMembership: Record "NPR MM Membership" temporary;
+    begin
+        if not GetEcomDocumentOfPostedInvoice(DocNoFilter, EcomSalesHeader) then
+            exit;
+
+        BuildMembershipTempBufferForDoc(EcomSalesHeader, TempMembership);
+        DocumentEntry.InsertIntoDocEntry(Database::"NPR MM Membership", TempMembership.TableCaption(), TempMembership.Count());
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::Navigate, OnAfterShowRecords, '', true, true)]
+    local procedure ShowPostedInvoiceMembershipsFromFindEntries(var DocumentEntry: Record "Document Entry"; DocNoFilter: Text; PostingDateFilter: Text)
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        Membership: Record "NPR MM Membership";
+        TempMembership: Record "NPR MM Membership" temporary;
+        MembershipFilter: Text;
+    begin
+        if DocumentEntry."Table ID" <> Database::"NPR MM Membership" then
+            exit;
+        if not GetEcomDocumentOfPostedInvoice(DocNoFilter, EcomSalesHeader) then
+            exit;
+
+        BuildMembershipTempBufferForDoc(EcomSalesHeader, TempMembership);
+        case TempMembership.Count() of
+            0:
+                exit;
+            1:
+                begin
+                    TempMembership.FindFirst();
+                    OpenMembershipCardForSystemId(TempMembership.SystemId);
+                end;
+            else begin
+                TempMembership.FindSet();
+                repeat
+                    MembershipFilter += '|' + Format(TempMembership."Entry No.", 0, 9);
+                until TempMembership.Next() = 0;
+                Membership.SetFilter("Entry No.", CopyStr(MembershipFilter, 2));
+                Page.Run(Page::"NPR MM Memberships", Membership);
+            end;
+        end;
+    end;
+
+    local procedure GetEcomDocumentOfPostedInvoice(DocNoFilter: Text; var EcomSalesHeader: Record "NPR Ecom Sales Header"): Boolean
+    var
+        EcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link";
+        Membership: Record "NPR MM Membership";
+        SalesInvHeader: Record "Sales Invoice Header";
+    begin
+        if not (SalesInvHeader.ReadPermission() and EcomSalesHeader.ReadPermission() and EcomSalesMembershipLink.ReadPermission() and Membership.ReadPermission()) then
+            exit(false);
+        if StrLen(DocNoFilter) > MaxStrLen(SalesInvHeader."No.") then
+            exit(false);
+
+        SalesInvHeader.SetLoadFields("NPR Inc Ecom Sale Id");
+        if not SalesInvHeader.Get(DocNoFilter) then
+            exit(false);
+        if IsNullGuid(SalesInvHeader."NPR Inc Ecom Sale Id") then
+            exit(false);
+
+        exit(EcomSalesHeader.GetBySystemId(SalesInvHeader."NPR Inc Ecom Sale Id"));
+    end;
+
     local procedure CreateMembershipPaymentMethods(EcomSalesHeader: Record "NPR Ecom Sales Header"; Membership: Record "NPR MM Membership"; SaleAmountInclVAT: Decimal; CreateInitialSale: Boolean)
     var
         TempPaymentLine: Record "NPR Magento Payment Line" temporary;

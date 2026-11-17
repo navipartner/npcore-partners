@@ -6695,10 +6695,14 @@
     var
         MembershipEntry: Record "NPR MM Membership Entry";
     begin
+        if (DocNoFilter = '') then
+            exit;
 
         if (MembershipEntry.ReadPermission()) then begin
             if (not MembershipEntry.SetCurrentKey("Receipt No.")) then;
             MembershipEntry.SetFilter("Receipt No.", '%1', DocNoFilter);
+            if (MembershipEntry.IsEmpty()) then
+                SetRenewalInvoiceMembershipEntryFilter(DocNoFilter, MembershipEntry);
             InsertIntoDocEntry(DocumentEntry, Database::"NPR MM Membership Entry", 0, CopyStr(DocNoFilter, 1, 20), MembershipEntry.TableCaption(), MembershipEntry.Count());
         end;
 
@@ -6741,10 +6745,14 @@
         MembershipFilter: Text;
         PlaceHolderLbl: Label '|%1', Locked = true;
     begin
+        if (DocNoFilter = '') then
+            exit;
 
         if (DocumentEntry."Table ID" = Database::"NPR MM Membership Entry") then begin
             if (not MembershipEntry.SetCurrentKey("Receipt No.")) then;
-            MembershipEntry.SetFilter("Receipt No.", DocNoFilter);
+            MembershipEntry.SetFilter("Receipt No.", '%1', DocNoFilter);
+            if (MembershipEntry.IsEmpty()) then
+                SetRenewalInvoiceMembershipEntryFilter(DocNoFilter, MembershipEntry);
             MembershipEntry.FindSet();
             repeat
                 MembershipFilter += StrSubstNo(PlaceHolderLbl, MembershipEntry."Membership Entry No.");
@@ -6760,6 +6768,39 @@
         end;
     end;
 #endif
+    local procedure SetRenewalInvoiceMembershipEntryFilter(DocNoFilter: Text; var MembershipEntry: Record "NPR MM Membership Entry")
+    var
+        Membership: Record "NPR MM Membership";
+        SalesInvHeader: Record "Sales Invoice Header";
+    begin
+        if (not SalesInvHeader.ReadPermission()) then
+            exit;
+        if (StrLen(DocNoFilter) > MaxStrLen(SalesInvHeader."No.")) then
+            exit;
+
+        SalesInvHeader.SetLoadFields("Pre-Assigned No.", "NPR External Order No.");
+        if (not SalesInvHeader.Get(DocNoFilter)) then
+            exit;
+        if ((SalesInvHeader."Pre-Assigned No." = '') or (SalesInvHeader."NPR External Order No." = '')) then
+            exit;
+
+        Membership.SetCurrentKey("External Membership No.");
+        Membership.SetFilter("External Membership No.", '=%1', SalesInvHeader."NPR External Order No.");
+        Membership.SetLoadFields("Entry No.");
+        if (not Membership.FindSet()) then
+            exit;
+
+        MembershipEntry.Reset();
+        MembershipEntry.SetCurrentKey("Membership Entry No.");
+        MembershipEntry.SetFilter("Source Type", '=%1', MembershipEntry."Source Type"::SALESHEADER);
+        MembershipEntry.SetFilter("Document No.", '=%1', SalesInvHeader."Pre-Assigned No.");
+        repeat
+            MembershipEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
+            if (not MembershipEntry.IsEmpty()) then
+                exit;
+        until (Membership.Next() = 0);
+    end;
+
     local procedure InsertIntoDocEntry(var DocumentEntry: Record "Document Entry" temporary; DocTableID: Integer; DocType: Integer; DocNoFilter: Code[20]; DocTableName: Text; DocNoOfRecords: Integer): Integer
     begin
 

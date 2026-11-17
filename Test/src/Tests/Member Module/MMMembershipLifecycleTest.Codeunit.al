@@ -589,6 +589,64 @@ codeunit 85240 "NPR MMMembershipLifecycleTest"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure FindEntriesOnRenewalInvoiceFindsMembershipSharingItsNumber()
+    var
+        Assert: Codeunit Assert;
+        Membership: Record "NPR MM Membership";
+        EarlierMembership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        SalesInvHeader: Record "Sales Invoice Header";
+        LibraryUtility: Codeunit "Library - Utility";
+        NavigatePage: TestPage Navigate;
+        MembershipId: Text;
+        MembershipNumber: Text;
+        MemberId: Text;
+        MemberNumber: Text;
+        EarlierMembershipId: Text;
+        EarlierMembershipNumber: Text;
+        EarlierMemberId: Text;
+        EarlierMemberNumber: Text;
+        RenewalInvoiceNo: Code[20];
+    begin
+        // [SCENARIO] Membership numbers are unique per community only, so Find Entries on a renewal invoice still finds the renewed membership when an earlier membership has the same number
+
+        // [GIVEN] An earlier membership, and a renewed membership with an entry that points to the unposted renewal invoice
+        Initialize();
+        CreateGoldMembershipAndMember(EarlierMembershipId, EarlierMembershipNumber, EarlierMemberId, EarlierMemberNumber);
+        CreateGoldMembershipAndMember(MembershipId, MembershipNumber, MemberId, MemberNumber);
+        Membership.GetBySystemId(MembershipId);
+        RenewalInvoiceNo := CopyStr(LibraryUtility.GenerateRandomCode(SalesInvHeader.FieldNo("Pre-Assigned No."), Database::"Sales Invoice Header"), 1, MaxStrLen(RenewalInvoiceNo));
+        MembershipEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
+        MembershipEntry.FindLast();
+        MembershipEntry."Source Type" := MembershipEntry."Source Type"::SALESHEADER;
+        MembershipEntry."Document No." := RenewalInvoiceNo;
+        MembershipEntry.Modify();
+
+        // [GIVEN] The earlier membership has the same membership number, as a membership in another community can have
+        EarlierMembership.GetBySystemId(EarlierMembershipId);
+        EarlierMembership."External Membership No." := Membership."External Membership No.";
+        EarlierMembership.Modify();
+
+        // [GIVEN] The posted renewal invoice of the renewed membership
+        SalesInvHeader.Init();
+        SalesInvHeader."No." := CopyStr(LibraryUtility.GenerateRandomCode(SalesInvHeader.FieldNo("No."), Database::"Sales Invoice Header"), 1, MaxStrLen(SalesInvHeader."No."));
+        SalesInvHeader."Posting Date" := WorkDate();
+        SalesInvHeader."Pre-Assigned No." := RenewalInvoiceNo;
+        SalesInvHeader."NPR External Order No." := Membership."External Membership No.";
+        SalesInvHeader.Insert();
+
+        // [WHEN] Find Entries runs on the invoice
+        NavigatePage.Trap();
+        SalesInvHeader.Navigate();
+
+        // [THEN] One membership entry line counts the renewal entry of the renewed membership
+        NavigatePage.Filter.SetFilter("Table ID", Format(Database::"NPR MM Membership Entry"));
+        Assert.IsTrue(NavigatePage.First(), 'Find Entries must show the renewal entry even when an earlier membership has the same number.');
+        Assert.AreEqual(1, NavigatePage."No. of Records".AsInteger(), 'The membership entry line must count the renewal entry of the renewed membership.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure AutoRenew_02()
     var
         Assert: Codeunit Assert;
