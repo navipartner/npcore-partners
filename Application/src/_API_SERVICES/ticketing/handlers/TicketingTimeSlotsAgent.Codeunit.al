@@ -337,6 +337,10 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
         ForcedUnitPrice: Decimal;
         ForcedIncludesVat: Boolean;
         ForcedVatPercentage: Decimal;
+        IsRelative: Boolean;
+        RelativeIncludesVat: Boolean;
+        RelativeVatPercentage: Decimal;
+        BasePrice: Decimal;
     begin
         DatePriceBuffer.Reset();
         DatePriceBuffer.DeleteAll();
@@ -356,6 +360,12 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
                     ForcedUnitPrice := AddOnLine."Unit Price";
                     GetItemPriceVatBasis(AddOnLine."Item No.", ForcedIncludesVat, ForcedVatPercentage);
                 end;
+
+                IsRelative := false;
+                if (AddOnFound) then
+                    IsRelative := (AddOnLine."Use Unit Price" = AddOnLine."Use Unit Price"::Relative);
+                if (IsRelative) then
+                    GetItemPriceVatBasis(AddOnLine."Item No.", RelativeIncludesVat, RelativeVatPercentage);
 
                 IterationDate := FromDate;
                 while (IterationDate <= ToDate) do begin
@@ -381,6 +391,12 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
                         if (not _TicketPrice.CalculateErpPrice(DatePriceBuffer)) then
                             DatePriceBuffer.UnitPrice := 0;
 
+                    // The slot engine prices from the buffer as the POS prices from the ERP price, so only the emitted
+                    // basePrice carries a relative add-on amount.
+                    BasePrice := DatePriceBuffer.UnitPrice;
+                    if (IsRelative) then
+                        BasePrice := AddRelativeUnitPrice(AddOnLine, RelativeIncludesVat, RelativeVatPercentage, DatePriceBuffer.UnitPrice, DatePriceBuffer.UnitPriceIncludesVat);
+
                     // basePrice is the raw base (forced unit price, or price-list price). Discounts are not folded in;
                     // they surface as separate fields for the consumer to apply after priceDelta.
                     ResponseJson.StartObject()
@@ -388,7 +404,7 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
                         .AddProperty('variantCode', DatePriceBuffer.RequestVariantCode)
                         .AddProperty('admissionCode', DatePriceBuffer.AdmissionCode)
                         .AddProperty('date', IterationDate)
-                        .AddProperty('basePrice', DatePriceBuffer.UnitPrice)
+                        .AddProperty('basePrice', BasePrice)
                         .AddProperty('currencyCode', CurrencyCode);
                     AddPriceBreakdown(ResponseJson, Forced, AddOnFound, AddOnLine, DatePriceBuffer.DiscountPct);
                     ResponseJson.EndObject();
@@ -408,6 +424,9 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
         IterationDate: Date;
         AddOnFound: Boolean;
         Forced: Boolean;
+        IsRelative: Boolean;
+        RelativeIncludesVat: Boolean;
+        RelativeVatPercentage: Decimal;
         BasePrice: Decimal;
         ErpDiscountPct: Decimal;
     begin
@@ -421,6 +440,12 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
             Forced := false;
             if (AddOnFound) then
                 Forced := IsForcedPricedAddOnLine(AddOnLine);
+
+            IsRelative := false;
+            if (AddOnFound) then
+                IsRelative := (AddOnLine."Use Unit Price" = AddOnLine."Use Unit Price"::Relative);
+            if (IsRelative) then
+                GetItemPriceVatBasis(AddOnLine."Item No.", RelativeIncludesVat, RelativeVatPercentage);
 
             IterationDate := FromDate;
             while (IterationDate <= ToDate) do begin
@@ -438,6 +463,8 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
                         TempErpBuffer.UnitPrice := 0;
                     BasePrice := TempErpBuffer.UnitPrice;
                     ErpDiscountPct := TempErpBuffer.DiscountPct;
+                    if (IsRelative) then
+                        BasePrice := AddRelativeUnitPrice(AddOnLine, RelativeIncludesVat, RelativeVatPercentage, TempErpBuffer.UnitPrice, TempErpBuffer.UnitPriceIncludesVat);
                 end;
 
                 ResponseJson.StartObject()
@@ -456,8 +483,20 @@ codeunit 6151041 "NPR TicketingTimeSlotsAgent"
     end;
 
     local procedure IsForcedPricedAddOnLine(AddOnLine: Record "NPR NpIa Item AddOn Line"): Boolean
+    var
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
     begin
-        exit((AddOnLine."Use Unit Price" = AddOnLine."Use Unit Price"::Always) or (AddOnLine."Unit Price" <> 0));
+        exit(not ItemAddOnMgt.UsesBasePrice(AddOnLine."Use Unit Price", AddOnLine."Unit Price"));
+    end;
+
+    local procedure AddRelativeUnitPrice(AddOnLine: Record "NPR NpIa Item AddOn Line"; AddOnPriceIncludesVat: Boolean; AddOnPriceVatPercentage: Decimal; ErpUnitPrice: Decimal; ErpUnitPriceIncludesVat: Boolean): Decimal
+    var
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+    begin
+        exit(ItemAddOnMgt.GetAddOnUnitPrice(
+            AddOnLine."Use Unit Price",
+            ItemAddOnMgt.ConvertToVatBasis(AddOnLine."Unit Price", AddOnPriceIncludesVat, AddOnPriceVatPercentage, ErpUnitPriceIncludesVat),
+            ErpUnitPrice));
     end;
 
     local procedure AddPriceBreakdown(var ResponseJson: Codeunit "NPR JSON Builder"; Forced: Boolean; AddOnFound: Boolean; AddOnLine: Record "NPR NpIa Item AddOn Line"; ErpDiscountPct: Decimal)

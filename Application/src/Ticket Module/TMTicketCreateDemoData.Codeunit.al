@@ -234,6 +234,7 @@
         CreateEntryAndTourTicket('31050');
         CreateTimedEntryTicket('31051');
         CreateTimedShowTicket('31052');
+        CreateTicketPackageWithMixDiscount('31090');
 
         TicketSetup."Print Server Generator URL" := 'http://test.ticket.navipartner.dk/import/api/rest/v1/ticket/orders';
         TicketSetup."Timeout (ms)" := 30000;
@@ -416,6 +417,87 @@
         TicketBom.Get(ItemNo, '', AdmissionCode);
         TicketBom."Enforce Schedule Sales Limits" := true;
         TicketBom.Modify();
+    end;
+
+    // Attraction package 31090 - one adult (31001) and one child (31002) ticket per package, at a fixed quantity that
+    // follows the package line and added to its wallet. Each is priced relative to its ticket price
+    // (adult 157 - 17 = 140, child 107 - 7 = 100), while the package line itself is free. The mixed discount
+    // targets the child ticket: 10% off from 3 children, at most 5. Under the cap a package is discounted whole or not
+    // at all - package lines of 3 and 2 give all 5 children the 10%, a single package line of 6 gives none.
+    local procedure CreateTicketPackageWithMixDiscount(PackageItemNo: Code[20])
+    var
+        Item: Record Item;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscountLine: Record "NPR Mixed Discount Line";
+    begin
+        if (not ItemAddOn.Get(PackageItemNo)) then begin
+            ItemAddOn."No." := PackageItemNo;
+            ItemAddOn.Insert(true);
+        end;
+        ItemAddOn.Description := 'Adult + Child Package';
+        ItemAddOn.Enabled := true;
+        ItemAddOn.WalletTemplate := true;
+        ItemAddOn.Modify();
+
+        CreatePackageAddOnLine(ItemAddOn."No.", 10000, '31001', -17);
+        CreatePackageAddOnLine(ItemAddOn."No.", 20000, '31002', -7);
+
+        CreateItem(PackageItemNo, '', '', 'Adult + Child Package', 0);
+        Item.Get(PackageItemNo);
+        Item."NPR Item AddOn No." := ItemAddOn."No.";
+        Item.Modify();
+
+        if (not MixedDiscount.Get('TM-CHILD-3-TO-5')) then begin
+            MixedDiscount.Code := 'TM-CHILD-3-TO-5';
+            MixedDiscount.Insert(true);
+        end;
+        MixedDiscount.Description := 'Child ticket: 10% off from 3, at most 5';
+        MixedDiscount."Mix Type" := MixedDiscount."Mix Type"::Standard;
+        MixedDiscount.Lot := false;
+        MixedDiscount."Discount Type" := MixedDiscount."Discount Type"::"Total Discount %";
+        MixedDiscount."Total Discount %" := 10;
+        MixedDiscount."Min. Quantity" := 3;
+        MixedDiscount."Max. Quantity" := 5;
+        // Validating the status asks about overlapping discounts in a dialog
+        MixedDiscount.Status := MixedDiscount.Status::Active;
+        MixedDiscount.Modify(true);
+
+        if (not MixedDiscountLine.Get(MixedDiscount.Code, MixedDiscountLine."Disc. Grouping Type"::Item, '31002', '')) then begin
+            MixedDiscountLine.Init();
+            MixedDiscountLine.Code := MixedDiscount.Code;
+            MixedDiscountLine."Disc. Grouping Type" := MixedDiscountLine."Disc. Grouping Type"::Item;
+            MixedDiscountLine.Validate("No.", '31002');
+            MixedDiscountLine.Insert(true);
+        end;
+    end;
+
+    local procedure CreatePackageAddOnLine(AddOnNo: Code[20]; LineNo: Integer; ItemNo: Code[20]; RelativeUnitPrice: Decimal)
+    var
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        LineExists: Boolean;
+    begin
+        LineExists := ItemAddOnLine.Get(AddOnNo, LineNo);
+        if (not LineExists) then begin
+            ItemAddOnLine.Init();
+            ItemAddOnLine."AddOn No." := AddOnNo;
+            ItemAddOnLine."Line No." := LineNo;
+        end;
+
+        ItemAddOnLine.Validate(Type, ItemAddOnLine.Type::Quantity);
+        ItemAddOnLine.Validate("Item No.", ItemNo);
+        ItemAddOnLine.Validate(Quantity, 1);
+        ItemAddOnLine.Validate("Fixed Quantity", true);
+        ItemAddOnLine.Validate("Per Unit", true);
+        ItemAddOnLine.Validate(Mandatory, true);
+        ItemAddOnLine.AddToWallet := true;
+        ItemAddOnLine.Validate("Use Unit Price", ItemAddOnLine."Use Unit Price"::Relative);
+        ItemAddOnLine.Validate("Unit Price", RelativeUnitPrice);
+
+        if (LineExists) then
+            ItemAddOnLine.Modify(true)
+        else
+            ItemAddOnLine.Insert(true);
     end;
 
     procedure SetupMembershipGuestTicket(AdmissionCode: Code[20]; AdmissionDescription: text[50]; ItemCode: Code[20]; ItemDescription: text[100]): code[20]

@@ -71,6 +71,15 @@
         ItemAddOnLineSetup.DeleteSetup(Rec."AddOn No.", Rec."Line No.");
     end;
 
+    internal procedure IsUnitPriceFromMaster(NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line"): Boolean
+    begin
+        if (NpIaItemAddOnLine."Before Insert Function" <> 'UnitPriceFromMaster') then
+            exit(false);
+        if (NpIaItemAddOnLine."Before Insert Codeunit ID" <> CurrCodeunitId()) then
+            exit(false);
+        exit(true);
+    end;
+
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR NpIa Before Ins. Func.");

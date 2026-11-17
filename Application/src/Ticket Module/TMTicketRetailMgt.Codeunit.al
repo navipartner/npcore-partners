@@ -182,6 +182,7 @@
         ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
         xSaleLinePOS: Record "NPR POS Sale Line";
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
         DiscountAmount: Decimal;
         DiscountPercent: Decimal;
         ForceItemAddOnUnitPrice: Boolean;
@@ -224,8 +225,7 @@
                 end;
 
                 if (ItemAddOnLine.Get(SaleLinePOSAddOn."AddOn No.", SaleLinePOSAddOn."AddOn Line No.")) then
-                    ForceItemAddOnUnitPrice := ((ItemAddOnLine."Use Unit Price" = ItemAddOnLine."Use Unit Price"::Always) or
-                                                ((ItemAddOnLine."Use Unit Price" = ItemAddOnLine."Use Unit Price"::"Non-Zero") and (ItemAddOnLine."Unit Price" <> 0)));
+                    ForceItemAddOnUnitPrice := not ItemAddOnMgt.UsesBasePrice(ItemAddOnLine."Use Unit Price", ItemAddOnLine."Unit Price");
             end;
         end;
 

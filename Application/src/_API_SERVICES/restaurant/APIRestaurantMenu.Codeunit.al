@@ -314,7 +314,9 @@ codeunit 6248644 "NPR API Restaurant Menu"
     local procedure BuildAddonItemFromLine(var ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; PosUnitCode: Code[10]; VATBusPostingGroup: Code[20]; var Json: Codeunit "NPR JSON Builder")
     var
         CalculatedPrice: Decimal;
+        BasePrice: Decimal;
         ItemAddonTranslation: Record "NPR Item Addon Translation";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
     begin
         Json.AddProperty('addonNo', ItemAddOnLine."AddOn No.")
             .AddProperty('addonLineNo', ItemAddOnLine."Line No.")
@@ -324,12 +326,9 @@ codeunit 6248644 "NPR API Restaurant Menu"
             .AddProperty('itemCode', ItemAddOnLine."Item No.")
             .AddProperty('variantCode', ItemAddOnLine."Variant Code");
 
-        if ItemAddOnLine."Use Unit Price" = ItemAddOnLine."Use Unit Price"::Always then
-            CalculatedPrice := ItemAddOnLine."Unit Price"
-        else if (ItemAddOnLine."Use Unit Price" = ItemAddOnLine."Use Unit Price"::"Non-Zero") and (ItemAddOnLine."Unit Price" <> 0) then
-            CalculatedPrice := ItemAddOnLine."Unit Price"
-        else
-            CalculatedPrice := GetItemPrice(ItemAddOnLine."Item No.", ItemAddOnLine."Variant Code", PosUnitCode, VATBusPostingGroup);
+        if (ItemAddOnMgt.UsesBasePrice(ItemAddOnLine."Use Unit Price", ItemAddOnLine."Unit Price")) then
+            BasePrice := GetItemPrice(ItemAddOnLine."Item No.", ItemAddOnLine."Variant Code", PosUnitCode, VATBusPostingGroup);
+        CalculatedPrice := ItemAddOnMgt.GetAddOnUnitPrice(ItemAddOnLine."Use Unit Price", ItemAddOnLine."Unit Price", BasePrice);
 
         Json.AddProperty('unitPrice', CalculatedPrice);
 
@@ -345,7 +344,9 @@ codeunit 6248644 "NPR API Restaurant Menu"
     local procedure BuildAddonItemFromOption(var ItemAddOnLineOpt: Record "NPR NpIa ItemAddOn Line Opt."; PosUnitCode: Code[10]; VATBusPostingGroup: Code[20]; var Json: Codeunit "NPR JSON Builder")
     var
         CalculatedPrice: Decimal;
+        BasePrice: Decimal;
         ItemAddonTranslation: Record "NPR Item Addon Translation";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
     begin
         Json.AddProperty('addonNo', ItemAddOnLineOpt."AddOn No.")
             .AddProperty('addonLineNo', ItemAddOnLineOpt."AddOn Line No.")
@@ -355,13 +356,9 @@ codeunit 6248644 "NPR API Restaurant Menu"
             .AddProperty('itemCode', ItemAddOnLineOpt."Item No.")
             .AddProperty('variantCode', ItemAddOnLineOpt."Variant Code");
 
-        // Calculate price based on "Use Unit Price" setting
-        if ItemAddOnLineOpt."Use Unit Price" = ItemAddOnLineOpt."Use Unit Price"::Always then
-            CalculatedPrice := ItemAddOnLineOpt."Unit Price"
-        else if (ItemAddOnLineOpt."Use Unit Price" = ItemAddOnLineOpt."Use Unit Price"::"Non-Zero") and (ItemAddOnLineOpt."Unit Price" <> 0) then
-            CalculatedPrice := ItemAddOnLineOpt."Unit Price"
-        else
-            CalculatedPrice := GetItemPrice(ItemAddOnLineOpt."Item No.", ItemAddOnLineOpt."Variant Code", PosUnitCode, VATBusPostingGroup);
+        if (ItemAddOnMgt.UsesBasePrice(ItemAddOnLineOpt."Use Unit Price", ItemAddOnLineOpt."Unit Price")) then
+            BasePrice := GetItemPrice(ItemAddOnLineOpt."Item No.", ItemAddOnLineOpt."Variant Code", PosUnitCode, VATBusPostingGroup);
+        CalculatedPrice := ItemAddOnMgt.GetAddOnUnitPrice(ItemAddOnLineOpt."Use Unit Price", ItemAddOnLineOpt."Unit Price", BasePrice);
 
         Json.AddProperty('unitPrice', CalculatedPrice);
 

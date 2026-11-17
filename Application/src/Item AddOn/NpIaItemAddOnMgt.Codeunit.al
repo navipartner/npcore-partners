@@ -77,6 +77,14 @@
         if Rec.Find() then;
     end;
 
+    internal procedure SaleHasPackageLines(SaleLinePOS: Record "NPR POS Sale Line"): Boolean
+    var
+        PackageLineNos: List of [Integer];
+    begin
+        FindPackageLineNos(SaleLinePOS, PackageLineNos);
+        exit(PackageLineNos.Count() > 0);
+    end;
+
     local procedure DataSourceExtensionName(): Text
     begin
         exit('ItemAddOn');
@@ -588,38 +596,8 @@
 
             SaleLinePOS.Quantity := ItemAddOnLine.Quantity; // Prime the quantity to ensure correct price calculation in case of per unit add-on line
             SaleLinePOS.Validate("No.", ItemAddOnLine."Item No.");
-            SaleLinePOS.SetDeferPriceCalculation(true);
 
-            SaleLinePOS.Description := ItemAddOnLine.Description;
-
-            Item.Get(ItemAddOnLine."Item No.");
-            if (ItemAddOnLine."Unit Price" <> 0) or (ItemAddOnLine."Use Unit Price" = ItemAddOnLine."Use Unit Price"::Always) then begin
-                UnitPrice := ItemAddOnLine."Unit Price";
-                if (Item."Price Includes VAT") then begin
-                    Item.TestField("VAT Bus. Posting Gr. (Price)");
-                    Item.TestField("VAT Prod. Posting Group");
-                end;
-                POSSaleLine.ConvertPriceToVAT(Item."Price Includes VAT", Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group", SaleLinePOS, UnitPrice);
-
-                SaleLinePOS."Manual Item Sales Price" := true;
-                SaleLinePOS.Validate("Unit Price", UnitPrice);
-            end;
-
-            if (ItemAddOnLine."Per Unit" and ItemAddOnLine.Mandatory) and (not ItemAddOnLine."Fixed Quantity") then
-                SaleLinePOS.Validate(Quantity, ItemAddOnLine.Quantity * MasterLineQuantityBase)
-            else
-                SaleLinePOS.Validate(Quantity, ItemAddOnLine.Quantity);
-
-            if (ItemAddOnLine."Discount %" <> 0) and (ItemAddOnLine.DiscountAmount = 0) then
-                SaleLinePOS.Validate("Discount %", ItemAddOnLine."Discount %");
-            if (ItemAddOnLine."Discount %" = 0) and (ItemAddOnLine.DiscountAmount <> 0) then
-                SaleLinePOS.Validate("Discount Amount", ItemAddOnLine.DiscountAmount);
-
-            if (ItemAddOnLine."Serial No." <> '') then
-                SaleLinePOS.Validate("Serial No.", ItemAddOnLine."Serial No.");
-            if (ItemAddOnLine."Lot No." <> '') then
-                SaleLinePOS.Validate("Lot No.", ItemAddOnLine."Lot No.");
-
+            // Linked only after the item is validated, as that can ask for POS info, which must happen outside a write transaction.
             SaleLinePOS.Indentation := BaseLineIndent + 1;
 
             FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
@@ -645,6 +623,42 @@
             SaleLinePOSAddOn.DiscountAmount := ItemAddOnLine.DiscountAmount;
             SaleLinePOSAddOn."Selected Option Line No." := SelectedOptionLineNo;
             SaleLinePOSAddOn.Insert(true);
+
+            // The price was calculated before the line was linked to its add-on, so it does not hold the relative amount yet.
+            if (ItemAddOnLine."Use Unit Price" = ItemAddOnLine."Use Unit Price"::Relative) then
+                SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice(true);
+
+            SaleLinePOS.SetDeferPriceCalculation(true);
+
+            SaleLinePOS.Description := ItemAddOnLine.Description;
+
+            Item.Get(ItemAddOnLine."Item No.");
+            if (not UsesBasePrice(ItemAddOnLine."Use Unit Price", ItemAddOnLine."Unit Price")) then begin
+                UnitPrice := ItemAddOnLine."Unit Price";
+                if (Item."Price Includes VAT") then begin
+                    Item.TestField("VAT Bus. Posting Gr. (Price)");
+                    Item.TestField("VAT Prod. Posting Group");
+                end;
+                POSSaleLine.ConvertPriceToVAT(Item."Price Includes VAT", Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group", SaleLinePOS, UnitPrice);
+
+                SaleLinePOS."Manual Item Sales Price" := true;
+                SaleLinePOS.Validate("Unit Price", UnitPrice);
+            end;
+
+            if (ItemAddOnLine."Per Unit" and ItemAddOnLine.Mandatory) and (not ItemAddOnLine."Fixed Quantity") then
+                SaleLinePOS.Validate(Quantity, ItemAddOnLine.Quantity * MasterLineQuantityBase)
+            else
+                SaleLinePOS.Validate(Quantity, ItemAddOnLine.Quantity);
+
+            if (ItemAddOnLine."Discount %" <> 0) and (ItemAddOnLine.DiscountAmount = 0) then
+                SaleLinePOS.Validate("Discount %", ItemAddOnLine."Discount %");
+            if (ItemAddOnLine."Discount %" = 0) and (ItemAddOnLine.DiscountAmount <> 0) then
+                SaleLinePOS.Validate("Discount Amount", ItemAddOnLine.DiscountAmount);
+
+            if (ItemAddOnLine."Serial No." <> '') then
+                SaleLinePOS.Validate("Serial No.", ItemAddOnLine."Serial No.");
+            if (ItemAddOnLine."Lot No." <> '') then
+                SaleLinePOS.Validate("Lot No.", ItemAddOnLine."Lot No.");
 
             POSSaleLine.SetUsePresetLineNo(true);
             POSSaleLine.SetUseCustomSystemId(true);
@@ -681,7 +695,7 @@
         SaleLinePOS."Variant Code" := ItemAddOnLine."Variant Code";
         SaleLinePOS.Validate("No.", ItemAddOnLine."Item No.");
         SaleLinePOS.Description := ItemAddOnLine.Description;
-        if (ItemAddOnLine."Unit Price" <> 0) or (ItemAddOnLine."Use Unit Price" = ItemAddOnLine."Use Unit Price"::Always) then begin
+        if (not UsesBasePrice(ItemAddOnLine."Use Unit Price", ItemAddOnLine."Unit Price")) then begin
             SaleLinePOS."Manual Item Sales Price" := true;
             SaleLinePOS."Serial No." := '';
             SaleLinePOS.Validate("Unit Price", ItemAddOnLine."Unit Price");
@@ -709,6 +723,138 @@
         end;
 
         exit(true);
+    end;
+
+    internal procedure UsesBasePrice(UseUnitPrice: Option "Non-Zero",Always,Relative; AddOnUnitPrice: Decimal): Boolean
+    begin
+        case UseUnitPrice of
+            UseUnitPrice::Always:
+                exit(false);
+            UseUnitPrice::Relative:
+                exit(true);
+        end;
+
+        if (AddOnUnitPrice <> 0) then
+            exit(false);
+        exit(true);
+    end;
+
+    // BasePrice must be calculated from scratch, never read back from a sale line whose price already holds the relative amount.
+    internal procedure GetAddOnUnitPrice(UseUnitPrice: Option "Non-Zero",Always,Relative; AddOnUnitPrice: Decimal; BasePrice: Decimal): Decimal
+    begin
+        if (UseUnitPrice = UseUnitPrice::Relative) then begin
+            if ((BasePrice + AddOnUnitPrice) < 0) then
+                exit(0);
+            exit(BasePrice + AddOnUnitPrice);
+        end;
+
+        if (UsesBasePrice(UseUnitPrice, AddOnUnitPrice)) then
+            exit(BasePrice);
+
+        exit(AddOnUnitPrice);
+    end;
+
+    // An add-on line's unit price is in its item's VAT basis, which can differ from the base price it is combined with.
+    internal procedure ConvertToVatBasis(Price: Decimal; PriceIncludesVat: Boolean; VatPercentage: Decimal; ToPriceIncludesVat: Boolean): Decimal
+    begin
+        if (PriceIncludesVat = ToPriceIncludesVat) then
+            exit(Price);
+
+        if (ToPriceIncludesVat) then
+            exit(Price * (1 + VatPercentage / 100));
+        exit(Price / (1 + VatPercentage / 100));
+    end;
+
+    // A package is a main line and the add-on lines of a package template attached to it. Lines of other add-ons are not
+    // part of a package.
+    internal procedure IsPackageLine(SaleLinePOS: Record "NPR POS Sale Line"): Boolean
+    var
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+    begin
+        FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
+        if (SaleLinePOSAddOn.FindFirst()) then begin
+            if (SaleLinePOSAddOn."Applies-to Line No." = 0) then
+                exit(false);
+            if (not IsPackageTemplate(SaleLinePOSAddOn."AddOn No.")) then
+                exit(false);
+            exit(true);
+        end;
+
+        FilterAttachedItemAddonLines(SaleLinePOS, SaleLinePOS."Line No.", SaleLinePOSAddOn);
+        SaleLinePOSAddOn.SetLoadFields("AddOn No.");
+        if (not SaleLinePOSAddOn.FindSet()) then
+            exit(false);
+        repeat
+            if (IsPackageTemplate(SaleLinePOSAddOn."AddOn No.")) then
+                exit(true);
+        until (SaleLinePOSAddOn.Next() = 0);
+        exit(false);
+    end;
+
+    // The same package lines as IsPackageLine, for the whole sale in one read.
+    internal procedure FindPackageLineNos(SaleLinePOS: Record "NPR POS Sale Line"; var PackageLineNos: List of [Integer])
+    var
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+    begin
+        SaleLinePOSAddOn.SetFilter("Register No.", '=%1', SaleLinePOS."Register No.");
+        SaleLinePOSAddOn.SetFilter("Sales Ticket No.", '=%1', SaleLinePOS."Sales Ticket No.");
+        SaleLinePOSAddOn.SetFilter("Applies-to Line No.", '<>%1', 0);
+        SaleLinePOSAddOn.SetLoadFields("Sale Line No.", "Applies-to Line No.", "AddOn No.");
+        if (not SaleLinePOSAddOn.FindSet()) then
+            exit;
+        repeat
+            if (IsPackageTemplate(SaleLinePOSAddOn."AddOn No.")) then begin
+                PackageLineNos.Add(SaleLinePOSAddOn."Sale Line No.");
+                PackageLineNos.Add(SaleLinePOSAddOn."Applies-to Line No.");
+            end;
+        until (SaleLinePOSAddOn.Next() = 0);
+    end;
+
+    local procedure IsPackageTemplate(AddOnNo: Code[20]): Boolean
+    var
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+    begin
+        ItemAddOn.SetLoadFields(WalletTemplate);
+        if (not ItemAddOn.Get(AddOnNo)) then
+            exit(false);
+        if (not ItemAddOn.WalletTemplate) then
+            exit(false);
+        exit(true);
+    end;
+
+    // Called by the price engine after it has set a fresh base price, so the relative amount never adds up.
+    internal procedure ApplyRelativeUnitPrice(var SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        Item: Record Item;
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        RelativeUnitPrice: Decimal;
+    begin
+        if (SaleLinePOS.Indentation = 0) then
+            exit;
+
+        FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
+        SaleLinePOSAddOn.SetLoadFields("AddOn No.", "AddOn Line No.");
+        if (not SaleLinePOSAddOn.FindFirst()) then
+            exit;
+
+        ItemAddOnLine.SetLoadFields("Use Unit Price", "Unit Price");
+        if (not ItemAddOnLine.Get(SaleLinePOSAddOn."AddOn No.", SaleLinePOSAddOn."AddOn Line No.")) then
+            exit;
+        if (ItemAddOnLine."Use Unit Price" <> ItemAddOnLine."Use Unit Price"::Relative) then
+            exit;
+
+        Item.SetLoadFields("Price Includes VAT", "VAT Bus. Posting Gr. (Price)", "VAT Prod. Posting Group");
+        Item.Get(SaleLinePOS."No.");
+        if (Item."Price Includes VAT") then begin
+            Item.TestField("VAT Bus. Posting Gr. (Price)");
+            Item.TestField("VAT Prod. Posting Group");
+        end;
+        RelativeUnitPrice := ItemAddOnLine."Unit Price";
+        POSSaleLine.ConvertPriceToVAT(Item."Price Includes VAT", Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group", SaleLinePOS, RelativeUnitPrice);
+
+        SaleLinePOS."Unit Price" := GetAddOnUnitPrice(ItemAddOnLine."Use Unit Price", RelativeUnitPrice, SaleLinePOS."Unit Price");
     end;
 
     local procedure InsertPOSAddOnLineComment(AddOnLineComment: JsonToken; ItemAddOn: Record "NPR NpIa Item AddOn"; var SaleLinePOS: Record "NPR POS Sale Line")
@@ -1026,7 +1172,9 @@
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
         SaleLinePOS2: Record "NPR POS Sale Line";
         xSaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         Item: Record Item;
+        DiscountManagement: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
         TicketRetailMgt: Codeunit "NPR TM Ticket Retail Mgt.";
         WalletManager: Codeunit "NPR AttractionWalletCreate";
         HTMLDisplay: Codeunit "NPR POS HTML Disp. Prof.";
@@ -1067,6 +1215,13 @@
 
                 POSProxyDisplay.UpdateDisplay(SaleLinePOS2);
             until SaleLinePOSAddOn.Next() = 0;
+
+            // Scaling saves the add-ons without calculating their discounts, so a sale with packages is recalculated in full.
+            // In other sales, the scaled add-ons keep their discounts until the next calculation.
+            if (SaleLinePOS."Quantity (Base)" <> xSaleLinePOS."Quantity (Base)") then
+                if (SaleHasPackageLines(SaleLinePOS)) then
+                    if (SalePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.")) then
+                        DiscountManagement.RecalculateAllSaleLinePOS(SalePOS);
 
             HTMLDisplay.UpdateHTMLDisplay();
         end;

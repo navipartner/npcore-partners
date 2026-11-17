@@ -1610,6 +1610,7 @@
     var
         Item: Record Item;
         TicketDynamicPrice: Codeunit "NPR TM Dynamic Price";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
         RawPrice: Decimal;
         LineTotal: Decimal;
         UnitPrice: Decimal;
@@ -1635,8 +1636,7 @@
         Item.SetLoadFields("NPR Ticket Type", "Unit Price", "Price Includes VAT", "VAT Prod. Posting Group", "VAT Bus. Posting Gr. (Price)");
         Item.Get(AddOnLine."Item No.");
 
-        if ((AddOnLine."Use Unit Price" = AddOnLine."Use Unit Price"::Always) or
-            (AddOnLine."Unit Price" <> 0)) then begin
+        if (not ItemAddOnMgt.UsesBasePrice(AddOnLine."Use Unit Price", AddOnLine."Unit Price")) then begin
             // Template override — AddOn line dictates the unit price.
             RawPrice := AddOnLine."Unit Price";
             ErpUnitPriceIncludesVat := Item."Price Includes VAT";
@@ -1653,6 +1653,11 @@
                 ErpUnitPriceIncludesVat := Item."Price Includes VAT";
                 ErpUnitPriceVatPercentage := GetItemVatPercentage(Item);
             end;
+
+            RawPrice := ItemAddOnMgt.GetAddOnUnitPrice(
+                AddOnLine."Use Unit Price",
+                ItemAddOnMgt.ConvertToVatBasis(AddOnLine."Unit Price", Item."Price Includes VAT", GetItemVatPercentage(Item), ErpUnitPriceIncludesVat),
+                RawPrice);
         end;
 
         LineTotal := AdjustForDiscount(AddOnLine, RawPrice * AddOnLineQty);

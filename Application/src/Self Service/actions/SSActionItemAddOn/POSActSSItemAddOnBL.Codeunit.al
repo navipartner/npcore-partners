@@ -179,6 +179,7 @@ codeunit 6060027 "NPR POSAct. SS Item AddOn-BL"
     procedure ApplyUserQuantity(Value: Text; ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; MasterLineNumber: Integer; POSSale: Codeunit "NPR POS Sale"; POSSaleLine: Codeunit "NPR POS Sale Line")
     var
         SaleLinePOS: Record "NPR POS Sale Line";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
         BooleanValue: Boolean;
         DecVal: Decimal;
     begin
@@ -217,7 +218,8 @@ codeunit 6060027 "NPR POSAct. SS Item AddOn-BL"
             SaleLinePOS.Description := ItemAddOnLine.Description;
 
             SaleLinePOS.Validate(Quantity, ItemAddOnLine.Quantity);
-            if (ItemAddOnLine."Unit Price" <> 0) then begin
+            // Self-service does not apply a relative unit price, so such a line keeps the base price.
+            if (not ItemAddOnMgt.UsesBasePrice(ItemAddOnLine."Use Unit Price", ItemAddOnLine."Unit Price")) then begin
                 SaleLinePOS."Manual Item Sales Price" := true;
                 SaleLinePOS.Validate("Unit Price", ItemAddOnLine."Unit Price");
             end;

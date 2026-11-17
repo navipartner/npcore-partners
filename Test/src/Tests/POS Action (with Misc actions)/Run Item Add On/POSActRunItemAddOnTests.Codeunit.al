@@ -244,6 +244,41 @@ codeunit 85140 "NPR POS Act. RunItemAddOnTests"
         _Assert.IsTrue(SaleLinePOSAddOn.IsEmpty(), 'The item add-on relation must be deleted together with its parent line.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure UseUnitPriceRelative_WhereTheAmountWouldBeReadAsAPrice_IsRefused()
+    var
+        ChildItem: Record Item;
+        ParentItem: Record Item;
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        AddOnNo: Code[20];
+    begin
+        // [SCENARIO] A relative unit price is an amount added to the normal price, so it is refused where it would be read as the price itself
+
+        // [GIVEN] An add-on quantity line with an absolute unit price
+        _LibraryPOSMock.InitializeData(_Initialized, _POSUnit, _POSStore, _POSPaymentMethod);
+        CreateSaleItem(ParentItem, 10);
+        CreateSaleItem(ChildItem, 4);
+        AddOnNo := CreateQuantityAddOn(ParentItem, ChildItem, 1, false);
+        ItemAddOnLine.Get(AddOnNo, 10000);
+
+        // [WHEN] The line is made relative
+        ItemAddOnLine.Validate("Use Unit Price", ItemAddOnLine."Use Unit Price"::Relative);
+
+        // [THEN] The absolute unit price does not carry over as the amount
+        _Assert.AreEqual(0, ItemAddOnLine."Unit Price", 'Switching to a relative unit price must clear the absolute unit price.');
+
+        // [WHEN/THEN] A line priced by UnitPriceFromMaster, which sets an absolute unit price, cannot be made relative
+        ItemAddOnLine.Validate("Use Unit Price", ItemAddOnLine."Use Unit Price"::"Non-Zero");
+        ItemAddOnLine.Validate("Before Insert Function", 'UnitPriceFromMaster');
+        asserterror ItemAddOnLine.Validate("Use Unit Price", ItemAddOnLine."Use Unit Price"::Relative);
+
+        // [WHEN/THEN] Nor can a Select line, whose options carry the price
+        ItemAddOnLine.Validate("Before Insert Function", '');
+        ItemAddOnLine.Validate(Type, ItemAddOnLine.Type::Select);
+        asserterror ItemAddOnLine.Validate("Use Unit Price", ItemAddOnLine."Use Unit Price"::Relative);
+    end;
+
     local procedure CreateAndCompleteItemAddOnSale(CopySerialNo: Boolean; ParentSerialNo: Code[50]; var ParentItem: Record Item; var ChildItem: Record Item; var SalePOS: Record "NPR POS Sale"; var ParentSaleLine: Record "NPR POS Sale Line"; var ChildSaleLine: Record "NPR POS Sale Line")
     var
         AddOnNo: Code[20];

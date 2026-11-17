@@ -254,7 +254,7 @@
         until TempSaleLinePOS.Next() = 0;
     end;
 
-    local procedure CheckDiscTrigger(var SaleLinePOS: Record "NPR POS Sale Line"): Boolean
+    internal procedure CheckDiscTrigger(var SaleLinePOS: Record "NPR POS Sale Line"): Boolean
     begin
         if SaleLinePOS.IsTemporary then
             exit(false);

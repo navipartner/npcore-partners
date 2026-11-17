@@ -77,16 +77,16 @@
                     ToolTip = 'Specifies if salesperson can omit inserting the line to the sale.';
                     ApplicationArea = NPRRetail;
                 }
-                field("Unit Price"; Rec."Unit Price")
-                {
-
-                    ToolTip = 'Specifies the price of one unit of the item.';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Use Unit Price"; Rec."Use Unit Price")
                 {
 
-                    ToolTip = 'Specifies if the price of one unit of the item should be used for sold item.';
+                    ToolTip = 'Specifies how the line is priced. Non-Zero uses the Unit Price when it is not zero, otherwise the item''s normal price. Always uses the Unit Price, also when it is zero. Relative adds the Unit Price to the item''s normal price, so a negative Unit Price lowers it, and the result is never below zero.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Unit Price"; Rec."Unit Price")
+                {
+
+                    ToolTip = 'Specifies the price of one unit of the item. When Use Unit Price is Relative, it is the amount added to the item''s normal price.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Discount %"; Rec."Discount %")

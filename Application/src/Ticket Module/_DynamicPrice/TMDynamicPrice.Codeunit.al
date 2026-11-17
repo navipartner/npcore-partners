@@ -22,6 +22,7 @@ codeunit 6014559 "NPR TM Dynamic Price"
     var
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
         ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
         TicketUnitPrice: Decimal;
         Token: Text[100];
         TokenLineNumber: Integer;
@@ -68,8 +69,7 @@ codeunit 6014559 "NPR TM Dynamic Price"
                     end;
 
                     if (ItemAddOnLine.Get(SaleLinePOSAddOn."AddOn No.", SaleLinePOSAddOn."AddOn Line No.")) then
-                        ForceItemAddOnUnitPrice := ((ItemAddOnLine."Use Unit Price" = ItemAddOnLine."Use Unit Price"::Always) or
-                                                    ((ItemAddOnLine."Use Unit Price" = ItemAddOnLine."Use Unit Price"::"Non-Zero") and (ItemAddOnLine."Unit Price" <> 0)));
+                        ForceItemAddOnUnitPrice := not ItemAddOnMgt.UsesBasePrice(ItemAddOnLine."Use Unit Price", ItemAddOnLine."Unit Price");
                 end;
 
                 if (ForceItemAddOnUnitPrice) then begin

@@ -119,6 +119,8 @@
     local procedure FindSalesLinePrice(SalePOS: Record "NPR POS Sale"; BaseSaleLinePOS: Record "NPR POS Sale Line"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
         TicketPrice: Codeunit "NPR TM Dynamic Price";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+        KeepsLinePrice: Boolean;
     begin
         if SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item then
             exit;
@@ -133,7 +135,8 @@
 
         Item.Get(SaleLinePOS."No.");
 
-        if Item."NPR Group sale" or SaleLinePOS."Custom Price" then begin
+        KeepsLinePrice := Item."NPR Group sale" or SaleLinePOS."Custom Price";
+        if KeepsLinePrice then begin
             //The caller must set the correct values in the BaseSaleLinePOS record to ensure that the CalcBestUnitPrice() can correctly recognise differences in VAT, currency and UoM, and perform the necessary conversions
             TempSalesPriceListLine.DeleteAll();
             TempSalesPriceListLine."Source Type" := TempSalesPriceListLine."Source Type"::"All Customers";
@@ -162,6 +165,10 @@
             SaleLinePOS."Discount %" := 0;
 
         TicketPrice.CalculatedTicketPriceAfterErpPrice(SalePOS, SaleLinePOS);
+
+        // A kept line price already holds the relative amount.
+        if (not (KeepsLinePrice or Item."NPR Explode BOM auto")) then
+            ItemAddOnMgt.ApplyRelativeUnitPrice(SaleLinePOS);
     end;
 
     procedure FindSalesLineLineDisc(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")

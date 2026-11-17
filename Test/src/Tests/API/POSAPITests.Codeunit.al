@@ -1659,6 +1659,67 @@ codeunit 85157 "NPR POS API Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleLine_WithAddon_UseUnitPriceRelative_AddsDifferenceOnceToNormalPrice()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        Assert: Codeunit Assert;
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        SaleId: Guid;
+        AddonLineId: Guid;
+    begin
+        // [SCENARIO] A relative addon price is added to the item's normal price, and a recalculation starts again from the normal price
+        InitializeAddon();
+
+        // [GIVEN] An addon line with Use Unit Price = Relative and Unit Price = -5
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, _ItemAddon."No.", _AddonItem."No.",
+            ItemAddOnLine."Use Unit Price"::Relative, -5);
+
+        // [WHEN] The addon is added to a sale line of the parent item
+        CreateSaleWithAddon(ItemAddOnLine, SaleId, AddonLineId);
+
+        // [THEN] The addon costs the item price (25) less 5
+        Assert.AreEqual(20, GetAddonUnitPrice(SaleId), 'Addon should cost the item price (25) less 5');
+
+        // [WHEN] The addon quantity changes, which recalculates its price
+        Body.Add('quantity', 3);
+        Response := LibraryNPRetailAPI.CallApi('PATCH', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(AddonLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Update addon quantity should succeed');
+
+        // [THEN] The difference is applied once, not again on top of the previous price
+        Assert.AreEqual(20, GetAddonUnitPrice(SaleId), 'Addon should still cost the item price (25) less 5 after the recalculation');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleLine_WithAddon_UseUnitPriceRelative_FloorsAtZero()
+    var
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        Assert: Codeunit Assert;
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        SaleId: Guid;
+        AddonLineId: Guid;
+    begin
+        // [SCENARIO] A relative addon price larger than the item's normal price makes the addon free, not negative
+        InitializeAddon();
+
+        // [GIVEN] An addon line with Use Unit Price = Relative and Unit Price = -30
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, _ItemAddon."No.", _AddonItem."No.",
+            ItemAddOnLine."Use Unit Price"::Relative, -30);
+
+        // [WHEN] The addon is added to a sale line of the parent item
+        CreateSaleWithAddon(ItemAddOnLine, SaleId, AddonLineId);
+
+        // [THEN] The addon costs 0, not the item price (25) less 30
+        Assert.AreEqual(0, GetAddonUnitPrice(SaleId), 'Addon price should be floored at 0');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure SaleLine_WithAddon_ParentEmptyVATBusPostGrPrice_Failure()
     var
         LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
@@ -5172,6 +5233,73 @@ codeunit 85157 "NPR POS API Tests"
 
         _AddonInitialized := true;
         Commit();
+    end;
+
+    local procedure CreateSaleWithAddon(ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; var SaleId: Guid; var AddonLineId: Guid)
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        SaleLineId: Guid;
+    begin
+        SaleId := CreateGuid();
+        SaleLineId := CreateGuid();
+        AddonLineId := CreateGuid();
+
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        Body.Add('type', 'Item');
+        Body.Add('code', _Item."No.");
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create parent sale line should succeed');
+
+        Clear(Body);
+        Body.Add('lineId', FormatGuid(AddonLineId));
+        Body.Add('parentLineId', FormatGuid(SaleLineId));
+        Body.Add('addonNo', ItemAddOnLine."AddOn No.");
+        Body.Add('addonLineNo', Format(ItemAddOnLine."Line No."));
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId) + '/addon', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create addon line should succeed');
+    end;
+
+    local procedure GetAddonUnitPrice(SaleId: Guid) UnitPrice: Decimal
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        Body: JsonObject;
+        ResponseBody: JsonObject;
+        SaleLineObj: JsonObject;
+        SaleLinesArray: JsonArray;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        JToken: JsonToken;
+        SaleLineToken: JsonToken;
+        FoundAddon: Boolean;
+    begin
+        QueryParams.Add('withLines', 'true');
+        Response := LibraryNPRetailAPI.CallApi('GET', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Get sale should succeed');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        ResponseBody.Get('saleLines', JToken);
+        SaleLinesArray := JToken.AsArray();
+
+        foreach SaleLineToken in SaleLinesArray do begin
+            SaleLineObj := SaleLineToken.AsObject();
+            if (SaleLineObj.Get('isAddon', JToken)) then
+                if (JToken.AsValue().AsBoolean()) then begin
+                    SaleLineObj.Get('unitPrice', JToken);
+                    UnitPrice := JToken.AsValue().AsDecimal();
+                    FoundAddon := true;
+                end;
+        end;
+        Assert.IsTrue(FoundAddon, 'Should find addon line in sale');
     end;
 
     local procedure VerifyRestaurantSetupForKitchenOrders()

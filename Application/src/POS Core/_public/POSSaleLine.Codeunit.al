@@ -295,16 +295,28 @@
     procedure DeleteLine()
     var
         LocalxRec: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+        RecalculateDiscounts: Boolean;
     begin
         if (not RefreshCurrent()) then
             exit;
 
         OnBeforeDeletePOSSaleLine(Rec, false);
         LocalxRec := Rec;
+        // The calculation after the delete only reacts to the deleted line's own discount. In a sale with packages that misses the
+        // add-on lines deleted with it and a discount a package line held back, so the whole sale is recalculated instead.
+        // Checked before the delete removes the add-on lines.
+        if (POSSalesDiscountCalcMgt.CheckDiscTrigger(LocalxRec)) then
+            RecalculateDiscounts := ItemAddOnMgt.SaleHasPackageLines(LocalxRec);
         Rec.Delete(true);
 
-        POSSalesDiscountCalcMgt.OnAfterDeleteSaleLinePOS(LocalxRec);
+        if (RecalculateDiscounts) then begin
+            if (SalePOS.Get(LocalxRec."Register No.", LocalxRec."Sales Ticket No.")) then
+                POSSalesDiscountCalcMgt.RecalculateAllSaleLinePOS(SalePOS);
+        end else
+            POSSalesDiscountCalcMgt.OnAfterDeleteSaleLinePOS(LocalxRec);
 
         if (Rec.Find('><')) then begin
             Rec.UpdateAmounts(Rec);

@@ -62,7 +62,7 @@
                 Item.Get("Item No.");
 
                 "Unit Price" := Item."Unit Price";
-                if (Item."NPR Ticket Type" <> '') then
+                if ((Item."NPR Ticket Type" <> '') or ("Use Unit Price" = "Use Unit Price"::Relative)) then
                     "Unit Price" := 0;// force ERP pricing as default (when unit price is zero, it will calculate the ERP price runtime)
 
                 Description := Item.Description;
@@ -104,8 +104,17 @@
         {
             Caption = 'Use Unit Price';
             DataClassification = CustomerContent;
-            OptionCaption = 'Non-Zero,Always';
-            OptionMembers = "Non-Zero",Always;
+            OptionCaption = 'Non-Zero,Always,Relative';
+            OptionMembers = "Non-Zero",Always,Relative;
+
+            trigger OnValidate()
+            begin
+                ValidateRelativeUnitPrice();
+
+                // A relative unit price is added to the base price, the others replace it, so the amount cannot carry over.
+                if (("Use Unit Price" = "Use Unit Price"::Relative) <> (xRec."Use Unit Price" = "Use Unit Price"::Relative)) then
+                    "Unit Price" := 0;
+            end;
         }
         field(50; "Unit Price"; Decimal)
         {
@@ -234,6 +243,7 @@
                     end;
                 end;
                 EventSubscription.FindFirst();
+                ValidateRelativeUnitPrice();
             end;
         }
         field(205; "Before Insert Codeunit Name"; Text[30])
@@ -271,6 +281,7 @@
 
                 EventSubscription.FindFirst();
                 "Before Insert Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
+                ValidateRelativeUnitPrice();
             end;
         }
         field(220; "Copy Serial No."; Boolean)
@@ -332,6 +343,22 @@
 
         "Before Insert Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
         "Before Insert Function" := EventSubscription."Subscriber Function";
+        ValidateRelativeUnitPrice();
+    end;
+
+    local procedure ValidateRelativeUnitPrice()
+    var
+        BeforeInsFunc: Codeunit "NPR NpIa Before Ins. Func.";
+        UnitPriceFromMasterErr: Label '%1 cannot be %2 when %3 is %4.', Comment = '%1 = Use Unit Price field caption, %2 = Relative option caption, %3 = Before Insert Function field caption, %4 = before insert function name';
+    begin
+        if ("Use Unit Price" <> "Use Unit Price"::Relative) then
+            exit;
+
+        TestField(Type, Type::Quantity);
+
+        // That function sets an absolute unit price, which a relative line would add to the base price.
+        if (BeforeInsFunc.IsUnitPriceFromMaster(Rec)) then
+            Error(UnitPriceFromMasterErr, FieldCaption("Use Unit Price"), Format("Use Unit Price"), FieldCaption("Before Insert Function"), "Before Insert Function");
     end;
 
     local procedure FilterOnBeforeInsertSubscribers(var EventSubscription: Record "Event Subscription")
