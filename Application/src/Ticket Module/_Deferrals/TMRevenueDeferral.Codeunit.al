@@ -10,8 +10,19 @@ codeunit 6184739 "NPR TM RevenueDeferral"
 
     internal procedure ProcessBatch()
     begin
+        // A batch of 500 requests bounds how many rows one posting transaction keeps locked until it commits.
+        ProcessBatch(500);
+    end;
+
+    internal procedure ProcessBatch(PendingDeferralBatchSize: Integer)
+    var
+        InvalidBatchSizeErr: Label 'Pending deferral batch size %1 must be at least 1. This is a programming bug.', Locked = true;
+    begin
+        if (PendingDeferralBatchSize < 1) then
+            Error(InvalidBatchSizeErr, PendingDeferralBatchSize);
+
         ProcessStatusRegistered();
-        ProcessStatusPendingDeferral();
+        ProcessStatusPendingDeferral(PendingDeferralBatchSize);
     end;
 
     internal procedure DeleteDeferralRequests(TicketAccessEntryNos: List of [Integer])
@@ -254,49 +265,145 @@ EventDate: Date) ValidRequest: Boolean
 
     local procedure ProcessStatusRegistered()
     var
-        DeferRevenueRequest, DeferRevenueRequestUpdate : Record "NPR TM DeferRevenueRequest";
+        DeferRevenueRequest: Record "NPR TM DeferRevenueRequest";
+        RunDate: Date;
     begin
         // Dress the request with all possible intermediary information 
-        DeferRevenueRequest.SetCurrentKey(Status);
-        DeferRevenueRequest.SetFilter(Status, '=%1|=%2', DeferRevenueRequest.Status::REGISTERED, DeferRevenueRequest.Status::WAITING);
-        if (not DeferRevenueRequest.FindSet(true)) then
+        // Requests are locked and committed one reservation token at a time, so the batch never holds locks on the whole status range.
+        RunDate := Today();
+
+        DeferRevenueRequest.SetFilter(Status, '=%1', DeferRevenueRequest.Status::REGISTERED);
+        ProcessRegisteredByToken(DeferRevenueRequest, false, RunDate);
+
+        // A WAITING request only changes state once its ticket has expired or been admitted.
+        DeferRevenueRequest.SetFilter(Status, '=%1', DeferRevenueRequest.Status::WAITING);
+        ProcessRegisteredByToken(DeferRevenueRequest, true, RunDate);
+    end;
+
+    local procedure ProcessRegisteredByToken(var CandidateRequest: Record "NPR TM DeferRevenueRequest"; DueOnly: Boolean; RunDate: Date)
+    var
+        EntryNosByToken: Dictionary of [Text, List of [Integer]];
+        TokenIDs: List of [Text];
+        EntryNos: List of [Integer];
+        TokenID: Text;
+        TicketAccessEntryNo: Integer;
+    begin
+        CandidateRequest.ReadIsolation := IsolationLevel::ReadCommitted;
+        CandidateRequest.SetCurrentKey(Status);
+        CandidateRequest.SetLoadFields(TicketAccessEntryNo, TokenID, TicketValidUntil, AchievedDate);
+        if (not CandidateRequest.FindSet()) then
             exit;
 
         repeat
-            DeferRevenueRequestUpdate.Get(DeferRevenueRequest.TicketAccessEntryNo);
-            ProcessOneStatusRegistered(DeferRevenueRequestUpdate);
-            DeferRevenueRequestUpdate.Modify();
-        until (DeferRevenueRequest.Next() = 0);
-        Commit();
+            if ((not DueOnly) or (CandidateRequest.TicketValidUntil < RunDate) or (CandidateRequest.AchievedDate <> 0D)) then
+                AddEntryNoToGroup(EntryNosByToken, TokenIDs, CandidateRequest.TokenID, CandidateRequest.TicketAccessEntryNo);
+        until (CandidateRequest.Next() = 0);
+
+        foreach TokenID in TokenIDs do begin
+            EntryNosByToken.Get(TokenID, EntryNos);
+            foreach TicketAccessEntryNo in EntryNos do
+                ProcessRegisteredRequest(TicketAccessEntryNo);
+            Commit();
+        end;
     end;
 
-    local procedure ProcessStatusPendingDeferral()
+    local procedure AddEntryNoToGroup(var EntryNosByGroup: Dictionary of [Text, List of [Integer]]; var GroupKeys: List of [Text]; GroupKey: Text; TicketAccessEntryNo: Integer)
+    var
+        EntryNos: List of [Integer];
     begin
-        CalculateDeferralAndPost();
+        // A fresh list per call, written back with Set, keeps groups apart whether the list is copied or shared by reference.
+        // GroupKeys keeps the groups in first-seen order, because a Dictionary has no defined order.
+        if (EntryNosByGroup.ContainsKey(GroupKey)) then
+            EntryNos := EntryNosByGroup.Get(GroupKey)
+        else
+            GroupKeys.Add(GroupKey);
+        EntryNos.Add(TicketAccessEntryNo);
+        EntryNosByGroup.Set(GroupKey, EntryNos);
+    end;
+
+    local procedure ProcessRegisteredRequest(TicketAccessEntryNo: Integer)
+    var
+        DeferRevenueRequest: Record "NPR TM DeferRevenueRequest";
+    begin
+        DeferRevenueRequest.ReadIsolation := IsolationLevel::UpdLock;
+        if (not DeferRevenueRequest.Get(TicketAccessEntryNo)) then
+            exit;
+
+        // The status may have moved on since the unlocked candidate read.
+        if (not (DeferRevenueRequest.Status in [DeferRevenueRequest.Status::REGISTERED, DeferRevenueRequest.Status::WAITING])) then
+            exit;
+
+        ProcessOneStatusRegistered(DeferRevenueRequest);
+        DeferRevenueRequest.Modify();
+    end;
+
+    local procedure ProcessStatusPendingDeferral(BatchSize: Integer)
+    var
+        DeferRevenueRequest: Record "NPR TM DeferRevenueRequest";
+        EntryNosByDocument: Dictionary of [Text, List of [Integer]];
+        DocumentNos: List of [Text];
+        DocumentEntryNos: List of [Integer];
+        BatchEntryNos: List of [Integer];
+        DocumentNo: Text;
+        TicketAccessEntryNo: Integer;
+    begin
+        // The candidate read holds no locks. Requests are posted and committed in batches of whole source documents,
+        // and a document larger than a batch is split, so a batch never locks more than BatchSize requests.
+        DeferRevenueRequest.ReadIsolation := IsolationLevel::ReadCommitted;
+        DeferRevenueRequest.SetCurrentKey(Status);
+        DeferRevenueRequest.SetFilter(Status, '=%1', DeferRevenueRequest.Status::PENDING_DEFERRAL);
+        DeferRevenueRequest.SetLoadFields(TicketAccessEntryNo, SourceDocumentNo);
+        if (not DeferRevenueRequest.FindSet()) then
+            exit;
+
+        repeat
+            AddEntryNoToGroup(EntryNosByDocument, DocumentNos, DeferRevenueRequest.SourceDocumentNo, DeferRevenueRequest.TicketAccessEntryNo);
+        until (DeferRevenueRequest.Next() = 0);
+
+        foreach DocumentNo in DocumentNos do begin
+            EntryNosByDocument.Get(DocumentNo, DocumentEntryNos);
+            if (BatchEntryNos.Count() + DocumentEntryNos.Count() > BatchSize) then
+                PostAndCommitBatch(BatchEntryNos);
+
+            foreach TicketAccessEntryNo in DocumentEntryNos do begin
+                BatchEntryNos.Add(TicketAccessEntryNo);
+                if (BatchEntryNos.Count() >= BatchSize) then
+                    PostAndCommitBatch(BatchEntryNos);
+            end;
+        end;
+
+        PostAndCommitBatch(BatchEntryNos);
+    end;
+
+    local procedure PostAndCommitBatch(var BatchEntryNos: List of [Integer])
+    begin
+        if (BatchEntryNos.Count() = 0) then
+            exit;
+
+        CalculateDeferralAndPost(BatchEntryNos);
         Commit();
+        Clear(BatchEntryNos);
     end;
 
     [CommitBehavior(CommitBehavior::Error)]
-    local procedure CalculateDeferralAndPost()
+    local procedure CalculateDeferralAndPost(TicketAccessEntryNos: List of [Integer])
     var
-        DeferRevenueRequest, DeferRevenueRequestUpdate : Record "NPR TM DeferRevenueRequest";
+        DeferRevenueRequestUpdate: Record "NPR TM DeferRevenueRequest";
         TempRevenueRecognitionBuffer: Record "NPR TM RevenuePostingBuffer" temporary;
         TempGenJournalLine: Record "Gen. Journal Line" temporary;
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
+        TicketAccessEntryNo: Integer;
     begin
         // Dress the request with all possible intermediary information 
-        DeferRevenueRequest.SetCurrentKey(Status);
-        DeferRevenueRequest.SetFilter(Status, '=%1', DeferRevenueRequest.Status::PENDING_DEFERRAL);
-        if (not DeferRevenueRequest.FindSet(true)) then
-            exit;
-
+        // The requests of the batch stay locked until the caller commits the batch.
         // Refresh postings details and aggregate
-        repeat
-            DeferRevenueRequestUpdate.Get(DeferRevenueRequest.TicketAccessEntryNo);
-            if (ProcessOneStatusPendingDeferral(DeferRevenueRequestUpdate)) then
-                AggregateDeferrals(DeferRevenueRequestUpdate, TempRevenueRecognitionBuffer);
-            DeferRevenueRequestUpdate.Modify();
-        until (DeferRevenueRequest.Next() = 0);
+        DeferRevenueRequestUpdate.ReadIsolation := IsolationLevel::UpdLock;
+        foreach TicketAccessEntryNo in TicketAccessEntryNos do
+            if (DeferRevenueRequestUpdate.Get(TicketAccessEntryNo)) then begin
+                if (ProcessOneStatusPendingDeferral(DeferRevenueRequestUpdate)) then
+                    AggregateDeferrals(DeferRevenueRequestUpdate, TempRevenueRecognitionBuffer);
+                DeferRevenueRequestUpdate.Modify();
+            end;
 
         // Create posting journal lines from the aggregation buffer
         CreateJournalLines(TempRevenueRecognitionBuffer, TempGenJournalLine);
