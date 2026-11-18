@@ -718,7 +718,8 @@
         ArchCoupon."Max Use per Sale" := Coupon."Max Use per Sale";
         ArchCoupon."Print Template Code" := Coupon."Print Template Code";
         ArchCoupon."POS Store Group" := Coupon."POS Store Group";
-        ArchCoupon.Insert();
+        ArchCoupon.SystemId := Coupon.SystemId;
+        ArchCoupon.Insert(false, true);
     end;
 
     local procedure InsertArchivedCouponEntry(Coupon: Record "NPR NpDc Coupon"; CouponEntry: Record "NPR NpDc Coupon Entry")

@@ -21,31 +21,37 @@ page 6150948 "NPR Ecom Coupon Sub"
                 field("No."; Rec."No.")
                 {
                     ApplicationArea = NPRRetail;
+                    StyleExpr = _RowStyle;
                     ToolTip = 'Specifies the coupon number.';
                 }
                 field("Reference No."; Rec."Reference No.")
                 {
                     ApplicationArea = NPRRetail;
+                    StyleExpr = _RowStyle;
                     ToolTip = 'Specifies the customer-facing reference number.';
                 }
                 field("Coupon Type"; Rec."Coupon Type")
                 {
                     ApplicationArea = NPRRetail;
+                    StyleExpr = _RowStyle;
                     ToolTip = 'Specifies the coupon type.';
                 }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the coupon description.';
+                    StyleExpr = _RowStyle;
+                    ToolTip = 'Specifies the coupon description. Archived coupons are prefixed with [Archived].';
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
                     ApplicationArea = NPRRetail;
+                    StyleExpr = _RowStyle;
                     ToolTip = 'Specifies when the coupon became valid.';
                 }
                 field("Ending Date"; Rec."Ending Date")
                 {
                     ApplicationArea = NPRRetail;
+                    StyleExpr = _RowStyle;
                     ToolTip = 'Specifies when the coupon expires.';
                 }
             }
@@ -72,6 +78,16 @@ page 6150948 "NPR Ecom Coupon Sub"
             }
         }
     }
+
+    trigger OnAfterGetRecord()
+    var
+        EcomCreateVchrImpl: Codeunit "NPR EcomCreateVchrImpl";
+    begin
+        if EcomCreateVchrImpl.IsArchivedTempDescription(Rec.Description) then
+            _RowStyle := 'Subordinate'
+        else
+            _RowStyle := 'Standard';
+    end;
 
     internal procedure ClearContents()
     begin
@@ -120,5 +136,8 @@ page 6150948 "NPR Ecom Coupon Sub"
             Rec.Insert(false, true);
         end;
     end;
+
+    var
+        _RowStyle: Text;
 }
 #endif

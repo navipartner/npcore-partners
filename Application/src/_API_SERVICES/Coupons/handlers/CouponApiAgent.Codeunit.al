@@ -738,7 +738,11 @@ codeunit 6248530 "NPR CouponApiAgent"
             exit(true);
         end;
 
-        // Archiving inserts a new row without the coupon's SystemId, so an archived coupon is found by its reference.
+        if (ArchivedCoupon.GetBySystemId(CouponId)) then begin
+            ArchivedCouponToJson(LatestVersion, ArchivedCoupon, JsonObjectName, Json);
+            exit(true);
+        end;
+
         if (ReferenceNo = '') then
             exit(false);
 

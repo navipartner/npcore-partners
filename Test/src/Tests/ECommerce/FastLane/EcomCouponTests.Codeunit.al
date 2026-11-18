@@ -374,11 +374,48 @@ codeunit 85243 "NPR Ecom Coupon Tests"
     end;
     #endregion
 
+    #region Archived coupons stay on the ecommerce document
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ArchivedCoupon_StillListedOnDocumentWithSameId()
+    var
+        CouponType: Record "NPR NpDc Coupon Type";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        NpDcArchCoupon: Record "NPR NpDc Arch. Coupon";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponImpl: Codeunit "NPR EcomCreateCouponImpl";
+        EcomCreateVchrImpl: Codeunit "NPR EcomCreateVchrImpl";
+        CouponSystemIds: List of [Guid];
+        ReferenceNos: List of [Text];
+    begin
+        // [GIVEN] a processed coupon line whose coupon is then archived from the coupon card
+        CreateProcessedCouponDocument(EcomSalesHeader, EcomSalesLine, CouponType, 1);
+        ArchiveDocumentCoupons(EcomSalesHeader, CouponSystemIds, ReferenceNos);
+
+        // [WHEN] the document's coupons are looked up
+        CouponImpl.BuildCouponTempBufferForDoc(EcomSalesHeader, TempCoupon);
+
+        // [THEN] the archived coupon is still listed, with the id it had before it was archived, marked as archived
+        _Assert.AreEqual(1, TempCoupon.Count(), 'An archived coupon must still be listed on the ecommerce document that issued it.');
+        TempCoupon.FindFirst();
+        _Assert.AreEqual(CouponSystemIds.Get(1), TempCoupon.SystemId, 'The listed archived coupon must keep the id the coupon had before it was archived.');
+        _Assert.AreEqual(ReferenceNos.Get(1), TempCoupon."Reference No.", 'The listed archived coupon must show its reference number.');
+        _Assert.IsTrue(EcomCreateVchrImpl.IsArchivedTempDescription(TempCoupon.Description), 'The listed archived coupon must be marked as archived.');
+        _Assert.IsTrue(NpDcArchCoupon.GetBySystemId(CouponSystemIds.Get(1)), 'Archiving must keep the coupon''s SystemId on the archived coupon.');
+
+        // [THEN] GET V2 and V3 still return it as an issued asset
+        AssertOneIssuedCoupon(_LibDocApi.GetSalesDocumentTextV2(EcomSalesHeader), '(Get V2, archived coupon)');
+        AssertOneIssuedCoupon(_LibDocApi.GetSalesDocumentTextV3(EcomSalesHeader), '(Get V3, archived coupon)');
+    end;
+    #endregion
+
     #region Helpers
 
     local procedure AssertOneIssuedCoupon(DocumentText: Text; Context: Text)
     var
         NpDcCoupon: Record "NPR NpDc Coupon";
+        NpDcArchCoupon: Record "NPR NpDc Arch. Coupon";
         RootObject: JsonObject;
         LineObject: JsonObject;
         AssetObject: JsonObject;
@@ -389,6 +426,7 @@ codeunit 85243 "NPR Ecom Coupon Tests"
         AssetToken: JsonToken;
         AssetId: Guid;
         AssetCount: Integer;
+        ReferenceNo: Text;
     begin
         RootObject.ReadFrom(DocumentText);
         RootObject.Get('salesDocumentLines', JToken);
@@ -410,9 +448,14 @@ codeunit 85243 "NPR Ecom Coupon Tests"
             AssetObject.Get('id', JToken);
             _Assert.IsTrue(Evaluate(AssetId, JToken.AsValue().AsText()), 'issuedAssets id must be a valid Guid. ' + Context);
 
-            _Assert.IsTrue(NpDcCoupon.GetBySystemId(AssetId), 'GetBySystemId must resolve the emitted issuedAssets id to a real coupon. ' + Context);
+            if NpDcCoupon.GetBySystemId(AssetId) then
+                ReferenceNo := NpDcCoupon."Reference No."
+            else begin
+                _Assert.IsTrue(NpDcArchCoupon.GetBySystemId(AssetId), 'GetBySystemId must resolve the emitted issuedAssets id to a coupon or an archived coupon. ' + Context);
+                ReferenceNo := NpDcArchCoupon."Reference No.";
+            end;
             AssetObject.Get('referenceNo', JToken);
-            _Assert.AreEqual(NpDcCoupon."Reference No.", JToken.AsValue().AsText(), 'issuedAssets referenceNo must match the resolved coupon. ' + Context);
+            _Assert.AreEqual(ReferenceNo, JToken.AsValue().AsText(), 'issuedAssets referenceNo must match the resolved coupon. ' + Context);
 
             AssetCount += 1;
         end;
@@ -434,6 +477,34 @@ codeunit 85243 "NPR Ecom Coupon Tests"
         EcomSalesLine."Line Amount" := Qty * UnitPrice;
         EcomSalesLine.Captured := true;
         EcomSalesLine.Insert(true);
+    end;
+
+    local procedure CreateProcessedCouponDocument(var EcomSalesHeader: Record "NPR Ecom Sales Header"; var EcomSalesLine: Record "NPR Ecom Sales Line"; var CouponType: Record "NPR NpDc Coupon Type"; Qty: Decimal)
+    var
+        CouponImpl: Codeunit "NPR EcomCreateCouponImpl";
+    begin
+        _LibEcom.CreateEcomSalesHeader(EcomSalesHeader);
+        EcomSalesHeader."External No." := _LibEcom.NextExternalNo('CPNARCH');
+        EcomSalesHeader.Modify();
+        CreateCapturedCouponLine(EcomSalesLine, EcomSalesHeader, _LibEcom.CreateEcomCouponItem(CouponType), Qty, 100);
+        CouponImpl.Process(EcomSalesLine);
+    end;
+
+    local procedure ArchiveDocumentCoupons(EcomSalesHeader: Record "NPR Ecom Sales Header"; var CouponSystemIds: List of [Guid]; var ReferenceNos: List of [Text])
+    var
+        EcomSalesCouponLink: Record "NPR Ecom Sales Coupon Link";
+        NpDcCoupon: Record "NPR NpDc Coupon";
+        NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
+    begin
+        EcomSalesCouponLink.SetRange(Source, EcomSalesCouponLink.Source::"Ecom Sales Document");
+        EcomSalesCouponLink.SetRange("Source System Id", EcomSalesHeader.SystemId);
+        EcomSalesCouponLink.FindSet();
+        repeat
+            NpDcCoupon.GetBySystemId(EcomSalesCouponLink."Coupon System Id");
+            CouponSystemIds.Add(NpDcCoupon.SystemId);
+            ReferenceNos.Add(NpDcCoupon."Reference No.");
+            NpDcCouponMgt.ArchiveCoupon(NpDcCoupon);
+        until EcomSalesCouponLink.Next() = 0;
     end;
 
     local procedure GetNextLineNo(EcomSalesHeader: Record "NPR Ecom Sales Header"): Integer

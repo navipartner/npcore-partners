@@ -90,7 +90,7 @@ codeunit 6151118 "NPR EcomCreateCouponImpl"
     begin
         BuildCouponTempBufferForDoc(EcomSalesHeader, TempCoupon);
         if not TempCoupon.IsEmpty() then
-            Page.RunModal(0, TempCoupon);
+            Page.RunModal(Page::"NPR Ecom Coupon Lookup", TempCoupon);
     end;
 
     internal procedure ShowRelatedCouponsAction(EcomSalesLine: Record "NPR Ecom Sales Line")
@@ -111,7 +111,7 @@ codeunit 6151118 "NPR EcomCreateCouponImpl"
                     OpenCouponCardForSystemId(TempCoupon.SystemId);
                 end;
             else
-                Page.RunModal(0, TempCoupon);
+                Page.RunModal(Page::"NPR Ecom Coupon Lookup", TempCoupon);
         end;
     end;
 
@@ -172,25 +172,50 @@ codeunit 6151118 "NPR EcomCreateCouponImpl"
     local procedure ResolveCouponLink(var EcomSalesCouponLink: Record "NPR Ecom Sales Coupon Link"; var TempCoupon: Record "NPR NpDc Coupon" temporary)
     var
         NpDcCoupon: Record "NPR NpDc Coupon";
+        NpDcArchCoupon: Record "NPR NpDc Arch. Coupon";
     begin
         if NpDcCoupon.GetBySystemId(EcomSalesCouponLink."Coupon System Id") then begin
             TempCoupon := NpDcCoupon;
             TempCoupon.SystemId := NpDcCoupon.SystemId;
             if TempCoupon.Insert(false, true) then;
+            exit;
         end;
+        if NpDcArchCoupon.GetBySystemId(EcomSalesCouponLink."Coupon System Id") then
+            InsertArchivedAsTempCoupon(NpDcArchCoupon, TempCoupon);
+    end;
+
+    local procedure InsertArchivedAsTempCoupon(NpDcArchCoupon: Record "NPR NpDc Arch. Coupon"; var TempCoupon: Record "NPR NpDc Coupon" temporary)
+    var
+        EcomCreateVchrImpl: Codeunit "NPR EcomCreateVchrImpl";
+    begin
+        TempCoupon.Init();
+        TempCoupon."No." := NpDcArchCoupon."No.";
+        TempCoupon."Coupon Type" := NpDcArchCoupon."Coupon Type";
+        TempCoupon."Reference No." := NpDcArchCoupon."Reference No.";
+        TempCoupon.Description := CopyStr(EcomCreateVchrImpl.BuildArchivedDescription(NpDcArchCoupon.Description), 1, MaxStrLen(TempCoupon.Description));
+        TempCoupon."Starting Date" := NpDcArchCoupon."Starting Date";
+        TempCoupon."Ending Date" := NpDcArchCoupon."Ending Date";
+        TempCoupon.SystemId := NpDcArchCoupon.SystemId;
+        if TempCoupon.Insert(false, true) then;
     end;
 
     internal procedure OpenCouponCardForSystemId(SystemIdParam: Guid)
     var
         NpDcCoupon: Record "NPR NpDc Coupon";
+        NpDcArchCoupon: Record "NPR NpDc Arch. Coupon";
         NotAvailableMsg: Label 'This coupon is no longer available in the system.';
     begin
-        if not NpDcCoupon.GetBySystemId(SystemIdParam) then begin
-            Message(NotAvailableMsg);
+        if NpDcCoupon.GetBySystemId(SystemIdParam) then begin
+            NpDcCoupon.SetRecFilter();
+            Page.Run(Page::"NPR NpDc Coupon Card", NpDcCoupon);
             exit;
         end;
-        NpDcCoupon.SetRecFilter();
-        Page.Run(Page::"NPR NpDc Coupon Card", NpDcCoupon);
+        if NpDcArchCoupon.GetBySystemId(SystemIdParam) then begin
+            NpDcArchCoupon.SetRecFilter();
+            Page.Run(Page::"NPR NpDc Arch. Coupon Card", NpDcArchCoupon);
+            exit;
+        end;
+        Message(NotAvailableMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnAfterNavigateFindRecords', '', true, true)]
@@ -210,9 +235,7 @@ codeunit 6151118 "NPR EcomCreateCouponImpl"
     local procedure ShowPostedInvoiceCouponsFromFindEntries(var DocumentEntry: Record "Document Entry"; DocNoFilter: Text; PostingDateFilter: Text)
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
-        NpDcCoupon: Record "NPR NpDc Coupon";
         TempCoupon: Record "NPR NpDc Coupon" temporary;
-        CouponFilter: Text;
     begin
         if DocumentEntry."Table ID" <> Database::"NPR NpDc Coupon" then
             exit;
@@ -228,14 +251,8 @@ codeunit 6151118 "NPR EcomCreateCouponImpl"
                     TempCoupon.FindFirst();
                     OpenCouponCardForSystemId(TempCoupon.SystemId);
                 end;
-            else begin
-                TempCoupon.FindSet();
-                repeat
-                    CouponFilter += '|' + TempCoupon."No.";
-                until TempCoupon.Next() = 0;
-                NpDcCoupon.SetFilter("No.", CopyStr(CouponFilter, 2));
-                Page.Run(Page::"NPR NpDc Coupons", NpDcCoupon);
-            end;
+            else
+                Page.RunModal(Page::"NPR Ecom Coupon Lookup", TempCoupon);
         end;
     end;
 
