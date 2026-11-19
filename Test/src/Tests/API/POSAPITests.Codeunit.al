@@ -1855,6 +1855,334 @@ codeunit 85157 "NPR POS API Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleLine_WithAddonsArray_OptionalPerUnitAddon_ScaledByParentQuantity()
+    var
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        Assert: Codeunit Assert;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        AddonSaleLinePOS: Record "NPR POS Sale Line";
+        AddonLineId: Guid;
+    begin
+        // [SCENARIO] An optional Per Unit addon created together with its parent at quantity 2 is multiplied by the parent quantity
+        InitializeAddon();
+
+        // [GIVEN] An optional Per Unit addon line with quantity 1
+        LibraryRestaurant.CreateItemAddon(ItemAddOn);
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, ItemAddOn."No.", _AddonItem."No.",
+            ItemAddOnLine."Use Unit Price"::Always, 10);
+        ItemAddOnLine.Validate("Per Unit", true);
+        ItemAddOnLine.Modify(true);
+
+        // [WHEN] The parent line is created at quantity 2 with the addon at quantity 1 and x-api-version 2026-11-23
+        AddonLineId := CreateSaleLineWithAddon(2, ItemAddOnLine, 0, 1, '2026-11-23');
+
+        // [THEN] The addon line has quantity 2
+        Assert.IsTrue(AddonSaleLinePOS.GetBySystemId(AddonLineId), 'Addon sale line should exist');
+        Assert.AreEqual(2, AddonSaleLinePOS.Quantity, 'Optional Per Unit addon should be multiplied by the parent quantity');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleLine_WithAddonsArray_OptionalPerUnitAddon_EarlierApiVersion_KeepsSentQuantity()
+    var
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        Assert: Codeunit Assert;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        AddonSaleLinePOS: Record "NPR POS Sale Line";
+        AddonLineId: Guid;
+    begin
+        // [SCENARIO] With an API version before 2026-11-23, an optional Per Unit addon created together with its parent at quantity 2 keeps the sent quantity
+        InitializeAddon();
+
+        // [GIVEN] An optional Per Unit addon line with quantity 1
+        LibraryRestaurant.CreateItemAddon(ItemAddOn);
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, ItemAddOn."No.", _AddonItem."No.",
+            ItemAddOnLine."Use Unit Price"::Always, 10);
+        ItemAddOnLine.Validate("Per Unit", true);
+        ItemAddOnLine.Modify(true);
+
+        // [WHEN] The parent line is created at quantity 2 with the addon at quantity 1 and x-api-version 2026-11-22
+        AddonLineId := CreateSaleLineWithAddon(2, ItemAddOnLine, 0, 1, '2026-11-22');
+
+        // [THEN] The addon line keeps quantity 1
+        Assert.IsTrue(AddonSaleLinePOS.GetBySystemId(AddonLineId), 'Addon sale line should exist');
+        Assert.AreEqual(1, AddonSaleLinePOS.Quantity, 'Before API version 2026-11-23 an optional Per Unit addon should keep the sent quantity');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleLine_WithAddonsArray_MandatoryPerUnitAddon_ScaledOnce()
+    var
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        Assert: Codeunit Assert;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        AddonSaleLinePOS: Record "NPR POS Sale Line";
+        AddonLineId: Guid;
+    begin
+        // [SCENARIO] A mandatory Per Unit addon created together with its parent at quantity 2 is multiplied once, not twice
+        InitializeAddon();
+
+        // [GIVEN] A mandatory Per Unit addon line with quantity 1
+        LibraryRestaurant.CreateItemAddon(ItemAddOn);
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, ItemAddOn."No.", _AddonItem."No.",
+            ItemAddOnLine."Use Unit Price"::Always, 10);
+        ItemAddOnLine.Validate("Per Unit", true);
+        ItemAddOnLine.Validate(Mandatory, true);
+        ItemAddOnLine.Modify(true);
+
+        // [WHEN] The parent line is created at quantity 2 with the addon at quantity 1 and x-api-version 2026-11-23
+        AddonLineId := CreateSaleLineWithAddon(2, ItemAddOnLine, 0, 1, '2026-11-23');
+
+        // [THEN] The addon line has quantity 2
+        Assert.IsTrue(AddonSaleLinePOS.GetBySystemId(AddonLineId), 'Addon sale line should exist');
+        Assert.AreEqual(2, AddonSaleLinePOS.Quantity, 'Mandatory Per Unit addon should be multiplied by the parent quantity once');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleLine_WithAddonsArray_FixedPerUnitSelectOption_ScaledByParentQuantity()
+    var
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        Assert: Codeunit Assert;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        ItemAddOnLineOpt: Record "NPR NpIa ItemAddOn Line Opt.";
+        AddonSaleLinePOS: Record "NPR POS Sale Line";
+        AddonLineId: Guid;
+    begin
+        // [SCENARIO] A Fixed Quantity Per Unit option of a Select addon (a menu drink) created together with its parent at quantity 2 is multiplied by the parent quantity
+        InitializeAddon();
+
+        // [GIVEN] A Select addon line with a Fixed Quantity Per Unit option with quantity 1
+        LibraryRestaurant.CreateItemAddon(ItemAddOn);
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, ItemAddOn."No.", _AddonItem."No.",
+            ItemAddOnLine."Use Unit Price"::Always, 10);
+        ItemAddOnLine.Validate(Type, ItemAddOnLine.Type::Select);
+        ItemAddOnLine.Modify(true);
+        LibraryRestaurant.CreateItemAddonLineOption(ItemAddOnLineOpt, ItemAddOnLine, _AddonItem."No.",
+            ItemAddOnLineOpt."Use Unit Price"::Always, 10);
+        ItemAddOnLineOpt.Validate("Fixed Quantity", true);
+        ItemAddOnLineOpt.Validate("Per Unit", true);
+        ItemAddOnLineOpt.Modify(true);
+
+        // [WHEN] The parent line is created at quantity 2 with the option selected at quantity 1 and x-api-version 2026-11-23
+        AddonLineId := CreateSaleLineWithAddon(2, ItemAddOnLine, ItemAddOnLineOpt."Line No.", 1, '2026-11-23');
+
+        // [THEN] The addon line has quantity 2
+        Assert.IsTrue(AddonSaleLinePOS.GetBySystemId(AddonLineId), 'Addon sale line should exist');
+        Assert.AreEqual(2, AddonSaleLinePOS.Quantity, 'Fixed Quantity Per Unit option should be multiplied by the parent quantity');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleLine_WithAddonsArray_MandatoryFixedPerUnitAddon_ScaledByParentQuantity()
+    var
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        Assert: Codeunit Assert;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        AddonSaleLinePOS: Record "NPR POS Sale Line";
+        AddonLineId: Guid;
+    begin
+        // [SCENARIO] A mandatory Fixed Quantity Per Unit addon (the burger in a burger menu) created together with its parent at quantity 2 is multiplied by the parent quantity
+        InitializeAddon();
+
+        // [GIVEN] A mandatory Fixed Quantity Per Unit addon line with quantity 1
+        LibraryRestaurant.CreateItemAddon(ItemAddOn);
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, ItemAddOn."No.", _AddonItem."No.",
+            ItemAddOnLine."Use Unit Price"::Always, 10);
+        ItemAddOnLine.Validate("Per Unit", true);
+        ItemAddOnLine.Validate("Fixed Quantity", true);
+        ItemAddOnLine.Validate(Mandatory, true);
+        ItemAddOnLine.Modify(true);
+
+        // [WHEN] The parent line is created at quantity 2 with the addon at quantity 1 and x-api-version 2026-11-23
+        AddonLineId := CreateSaleLineWithAddon(2, ItemAddOnLine, 0, 1, '2026-11-23');
+
+        // [THEN] The addon line has quantity 2
+        Assert.IsTrue(AddonSaleLinePOS.GetBySystemId(AddonLineId), 'Addon sale line should exist');
+        Assert.AreEqual(2, AddonSaleLinePOS.Quantity, 'Mandatory Fixed Quantity Per Unit addon should be multiplied by the parent quantity');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleLine_WithAddonsArray_AddonNotPerUnit_KeepsSentQuantity()
+    var
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        Assert: Codeunit Assert;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        AddonSaleLinePOS: Record "NPR POS Sale Line";
+        AddonLineId: Guid;
+    begin
+        // [SCENARIO] An addon that is not Per Unit keeps the sent quantity when its parent is created at quantity 2
+        InitializeAddon();
+
+        // [GIVEN] An optional addon line with quantity 1 that is not Per Unit
+        LibraryRestaurant.CreateItemAddon(ItemAddOn);
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, ItemAddOn."No.", _AddonItem."No.",
+            ItemAddOnLine."Use Unit Price"::Always, 10);
+
+        // [WHEN] The parent line is created at quantity 2 with the addon at quantity 1 and x-api-version 2026-11-23
+        AddonLineId := CreateSaleLineWithAddon(2, ItemAddOnLine, 0, 1, '2026-11-23');
+
+        // [THEN] The addon line keeps quantity 1
+        Assert.IsTrue(AddonSaleLinePOS.GetBySystemId(AddonLineId), 'Addon sale line should exist');
+        Assert.AreEqual(1, AddonSaleLinePOS.Quantity, 'Addon that is not Per Unit should keep the sent quantity');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleLine_WithAddonsArray_OptionalPerUnitAddon_ParentQuantityZero_KeepsSentQuantity()
+    var
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        Assert: Codeunit Assert;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        AddonSaleLinePOS: Record "NPR POS Sale Line";
+        AddonLineId: Guid;
+    begin
+        // [SCENARIO] An optional Per Unit addon created together with a parent at quantity 0 keeps the sent quantity
+        InitializeAddon();
+
+        // [GIVEN] An optional Per Unit addon line with quantity 1
+        LibraryRestaurant.CreateItemAddon(ItemAddOn);
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, ItemAddOn."No.", _AddonItem."No.",
+            ItemAddOnLine."Use Unit Price"::Always, 10);
+        ItemAddOnLine.Validate("Per Unit", true);
+        ItemAddOnLine.Modify(true);
+
+        // [WHEN] The parent line is created at quantity 0 with the addon at quantity 1 and x-api-version 2026-11-23
+        AddonLineId := CreateSaleLineWithAddon(0, ItemAddOnLine, 0, 1, '2026-11-23');
+
+        // [THEN] The addon line keeps quantity 1
+        Assert.IsTrue(AddonSaleLinePOS.GetBySystemId(AddonLineId), 'Addon sale line should exist');
+        Assert.AreEqual(1, AddonSaleLinePOS.Quantity, 'Optional Per Unit addon should keep the sent quantity when the parent quantity is 0');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleLineAddon_OptionalPerUnitAddon_ScaledByParentQuantity()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        Assert: Codeunit Assert;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        AddonSaleLinePOS: Record "NPR POS Sale Line";
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        SaleId: Guid;
+        SaleLineId: Guid;
+        AddonLineId: Guid;
+    begin
+        // [SCENARIO] An optional Per Unit addon added to an existing parent line at quantity 3 is multiplied by the parent quantity
+        InitializeAddon();
+
+        // [GIVEN] An optional Per Unit addon line with quantity 1
+        LibraryRestaurant.CreateItemAddon(ItemAddOn);
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, ItemAddOn."No.", _AddonItem."No.",
+            ItemAddOnLine."Use Unit Price"::Always, 10);
+        ItemAddOnLine.Validate("Per Unit", true);
+        ItemAddOnLine.Modify(true);
+
+        // [GIVEN] A sale with a parent line at quantity 3
+        SaleId := CreateGuid();
+        SaleLineId := CreateGuid();
+        AddonLineId := CreateGuid();
+        Headers.Add('x-api-version', '2026-11-23');
+
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        Clear(Body);
+        Body.Add('type', 'Item');
+        Body.Add('code', _Item."No.");
+        Body.Add('quantity', 3);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create parent sale line should succeed');
+
+        // [WHEN] The addon is added through the separate addon endpoint with quantity 2 per unit and x-api-version 2026-11-23
+        Clear(Body);
+        Body.Add('lineId', FormatGuid(AddonLineId));
+        Body.Add('parentLineId', FormatGuid(SaleLineId));
+        Body.Add('addonNo', ItemAddOn."No.");
+        Body.Add('addonLineNo', Format(ItemAddOnLine."Line No."));
+        Body.Add('quantity', 2);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(AddonLineId) + '/addon', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create addon line should succeed');
+
+        // [THEN] The addon line has quantity 6
+        Assert.IsTrue(AddonSaleLinePOS.GetBySystemId(AddonLineId), 'Addon sale line should exist');
+        Assert.AreEqual(6, AddonSaleLinePOS.Quantity, 'Optional Per Unit addon should be the sent quantity multiplied by the parent quantity');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleLineAddon_OptionalPerUnitAddon_EarlierApiVersion_KeepsSentQuantity()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        Assert: Codeunit Assert;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        AddonSaleLinePOS: Record "NPR POS Sale Line";
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        SaleId: Guid;
+        SaleLineId: Guid;
+        AddonLineId: Guid;
+    begin
+        // [SCENARIO] With an API version before 2026-11-23, an optional Per Unit addon added to an existing parent line at quantity 3 keeps the sent quantity
+        InitializeAddon();
+
+        // [GIVEN] An optional Per Unit addon line with quantity 1
+        LibraryRestaurant.CreateItemAddon(ItemAddOn);
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, ItemAddOn."No.", _AddonItem."No.",
+            ItemAddOnLine."Use Unit Price"::Always, 10);
+        ItemAddOnLine.Validate("Per Unit", true);
+        ItemAddOnLine.Modify(true);
+
+        // [GIVEN] A sale with a parent line at quantity 3
+        SaleId := CreateGuid();
+        SaleLineId := CreateGuid();
+        AddonLineId := CreateGuid();
+        Headers.Add('x-api-version', '2026-11-22');
+
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        Clear(Body);
+        Body.Add('type', 'Item');
+        Body.Add('code', _Item."No.");
+        Body.Add('quantity', 3);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create parent sale line should succeed');
+
+        // [WHEN] The addon is added through the separate addon endpoint with quantity 2 and x-api-version 2026-11-22
+        Clear(Body);
+        Body.Add('lineId', FormatGuid(AddonLineId));
+        Body.Add('parentLineId', FormatGuid(SaleLineId));
+        Body.Add('addonNo', ItemAddOn."No.");
+        Body.Add('addonLineNo', Format(ItemAddOnLine."Line No."));
+        Body.Add('quantity', 2);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(AddonLineId) + '/addon', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create addon line should succeed');
+
+        // [THEN] The addon line keeps quantity 2
+        Assert.IsTrue(AddonSaleLinePOS.GetBySystemId(AddonLineId), 'Addon sale line should exist');
+        Assert.AreEqual(2, AddonSaleLinePOS.Quantity, 'Before API version 2026-11-23 the addon endpoint should keep the sent quantity');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RestaurantMenu_ItemStatus_ReturnsInJSON()
     var
         LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
@@ -5527,6 +5855,43 @@ codeunit 85157 "NPR POS API Tests"
         POSSale."User ID" := SaleUserId;
         POSSale.Modify();
         exit(POSSale.SystemId);
+    end;
+
+    local procedure CreateSaleLineWithAddon(ParentQuantity: Decimal; ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; SelectedOptionLineNo: Integer; AddonQuantity: Decimal; ApiVersion: Text) AddonLineId: Guid
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        Body: JsonObject;
+        AddonsArray: JsonArray;
+        AddonObj: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        SaleId: Guid;
+    begin
+        SaleId := CreateGuid();
+        AddonLineId := CreateGuid();
+        Headers.Add('x-api-version', ApiVersion);
+
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        Clear(Body);
+        Body.Add('type', 'Item');
+        Body.Add('code', _Item."No.");
+        Body.Add('quantity', ParentQuantity);
+
+        AddonObj.Add('lineId', FormatGuid(AddonLineId));
+        AddonObj.Add('addonNo', ItemAddOnLine."AddOn No.");
+        AddonObj.Add('addonLineNo', Format(ItemAddOnLine."Line No."));
+        if SelectedOptionLineNo <> 0 then
+            AddonObj.Add('selectedOptionLineNo', Format(SelectedOptionLineNo));
+        AddonObj.Add('quantity', AddonQuantity);
+        AddonsArray.Add(AddonObj);
+        Body.Add('addons', AddonsArray);
+
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(CreateGuid()), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale line with addon should succeed');
     end;
 
     local procedure FormatGuid(Id: Guid): Text
