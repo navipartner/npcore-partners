@@ -5,5 +5,8 @@ permissionset 6014424 "NPR API Inventory"
     Assignable = true;
     Caption = 'NPR API - Inventory';
     IncludedPermissionSets = "NPR API Core";
+#if not BC23
+    Permissions = codeunit "NPR Inventory Webhooks" = X;
+#endif
 }
 #endif

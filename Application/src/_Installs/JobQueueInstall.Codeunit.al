@@ -113,6 +113,13 @@
         end;
 #endif
 
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23)
+        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddInvItemsChangedJQ')) then begin
+            AddInvItemsChangedJQ();
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddInvItemsChangedJQ'));
+        end;
+#endif
+
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -216,6 +223,15 @@
         RetentionPolicyMgmt: Codeunit "NPR Retention Policy Mgmt.";
     begin
         RetentionPolicyMgmt.SetupRetentionPolicyJobQueue();
+    end;
+#endif
+
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23)
+    local procedure AddInvItemsChangedJQ()
+    var
+        InvItemsChangedJQ: Codeunit "NPR Inv. Items Changed JQ";
+    begin
+        InvItemsChangedJQ.SetupJobQueue();
     end;
 #endif
 

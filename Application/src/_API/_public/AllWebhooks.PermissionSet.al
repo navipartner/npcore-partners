@@ -12,6 +12,9 @@ permissionset 6014416 "NPR All Webhooks"
         codeunit "NPR MM MembershipWebHooks" = X,
         codeunit "NPR NP Passes WebHooks" = X,
         codeunit "NPR Entria Integr. Webhooks" = X,
-        codeunit "NPR TM Ticket Webhooks" = X;
+        codeunit "NPR TM Ticket Webhooks" = X,
+#if not BC23
+        codeunit "NPR Inventory Webhooks" = X;
+#endif
 }
 #endif

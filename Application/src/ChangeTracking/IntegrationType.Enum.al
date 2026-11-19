@@ -7,4 +7,8 @@ enum 6014614 "NPR Integration Type"
     {
         Caption = 'Shopify';
     }
+    value(1; "Inventory Items Changed")
+    {
+        Caption = 'Inventory Items Changed';
+    }
 }

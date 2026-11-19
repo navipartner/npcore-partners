@@ -56,6 +56,9 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRRetPolicy_DataLog_Cleanup'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRRetPolicy_IRLFiscalizationPreservation'));
 #endif
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23)
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddInvItemsChangedJQ'));
+#endif
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddJobQueues'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateJobQueues1'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddTaskCountResetJQ'));
@@ -523,6 +526,10 @@
                         exit('SetManuallySetOnHold-20230818');
                     'AddNPRRetentionPolicyJobQueue':
                         exit('AddNPRRetentionPolicyJobQueue-20251227');
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23)
+                    'AddInvItemsChangedJQ':
+                        exit('AddInvItemsChangedJQ-20261106');
+#endif
                 end;
             Codeunit::"NPR New Prices Install":
                 exit('NPRNewPriceTableInstall-20210920');
