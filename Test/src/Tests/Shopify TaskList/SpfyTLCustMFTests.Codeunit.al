@@ -747,7 +747,7 @@ codeunit 85388 "NPR Spfy TL Cust&MF Tests"
         TaskEntryNo := EnqueueCustomerTask(StoreCode, Customer, "NPR Spfy Task Op"::Insert, CurrentDateTime());
 
         // [GIVEN] Shopify has no customer by that email, confirms the create, and answers the post-create read-back.
-        MockClient.AddResponse('customers(', '{"data":{"customers":{"edges":[]}}}');
+        MockClient.AddResponse('FindCustomerByEmail', '{"data":{"customer":null}}');
         MockClient.AddResponse(CustomerCreateTok, '{"data":{"customerCreate":{"customer":{"id":"gid://shopify/Customer/3001","defaultAddress":{"id":"gid://shopify/MailingAddress/4001"}},"userErrors":[]}}}');
         MockClient.AddResponse('GetCustomer', '{"data":{"customer":{"id":"gid://shopify/Customer/3001","firstName":"Test","lastName":"Customer","defaultEmailAddress":{"emailAddress":"test@example.com","marketingState":"NOT_SUBSCRIBED"},"defaultPhoneNumber":null,"defaultAddress":{"id":"gid://shopify/MailingAddress/4001","address1":"","address2":"","city":"","province":"","zip":"","countryCode":"DK"}}}}');
 

@@ -154,6 +154,7 @@ codeunit 6248553 "NPR Spfy Customer Mgt."
     internal procedure FindCustomerByShopifyID(ShopifyStoreCode: Code[20]; CustomerId: Text[30]; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link") Found: Boolean
     var
         ShopifyAssignedID: Record "NPR Spfy Assigned ID";
+        LinkedSpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         RecRef: RecordRef;
     begin
@@ -162,14 +163,78 @@ codeunit 6248553 "NPR Spfy Customer Mgt."
         if ShopifyAssignedID.FindSet() then
             repeat
                 if RecRef.Get(ShopifyAssignedID."BC Record ID") then begin
-                    RecRef.SetTable(SpfyStoreCustomerLink);
-                    SpfyStoreCustomerLink.Mark(
-                        (SpfyStoreCustomerLink.Type = SpfyStoreCustomerLink.Type::Customer) and (SpfyStoreCustomerLink."No." <> '') and
-                        (SpfyStoreCustomerLink."Shopify Store Code" = ShopifyStoreCode));
+                    //SetTable replaces the record, marks included, so it goes into a separate variable
+                    RecRef.SetTable(LinkedSpfyStoreCustomerLink);
+                    if (LinkedSpfyStoreCustomerLink.Type = LinkedSpfyStoreCustomerLink.Type::Customer) and (LinkedSpfyStoreCustomerLink."No." <> '') and
+                       (LinkedSpfyStoreCustomerLink."Shopify Store Code" = ShopifyStoreCode)
+                    then
+                        if SpfyStoreCustomerLink.Get(LinkedSpfyStoreCustomerLink.Type, LinkedSpfyStoreCustomerLink."No.", LinkedSpfyStoreCustomerLink."Shopify Store Code") then
+                            SpfyStoreCustomerLink.Mark(true);
                 end;
             until ShopifyAssignedID.Next() = 0;
         SpfyStoreCustomerLink.MarkedOnly(true);
         Found := not SpfyStoreCustomerLink.IsEmpty();
+    end;
+
+    /// <summary>
+    /// The request that looks a customer up in Shopify by e-mail. customerByIdentifier matches the whole address,
+    /// unlike a customers(query: "email:...") search, which matches words: searching for jane@example.com
+    /// that way also finds b-jane@example.com.
+    /// </summary>
+    internal procedure FindCustomerByEmailRequest(Email: Text) RequestJson: JsonObject
+    var
+        IdentifierJson: JsonObject;
+        VariablesJson: JsonObject;
+        QueryTok: Label 'query FindCustomerByEmail($identifier: CustomerIdentifierInput!) {customer: customerByIdentifier(identifier: $identifier) {id defaultEmailAddress{emailAddress}}}', Locked = true;
+    begin
+        IdentifierJson.Add('emailAddress', Email.Trim());
+        VariablesJson.Add('identifier', IdentifierJson);
+        RequestJson.Add('query', QueryTok);
+        RequestJson.Add('variables', VariablesJson);
+    end;
+
+    /// <summary>
+    /// The GID of the customer a FindCustomerByEmailRequest response names, or blank when Shopify has nobody with
+    /// that address. A customer with any other address counts as nobody, because the caller is about to link the id
+    /// to a BC customer, send it a customer update or give it a gift card.
+    /// </summary>
+    internal procedure CustomerGIDWithEmail(ShopifyResponse: JsonToken; Email: Text): Text
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+        CustomerToken: JsonToken;
+    begin
+        if not ShopifyResponse.SelectToken('data.customer', CustomerToken) then
+            exit('');
+        if not CustomerToken.IsObject() then  //null when nobody has the address
+            exit('');
+        if LowerCase(JsonHelper.GetJText(CustomerToken, 'defaultEmailAddress.emailAddress', false).Trim()) <> LowerCase(Email.Trim()) then
+            exit('');
+        exit(JsonHelper.GetJText(CustomerToken, 'id', false));
+    end;
+
+    /// <summary>
+    /// Raises when the Shopify customer is already linked to another BC customer at the store, so that a lookup
+    /// by e-mail never links it to a second one or sends it the second one's data. Gift cards do not call this:
+    /// they only use the id, and a Shopify customer with exactly the buyer's address is the right one to get it.
+    /// A link that already holds the id creates no new link, so it passes even when order import has linked the
+    /// same Shopify customer to another BC customer.
+    /// </summary>
+    internal procedure CheckShopifyCustomerNotLinkedElsewhere(SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; ShopifyCustomerID: Text[30])
+    var
+        Customer: Record Customer;
+        LinkedSpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        LinkedElsewhereErr: Label 'Shopify customer %1 is already linked to %2 %3, so it cannot also be linked to %2 %4. Give the two customers different %5 values, or correct the existing link.', Comment = '%1 = Shopify customer id, %2 = Customer table caption, %3 = customer already linked, %4 = customer being linked, %5 = E-Mail field caption';
+    begin
+        if (ShopifyCustomerID = '') or (SpfyStoreCustomerLink."No." = '') then
+            exit;
+        if SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreCustomerLink.RecordId(), "NPR Spfy ID Type"::"Entry ID") = ShopifyCustomerID then
+            exit;
+        if not FindCustomerByShopifyID(SpfyStoreCustomerLink."Shopify Store Code", ShopifyCustomerID, LinkedSpfyStoreCustomerLink) then
+            exit;
+        LinkedSpfyStoreCustomerLink.SetFilter("No.", '<>%1', SpfyStoreCustomerLink."No.");
+        if LinkedSpfyStoreCustomerLink.FindFirst() then
+            Error(LinkedElsewhereErr, ShopifyCustomerID, Customer.TableCaption(), LinkedSpfyStoreCustomerLink."No.", SpfyStoreCustomerLink."No.", Customer.FieldCaption("E-Mail"));
     end;
 
     local procedure CheckCustomerIsSynchronized(Customer: Record Customer): Boolean

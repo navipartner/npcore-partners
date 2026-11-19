@@ -139,6 +139,9 @@ report 6014569 "NPR Spfy Upd. Cust.Sync Status"
                     ErrorMessageMgt.LogError(CellValueAsText, StrSubstNo(CustomerNotFoundErr, RecNo, CellValueAsText), '');
 #endif
             end;
+            //With this customer's writes still open, the next customer's error would stop the whole report
+            //instead of being trapped by Run
+            Commit();
             Window.Update(1, Round(RecNo / TotalRecNo * 10000, 1));
         until RecNo = TotalRecNo;
         TempExcelBuffer.Reset();

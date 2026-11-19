@@ -91,6 +91,9 @@ report 6014568 "NPR Spfy Cust. Re-sync Options"
                     RecNo += 1;
                     Window.Update(2, Round(RecNo / TotalRecNo * 10000, 1));
                 end;
+                //With this customer's writes still open, the next customer's error would stop the whole report
+                //instead of being trapped by Run
+                Commit();
             end;
 
             trigger OnPostDataItem()

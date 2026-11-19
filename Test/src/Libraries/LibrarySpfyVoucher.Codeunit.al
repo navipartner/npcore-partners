@@ -247,37 +247,38 @@ codeunit 85469 "NPR Library - Spfy Voucher"
     end;
 
     /// <summary>
-    /// The exact search string a recorded customer-lookup request carried, so a test can assert on the address
+    /// The exact address a recorded customer-lookup request asked Shopify about, so a test can assert on the address
     /// that was really sent rather than on a substring of it.
     /// </summary>
-    procedure CustomerSearchCriteria(RequestText: Text): Text
+    procedure CustomerLookupEmail(RequestText: Text): Text
     var
         Request: JsonToken;
-        Criteria: JsonToken;
+        Email: JsonToken;
     begin
         if RequestText = '' then
             exit('');
         Request.ReadFrom(RequestText);
-        if not Request.SelectToken('variables.searchCriteria', Criteria) then
+        if not Request.SelectToken('variables.identifier.emailAddress', Email) then
             exit('');
-        exit(Criteria.AsValue().AsText());
+        exit(Email.AsValue().AsText());
     end;
 
     #endregion
 
     #region Canned Shopify GraphQL responses
 
-    /// <summary>Response for the "FindCustomerByEmail" query: one matching customer.</summary>
-    procedure ResponseCustomerSearchHit(ShopifyCustomerID: Text) ResponseText: Text
+    /// <summary>
+    /// Response for the "FindCustomerByEmail" query: the customer Shopify holds under that address. The lookup only
+    /// accepts a customer whose own address is the one it asked about, so Email has to be that address.
+    /// </summary>
+    procedure ResponseCustomerSearchHit(ShopifyCustomerID: Text; Email: Text) ResponseText: Text
     var
-        Root, DataObj, CustomersObj, EdgeObj, NodeObj : JsonObject;
-        Edges: JsonArray;
+        Root, DataObj, CustomerObj, EmailObj : JsonObject;
     begin
-        NodeObj.Add('id', 'gid://shopify/Customer/' + ShopifyCustomerID);
-        EdgeObj.Add('node', NodeObj);
-        Edges.Add(EdgeObj);
-        CustomersObj.Add('edges', Edges);
-        DataObj.Add('customers', CustomersObj);
+        CustomerObj.Add('id', 'gid://shopify/Customer/' + ShopifyCustomerID);
+        EmailObj.Add('emailAddress', Email);
+        CustomerObj.Add('defaultEmailAddress', EmailObj);
+        DataObj.Add('customer', CustomerObj);
         Root.Add('data', DataObj);
         Root.WriteTo(ResponseText);
     end;
@@ -285,11 +286,11 @@ codeunit 85469 "NPR Library - Spfy Voucher"
     /// <summary>Response for the "FindCustomerByEmail" query: nobody with that e-mail.</summary>
     procedure ResponseCustomerSearchMiss() ResponseText: Text
     var
-        Root, DataObj, CustomersObj : JsonObject;
-        Edges: JsonArray;
+        Root, DataObj : JsonObject;
+        NullValue: JsonValue;
     begin
-        CustomersObj.Add('edges', Edges);
-        DataObj.Add('customers', CustomersObj);
+        NullValue.SetValueToNull();
+        DataObj.Add('customer', NullValue);
         Root.Add('data', DataObj);
         Root.WriteTo(ResponseText);
     end;

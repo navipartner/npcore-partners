@@ -100,7 +100,7 @@ codeunit 85464 "NPR Spfy Gift Card Tests"
         _LibrarySpfyVoucher.CreateVoucher('SPFYV30', _VoucherTypeLbl, 'SPFYVCHR0030', 100, Voucher);
         _LibrarySpfyVoucher.SetVoucherBuyer(Voucher, Customer."No.", 'unsynced@npretail.test', 'Unsynced Buyer');
         _LibrarySpfyVoucher.CreateVoucherNcTask(_StoreCodeLbl, Voucher, NcTask);
-        MockClient.AddResponse('FindCustomerByEmail', _LibrarySpfyVoucher.ResponseCustomerSearchHit('777'));
+        MockClient.AddResponse('FindCustomerByEmail', _LibrarySpfyVoucher.ResponseCustomerSearchHit('777', 'unsynced@npretail.test'));
         MockClient.AddResponse('giftCardCreate', _LibrarySpfyVoucher.ResponseGiftCardCreated('9003'));
 
         // [WHEN] The voucher sender runs
@@ -135,7 +135,7 @@ codeunit 85464 "NPR Spfy Gift Card Tests"
         _LibrarySpfyVoucher.CreateVoucher('SPFYV70', _VoucherTypeLbl, 'SPFYVCHR0070', 100, Voucher);
         _LibrarySpfyVoucher.SetVoucherBuyer(Voucher, Customer."No.", 'onvoucheronly@npretail.test', 'Emailless Buyer');
         _LibrarySpfyVoucher.CreateVoucherNcTask(_StoreCodeLbl, Voucher, NcTask);
-        MockClient.AddResponse('onvoucheronly@npretail.test', _LibrarySpfyVoucher.ResponseCustomerSearchHit('711'));
+        MockClient.AddResponse('onvoucheronly@npretail.test', _LibrarySpfyVoucher.ResponseCustomerSearchHit('711', 'onvoucheronly@npretail.test'));
         MockClient.AddResponse('giftCardCreate', _LibrarySpfyVoucher.ResponseGiftCardCreated('9007'));
 
         // [WHEN] The voucher sender runs
@@ -169,7 +169,7 @@ codeunit 85464 "NPR Spfy Gift Card Tests"
         _LibrarySpfyVoucher.CreateVoucher('SPFYV12', _VoucherTypeLbl, 'SPFYVCHR0012', 100, Voucher);
         _LibrarySpfyVoucher.SetVoucherBuyer(Voucher, Customer."No.", '  padded@npretail.test  ', 'Padded Buyer');
         _LibrarySpfyVoucher.CreateVoucherNcTask(_StoreCodeLbl, Voucher, NcTask);
-        MockClient.AddResponse('padded@npretail.test', _LibrarySpfyVoucher.ResponseCustomerSearchHit('1212'));
+        MockClient.AddResponse('padded@npretail.test', _LibrarySpfyVoucher.ResponseCustomerSearchHit('1212', 'padded@npretail.test'));
         MockClient.AddResponse('giftCardCreate', _LibrarySpfyVoucher.ResponseGiftCardCreated('9012'));
 
         // [WHEN] The voucher sender runs
@@ -178,8 +178,8 @@ codeunit 85464 "NPR Spfy Gift Card Tests"
 
         // [THEN] Shopify was searched for the trimmed address, not the padded one
         _Assert.AreEqual(
-            'email:padded@npretail.test',
-            _LibrarySpfyVoucher.CustomerSearchCriteria(MockClient.GetRequestContaining('FindCustomerByEmail')),
+            'padded@npretail.test',
+            _LibrarySpfyVoucher.CustomerLookupEmail(MockClient.GetRequestContaining('FindCustomerByEmail')),
             'The address must be trimmed before it is used to search Shopify.');
     end;
 
@@ -200,7 +200,7 @@ codeunit 85464 "NPR Spfy Gift Card Tests"
         _LibrarySpfyVoucher.CreateVoucher('SPFYV13', _VoucherTypeLbl, 'SPFYVCHR0013', 100, Voucher);
         _LibrarySpfyVoucher.SetVoucherBuyer(Voucher, Customer."No.", 'onthevoucher@npretail.test', 'Spacey Buyer');
         _LibrarySpfyVoucher.CreateVoucherNcTask(_StoreCodeLbl, Voucher, NcTask);
-        MockClient.AddResponse('onthevoucher@npretail.test', _LibrarySpfyVoucher.ResponseCustomerSearchHit('1313'));
+        MockClient.AddResponse('onthevoucher@npretail.test', _LibrarySpfyVoucher.ResponseCustomerSearchHit('1313', 'onthevoucher@npretail.test'));
         MockClient.AddResponse('giftCardCreate', _LibrarySpfyVoucher.ResponseGiftCardCreated('9013'));
 
         // [WHEN] The voucher sender runs
@@ -209,8 +209,8 @@ codeunit 85464 "NPR Spfy Gift Card Tests"
 
         // [THEN] The voucher's address was the search key, and the customer it found is on the gift card
         _Assert.AreEqual(
-            'email:onthevoucher@npretail.test',
-            _LibrarySpfyVoucher.CustomerSearchCriteria(MockClient.GetRequestContaining('FindCustomerByEmail')),
+            'onthevoucher@npretail.test',
+            _LibrarySpfyVoucher.CustomerLookupEmail(MockClient.GetRequestContaining('FindCustomerByEmail')),
             'An address of only spaces must not stop the voucher e-mail being used.');
         _Assert.AreEqual(
             _LibrarySpfyVoucher.CustomerGID('1313'),
@@ -240,7 +240,7 @@ codeunit 85464 "NPR Spfy Gift Card Tests"
         _LibrarySpfyVoucher.CreateVoucher('SPFYV106', _VoucherTypeLbl, 'SPFYVCHR0106', 100, Voucher);
         _LibrarySpfyVoucher.SetVoucherBuyer(Voucher, Customer."No.", '', 'Carded Padded');
         _LibrarySpfyVoucher.CreateVoucherNcTask(_StoreCodeLbl, Voucher, NcTask);
-        MockClient.AddResponse('FindCustomerByEmail', _LibrarySpfyVoucher.ResponseCustomerSearchHit('776'));
+        MockClient.AddResponse('FindCustomerByEmail', _LibrarySpfyVoucher.ResponseCustomerSearchHit('776', 'oncard106@npretail.test'));
         MockClient.AddResponse('giftCardCreate', _LibrarySpfyVoucher.ResponseGiftCardCreated('9013'));
 
         // [WHEN] The voucher sender runs
@@ -249,8 +249,8 @@ codeunit 85464 "NPR Spfy Gift Card Tests"
 
         // [THEN] The padding is gone from the search key
         _Assert.AreEqual(
-            'email:oncard106@npretail.test',
-            _LibrarySpfyVoucher.CustomerSearchCriteria(MockClient.GetRequestContaining('FindCustomerByEmail')),
+            'oncard106@npretail.test',
+            _LibrarySpfyVoucher.CustomerLookupEmail(MockClient.GetRequestContaining('FindCustomerByEmail')),
             'An address taken from the customer card must be trimmed before it becomes a search key.');
     end;
 
@@ -269,7 +269,7 @@ codeunit 85464 "NPR Spfy Gift Card Tests"
         _LibrarySpfyVoucher.CreateVoucher('SPFYV107', _VoucherTypeLbl, 'SPFYVCHR0107', 100, Voucher);
         _LibrarySpfyVoucher.SetVoucherBuyer(Voucher, '', '  onvoucher107@npretail.test  ', 'Voucher Padded');
         _LibrarySpfyVoucher.CreateVoucherNcTask(_StoreCodeLbl, Voucher, NcTask);
-        MockClient.AddResponse('FindCustomerByEmail', _LibrarySpfyVoucher.ResponseCustomerSearchHit('778'));
+        MockClient.AddResponse('FindCustomerByEmail', _LibrarySpfyVoucher.ResponseCustomerSearchHit('778', 'onvoucher107@npretail.test'));
         MockClient.AddResponse('giftCardCreate', _LibrarySpfyVoucher.ResponseGiftCardCreated('9014'));
 
         // [WHEN] The voucher sender runs
@@ -278,8 +278,8 @@ codeunit 85464 "NPR Spfy Gift Card Tests"
 
         // [THEN] The padding is gone from the search key
         _Assert.AreEqual(
-            'email:onvoucher107@npretail.test',
-            _LibrarySpfyVoucher.CustomerSearchCriteria(MockClient.GetRequestContaining('FindCustomerByEmail')),
+            'onvoucher107@npretail.test',
+            _LibrarySpfyVoucher.CustomerLookupEmail(MockClient.GetRequestContaining('FindCustomerByEmail')),
             'The voucher''s own address must be trimmed before it becomes a search key.');
     end;
 
@@ -303,7 +303,7 @@ codeunit 85464 "NPR Spfy Gift Card Tests"
         _LibrarySpfyVoucher.CreateVoucher('SPFYV14', _VoucherTypeLbl, 'SPFYVCHR0014', 100, Voucher);
         _LibrarySpfyVoucher.SetVoucherBuyer(Voucher, Customer."No.", '', 'Carded Buyer');
         _LibrarySpfyVoucher.CreateVoucherNcTask(_StoreCodeLbl, Voucher, NcTask);
-        MockClient.AddResponse('onthecard@npretail.test', _LibrarySpfyVoucher.ResponseCustomerSearchHit('1414'));
+        MockClient.AddResponse('onthecard@npretail.test', _LibrarySpfyVoucher.ResponseCustomerSearchHit('1414', 'onthecard@npretail.test'));
         MockClient.AddResponse('giftCardCreate', _LibrarySpfyVoucher.ResponseGiftCardCreated('9014'));
 
         // [WHEN] The voucher sender runs
@@ -312,8 +312,8 @@ codeunit 85464 "NPR Spfy Gift Card Tests"
 
         // [THEN] The customer card's address was used, and the customer it found is on the gift card
         _Assert.AreEqual(
-            'email:onthecard@npretail.test',
-            _LibrarySpfyVoucher.CustomerSearchCriteria(MockClient.GetRequestContaining('FindCustomerByEmail')),
+            'onthecard@npretail.test',
+            _LibrarySpfyVoucher.CustomerLookupEmail(MockClient.GetRequestContaining('FindCustomerByEmail')),
             'A link address of only spaces must not hide the address on the customer card.');
         _Assert.AreEqual(
             _LibrarySpfyVoucher.CustomerGID('1414'),
@@ -336,7 +336,7 @@ codeunit 85464 "NPR Spfy Gift Card Tests"
         _LibrarySpfyVoucher.CreateVoucher('SPFYV15', _VoucherTypeLbl, 'SPFYVCHR0015', 100, Voucher);
         _LibrarySpfyVoucher.SetVoucherBuyer(Voucher, 'SPFYGONE', 'stillhere@npretail.test', 'Deleted Customer');
         _LibrarySpfyVoucher.CreateVoucherNcTask(_StoreCodeLbl, Voucher, NcTask);
-        MockClient.AddResponse('stillhere@npretail.test', _LibrarySpfyVoucher.ResponseCustomerSearchHit('1515'));
+        MockClient.AddResponse('stillhere@npretail.test', _LibrarySpfyVoucher.ResponseCustomerSearchHit('1515', 'stillhere@npretail.test'));
         MockClient.AddResponse('giftCardCreate', _LibrarySpfyVoucher.ResponseGiftCardCreated('9015'));
 
         // [WHEN] The voucher sender runs
@@ -345,8 +345,8 @@ codeunit 85464 "NPR Spfy Gift Card Tests"
 
         // [THEN] The voucher's own address was used to find the buyer, so the gift card still reaches somebody
         _Assert.AreEqual(
-            'email:stillhere@npretail.test',
-            _LibrarySpfyVoucher.CustomerSearchCriteria(MockClient.GetRequestContaining('FindCustomerByEmail')),
+            'stillhere@npretail.test',
+            _LibrarySpfyVoucher.CustomerLookupEmail(MockClient.GetRequestContaining('FindCustomerByEmail')),
             'A Customer No. that resolves to nothing must not stop the voucher e-mail being used.');
         _Assert.AreEqual(
             _LibrarySpfyVoucher.CustomerGID('1515'),
@@ -370,7 +370,7 @@ codeunit 85464 "NPR Spfy Gift Card Tests"
         _LibrarySpfyVoucher.CreateVoucher('SPFYV80', _VoucherTypeLbl, 'SPFYVCHR0080', 100, Voucher);
         _LibrarySpfyVoucher.SetVoucherBuyer(Voucher, '', 'nocustomer@npretail.test', 'Walk In Buyer');
         _LibrarySpfyVoucher.CreateVoucherNcTask(_StoreCodeLbl, Voucher, NcTask);
-        MockClient.AddResponse('FindCustomerByEmail', _LibrarySpfyVoucher.ResponseCustomerSearchHit('811'));
+        MockClient.AddResponse('FindCustomerByEmail', _LibrarySpfyVoucher.ResponseCustomerSearchHit('811', 'nocustomer@npretail.test'));
         MockClient.AddResponse('giftCardCreate', _LibrarySpfyVoucher.ResponseGiftCardCreated('9008'));
 
         // [WHEN] The voucher sender runs
@@ -385,6 +385,82 @@ codeunit 85464 "NPR Spfy Gift Card Tests"
         _Assert.IsFalse(
             _LibrarySpfyVoucher.GiftCardInputHasField(SendRequest, 'recipientAttributes'),
             'Nobody else was nominated, so no separate recipient may be attached.');
+    end;
+
+    [Test]
+    procedure ShopifyCustomerWhoseAddressContainsTheBuyers_DoesNotGetTheGiftCard()
+    var
+        NcTask: Record "NPR Nc Task";
+        Voucher: Record "NPR NpRv Voucher";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SendVoucher: Codeunit "NPR Spfy Send Voucher";
+    begin
+        // [SCENARIO] A Shopify customer whose address merely contains the buyer's is not given the gift card; the buyer is created and gets it instead.
+        Initialize();
+
+        // [GIVEN] A voucher whose buyer is known by address only
+        _LibrarySpfyVoucher.CreateVoucher('SPFYV81', _VoucherTypeLbl, 'SPFYVCHR0081', 100, Voucher);
+        _LibrarySpfyVoucher.SetVoucherBuyer(Voucher, '', 'jane@npretail.test', 'Walk In Buyer');
+        _LibrarySpfyVoucher.CreateVoucherNcTask(_StoreCodeLbl, Voucher, NcTask);
+
+        // [GIVEN] Shopify answering the lookup with a different customer whose address contains the buyer's
+        MockClient.AddResponse('FindCustomerByEmail', _LibrarySpfyVoucher.ResponseCustomerSearchHit('821', 'b-jane@npretail.test'));
+        MockClient.AddResponse('metafieldDefinitions', _LibrarySpfyVoucher.ResponseNoMetafieldDefinitions());
+        MockClient.AddResponse('customerCreate', _LibrarySpfyVoucher.ResponseCustomerCreated('822'));
+        MockClient.AddResponse('giftCardCreate', _LibrarySpfyVoucher.ResponseGiftCardCreated('9010'));
+
+        // [WHEN] The voucher sender runs
+        SendVoucher.SetGraphQLClient(MockClient);
+        SendVoucher.Run(NcTask);
+
+        // [THEN] The gift card goes to the buyer created in Shopify, not to the other customer
+        _Assert.AreEqual(
+            _LibrarySpfyVoucher.CustomerGID('822'),
+            _LibrarySpfyVoucher.GiftCardInputValue(MockClient.GetRequestContaining('giftCardCreate'), 'customerId'),
+            'A Shopify customer with a different address must not be given the gift card.');
+    end;
+
+    [Test]
+    procedure BuyerSharingTheAddressOfAnotherLinkedCustomer_GetsTheGiftCardOnThatShopifyCustomer()
+    var
+        Buyer: Record Customer;
+        LinkedCustomer: Record Customer;
+        NcTask: Record "NPR Nc Task";
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+        Voucher: Record "NPR NpRv Voucher";
+        MockClient: Codeunit "NPR Spfy Mock GraphQL Client";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SendVoucher: Codeunit "NPR Spfy Send Voucher";
+    begin
+        // [SCENARIO] A buyer with no Shopify id whose address belongs to a Shopify customer linked to another BC customer gets the gift card on that Shopify customer, and is not linked to it.
+        Initialize();
+
+        // [GIVEN] A customer linked to Shopify customer 825, and a buyer with the same address and no Shopify id
+        _LibrarySpfyVoucher.CreateCustomerWithStoreLink('SPFYC82', _StoreCodeLbl, 'shared82@npretail.test', 'Linked Customer', '825', LinkedCustomer);
+        _LibrarySpfyVoucher.CreateCustomerWithStoreLink('SPFYC83', _StoreCodeLbl, 'shared82@npretail.test', 'Same Person', '', Buyer);
+
+        // [GIVEN] A voucher bought by the second customer
+        _LibrarySpfyVoucher.CreateVoucher('SPFYV82', _VoucherTypeLbl, 'SPFYVCHR0082', 100, Voucher);
+        _LibrarySpfyVoucher.SetVoucherBuyer(Voucher, Buyer."No.", 'shared82@npretail.test', 'Same Person');
+        _LibrarySpfyVoucher.CreateVoucherNcTask(_StoreCodeLbl, Voucher, NcTask);
+
+        // [GIVEN] Shopify answering the lookup with Shopify customer 825
+        MockClient.AddResponse('FindCustomerByEmail', _LibrarySpfyVoucher.ResponseCustomerSearchHit('825', 'shared82@npretail.test'));
+        MockClient.AddResponse('giftCardCreate', _LibrarySpfyVoucher.ResponseGiftCardCreated('9016'));
+
+        // [WHEN] The voucher sender runs
+        SendVoucher.SetGraphQLClient(MockClient);
+        SendVoucher.Run(NcTask);
+
+        // [THEN] The gift card goes to Shopify customer 825
+        _Assert.AreEqual(
+            _LibrarySpfyVoucher.CustomerGID('825'),
+            _LibrarySpfyVoucher.GiftCardInputValue(MockClient.GetRequestContaining('giftCardCreate'), 'customerId'),
+            'The Shopify customer with exactly the buyer''s address must get the gift card.');
+
+        // [THEN] The buyer is not linked to Shopify customer 825
+        SpfyStoreCustomerLink.Get(SpfyStoreCustomerLink.Type::Customer, Buyer."No.", _StoreCodeLbl);
+        _Assert.AreEqual('', SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreCustomerLink.RecordId(), "NPR Spfy ID Type"::"Entry ID"), 'A gift card must not link the buyer to a Shopify customer another BC customer holds.');
     end;
 
     [Test]
@@ -408,7 +484,7 @@ codeunit 85464 "NPR Spfy Gift Card Tests"
         _LibrarySpfyVoucher.CreateVoucherNcTask(_StoreCodeLbl, Voucher, NcTask);
         // Keyed on the nominee's address, not on the query name: a regression that searched the buyer's
         // address instead would find no canned response and fail rather than quietly resolving to 888.
-        MockClient.AddResponse('FindCustomerByEmail', 'friend@npretail.test', _LibrarySpfyVoucher.ResponseCustomerSearchHit('888'));
+        MockClient.AddResponse('FindCustomerByEmail', 'friend@npretail.test', _LibrarySpfyVoucher.ResponseCustomerSearchHit('888', 'friend@npretail.test'));
         MockClient.AddResponse('giftCardCreate', _LibrarySpfyVoucher.ResponseGiftCardCreated('9004'));
 
         // [WHEN] The voucher sender runs
@@ -500,7 +576,7 @@ codeunit 85464 "NPR Spfy Gift Card Tests"
         _LibrarySpfyVoucher.SetVoucherMessage(Voucher, 'Happy birthday');
         _LibrarySpfyVoucher.SetVoucherSendOn(Voucher, CreateDateTime(CalcDate('<+7D>', Today()), 120000T));
         _LibrarySpfyVoucher.CreateVoucherNcTask(_StoreCodeLbl, Voucher, NcTask);
-        MockClient.AddResponse('FindCustomerByEmail', 'friend206@npretail.test', _LibrarySpfyVoucher.ResponseCustomerSearchHit('892'));
+        MockClient.AddResponse('FindCustomerByEmail', 'friend206@npretail.test', _LibrarySpfyVoucher.ResponseCustomerSearchHit('892', 'friend206@npretail.test'));
         MockClient.AddResponse('giftCardCreate', _LibrarySpfyVoucher.ResponseGiftCardCreated('9021'));
 
         // [WHEN] The voucher sender runs
@@ -548,7 +624,7 @@ codeunit 85464 "NPR Spfy Gift Card Tests"
         _LibrarySpfyVoucher.SetVoucherRecipient(Voucher, 'nominee@npretail.test', 'Nina Nominee');
         _LibrarySpfyVoucher.CreateVoucherNcTask(_StoreCodeLbl, Voucher, NcTask);
         MockClient.AddResponse('stranger@npretail.test', _LibrarySpfyVoucher.ResponseCustomerSearchMiss());
-        MockClient.AddResponse('nominee@npretail.test', _LibrarySpfyVoucher.ResponseCustomerSearchHit('999'));
+        MockClient.AddResponse('nominee@npretail.test', _LibrarySpfyVoucher.ResponseCustomerSearchHit('999', 'nominee@npretail.test'));
         MockClient.AddResponse('giftCardCreate', _LibrarySpfyVoucher.ResponseGiftCardCreated('9009'));
 
         // [WHEN] The voucher sender runs
@@ -737,7 +813,7 @@ codeunit 85464 "NPR Spfy Gift Card Tests"
         // [GIVEN] ...and a nomination naming the card address, which is the one the buyer resolves to
         _LibrarySpfyVoucher.SetVoucherRecipient(Voucher, 'card101@npretail.test', '');
         _LibrarySpfyVoucher.CreateVoucherNcTask(_StoreCodeLbl, Voucher, NcTask);
-        MockClient.AddResponse('FindCustomerByEmail', _LibrarySpfyVoucher.ResponseCustomerSearchHit('881'));
+        MockClient.AddResponse('FindCustomerByEmail', _LibrarySpfyVoucher.ResponseCustomerSearchHit('881', 'card101@npretail.test'));
         MockClient.AddResponse('giftCardCreate', _LibrarySpfyVoucher.ResponseGiftCardCreated('9008'));
 
         // [WHEN] The voucher sender runs

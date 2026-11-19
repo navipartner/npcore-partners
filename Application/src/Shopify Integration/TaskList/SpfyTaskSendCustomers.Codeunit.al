@@ -48,13 +48,18 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         ShopifyResponse: JsonToken;
         ShopifyCustomerID: Text[30];
+        LinkExists: Boolean;
         Success: Boolean;
     begin
         Clear(SpfyTask."Data Output");
         Clear(SpfyTask.Response);
         ClearLastError();
 
-        PrepareCustomerUpdateRequest(SpfyTask, SpfyStoreCustomerLink);
+        if not PrepareCustomerUpdateRequest(SpfyTask, SpfyStoreCustomerLink) then begin
+            LinkExists := SpfyStoreCustomerLink.Find();
+            DisableStoreLink(SpfyStoreCustomerLink, LinkExists);
+            exit;
+        end;
         Success := GetGraphQLClient().ExecuteRequest(SpfyTask, true, ShopifyResponse);
         SpfyTask.Modify();
         Commit();
@@ -81,13 +86,17 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
         RetrieveShopifyCustomerAndUpdateBCCustomerWithDataFromShopify(SpfyStoreCustomerLink, ShopifyCustomerID, SpfyTask.Type = SpfyTask.Type::Delete, false, false);
     end;
 
-    local procedure PrepareCustomerUpdateRequest(var SpfyTask: Record "NPR Spfy Task"; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link")
+    /// <summary>
+    /// Returns false, with no request written, for a delete of a customer whose link carries no Shopify id. That
+    /// customer was never linked to a Shopify customer, so there is nothing in Shopify that is ours to delete, and
+    /// a customer found by e-mail could belong to somebody else.
+    /// </summary>
+    local procedure PrepareCustomerUpdateRequest(var SpfyTask: Record "NPR Spfy Task"; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"): Boolean
     var
         Customer: Record Customer;
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         RecRef: RecordRef;
         ShopifyCustomerID: Text[30];
-        ShopifyCustomerIDEmptyErr: Label 'Shopify Customer Id must be specified for %1, %2 = %3', Comment = '%1 - Customer record id, %2 - Shopify store code field name, %3 - Shopify store code';
     begin
         RecRef.Get(SpfyTask."Record ID");
         RecRef.SetTable(Customer);
@@ -96,20 +105,19 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
         UpdateFromCustomer(Customer, SpfyStoreCustomerLink);
 
         ShopifyCustomerID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreCustomerLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        if (ShopifyCustomerID = '') and (SpfyTask.Type = SpfyTask.Type::Delete) then
+            exit(false);
         if ShopifyCustomerID = '' then
             ShopifyCustomerID := GetShopifyCustomerID(SpfyStoreCustomerLink, false);
         if ShopifyCustomerID = '' then begin
-            case SpfyTask.Type of
-                SpfyTask.Type::Modify:
-                    SpfyTask.Type := SpfyTask.Type::Insert;
-                SpfyTask.Type::Delete:
-                    Error(ShopifyCustomerIDEmptyErr, Format(Customer.RecordId()), SpfyStoreCustomerLink.FieldCaption("Shopify Store Code"), SpfyStoreCustomerLink."Shopify Store Code");
-            end;
+            if SpfyTask.Type = SpfyTask.Type::Modify then
+                SpfyTask.Type := SpfyTask.Type::Insert;
         end else
             if SpfyTask.Type = SpfyTask.Type::Insert then
                 SpfyTask.Type := SpfyTask.Type::Modify;
 
         PrepareCustomerUpdateRequest(SpfyTask, SpfyStoreCustomerLink, ShopifyCustomerID);
+        exit(true);
     end;
 
     local procedure PrepareCustomerUpdateRequest(var SpfyTask: Record "NPR Spfy Task"; SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; ShopifyCustomerID: Text[30])
@@ -252,8 +260,10 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
 
     internal procedure GetShopifyCustomerID(var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; WithDialog: Boolean): Text[30]
     var
+        SpfyCustomerMgt: Codeunit "NPR Spfy Customer Mgt.";
         Window: Dialog;
         ShopifyCustomerGID: Text;
+        ShopifyCustomerID: Text[30];
     begin
         if (SpfyStoreCustomerLink."No." = '') or (SpfyStoreCustomerLink."Shopify Store Code" = '') then
             exit('');
@@ -267,8 +277,11 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
 
         ShopifyCustomerGID := GetCustomerGIDFromShopify(SpfyStoreCustomerLink, false);
 #pragma warning disable AA0139
-        _ShopifyCustomerID := _SpfyIntegrationMgt.RemoveUntil(ShopifyCustomerGID, '/');
+        ShopifyCustomerID := _SpfyIntegrationMgt.RemoveUntil(ShopifyCustomerGID, '/');
 #pragma warning restore AA0139
+        //Every caller links the id to this customer
+        SpfyCustomerMgt.CheckShopifyCustomerNotLinkedElsewhere(SpfyStoreCustomerLink, ShopifyCustomerID);
+        _ShopifyCustomerID := ShopifyCustomerID;
         _LastQueriedSpfyStoreCustomerLink := SpfyStoreCustomerLink;
 
         if WithDialog then
@@ -377,6 +390,7 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
     var
         Customer: Record Customer;
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        SpfyCustomerMgt: Codeunit "NPR Spfy Customer Mgt.";
         ShopifyResponse: JsonToken;
         UserErrors: JsonToken;
         ShopifyCustomerID: Text[30];
@@ -395,13 +409,9 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
         end;
         if not FindShopifyCustomerByEmail(SpfyStoreCustomerLink."E-Mail", SpfyStoreCustomerLink."Shopify Store Code", ShopifyResponse) then
             Error(CustomerSearchQueryErr, SpfyStoreCustomerLink."E-Mail", GetLastErrorText());
-        if ShopifyResponse.SelectToken('data.customers.edges', ShopifyResponse) and ShopifyResponse.IsArray() then
-            if ShopifyResponse.AsArray().Count() > 0 then begin
-                ShopifyResponse.AsArray().Get(0, ShopifyResponse);
-                ShopifyCustomerGID := _JsonHelper.GetJText(ShopifyResponse, 'node.id', false);
-                if ShopifyCustomerGID <> '' then
-                    exit;
-            end;
+        ShopifyCustomerGID := SpfyCustomerMgt.CustomerGIDWithEmail(ShopifyResponse, SpfyStoreCustomerLink."E-Mail");
+        if ShopifyCustomerGID <> '' then
+            exit;
 
         //Create Shopify customer
         if not CreateMissing then
@@ -429,15 +439,11 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
     local procedure FindShopifyCustomerByEmail(Email: Text; ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken): Boolean
     var
         SpfyTask: Record "NPR Spfy Task";
+        SpfyCustomerMgt: Codeunit "NPR Spfy Customer Mgt.";
         QueryStream: OutStream;
         RequestJson: JsonObject;
-        VariablesJson: JsonObject;
-        QueryTok: Label 'query FindCustomerByEmail($searchCriteria: String!) {customers(first: 1, query: $searchCriteria) {edges{node{id}}}}', Locked = true;
     begin
-        VariablesJson.Add('searchCriteria', 'email:' + Email);
-        RequestJson.Add('query', QueryTok);
-        RequestJson.Add('variables', VariablesJson);
-
+        RequestJson := SpfyCustomerMgt.FindCustomerByEmailRequest(Email);
         SpfyTask."Store Code" := ShopifyStoreCode;
         SpfyTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         RequestJson.WriteTo(QueryStream);
@@ -614,9 +620,7 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
 #pragma warning restore AA0139
         LinkExists := SpfyStoreCustomerLink.Find();
         if Removed then begin
-            DisableIntegrationForCustomer(SpfyStoreCustomerLink);
-            if LinkExists then
-                ModifySpfyStoreCustomerLink(SpfyStoreCustomerLink, true);
+            DisableStoreLink(SpfyStoreCustomerLink, LinkExists);
             exit;
         end;
 
@@ -1083,6 +1087,13 @@ codeunit 6151461 "NPR Spfy Task Send Customers"
             // No-op when the RowVersion feature is off; user edits come in with DisableDataLog=false → still detected.
             SpfySyncStateMgt.AdvanceStoreCustomerLinkBaseline(SpfyStoreCustomerLink);
         end;
+    end;
+
+    local procedure DisableStoreLink(var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; LinkExists: Boolean)
+    begin
+        DisableIntegrationForCustomer(SpfyStoreCustomerLink);
+        if LinkExists then
+            ModifySpfyStoreCustomerLink(SpfyStoreCustomerLink, true);
     end;
 
     local procedure DisableIntegrationForCustomer(var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link")

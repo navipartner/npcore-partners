@@ -52,13 +52,18 @@ codeunit 6248540 "NPR Spfy Send Customers"
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         ShopifyResponse: JsonToken;
         ShopifyCustomerID: Text[30];
+        LinkExists: Boolean;
         Success: Boolean;
     begin
         Clear(NcTask."Data Output");
         Clear(NcTask.Response);
         ClearLastError();
 
-        PrepareCustomerUpdateRequest(NcTask, SpfyStoreCustomerLink);
+        if not PrepareCustomerUpdateRequest(NcTask, SpfyStoreCustomerLink) then begin
+            LinkExists := SpfyStoreCustomerLink.Find();
+            DisableStoreLink(SpfyStoreCustomerLink, LinkExists);
+            exit;
+        end;
         Success := GetGraphQLClient().ExecuteRequest(NcTask, true, ShopifyResponse);
         NcTask.Modify();
         Commit();
@@ -85,13 +90,17 @@ codeunit 6248540 "NPR Spfy Send Customers"
         RetrieveShopifyCustomerAndUpdateBCCustomerWithDataFromShopify(SpfyStoreCustomerLink, ShopifyCustomerID, NcTask.Type = NcTask.Type::Delete, false, false);
     end;
 
-    local procedure PrepareCustomerUpdateRequest(var NcTask: Record "NPR Nc Task"; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link")
+    /// <summary>
+    /// Returns false, with no request written, for a delete of a customer whose link carries no Shopify id. That
+    /// customer was never linked to a Shopify customer, so there is nothing in Shopify that is ours to delete, and
+    /// a customer found by e-mail could belong to somebody else.
+    /// </summary>
+    local procedure PrepareCustomerUpdateRequest(var NcTask: Record "NPR Nc Task"; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"): Boolean
     var
         Customer: Record Customer;
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         RecRef: RecordRef;
         ShopifyCustomerID: Text[30];
-        ShopifyCustomerIDEmptyErr: Label 'Shopify Customer Id must be specified for %1, %2 = %3', Comment = '%1 - Customer record id, %2 - Shopify store code field name, %3 - Shopify store code';
     begin
         RecRef.Get(NcTask."Record ID");
         RecRef.SetTable(Customer);
@@ -100,20 +109,19 @@ codeunit 6248540 "NPR Spfy Send Customers"
         UpdateFromCustomer(Customer, SpfyStoreCustomerLink);
 
         ShopifyCustomerID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreCustomerLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        if (ShopifyCustomerID = '') and (NcTask.Type = NcTask.Type::Delete) then
+            exit(false);
         if ShopifyCustomerID = '' then
             ShopifyCustomerID := GetShopifyCustomerID(SpfyStoreCustomerLink, false);
         if ShopifyCustomerID = '' then begin
-            case NcTask.Type of
-                NcTask.Type::Modify:
-                    NcTask.Type := NcTask.Type::Insert;
-                NcTask.Type::Delete:
-                    Error(ShopifyCustomerIDEmptyErr, Format(Customer.RecordId()), SpfyStoreCustomerLink.FieldCaption("Shopify Store Code"), SpfyStoreCustomerLink."Shopify Store Code");
-            end;
+            if NcTask.Type = NcTask.Type::Modify then
+                NcTask.Type := NcTask.Type::Insert;
         end else
             if NcTask.Type = NcTask.Type::Insert then
                 NcTask.Type := NcTask.Type::Modify;
 
         PrepareCustomerUpdateRequest(NcTask, SpfyStoreCustomerLink, ShopifyCustomerID);
+        exit(true);
     end;
 
     local procedure PrepareCustomerUpdateRequest(var NcTask: Record "NPR Nc Task"; SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; ShopifyCustomerID: Text[30])
@@ -258,8 +266,10 @@ codeunit 6248540 "NPR Spfy Send Customers"
 
     internal procedure GetShopifyCustomerID(var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; WithDialog: Boolean): Text[30]
     var
+        SpfyCustomerMgt: Codeunit "NPR Spfy Customer Mgt.";
         Window: Dialog;
         ShopifyCustomerGID: Text;
+        ShopifyCustomerID: Text[30];
     begin
         if (SpfyStoreCustomerLink."No." = '') or (SpfyStoreCustomerLink."Shopify Store Code" = '') then
             exit('');
@@ -273,8 +283,11 @@ codeunit 6248540 "NPR Spfy Send Customers"
 
         ShopifyCustomerGID := GetCustomerGIDFromShopify(SpfyStoreCustomerLink, false);
 #pragma warning disable AA0139
-        _ShopifyCustomerID := _SpfyIntegrationMgt.RemoveUntil(ShopifyCustomerGID, '/');
+        ShopifyCustomerID := _SpfyIntegrationMgt.RemoveUntil(ShopifyCustomerGID, '/');
 #pragma warning restore AA0139
+        //Every caller links the id to this customer
+        SpfyCustomerMgt.CheckShopifyCustomerNotLinkedElsewhere(SpfyStoreCustomerLink, ShopifyCustomerID);
+        _ShopifyCustomerID := ShopifyCustomerID;
         _LastQueriedSpfyStoreCustomerLink := SpfyStoreCustomerLink;
 
         if WithDialog then
@@ -383,6 +396,7 @@ codeunit 6248540 "NPR Spfy Send Customers"
     var
         Customer: Record Customer;
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        SpfyCustomerMgt: Codeunit "NPR Spfy Customer Mgt.";
         ShopifyResponse: JsonToken;
         UserErrors: JsonToken;
         ShopifyCustomerID: Text[30];
@@ -401,13 +415,9 @@ codeunit 6248540 "NPR Spfy Send Customers"
         end;
         if not FindShopifyCustomerByEmail(SpfyStoreCustomerLink."E-Mail", SpfyStoreCustomerLink."Shopify Store Code", ShopifyResponse) then
             Error(CustomerSearchQueryErr, SpfyStoreCustomerLink."E-Mail", GetLastErrorText());
-        if ShopifyResponse.SelectToken('data.customers.edges', ShopifyResponse) and ShopifyResponse.IsArray() then
-            if ShopifyResponse.AsArray().Count() > 0 then begin
-                ShopifyResponse.AsArray().Get(0, ShopifyResponse);
-                ShopifyCustomerGID := _JsonHelper.GetJText(ShopifyResponse, 'node.id', false);
-                if ShopifyCustomerGID <> '' then
-                    exit;
-            end;
+        ShopifyCustomerGID := SpfyCustomerMgt.CustomerGIDWithEmail(ShopifyResponse, SpfyStoreCustomerLink."E-Mail");
+        if ShopifyCustomerGID <> '' then
+            exit;
 
         //Create Shopify customer
         if not CreateMissing then
@@ -418,10 +428,10 @@ codeunit 6248540 "NPR Spfy Send Customers"
         // A mutation Shopify refuses still answers 200 with the reason in userErrors and the customer left
         // null, so the transport test above passes. Without this the id read below is what fails, raising
         // "required value missing" and nothing else. The NcTask carrying this request is a local that is
-        // never inserted, so Shopify's own reason - an e-mail already taken, most often, because the search
-        // that preceded it is eventually consistent - would be recorded nowhere in BC, and the task would
-        // retry on the same input for as long as the answer stays the same. Every other mutation in this
-        // module makes the same check.
+        // never inserted, so Shopify's own reason - an e-mail already taken, most often, because the customer
+        // was created on the Shopify side between the lookup and the create - would be recorded nowhere in
+        // BC, and the task would retry on the same input for as long as the answer stays the same. Every
+        // other mutation in this module makes the same check.
         if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse, UserErrors) then begin
             UserErrors.WriteTo(UserErrorsTxt);
             Error(CustomerCreateQueryErr, SpfyStoreCustomerLink."E-Mail", UserErrorsTxt);
@@ -439,15 +449,11 @@ codeunit 6248540 "NPR Spfy Send Customers"
     local procedure FindShopifyCustomerByEmail(Email: Text; ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken): Boolean
     var
         NcTask: Record "NPR Nc Task";
+        SpfyCustomerMgt: Codeunit "NPR Spfy Customer Mgt.";
         QueryStream: OutStream;
         RequestJson: JsonObject;
-        VariablesJson: JsonObject;
-        QueryTok: Label 'query FindCustomerByEmail($searchCriteria: String!) {customers(first: 1, query: $searchCriteria) {edges{node{id}}}}', Locked = true;
     begin
-        VariablesJson.Add('searchCriteria', 'email:' + Email);
-        RequestJson.Add('query', QueryTok);
-        RequestJson.Add('variables', VariablesJson);
-
+        RequestJson := SpfyCustomerMgt.FindCustomerByEmailRequest(Email);
         NcTask."Store Code" := ShopifyStoreCode;
         NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         RequestJson.WriteTo(QueryStream);
@@ -624,9 +630,7 @@ codeunit 6248540 "NPR Spfy Send Customers"
 #pragma warning restore AA0139
         LinkExists := SpfyStoreCustomerLink.Find();
         if Removed then begin
-            DisableIntegrationForCustomer(SpfyStoreCustomerLink);
-            if LinkExists then
-                ModifySpfyStoreCustomerLink(SpfyStoreCustomerLink, true);
+            DisableStoreLink(SpfyStoreCustomerLink, LinkExists);
             exit;
         end;
 
@@ -1094,6 +1098,13 @@ codeunit 6248540 "NPR Spfy Send Customers"
             // No-op when the RowVersion feature is off; user edits come in with DisableDataLog=false → still detected.
             SpfySyncStateMgt.AdvanceStoreCustomerLinkBaseline(SpfyStoreCustomerLink);
         end;
+    end;
+
+    local procedure DisableStoreLink(var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; LinkExists: Boolean)
+    begin
+        DisableIntegrationForCustomer(SpfyStoreCustomerLink);
+        if LinkExists then
+            ModifySpfyStoreCustomerLink(SpfyStoreCustomerLink, true);
     end;
 
     local procedure DisableIntegrationForCustomer(var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link")
