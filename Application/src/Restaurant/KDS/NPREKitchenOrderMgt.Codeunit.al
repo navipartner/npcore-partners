@@ -179,11 +179,49 @@
                 GlobalKitchenOrder.Priority := DefaultPriority(KitchenRequest);
                 GlobalKitchenOrder."Created Date-Time" := KitchenRequest."Created Date-Time";
                 GlobalKitchenOrder."Restaurant Code" := KitchenRequest."Restaurant Code";
+                GlobalKitchenOrder."Display Order No." := NextDisplayOrderNo(CounterRestaurantCode(KitchenRequest, KitchenReqSourceLink));
                 GlobalKitchenOrder.Insert();
                 NotificationHandler.CreateOrderNotifications(GlobalKitchenOrder, "NPR NPRE Notification Trigger"::KDS_ORDER_NEW, 0DT);
             end;
         end;
         exit(GlobalKitchenOrder."Order ID");
+    end;
+
+    local procedure CounterRestaurantCode(KitchenRequest: Record "NPR NPRE Kitchen Request"; KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link"): Code[20]
+    var
+        Seating: Record "NPR NPRE Seating";
+        SeatingLocation: Record "NPR NPRE Seating Location";
+    begin
+        if KitchenReqSourceLink."Seating Code" <> '' then
+            if Seating.Get(KitchenReqSourceLink."Seating Code") then
+                if SeatingLocation.Get(Seating."Seating Location") then
+                    if SeatingLocation."Restaurant Code" <> '' then
+                        exit(SeatingLocation."Restaurant Code");
+        exit(KitchenRequest."Restaurant Code");
+    end;
+
+    local procedure NextDisplayOrderNo(RestaurantCode: Code[20]): Integer
+    var
+        KitchenOrderCounter: Record "NPR NPRE Kitchen Order Counter";
+        TimeZoneMgt: Codeunit "NPR Time Zone Mgt.";
+        LocalDate: Date;
+        LocalTime: Time;
+    begin
+        TimeZoneMgt.GetLocalDateTime(CurrentDateTime(), LocalDate, LocalTime);
+        KitchenOrderCounter.ReadIsolation := IsolationLevel::UpdLock;
+        if not KitchenOrderCounter.Get(RestaurantCode) then begin
+            KitchenOrderCounter.Init();
+            KitchenOrderCounter."Restaurant Code" := RestaurantCode;
+            if not KitchenOrderCounter.Insert() then
+                KitchenOrderCounter.Get(RestaurantCode);
+        end;
+        if (KitchenOrderCounter."Last Display Order Date" < LocalDate) or (KitchenOrderCounter."Last Display Order No." >= 999) then
+            KitchenOrderCounter."Last Display Order No." := 0;
+        KitchenOrderCounter."Last Display Order No." += 1;
+        if KitchenOrderCounter."Last Display Order Date" < LocalDate then
+            KitchenOrderCounter."Last Display Order Date" := LocalDate;
+        KitchenOrderCounter.Modify();
+        exit(KitchenOrderCounter."Last Display Order No.");
     end;
 
     local procedure HandleQtyChange(var KitchenRequest: Record "NPR NPRE Kitchen Request"; KitchenRequestParam: Record "NPR NPRE Kitchen Request"; KitchenReqSourceParam: Record "NPR NPRE Kitchen Req.Src. Link"; CancelledKitchenOrders: Codeunit "NPR HashSet of [BigInteger]")

@@ -500,6 +500,7 @@ codeunit 85376 "NPR NPRE End Of Sale Tests"
     procedure EndSale_FastFoodKitchenOrder_QueuesTheKitchenOrderNoMessage()
     var
         Item: Record Item;
+        KitchenOrder: Record "NPR NPRE Kitchen Order";
         KitchenReqSrcLink: Record "NPR NPRE Kitchen Req.Src. Link";
         KitchenRequest: Record "NPR NPRE Kitchen Request";
         POSEntry: Record "NPR POS Entry";
@@ -509,10 +510,11 @@ codeunit 85376 "NPR NPRE End Of Sale Tests"
         JToken: JsonToken;
         WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Close w/out Saving";
     begin
-        // [SCENARIO] A paid fast-food sale tells the cashier the kitchen order no. of what went to the kitchen
+        // [SCENARIO] A paid fast-food sale tells the cashier the display order no. of what went to the kitchen, the same number the customer sees
 
-        // [GIVEN] A fast-food sale of a kitchen-routed item, sent to the kitchen and paid
+        // [GIVEN] A fast-food sale of a kitchen-routed item, sent to the kitchen and paid, in a restaurant whose display counter is at 700 today
         InitializeFastFoodScenario(Seating, WaiterPad);
+        SetDisplayOrderCounter(Seating, 700, Today());
         CreateSaleItem(Item);
         _LibraryRestaurant.SetupItemForKitchenOrders(Item);
         _LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
@@ -523,15 +525,18 @@ codeunit 85376 "NPR NPRE End Of Sale Tests"
         // [WHEN] The end-of-sale post-workflows are collected
         CollectEndOfSalePostWorkflows(PostWorkflows);
 
-        // [THEN] A message with the kitchen order no. of the sent waiter pad is queued
+        // [THEN] A message with the display order no. of the sent waiter pad's kitchen order is queued
         KitchenReqSrcLink.SetRange("Source Document Type", KitchenReqSrcLink."Source Document Type"::"Waiter Pad");
         KitchenReqSrcLink.SetRange("Source Document No.", WaiterPad."No.");
         KitchenReqSrcLink.FindFirst();
         KitchenRequest.Get(KitchenReqSrcLink."Request No.");
+        KitchenOrder.Get(KitchenRequest."Order ID");
+        _Assert.AreNotEqual(0, KitchenOrder."Display Order No.", 'The kitchen order did not get a display order no.');
+        _Assert.AreNotEqual(Format(KitchenOrder."Order ID"), Format(KitchenOrder."Display Order No."), 'The display order no. must differ from the order id for this test to be meaningful.');
         _Assert.IsTrue(PostWorkflows.Get('SHOW_MESSAGE', JToken), 'The kitchen order no. message was not queued.');
         JToken.AsObject().Get('customParameters', JToken);
         JToken.AsObject().Get('message', JToken);
-        _Assert.AreEqual(Format(KitchenRequest."Order ID"), JToken.AsValue().AsText(), 'The queued message does not carry the kitchen order no.');
+        _Assert.AreEqual(Format(KitchenOrder."Display Order No."), JToken.AsValue().AsText(), 'The queued message does not carry the display order no.');
     end;
 
     [Test]
@@ -1126,6 +1131,21 @@ codeunit 85376 "NPR NPRE End Of Sale Tests"
         else
             POSRestaurantProfile.TestField(Code, POSStoreRestaurantProfileCode);
         _Assert.AreEqual('', POSSetup.RestaurantCode(), 'Test prerequisite: the POS session must not resolve a restaurant code.');
+    end;
+
+    local procedure SetDisplayOrderCounter(Seating: Record "NPR NPRE Seating"; LastDisplayOrderNo: Integer; LastDisplayOrderDate: Date)
+    var
+        KitchenOrderCounter: Record "NPR NPRE Kitchen Order Counter";
+        SeatingLocation: Record "NPR NPRE Seating Location";
+    begin
+        SeatingLocation.Get(Seating."Seating Location");
+        if not KitchenOrderCounter.Get(SeatingLocation."Restaurant Code") then begin
+            KitchenOrderCounter."Restaurant Code" := SeatingLocation."Restaurant Code";
+            KitchenOrderCounter.Insert();
+        end;
+        KitchenOrderCounter."Last Display Order No." := LastDisplayOrderNo;
+        KitchenOrderCounter."Last Display Order Date" := LastDisplayOrderDate;
+        KitchenOrderCounter.Modify();
     end;
 
     local procedure SetReceiptNoSeriesAbovePostedReceipts(POSUnit: Record "NPR POS Unit")

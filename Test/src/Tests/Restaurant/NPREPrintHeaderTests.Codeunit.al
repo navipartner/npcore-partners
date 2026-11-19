@@ -173,6 +173,51 @@ codeunit 85300 "NPR NPRE Print Header Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure GetKitchenOrderDisplayTextShowsTheDisplayOrderNo()
+    var
+        KitchenOrder: Record "NPR NPRE Kitchen Order";
+        KitchenPrintMgt: Codeunit "NPR NPRE Kitchen Print Mgt";
+    begin
+        // [SCENARIO] Receipts and kitchen tickets print the customer-facing display order no. when the kitchen order has one
+        // [GIVEN] A kitchen order with display order no. 42
+        KitchenOrder.Init();
+        KitchenOrder."Display Order No." := 42;
+        KitchenOrder.Insert(false);
+
+        // [WHEN] The order number text for printing is resolved
+        // [THEN] It is the display order no., not the order id
+        Assert.AreEqual('42', KitchenPrintMgt.GetKitchenOrderDisplayText(KitchenOrder."Order ID"), 'The display order no. should be printed when assigned.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GetKitchenOrderDisplayTextFallsBackToTheOrderId()
+    var
+        KitchenOrder: Record "NPR NPRE Kitchen Order";
+        KitchenPrintMgt: Codeunit "NPR NPRE Kitchen Print Mgt";
+    begin
+        // [SCENARIO] A kitchen order that was open at upgrade has no display order no. and keeps printing its order id
+        // [GIVEN] A kitchen order without a display order no.
+        KitchenOrder.Init();
+        KitchenOrder.Insert(false);
+
+        // [WHEN] The order number text for printing is resolved
+        // [THEN] It is the order id
+        Assert.AreEqual(Format(KitchenOrder."Order ID", 0, 9), KitchenPrintMgt.GetKitchenOrderDisplayText(KitchenOrder."Order ID"), 'The order id should be printed when no display order no. is assigned.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GetKitchenOrderDisplayTextOfUnknownOrderIsTheOrderId()
+    var
+        KitchenPrintMgt: Codeunit "NPR NPRE Kitchen Print Mgt";
+    begin
+        // [SCENARIO] A send-log entry can point at a kitchen order that no longer exists; the ticket still prints the logged id
+        Assert.AreEqual('987654321', KitchenPrintMgt.GetKitchenOrderDisplayText(987654321), 'An unknown kitchen order should print its id.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure GetKitchenOrderIdsSkipsCancelledRequests()
     var
         WaiterPad: Record "NPR NPRE Waiter Pad";

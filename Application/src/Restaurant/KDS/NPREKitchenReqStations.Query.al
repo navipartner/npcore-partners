@@ -10,6 +10,7 @@
         dataitem(KitchenOrder; "NPR NPRE Kitchen Order")
         {
             column(Order_ID; "Order ID") { }
+            column(Display_Order_No; "Display Order No.") { }
             column(Order_Restaurant_Code; "Restaurant Code") { }
             column(Order_Status; "Order Status") { }
             column(Created_DateTime; "Created Date-Time") { }

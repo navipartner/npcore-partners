@@ -34,6 +34,7 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
                     Clear(KitchenOrderContent);
                     KitchenOrderContent.Add('restaurantId', KitchenOrder."Restaurant Code");
                     KitchenOrderContent.Add('orderId', KitchenOrder."Order ID");
+                    KitchenOrderContent.Add('displayOrderNo', KitchenOrder."Display Order No.");
                     KitchenOrderContent.Add('orderStatus', KitchenOrder."Order Status".AsInteger());
                     KitchenOrderContent.Add('orderStatusName', StatusEnumValueName(KitchenOrder."Order Status"));
                     KitchenOrderContent.Add('priority', KitchenOrder.Priority);
@@ -295,6 +296,7 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
                 Clear(KitchenRequests);
                 Clear(CustomerDetailsDic);
                 OrderHdr.Add('orderId', KitchenReqStationsQry.Order_ID);
+                OrderHdr.Add('displayOrderNo', KitchenReqStationsQry.Display_Order_No);
                 OrderHdr.Add('restaurantId', KitchenReqStationsQry.Request_Restaurant_Code);
                 OrderHdr.Add('orderStatus', KitchenReqStationsQry.Order_Status.AsInteger());
                 OrderHdr.Add('orderStatusName', StatusEnumValueName(KitchenReqStationsQry.Order_Status));

@@ -19,6 +19,11 @@
                     ToolTip = 'Specifies the order unique Id, assigned by the system according to an automatically maintained number series.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Display Order No."; Rec."Display Order No.")
+                {
+                    ToolTip = 'Specifies the customer-facing order number. It restarts at 1 every day per restaurant and wraps after 999.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Restaurant Code"; Rec."Restaurant Code")
                 {
                     Editable = false;

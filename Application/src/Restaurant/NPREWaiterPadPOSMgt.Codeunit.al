@@ -1321,6 +1321,7 @@
         CustomParameters: JsonObject;
         KitchenOrderSystemId: Guid;
         KitchenOrderNo: BigInteger;
+        KitchenOrderDisplayNo: Integer;
         KitchenOrderNoLbl: Label 'Kitchen order no.';
     begin
         POSEntryWaiterPadLink.SetRange("POS Entry No.", POSEntryNo);
@@ -1335,11 +1336,14 @@
         SetupProxy.GetServiceFlowProfile(ServiceFlowProfile);
         if not ServiceFlowProfile."AutoSave to W/Pad on Sale End" then
             exit;
-        KitchenOrderNo := KitchenPrintMgt.GetKitchenOrderId(POSEntryNo, KitchenOrderSystemId);
+        KitchenOrderNo := KitchenPrintMgt.GetKitchenOrderId(POSEntryNo, KitchenOrderSystemId, KitchenOrderDisplayNo);
         if KitchenOrderNo = 0 then
             exit;
         CustomParameters.Add('title', KitchenOrderNoLbl);
-        CustomParameters.Add('message', Format(KitchenOrderNo));
+        if KitchenOrderDisplayNo <> 0 then
+            CustomParameters.Add('message', Format(KitchenOrderDisplayNo))
+        else
+            CustomParameters.Add('message', Format(KitchenOrderNo));
         ActionParameters.Add('customParameters', CustomParameters);
         PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::SHOW_MESSAGE), ActionParameters);
     end;

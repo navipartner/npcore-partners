@@ -463,6 +463,228 @@ codeunit 85159 "NPR Kitchen Order API Tests"
         Assert.IsFalse(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Should return not found for wrong restaurant');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CompleteSale_FirstOrdersOfTheDay_GetDisplayNosFromOne()
+    var
+        KitchenOrderCounter: Record "NPR NPRE Kitchen Order Counter";
+        Assert: Codeunit Assert;
+        OtherRestaurantCode: Code[20];
+    begin
+        // [SCENARIO] The restaurant's display order number restarts at 1 on a new day, counts up, and leaves other restaurants' counters alone
+        Initialize();
+
+        // [GIVEN] The restaurant's counter was last used yesterday, and another restaurant's counter is at 500 today
+        SetDisplayOrderCounter(_RestaurantCode, 500, CalcDate('<-1D>', Today()));
+        OtherRestaurantCode := CopyStr('OTHER-' + _RestaurantCode, 1, MaxStrLen(OtherRestaurantCode));
+        SetDisplayOrderCounter(OtherRestaurantCode, 500, Today());
+
+        // [WHEN] Two kitchen orders are created
+        // [THEN] They get display numbers 1 and 2
+        Assert.AreEqual(1, CreateSaleAndGetDisplayOrderNo(), 'First order of the day should get display number 1');
+        Assert.AreEqual(2, CreateSaleAndGetDisplayOrderNo(), 'Second order of the day should get display number 2');
+
+        // [THEN] The other restaurant's counter is unchanged
+        KitchenOrderCounter.Get(OtherRestaurantCode);
+        Assert.AreEqual(500, KitchenOrderCounter."Last Display Order No.", 'Another restaurant''s counter should not change');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CompleteSale_DisplayNo999Reached_WrapsToOne()
+    var
+        Assert: Codeunit Assert;
+    begin
+        // [SCENARIO] The display order number wraps back to 1 after 999 within the same day
+        Initialize();
+
+        // [GIVEN] The restaurant's counter is at 999 today
+        SetDisplayOrderCounter(_RestaurantCode, 999, Today());
+
+        // [WHEN] A kitchen order is created
+        // [THEN] It gets display number 1
+        Assert.AreEqual(1, CreateSaleAndGetDisplayOrderNo(), 'Display number should wrap to 1 after 999');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CompleteSale_CounterDateAhead_ContinuesSequence()
+    var
+        KitchenOrderCounter: Record "NPR NPRE Kitchen Order Counter";
+        Assert: Codeunit Assert;
+        Tomorrow: Date;
+    begin
+        // [SCENARIO] A session whose date lags behind the stored counter date (a UTC API session after a local-time POS session) continues the sequence instead of resetting it
+        Initialize();
+
+        // [GIVEN] The restaurant's counter is at 10 with tomorrow's date
+        Tomorrow := CalcDate('<+1D>', Today());
+        SetDisplayOrderCounter(_RestaurantCode, 10, Tomorrow);
+
+        // [WHEN] A kitchen order is created
+        // [THEN] It gets display number 11 and the stored date is not moved back
+        Assert.AreEqual(11, CreateSaleAndGetDisplayOrderNo(), 'Display number should continue the sequence');
+        KitchenOrderCounter.Get(_RestaurantCode);
+        Assert.AreEqual(Tomorrow, KitchenOrderCounter."Last Display Order Date", 'Counter date should not move backwards');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CompleteSale_StationSelectionWithoutRestaurant_UsesSeatingLocationRestaurant()
+    var
+        KitchenOrderCounter: Record "NPR NPRE Kitchen Order Counter";
+        BlankRestaurantSelection: Record "NPR NPRE Kitchen Station Slct.";
+        TempRestaurantSelection: Record "NPR NPRE Kitchen Station Slct." temporary;
+        Assert: Codeunit Assert;
+        DisplayOrderNo: Integer;
+    begin
+        // [SCENARIO] When the kitchen station is selected through a line without a restaurant code, the display number still comes from the ordering restaurant's counter
+        Initialize();
+
+        // [GIVEN] The restaurant's only station selection line has a blank restaurant code
+        ReplaceStationSelectionWithBlankRestaurantLine(TempRestaurantSelection, BlankRestaurantSelection);
+
+        // [GIVEN] The restaurant's counter is at 40 and the blank restaurant's counter is at 900
+        SetDisplayOrderCounter(_RestaurantCode, 40, Today());
+        SetDisplayOrderCounter('', 900, Today());
+
+        // [WHEN] A kitchen order is created
+        DisplayOrderNo := CreateSaleAndGetDisplayOrderNo();
+        RestoreStationSelection(TempRestaurantSelection, BlankRestaurantSelection);
+
+        // [THEN] It gets display number 41 from the restaurant's counter, and the blank restaurant's counter is unchanged
+        Assert.AreEqual(41, DisplayOrderNo, 'Display number should come from the seating location''s restaurant');
+        KitchenOrderCounter.Get('');
+        Assert.AreEqual(900, KitchenOrderCounter."Last Display Order No.", 'The blank restaurant''s counter should not change');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SmsTemplate_DisplayOrderNoField_IsMerged()
+    var
+        NotificationEntry: Record "NPR NPRE Notification Entry";
+        SmsTemplateHeader: Record "NPR SMS Template Header";
+        SmsTemplateLine: Record "NPR SMS Template Line";
+        SmsImplementation: Codeunit "NPR SMS Implementation";
+        Assert: Codeunit Assert;
+    begin
+        // [SCENARIO] An SMS template can show the kitchen order's display number through field 2 of the notification entry
+        Initialize();
+
+        // [GIVEN] A notification entry for a kitchen order with display number 701, and an SMS template whose text references field 2
+        CreateNotificationEntryForDisplayOrderNo(701, NotificationEntry);
+        if not SmsTemplateHeader.Get('KDSPLNO') then begin
+            SmsTemplateHeader.Code := 'KDSPLNO';
+            SmsTemplateHeader."Table No." := Database::"NPR NPRE Notification Entry";
+            SmsTemplateHeader.Insert();
+            SmsTemplateLine."Template Code" := SmsTemplateHeader.Code;
+            SmsTemplateLine."Line No." := 10000;
+            SmsTemplateLine."SMS Text" := 'Order {2} is ready';
+            SmsTemplateLine.Insert();
+        end;
+
+        // [WHEN] The SMS text is merged
+        // [THEN] It contains the display number, not the order ID
+        Assert.AreEqual('Order 701 is ready', SmsImplementation.MakeMessage(SmsTemplateHeader, NotificationEntry), 'SMS should contain the display order number');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure EmailTemplate_DisplayOrderNoField_IsMerged()
+    var
+        NotificationEntry: Record "NPR NPRE Notification Entry";
+        EmailTemplMgt: Codeunit "NPR E-mail Templ. Mgt.";
+        Assert: Codeunit Assert;
+        RecRef: RecordRef;
+    begin
+        // [SCENARIO] An e-mail template can show the kitchen order's display number through field 2 of the notification entry
+        Initialize();
+
+        // [GIVEN] A notification entry for a kitchen order with display number 701
+        CreateNotificationEntryForDisplayOrderNo(701, NotificationEntry);
+        RecRef.GetTable(NotificationEntry);
+
+        // [WHEN] The e-mail text is merged
+        // [THEN] It contains the display number, not the order ID
+        Assert.AreEqual('Order 701 is ready', EmailTemplMgt.MergeMailContent(RecRef, 'Order {2} is ready', '', ''), 'E-mail should contain the display order number');
+    end;
+
+    local procedure CreateNotificationEntryForDisplayOrderNo(DisplayOrderNo: Integer; var NotificationEntry: Record "NPR NPRE Notification Entry")
+    var
+        KitchenOrder: Record "NPR NPRE Kitchen Order";
+        Assert: Codeunit Assert;
+        KitchenOrderId: BigInteger;
+    begin
+        SetDisplayOrderCounter(_RestaurantCode, DisplayOrderNo - 1, Today());
+        Evaluate(KitchenOrderId, CreateSaleWithKitchenOrder(CreateGuid(), CreateGuid(), CreateGuid()));
+        KitchenOrder.Get(KitchenOrderId);
+        Assert.AreEqual(DisplayOrderNo, KitchenOrder."Display Order No.", 'Kitchen order should get the expected display number');
+        NotificationEntry.Init();
+        NotificationEntry."Kitchen Order ID" := KitchenOrder."Order ID";
+        NotificationEntry.Insert();
+    end;
+
+    local procedure ReplaceStationSelectionWithBlankRestaurantLine(var TempRestaurantSelection: Record "NPR NPRE Kitchen Station Slct." temporary; var BlankRestaurantSelection: Record "NPR NPRE Kitchen Station Slct.")
+    var
+        KitchenStationSelection: Record "NPR NPRE Kitchen Station Slct.";
+    begin
+        KitchenStationSelection.SetRange("Restaurant Code", _RestaurantCode);
+        KitchenStationSelection.FindSet();
+        repeat
+            TempRestaurantSelection := KitchenStationSelection;
+            TempRestaurantSelection.Insert();
+        until KitchenStationSelection.Next() = 0;
+        KitchenStationSelection.DeleteAll();
+
+        BlankRestaurantSelection.Init();
+        BlankRestaurantSelection."Restaurant Code" := '';
+        BlankRestaurantSelection."Seating Location" := '';
+        BlankRestaurantSelection."Serving Step" := '';
+        BlankRestaurantSelection."Print Category Code" := '';
+        BlankRestaurantSelection."Production Restaurant Code" := '';
+        BlankRestaurantSelection."Kitchen Station" := TempRestaurantSelection."Kitchen Station";
+        BlankRestaurantSelection."Production Step" := 1;
+        BlankRestaurantSelection.Insert();
+        Commit();
+    end;
+
+    local procedure RestoreStationSelection(var TempRestaurantSelection: Record "NPR NPRE Kitchen Station Slct." temporary; var BlankRestaurantSelection: Record "NPR NPRE Kitchen Station Slct.")
+    var
+        KitchenStationSelection: Record "NPR NPRE Kitchen Station Slct.";
+    begin
+        BlankRestaurantSelection.Delete();
+        TempRestaurantSelection.FindSet();
+        repeat
+            KitchenStationSelection := TempRestaurantSelection;
+            KitchenStationSelection.Insert();
+        until TempRestaurantSelection.Next() = 0;
+        Commit();
+    end;
+
+    local procedure SetDisplayOrderCounter(RestaurantCode: Code[20]; LastDisplayOrderNo: Integer; LastDisplayOrderDate: Date)
+    var
+        KitchenOrderCounter: Record "NPR NPRE Kitchen Order Counter";
+    begin
+        if not KitchenOrderCounter.Get(RestaurantCode) then begin
+            KitchenOrderCounter."Restaurant Code" := RestaurantCode;
+            KitchenOrderCounter.Insert();
+        end;
+        KitchenOrderCounter."Last Display Order No." := LastDisplayOrderNo;
+        KitchenOrderCounter."Last Display Order Date" := LastDisplayOrderDate;
+        KitchenOrderCounter.Modify();
+        Commit();
+    end;
+
+    local procedure CreateSaleAndGetDisplayOrderNo(): Integer
+    var
+        KitchenOrder: Record "NPR NPRE Kitchen Order";
+        KitchenOrderNo: BigInteger;
+    begin
+        Evaluate(KitchenOrderNo, CreateSaleWithKitchenOrder(CreateGuid(), CreateGuid(), CreateGuid()));
+        KitchenOrder.Get(KitchenOrderNo);
+        exit(KitchenOrder."Display Order No.");
+    end;
+
     local procedure Initialize()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -531,6 +753,8 @@ codeunit 85159 "NPR Kitchen Order API Tests"
         Headers: Dictionary of [Text, Text];
         ResponseBody: JsonObject;
         JToken: JsonToken;
+        KitchenOrder: Record "NPR NPRE Kitchen Order";
+        KitchenOrderId: BigInteger;
     begin
         // Create sale
         Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
@@ -566,6 +790,10 @@ codeunit 85159 "NPR Kitchen Order API Tests"
         KitchenOrderNo := JToken.AsValue().AsText();
         Assert.IsTrue(ResponseBody.Get('kitchenOrderId', JToken), 'Response should contain kitchenOrderId');
         Assert.AreNotEqual('', JToken.AsValue().AsText(), 'kitchenOrderId should not be empty');
+        Evaluate(KitchenOrderId, KitchenOrderNo);
+        KitchenOrder.Get(KitchenOrderId);
+        Assert.IsTrue(ResponseBody.Get('kitchenOrderDisplayNo', JToken), 'Response should contain kitchenOrderDisplayNo');
+        Assert.AreEqual(KitchenOrder."Display Order No.", JToken.AsValue().AsInteger(), 'kitchenOrderDisplayNo should match the stored display order number');
     end;
 
     local procedure CreateCleanupJobQueueEntry()

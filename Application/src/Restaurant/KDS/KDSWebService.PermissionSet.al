@@ -17,6 +17,7 @@ permissionset 6014405 "NPR KDS WebService"
         codeunit "NPR NPRE Restaurant Print" = X,
         codeunit "NPR NPRE Seating Mgt." = X,
         tabledata "NPR NPRE Kitchen Order" = RIM,
+        tabledata "NPR NPRE Kitchen Order Counter" = RIM,
         tabledata "NPR NPRE Kitchen Request" = RIM,
         tabledata "NPR NPRE Kitchen Req. Station" = RIM,
         tabledata "NPR NPRE Kitchen Req. Modif." = RIM,

@@ -297,7 +297,7 @@ codeunit 6248348 "NPR Static Sales Receipt"
         Printer.AddLine(OrderNoLbl, 1);
         Printer.SetFont(B22FontLbl);
         foreach KitchenOrderId in KitchenOrderIds do
-            Printer.AddLine(Format(KitchenOrderId, 0, 9), 1);
+            Printer.AddLine(KitchenPrintMgt.GetKitchenOrderDisplayText(KitchenOrderId), 1);
         Printer.SetFont(A11FontLbl);
         Printer.SetBold(false);
         Printer.AddLine('', 0);

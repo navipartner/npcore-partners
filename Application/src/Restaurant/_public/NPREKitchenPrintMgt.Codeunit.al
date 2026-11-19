@@ -63,20 +63,41 @@ codeunit 6151178 "NPR NPRE Kitchen Print Mgt"
 
     internal procedure GetKitchenOrderId(POSEntryNo: Integer; var KitchenOrderSystemId: Guid): BigInteger
     var
+        KitchenOrderDisplayNo: Integer;
+    begin
+        exit(GetKitchenOrderId(POSEntryNo, KitchenOrderSystemId, KitchenOrderDisplayNo));
+    end;
+
+    internal procedure GetKitchenOrderId(POSEntryNo: Integer; var KitchenOrderSystemId: Guid; var KitchenOrderDisplayNo: Integer): BigInteger
+    var
         KitchenOrder: Record "NPR NPRE Kitchen Order";
         KitchenOrderIds: List of [BigInteger];
         KitchenOrderId: BigInteger;
     begin
         Clear(KitchenOrderSystemId);
+        KitchenOrderDisplayNo := 0;
 
         GetKitchenOrderIds(POSEntryNo, KitchenOrderIds);
         if KitchenOrderIds.Count() = 0 then
             exit(0);
 
         KitchenOrderId := KitchenOrderIds.Get(1);
-        if KitchenOrder.Get(KitchenOrderId) then
+        if KitchenOrder.Get(KitchenOrderId) then begin
             KitchenOrderSystemId := KitchenOrder.SystemId;
+            KitchenOrderDisplayNo := KitchenOrder."Display Order No.";
+        end;
         exit(KitchenOrderId);
+    end;
+
+    internal procedure GetKitchenOrderDisplayText(KitchenOrderId: BigInteger): Text
+    var
+        KitchenOrder: Record "NPR NPRE Kitchen Order";
+    begin
+        KitchenOrder.SetLoadFields("Display Order No.");
+        if KitchenOrder.Get(KitchenOrderId) then
+            if KitchenOrder."Display Order No." <> 0 then
+                exit(Format(KitchenOrder."Display Order No.", 0, 9));
+        exit(Format(KitchenOrderId, 0, 9));
     end;
 
     local procedure AddKitchenOrderIdsOfWaiterPadLine(WaiterPadNo: Code[20]; WaiterPadLineNo: Integer; var KitchenOrderIds: List of [BigInteger])

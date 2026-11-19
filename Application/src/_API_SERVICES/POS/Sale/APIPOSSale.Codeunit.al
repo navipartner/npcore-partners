@@ -483,6 +483,7 @@ codeunit 6248632 "NPR API POS Sale"
         KitchenPrintMgt: Codeunit "NPR NPRE Kitchen Print Mgt";
         KitchenOrderNo: BigInteger;
         KitchenOrderSystemId: Guid;
+        KitchenOrderDisplayNo: Integer;
     begin
         Json.StartObject('')
             .AddProperty('entryNo', POSEntry."Entry No.")
@@ -490,11 +491,13 @@ codeunit 6248632 "NPR API POS Sale"
             .AddProperty('documentNo', POSEntry."Document No.")
             .AddProperty('totalAmountInclVat', POSEntry."Amount Incl. Tax");
 
-        KitchenOrderNo := KitchenPrintMgt.GetKitchenOrderId(POSEntry."Entry No.", KitchenOrderSystemId);
+        KitchenOrderNo := KitchenPrintMgt.GetKitchenOrderId(POSEntry."Entry No.", KitchenOrderSystemId, KitchenOrderDisplayNo);
         if KitchenOrderNo <> 0 then begin
             Json.AddProperty('kitchenOrderNo', Format(KitchenOrderNo));
             if not IsNullGuid(KitchenOrderSystemId) then
                 Json.AddProperty('kitchenOrderId', Format(KitchenOrderSystemId, 0, 4).ToLower());
+            if KitchenOrderDisplayNo <> 0 then
+                Json.AddProperty('kitchenOrderDisplayNo', KitchenOrderDisplayNo);
         end;
 
         Json.EndObject();

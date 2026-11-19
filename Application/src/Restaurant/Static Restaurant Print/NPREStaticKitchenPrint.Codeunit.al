@@ -88,7 +88,7 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
         if KitchenOrderIDs.Count() > 0 then begin
             Printer.SetBold(true);
             foreach KitchenOrderID in KitchenOrderIDs do
-                Printer.AddLine(StrSubstNo(KitchenOrderNoLbl, Format(KitchenOrderID, 0, 9)), 1);
+                Printer.AddLine(StrSubstNo(KitchenOrderNoLbl, KitchenPrintMgt.GetKitchenOrderDisplayText(KitchenOrderID)), 1);
             Printer.SetBold(false);
         end;
         Printer.AddLine(StrSubstNo(WaiterPadNoLbl, TempRestaurantPrintHeader."Waiter Pad No."), 1);

@@ -274,7 +274,7 @@ codeunit 6248576 "NPR Boca Static Sales Receipt"
         Printer.AddLine(OrderNoLbl, 1);
         Printer.SetFont(F8DoubleFontLbl);
         foreach KitchenOrderId in KitchenOrderIds do
-            Printer.AddLine(Format(KitchenOrderId, 0, 9), 1);
+            Printer.AddLine(KitchenPrintMgt.GetKitchenOrderDisplayText(KitchenOrderId), 1);
         Printer.SetFont(F8FontLbl);
         Printer.SetBold(false);
         Printer.AddLine('', 0);

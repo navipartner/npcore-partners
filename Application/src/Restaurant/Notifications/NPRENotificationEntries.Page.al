@@ -27,6 +27,11 @@ page 6184524 "NPR NPRE Notification Entries"
                     ApplicationArea = NPRRetail;
                     Editable = false;
                 }
+                field("Kitchen Display Order No."; Rec."Kitchen Display Order No.")
+                {
+                    ToolTip = 'Specifies the customer-facing order number of the kitchen order. Use field number 2 in SMS and e-mail templates to include it in the message.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Kitchen Request No."; Rec."Kitchen Request No.")
                 {
                     ToolTip = 'Specifies the kitchen request number for which this notification was created.';

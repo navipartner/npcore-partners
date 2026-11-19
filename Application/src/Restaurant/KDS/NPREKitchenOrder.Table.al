@@ -14,6 +14,12 @@
             Caption = 'Order ID';
             DataClassification = CustomerContent;
         }
+        field(2; "Display Order No."; Integer)
+        {
+            Caption = 'Display Order No.';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
         field(10; Status; Option)
         {
             Caption = 'Status';
@@ -93,7 +99,7 @@
         // Covers the KDS board and customer-display polls that filter the order's restaurant
         key(Key2; "Restaurant Code", "Order Status", Priority, "Created Date-Time")
         {
-            IncludedFields = "Expected Dine Date-Time", "Finished Date-Time";
+            IncludedFields = "Expected Dine Date-Time", "Finished Date-Time", "Display Order No.";
         }
         // Serves the readers that filter status with no restaurant filter on the order:
         // the station-filtered KDS branch, delayed-order notifications, the retention policy

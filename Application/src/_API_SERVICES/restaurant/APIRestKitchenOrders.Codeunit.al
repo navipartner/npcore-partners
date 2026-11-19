@@ -68,6 +68,7 @@ codeunit 6248638 "NPR API Rest. Kitchen Orders"
 
         KitchenOrder.SetLoadFields(
             "Order ID",
+            "Display Order No.",
             "Restaurant Code",
             "Order Status",
             Priority,
@@ -92,6 +93,7 @@ codeunit 6248638 "NPR API Rest. Kitchen Orders"
                 JsonArray.StartObject('')
                     .AddProperty('orderId', Format(KitchenOrder.SystemId, 0, 4).ToLower())
                     .AddProperty('orderNo', KitchenOrder."Order ID")
+                    .AddProperty('displayOrderNo', KitchenOrder."Display Order No.")
                     .AddProperty('restaurantCode', KitchenOrder."Restaurant Code")
                     .AddProperty('status', Format(KitchenOrder."Order Status"))
                     .AddProperty('priority', KitchenOrder.Priority)
@@ -141,6 +143,7 @@ codeunit 6248638 "NPR API Rest. Kitchen Orders"
         KitchenOrder.ReadIsolation := IsolationLevel::ReadCommitted;
         KitchenOrder.SetLoadFields(
             "Order ID",
+            "Display Order No.",
             "Restaurant Code",
             "Order Status",
             Priority,
@@ -158,6 +161,7 @@ codeunit 6248638 "NPR API Rest. Kitchen Orders"
         Json.StartObject('')
             .AddProperty('orderId', Format(KitchenOrder.SystemId, 0, 4).ToLower())
             .AddProperty('orderNo', KitchenOrder."Order ID")
+            .AddProperty('displayOrderNo', KitchenOrder."Display Order No.")
             .AddProperty('restaurantCode', KitchenOrder."Restaurant Code")
             .AddProperty('status', Format(KitchenOrder."Order Status"))
             .AddProperty('priority', KitchenOrder.Priority)

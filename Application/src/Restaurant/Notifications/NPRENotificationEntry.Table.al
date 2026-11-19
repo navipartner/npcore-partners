@@ -14,6 +14,13 @@ table 6150793 "NPR NPRE Notification Entry"
             Caption = 'Entry No.';
             DataClassification = CustomerContent;
         }
+        field(2; "Kitchen Display Order No."; Integer)
+        {
+            Caption = 'Kitchen Display Order No.';
+            FieldClass = FlowField;
+            CalcFormula = lookup("NPR NPRE Kitchen Order"."Display Order No." where("Order ID" = field("Kitchen Order ID")));
+            Editable = false;
+        }
         field(10; "Notification Trigger"; Enum "NPR NPRE Notification Trigger")
         {
             Caption = 'Notification Trigger';
