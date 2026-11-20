@@ -13,6 +13,9 @@ codeunit 85389 "NPR Spfy Order Import Tests"
         _AlterationItemNoLbl: Label 'T-SPFY-MMALTER', Locked = true;
         _MembershipIdLbl: Label '{6F9619FF-8B86-D011-B42D-00CF4FC964FF}', Locked = true;
         _OptionIdLbl: Label '{9A1C0E52-4A6D-4B2E-9C1E-2F0E5A7B3D41}', Locked = true;
+        _EditedOrderVoucherNoLbl: Label 'SPFYEDGC01', Locked = true;
+        _EditedOrderGiftCardIdLbl: Label '9274659', Locked = true;
+        _EditedOrderCardGatewayLbl: Label 'edited_order_card', Locked = true;
         _MessageCount: Integer;
         _LastMessageText: Text;
 
@@ -2375,6 +2378,148 @@ codeunit 85389 "NPR Spfy Order Import Tests"
     end;
 
     [Test]
+    procedure ClosedEntry_FirstImportClosed_EditedBelowGiftCard_GiftCardPaysWhatShopifyKept()
+    var
+        ClosedEntry: Record "NPR Spfy Event Log Entry";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        Voucher: Record "NPR NpRv Voucher";
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+        SpfyEventLogDocProcessr: Codeunit "NPR Spfy Event Log DocProcessr";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        RemovedSku: Code[20];
+        ShopifyId: Text[30];
+        ShippedLineId: Text[30];
+        RemovedLineId: Text[30];
+        AuthorizationId: Text[30];
+        GiftCardSaleId: Text[30];
+        GiftCardRefundId: Text[30];
+        Expected: Decimal;
+    begin
+        // [SCENARIO] An order first seen as Closed, edited down to 16.50 below its gift card payment of 100 with the 83.50 difference refunded to the gift card, is posted with the gift card paying 16.50 and the card nothing.
+        ShopifyId := '927465000001';
+        ShippedLineId := '927465000101';
+        RemovedLineId := '927465000201';
+        AuthorizationId := '927465000301';
+        GiftCardSaleId := '927465000302';
+        GiftCardRefundId := '927465000303';
+
+        // [GIVEN] a store that posts Shopify orders, a payment mapping for the card and a Shopify gift card voucher with 300 on it
+        PrepareGiftCardOrderStore(ShopifyId, AuthorizationId, GiftCardSaleId, GiftCardRefundId, StoreCode, Sku, RemovedSku);
+
+        // [GIVEN] a closed entry, and no earlier entry, for an order whose 16.50 line shipped and whose 732.60 line was removed, paid with a card authorization of 649.10 and a gift card sale of 100 of which 83.50 was refunded to the gift card
+        // The posting date comes from the entry, so it is kept on the work date.
+        InsertOrderEntryWithData(ClosedEntry, StoreCode, ShopifyId, "NPR SpfyAPIDocumentStatus"::Closed, CreateDateTime(WorkDate(), 120000T),
+            GiftCardEditedDownOrderJson(ShopifyId, ShippedLineId, Sku, RemovedLineId, RemovedSku, AuthorizationId, GiftCardSaleId, GiftCardRefundId, 83.5));
+        Commit(); // processing reads the result of Codeunit.Run, which the platform only allows outside a write transaction
+
+        // [WHEN] the closed entry is processed
+        SpfyEventLogDocProcessr.ProcessLogEntries(ClosedEntry);
+
+        // [THEN] the entry completed without an error
+        AssertEntryProcessedWithoutError(ClosedEntry."Entry No.");
+
+        // [THEN] one invoice of 16.50 was posted from the sales order the import created
+        FindEcomOrder(ShopifyId, EcomSalesHeader);
+        _Assert.AreNotEqual('', EcomSalesHeader."Created Doc No.", 'The import must have created a sales order.');
+        SalesInvoiceHeader.SetRange("Order No.", EcomSalesHeader."Created Doc No.");
+        _Assert.AreEqual(1, SalesInvoiceHeader.Count(), 'The shipped line must have been invoiced once.');
+        SalesInvoiceHeader.FindFirst();
+        SalesInvoiceHeader.CalcFields("Amount Including VAT");
+        Expected := 16.5;
+        _Assert.AreEqual(Expected, SalesInvoiceHeader."Amount Including VAT", 'Only the shipped line may be invoiced.');
+
+        // [THEN] the gift card pays the 16.50 on the invoice and the card pays nothing
+        _Assert.AreEqual(Expected, PaymentLinesAmount(Database::"Sales Invoice Header", Enum::"Sales Document Type".FromInteger(0), SalesInvoiceHeader."No.", Enum::"NPR Magento Payment Type"::Voucher), 'The gift card must pay the invoice with what Shopify kept of it.');
+        Expected := 0;
+        _Assert.AreEqual(Expected, PaymentLinesAmount(Database::"Sales Invoice Header", Enum::"Sales Document Type".FromInteger(0), SalesInvoiceHeader."No.", Enum::"NPR Magento Payment Type"::"Payment Method"), 'The card must pay nothing on an invoice the gift card covers.');
+
+        // [THEN] the voucher was redeemed for 16.50 only, so the 83.50 Shopify refunded stays on it and nothing is left reserved
+        VoucherEntry.SetRange("Voucher No.", _EditedOrderVoucherNoLbl);
+        VoucherEntry.SetRange("Entry Type", VoucherEntry."Entry Type"::Payment);
+        VoucherEntry.CalcSums(Amount);
+        Expected := -16.5;
+        _Assert.AreEqual(Expected, VoucherEntry.Amount, 'The voucher must be redeemed for what the invoice took from the gift card.');
+        Voucher.Get(_EditedOrderVoucherNoLbl);
+        Voucher.CalcFields(Amount);
+        Expected := 283.5;
+        _Assert.AreEqual(Expected, Voucher.Amount, 'The voucher must keep the 83.50 Shopify refunded to the gift card.');
+        NpRvSalesLine.SetRange("Voucher No.", _EditedOrderVoucherNoLbl);
+        NpRvSalesLine.SetRange(Posted, false);
+        NpRvSalesLine.CalcSums(Amount);
+        Expected := 0;
+        _Assert.AreEqual(Expected, NpRvSalesLine.Amount, 'Nothing may stay reserved on the voucher once the order is invoiced.');
+
+        CleanupGiftCardOrder(ShopifyId, AuthorizationId, GiftCardSaleId, GiftCardRefundId);
+    end;
+
+    [Test]
+    procedure ClosedEntry_FirstImportClosed_GiftCardKeepsMoreThanTheOrder_IsRefused()
+    var
+        ClosedEntry: Record "NPR Spfy Event Log Entry";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        SalesHeader: Record "Sales Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+        SpfyEventLogDocProcessr: Codeunit "NPR Spfy Event Log DocProcessr";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        RemovedSku: Code[20];
+        ShopifyId: Text[30];
+        ShippedLineId: Text[30];
+        RemovedLineId: Text[30];
+        AuthorizationId: Text[30];
+        GiftCardSaleId: Text[30];
+        GiftCardRefundId: Text[30];
+        Expected: Decimal;
+    begin
+        // [SCENARIO] An order first seen as Closed, edited down to 16.50 while Shopify refunded only 50 of its gift card payment of 100, is refused at posting, because the gift card would pay 50 for an order of 16.50.
+        ShopifyId := '927465000002';
+        ShippedLineId := '927465000102';
+        RemovedLineId := '927465000202';
+        AuthorizationId := '927465000311';
+        GiftCardSaleId := '927465000312';
+        GiftCardRefundId := '927465000313';
+
+        // [GIVEN] a store that posts Shopify orders, a payment mapping for the card and a Shopify gift card voucher with 300 on it
+        PrepareGiftCardOrderStore(ShopifyId, AuthorizationId, GiftCardSaleId, GiftCardRefundId, StoreCode, Sku, RemovedSku);
+
+        // [GIVEN] a closed entry, and no earlier entry, for an order whose 16.50 line shipped and whose 732.60 line was removed, paid with a card authorization of 649.10 and a gift card sale of 100 of which only 50 was refunded to the gift card
+        // The posting date comes from the entry, so it is kept on the work date.
+        InsertOrderEntryWithData(ClosedEntry, StoreCode, ShopifyId, "NPR SpfyAPIDocumentStatus"::Closed, CreateDateTime(WorkDate(), 120000T),
+            GiftCardEditedDownOrderJson(ShopifyId, ShippedLineId, Sku, RemovedLineId, RemovedSku, AuthorizationId, GiftCardSaleId, GiftCardRefundId, 50));
+        Commit(); // processing reads the result of Codeunit.Run, which the platform only allows outside a write transaction
+
+        // [WHEN] the closed entry is processed
+        SpfyEventLogDocProcessr.ProcessLogEntries(ClosedEntry);
+
+        // [THEN] the entry failed with an error and nothing was invoiced
+        ClosedEntry.Get(ClosedEntry."Entry No.");
+        _Assert.AreEqual(ClosedEntry."Processing Status"::Error, ClosedEntry."Processing Status", 'An order the gift card would overpay must fail the entry.');
+        _Assert.AreNotEqual('', ClosedEntry."Last Error Message", 'The entry must carry the posting error.');
+        FindEcomOrder(ShopifyId, EcomSalesHeader);
+        _Assert.AreNotEqual('', EcomSalesHeader."Created Doc No.", 'The import must have created a sales order.');
+        SalesInvoiceHeader.SetRange("Order No.", EcomSalesHeader."Created Doc No.");
+        _Assert.IsTrue(SalesInvoiceHeader.IsEmpty(), 'Nothing may be invoiced while the gift card would pay more than the order.');
+
+        // [THEN] the sales order stays as refreshed right before posting: its voucher line holds the 50 Shopify kept on the gift card and its card line nothing
+        _Assert.IsTrue(SalesHeader.Get(SalesHeader."Document Type"::Order, EcomSalesHeader."Created Doc No."), 'The sales order must be kept when posting is refused.');
+        Expected := 50;
+        _Assert.AreEqual(Expected, PaymentLinesAmount(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", Enum::"NPR Magento Payment Type"::Voucher), 'The voucher line must hold what Shopify kept on the gift card.');
+        Expected := 0;
+        _Assert.AreEqual(Expected, PaymentLinesAmount(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", Enum::"NPR Magento Payment Type"::"Payment Method"), 'The card must pay nothing on an order the gift card covers.');
+
+        // [THEN] the voucher was not redeemed
+        VoucherEntry.SetRange("Voucher No.", _EditedOrderVoucherNoLbl);
+        VoucherEntry.SetRange("Entry Type", VoucherEntry."Entry Type"::Payment);
+        _Assert.IsTrue(VoucherEntry.IsEmpty(), 'A refused order must not redeem the voucher.');
+
+        CleanupGiftCardOrder(ShopifyId, AuthorizationId, GiftCardSaleId, GiftCardRefundId);
+    end;
+
+    [Test]
     procedure ClosedEntry_PartiallyInvoiced_NothingMoreToPost_KeepsSalesOrder()
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
@@ -2622,6 +2767,170 @@ codeunit 85389 "NPR Spfy Order Import Tests"
         _Assert.AreEqual(LogEntry."Processing Status"::Processed, LogEntry."Processing Status", 'The entry must end as Processed.');
         _Assert.IsFalse(LogEntry.Postponed, 'The entry must not be postponed.');
         _Assert.AreEqual('', LogEntry."Last Error Message", 'The entry must not carry an error.');
+    end;
+
+    /// <summary>Removes what an earlier run of the same test committed, then sets up the store with "Delete After Final Post" on so
+    /// that it posts real payment lines: stock for the shipped item, a payment mapping for the card and a Shopify gift card voucher
+    /// with 300 on it.</summary>
+    local procedure PrepareGiftCardOrderStore(ShopifyId: Text[30]; AuthorizationId: Text[30]; GiftCardSaleId: Text[30]; GiftCardRefundId: Text[30]; var StoreCode: Code[20]; var Sku: Code[20]; var RemovedSku: Code[20])
+    var
+        Item: Record Item;
+        PaymentMapping: Record "NPR Magento Payment Mapping";
+        PaymentMethod: Record "Payment Method";
+        SalesReceivablesSetup: Record "Sales & Receivables Setup";
+        SpfyStore: Record "NPR Spfy Store";
+        Voucher: Record "NPR NpRv Voucher";
+        VoucherType: Record "NPR NpRv Voucher Type";
+        LibraryECommerce: Codeunit "NPR Library - E-Commerce";
+        LibraryERM: Codeunit "Library - ERM";
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibrarySales: Codeunit "Library - Sales";
+        LibrarySpfyVoucher: Codeunit "NPR Library - Spfy Voucher";
+        NpRvModulePayShopify: Codeunit "NPR NpRv Module Pay. - Shopify";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        ExternalPaymentType: Text;
+        PaymentMethodTok: Label 'SPFYEDCARD', Locked = true;
+        VoucherTypeTok: Label 'SPFYEDGC', Locked = true;
+        VoucherReferenceNoTok: Label 'SPFYEDGCREF01', Locked = true;
+        ExternalPaymentTypeTok: Label '%1_%2', Locked = true;
+    begin
+        CleanupGiftCardOrder(ShopifyId, AuthorizationId, GiftCardSaleId, GiftCardRefundId);
+        PrepareStoreThatDeletesAfterFinalPost(ShopifyId, StoreCode, Sku);
+        LibraryInventory.CreateItem(Item);
+        RemovedSku := Item."No.";
+        LibraryECommerce.IncreaseItemInventoryOnLocation(Sku, 10, 'SPFYLOC');
+        SalesReceivablesSetup.Get();
+        if (SalesReceivablesSetup."Posted Invoice Nos." = '') or (SalesReceivablesSetup."Posted Shipment Nos." = '') then
+            LibrarySales.SetPostedNoSeriesInSetup();
+
+        // The order is in the local currency, so the sales order carries no currency code.
+        SpfyStore.Get(StoreCode);
+        SpfyStore."Currency Blank for LCY" := true;
+        SpfyStore.Modify();
+
+        if not PaymentMethod.Get(PaymentMethodTok) then begin
+            PaymentMethod.Init();
+            PaymentMethod.Code := PaymentMethodTok;
+            PaymentMethod.Description := 'Web shop card';
+            PaymentMethod."Bal. Account Type" := PaymentMethod."Bal. Account Type"::"G/L Account";
+            PaymentMethod."Bal. Account No." := LibraryERM.CreateGLAccountNoWithDirectPosting();
+            PaymentMethod.Insert();
+        end;
+        ExternalPaymentType := LowerCase(StrSubstNo(ExternalPaymentTypeTok, StoreCode, _EditedOrderCardGatewayLbl));
+        if not PaymentMapping.Get('Shopify', ExternalPaymentType) then begin
+            PaymentMapping.Init();
+            PaymentMapping."External Payment Method Code" := 'Shopify';
+            PaymentMapping."External Payment Type" := CopyStr(ExternalPaymentType, 1, MaxStrLen(PaymentMapping."External Payment Type"));
+            PaymentMapping."Payment Method Code" := PaymentMethod.Code;
+            PaymentMapping.Insert();
+        end;
+
+        // A Shopify gift card pays only what the order needs and keeps the rest; the default module would take the whole voucher and issue a return voucher.
+        LibrarySpfyVoucher.CreateVoucherType(VoucherTypeTok, StoreCode, VoucherType);
+        VoucherType."Apply Payment Module" := NpRvModulePayShopify.ModuleCode();
+        VoucherType.Modify();
+        LibrarySpfyVoucher.CreateVoucher(_EditedOrderVoucherNoLbl, VoucherType.Code, VoucherReferenceNoTok, 300, Voucher);
+        LibrarySpfyVoucher.SetVoucherSendFromShopify(Voucher, false);
+        SpfyAssignedIDMgt.AssignShopifyID(Voucher.RecordId(), "NPR Spfy ID Type"::"Entry ID", _EditedOrderGiftCardIdLbl, false);
+    end;
+
+    /// <summary>Shopify's order as it is stored on the event log entry: a shipped line, a removed line, and a card authorization
+    /// held open in full next to a gift card sale of 100 that Shopify partly refunded to the gift card.</summary>
+    local procedure GiftCardEditedDownOrderJson(ShopifyId: Text; ShippedLineId: Text; ShippedSku: Code[20]; RemovedLineId: Text; RemovedSku: Code[20]; AuthorizationId: Text; GiftCardSaleId: Text; GiftCardRefundId: Text; GiftCardRefundAmount: Decimal) OrderResponse: JsonToken
+    var
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        OrderToken: JsonToken;
+        Fulfillments: JsonArray;
+        Transactions: JsonArray;
+        ShippedLinePrice: Decimal;
+        FulfillmentsTok: Label '[{"id":"gid://shopify/Fulfillment/1","status":"SUCCESS","displayStatus":"FULFILLED","createdAt":"2026-10-08T14:00:00Z","updatedAt":"2026-10-08T14:00:01Z","orderId":"gid://shopify/Order/%1","fulfillmentLineItems":[{"cursor":"a","node":{"id":"gid://shopify/FulfillmentLineItem/1","quantity":1,"lineItem":{"id":"gid://shopify/LineItem/%2","currentQuantity":1,"variant":{"price":"%3"},"unfulfilledQuantity":0,"nonFulfillableQuantity":0,"isGiftCard":false,"originalUnitPriceSet":{"presentmentMoney":{"amount":"%3"}}}}}]}]', Locked = true;
+        AuthorizationTok: Label '{"id":"gid://shopify/OrderTransaction/%1","kind":"AUTHORIZATION","status":"SUCCESS","gateway":"%2","paymentId":"pay-%1","processedAt":"2026-10-08T13:39:20Z","amountSet":%3,"totalUnsettledSet":%3,"receiptJson":"{}"}', Locked = true;
+        GiftCardSaleTok: Label '{"id":"gid://shopify/OrderTransaction/%1","kind":"SALE","status":"SUCCESS","gateway":"gift_card","processedAt":"2026-10-08T13:39:19Z","amountSet":%2,"receiptJson":"{\"gift_card_id\":\"gid://shopify/GiftCard/%3\"}"}', Locked = true;
+        GiftCardRefundTok: Label '{"id":"gid://shopify/OrderTransaction/%1","kind":"REFUND","status":"SUCCESS","gateway":"gift_card","processedAt":"2026-10-09T09:00:00Z","parentTransaction":{"id":"gid://shopify/OrderTransaction/%2","kind":"SALE"},"amountSet":%3,"receiptJson":"{}"}', Locked = true;
+        TransactionsTok: Label '[%1,%2,%3]', Locked = true;
+    begin
+        ShippedLinePrice := 16.5;
+        OrderResponse := LibrarySpfyImport.WrapOrderText(ShopifyId,
+            '[' + LibrarySpfyImport.ItemLineNodeText(ShippedLineId, ShippedSku, ShippedLinePrice, 1, 0, '[]') + ',' + LibrarySpfyImport.RemovedLineNodeText(RemovedLineId, RemovedSku, 732.6, 1, false, 1, 0) + ']', '[]');
+        OrderResponse.SelectToken('data.order', OrderToken);
+
+        Fulfillments.ReadFrom(StrSubstNo(FulfillmentsTok, ShopifyId, ShippedLineId, Format(ShippedLinePrice, 0, 9)));
+        OrderToken.AsObject().Add('fulfillments', Fulfillments);
+
+        Transactions.ReadFrom(StrSubstNo(TransactionsTok,
+            StrSubstNo(AuthorizationTok, AuthorizationId, _EditedOrderCardGatewayLbl, MoneySetJson(649.1)),
+            StrSubstNo(GiftCardSaleTok, GiftCardSaleId, MoneySetJson(100), _EditedOrderGiftCardIdLbl),
+            StrSubstNo(GiftCardRefundTok, GiftCardRefundId, GiftCardSaleId, MoneySetJson(GiftCardRefundAmount))));
+        OrderToken.AsObject().Replace('transactions', Transactions);
+    end;
+
+    /// <summary>A Shopify money set in the local currency, so amounts post unconverted.</summary>
+    local procedure MoneySetJson(Amount: Decimal): Text
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        MoneySetTok: Label '{"presentmentMoney":{"amount":"%1","currencyCode":"%2"},"shopMoney":{"amount":"%1","currencyCode":"%2"}}', Locked = true;
+    begin
+        GeneralLedgerSetup.Get();
+        exit(StrSubstNo(MoneySetTok, Format(Amount, 0, 9), GeneralLedgerSetup."LCY Code"));
+    end;
+
+    local procedure PaymentLinesAmount(DocumentTableNo: Integer; DocumentType: Enum "Sales Document Type"; DocumentNo: Code[20]; PaymentType: Enum "NPR Magento Payment Type"): Decimal
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+    begin
+        PaymentLine.SetRange("Document Table No.", DocumentTableNo);
+        PaymentLine.SetRange("Document Type", DocumentType);
+        PaymentLine.SetRange("Document No.", DocumentNo);
+        PaymentLine.SetRange("Payment Type", PaymentType);
+        PaymentLine.CalcSums(Amount);
+        exit(PaymentLine.Amount);
+    end;
+
+    /// <summary>Removes what the gift card order tests commit: the order's sales documents, log entries and Ecommerce document, the
+    /// links of its posted documents and of its transactions' payment lines, and the gift card voucher with its entries and
+    /// reservations.</summary>
+    local procedure CleanupGiftCardOrder(ShopifyId: Text[30]; AuthorizationId: Text[30]; GiftCardSaleId: Text[30]; GiftCardRefundId: Text[30])
+    var
+        EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
+        Voucher: Record "NPR NpRv Voucher";
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        TransactionIds: List of [Text[30]];
+        TransactionId: Text[30];
+    begin
+        LibrarySpfyImport.CleanupCommittedPostedOrderIds(ShopifyId);
+        LibrarySpfyImport.CleanupCommittedSimpleItemOrder(ShopifyId);
+
+        // The Ecommerce document goes without its payment lines, and the import refuses a payment line whose Shopify id already exists.
+        EcomSalesPmtLine.SetFilter("Shopify ID", '%1|%2|%3', AuthorizationId, GiftCardSaleId, GiftCardRefundId);
+        if not EcomSalesPmtLine.IsEmpty() then
+            EcomSalesPmtLine.DeleteAll();
+
+        // A transaction's line on an earlier run's invoice would count as already taken from it.
+        TransactionIds.Add(AuthorizationId);
+        TransactionIds.Add(GiftCardSaleId);
+        TransactionIds.Add(GiftCardRefundId);
+        foreach TransactionId in TransactionIds do begin
+            SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"NPR Magento Payment Line", "NPR Spfy ID Type"::"Entry ID", TransactionId, ShopifyAssignedID);
+            if not ShopifyAssignedID.IsEmpty() then
+                ShopifyAssignedID.DeleteAll();
+        end;
+
+        VoucherEntry.SetRange("Voucher No.", _EditedOrderVoucherNoLbl);
+        if not VoucherEntry.IsEmpty() then
+            VoucherEntry.DeleteAll();
+        NpRvSalesLine.SetRange("Voucher No.", _EditedOrderVoucherNoLbl);
+        if not NpRvSalesLine.IsEmpty() then
+            NpRvSalesLine.DeleteAll();
+        if Voucher.Get(_EditedOrderVoucherNoLbl) then
+            Voucher.Delete();
+        SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"NPR NpRv Voucher", "NPR Spfy ID Type"::"Entry ID", _EditedOrderGiftCardIdLbl, ShopifyAssignedID);
+        if not ShopifyAssignedID.IsEmpty() then
+            ShopifyAssignedID.DeleteAll();
+        Commit();
     end;
 
     // The test store has no payment mapping or gateway, and these tests are about the sales order, not its payments.

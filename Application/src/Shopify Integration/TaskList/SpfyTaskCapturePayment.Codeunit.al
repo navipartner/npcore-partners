@@ -563,6 +563,7 @@ codeunit 6151485 "NPR Spfy Task Capture Payment"
         DocumentTotal := PaymentLineParam.Amount;
         _SpfyPaymentGatewayHdlr.CollectOpenAuthorizations(SpfyTransactionBuffer, OrderTransactions, PaymentLineParam."Document Table No.", PaymentLineParam."Document No.", OpenAuthorizations, CapturedAuthorizations);
         _SpfyPaymentGatewayHdlr.CapUncapturedLinesToAuthorizations(DocPaymentLine, OpenAuthorizations);
+        _SpfyPaymentGatewayHdlr.CutRefundedSettledLines(DocPaymentLine, PaymentLineParam."Document Table No.", PaymentLineParam."Document Type", PaymentLineParam."Document No.", DocumentTotal, SpfyTransactionBuffer, OrderTransactions, OpenAuthorizations, CapturedAuthorizations);
 
         // Lines of fully refunded transactions go first, so the next passes size against what stays on the document. Money Shopify has
         // already taken (gift cards, sales, captured authorizations) then goes on the document before the authorizations it still holds open.

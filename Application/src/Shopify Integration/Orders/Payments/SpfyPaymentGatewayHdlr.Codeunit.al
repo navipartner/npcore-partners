@@ -471,26 +471,62 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
         exit(SmallerOf(
             SpfyTransactionBuffer."Amount (PCY)",
             SpfyTransactionBuffer."Amount (PCY)" - AmountTakenOnOtherInvoices(SpfyTransactionBuffer."Transaction ID", DocumentTableNo, DocumentNo) +
-                RefundsBookedOnCreditDocuments(OrderTransactions, SpfyTransactionBuffer."Transaction ID")));
+                RefundsOf(OrderTransactions, SpfyTransactionBuffer."Transaction ID", true)));
     end;
 
-    local procedure RefundsBookedOnCreditDocuments(OrderTransactions: JsonArray; ParentTransactionID: Text[30]) BookedAmount: Decimal
+    /// <summary>
+    /// As AmountLeftAfterOtherInvoices, for what Shopify captured of an authorization. Shopify parents a refund of captured money to the capture, so the refunds of its
+    /// captures come off what Shopify captured. While the authorization is still open, an other invoice's line counts only once BC captured it, because only then is
+    /// its money among the captures.
+    /// </summary>
+    local procedure CapturedAmountLeft(OrderTransactions: JsonArray; AuthorizationID: Text[30]; DocumentTableNo: Integer; DocumentNo: Code[20]; AuthorizationIsOpen: Boolean): Decimal
     var
         JsonHelper: Codeunit "NPR Json Helper";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         OrderTransaction: JsonToken;
+        CaptureID: Text[30];
+        BookedAmount: Decimal;
+        CapturedAmount: Decimal;
+        NetAmount: Decimal;
+        RefundedAmount: Decimal;
+        CaptureKindTok: Label 'CAPTURE', Locked = true;
+    begin
+        RefundedAmount := RefundsOf(OrderTransactions, AuthorizationID, false);
+        BookedAmount := RefundsOf(OrderTransactions, AuthorizationID, true);
+        foreach OrderTransaction in OrderTransactions do
+            if IsSuccessfulChild(OrderTransaction, CaptureKindTok, AuthorizationID) then begin
+                CapturedAmount += JsonHelper.GetJDecimal(OrderTransaction, 'amountSet.presentmentMoney.amount', false);
+#pragma warning disable AA0139
+                CaptureID := SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(OrderTransaction, 'id', false), '/');
+#pragma warning restore AA0139
+                RefundedAmount += RefundsOf(OrderTransactions, CaptureID, false);
+                BookedAmount += RefundsOf(OrderTransactions, CaptureID, true);
+            end;
+        NetAmount := CapturedAmount - RefundedAmount;
+        exit(SmallerOf(NetAmount, NetAmount - AmountTakenOnOtherInvoices(AuthorizationID, DocumentTableNo, DocumentNo, AuthorizationIsOpen) + BookedAmount));
+    end;
+
+    /// <summary>
+    /// The successful refunds of a transaction, or only those a credit document already booked.
+    /// </summary>
+    local procedure RefundsOf(OrderTransactions: JsonArray; ParentTransactionID: Text[30]; OnlyBookedOnCreditDocuments: Boolean) RefundedAmount: Decimal
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        OrderTransaction: JsonToken;
+        Counted: Boolean;
         RefundKindTok: Label 'REFUND', Locked = true;
-        SuccessStatusTok: Label 'SUCCESS', Locked = true;
     begin
         foreach OrderTransaction in OrderTransactions do
-            if (JsonHelper.GetJText(OrderTransaction, 'kind', false).ToUpper() = RefundKindTok) and
-               (JsonHelper.GetJText(OrderTransaction, 'status', false).ToUpper() = SuccessStatusTok) and
-               (SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(OrderTransaction, 'parentTransaction.id', false), '/') = ParentTransactionID)
-            then
+            if IsSuccessfulChild(OrderTransaction, RefundKindTok, ParentTransactionID) then begin
+                Counted := true;
+                if OnlyBookedOnCreditDocuments then
 #pragma warning disable AA0139
-                if IsBookedOnCreditDocument(SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(OrderTransaction, 'id', false), '/')) then
+                    Counted := IsBookedOnCreditDocument(SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(OrderTransaction, 'id', false), '/'));
 #pragma warning restore AA0139
-                    BookedAmount += JsonHelper.GetJDecimal(OrderTransaction, 'amountSet.presentmentMoney.amount', false);
+                if Counted then
+                    RefundedAmount += JsonHelper.GetJDecimal(OrderTransaction, 'amountSet.presentmentMoney.amount', false);
+            end;
     end;
 
     /// <summary>
@@ -523,7 +559,12 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
     /// What the payment lines on posted invoices other than the given document already took from a Shopify transaction.
     /// A sales order's own lines are left out: they hold only what its invoices have not taken yet.
     /// </summary>
-    local procedure AmountTakenOnOtherInvoices(TransactionID: Text[30]; DocumentTableNo: Integer; DocumentNo: Code[20]) TakenAmount: Decimal
+    local procedure AmountTakenOnOtherInvoices(TransactionID: Text[30]; DocumentTableNo: Integer; DocumentNo: Code[20]): Decimal
+    begin
+        exit(AmountTakenOnOtherInvoices(TransactionID, DocumentTableNo, DocumentNo, false));
+    end;
+
+    local procedure AmountTakenOnOtherInvoices(TransactionID: Text[30]; DocumentTableNo: Integer; DocumentNo: Code[20]; OnlyCapturedLines: Boolean) TakenAmount: Decimal
     var
         PaymentLine: Record "NPR Magento Payment Line";
         ShopifyAssignedID: Record "NPR Spfy Assigned ID";
@@ -536,7 +577,8 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
                     if (PaymentLine."Document Table No." = Database::"Sales Invoice Header") and
                        ((DocumentTableNo <> Database::"Sales Invoice Header") or (PaymentLine."Document No." <> DocumentNo))
                     then
-                        TakenAmount += PaymentLine.Amount;
+                        if not OnlyCapturedLines or (PaymentLine."Date Captured" <> 0D) then
+                            TakenAmount += PaymentLine.Amount;
             until ShopifyAssignedID.Next() = 0;
     end;
 
@@ -582,6 +624,226 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
                         SetUncapturedLineAmount(PaymentLine, AuthorizationAmountLeft);
                 end;
             until PaymentLine.Next() = 0;
+    end;
+
+    /// <summary>
+    /// Brings the lines of money Shopify already took (gift cards, sales, captured authorizations, and what BC captured of an open authorization)
+    /// in line with what each transaction has left after its refunds and other invoices, on an unposted order or invoice. While the lines exceed
+    /// what the document has left to invoice, a transaction's lines are cut, last line first, until together they hold no more than the transaction
+    /// has left. A voucher line BC already redeemed at capture counts toward its transaction but is never cut. Card lines BC may still fit
+    /// (uncaptured, unrequested open authorizations) are fitted afterwards, so they are left out. A refund within the order total stays for its
+    /// credit memo. Whether or not anything was cut, no line asks for more than its transaction has left, so a release cannot grow it back.
+    /// </summary>
+    internal procedure CutRefundedSettledLines(var DocPaymentLine: Record "NPR Magento Payment Line"; DocumentTableNo: Integer; DocumentType: Enum "Sales Document Type"; DocumentNo: Code[20]; DocumentTotal: Decimal; var SpfyTransactionBuffer: Record "NPR Spfy Transaction Buffer"; OrderTransactions: JsonArray; OpenAuthorizations: Dictionary of [Text, Decimal]; CapturedAuthorizations: Dictionary of [Text, Decimal])
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        TransactionHeld: Dictionary of [Text, Decimal];
+        TransactionLeft: Dictionary of [Text, Decimal];
+        CapturedOpenAuthorizations: List of [Text];
+        TransactionIDs: List of [Text];
+        TransactionID: Text[30];
+        TransactionKey: Text;
+        Cut: Decimal;
+        Excess: Decimal;
+        Pass: Integer;
+    begin
+        // A posted invoice's lines are booked; a refund after posting goes through a credit memo. A credit document's lines are refunds.
+        if DocumentTableNo <> Database::"Sales Header" then
+            exit;
+        if not (DocumentType in [DocumentType::Order, DocumentType::Invoice]) then
+            exit;
+
+        foreach TransactionKey in OpenAuthorizations.Keys() do
+            if SuccessfullyCapturedAmount(OrderTransactions, CopyStr(TransactionKey, 1, MaxStrLen(TransactionID))) > 0 then
+                CapturedOpenAuthorizations.Add(TransactionKey);
+
+        // One transaction can have several lines on the document, for example a gift card line BC captured for virtual items and one for the rest.
+        PaymentLine.CopyFilters(DocPaymentLine);
+        PaymentLine.SetRange(Posted, false);
+        PaymentLine.Ascending(false);
+        if PaymentLine.FindSet() then
+            repeat
+                if SettledTransactionOfLine(PaymentLine, SpfyTransactionBuffer, OpenAuthorizations, CapturedAuthorizations, CapturedOpenAuthorizations, TransactionID) then begin
+                    if not TransactionLeft.ContainsKey(TransactionID) then begin
+                        TransactionLeft.Add(TransactionID, SettledAmountLeft(TransactionID, DocumentTableNo, DocumentNo, SpfyTransactionBuffer, OrderTransactions, OpenAuthorizations, CapturedAuthorizations));
+                        TransactionHeld.Add(TransactionID, 0);
+                        TransactionIDs.Add(TransactionID);
+                    end;
+                    TransactionHeld.Set(TransactionID, TransactionHeld.Get(TransactionID) + PaymentLine.Amount);
+                end;
+            until PaymentLine.Next() = 0;
+
+        DocPaymentLine.CalcSums(Amount);
+        Excess := DocPaymentLine.Amount - AmountOnOpenAuthorizationLines(DocPaymentLine, OpenAuthorizations) - DocumentTotal;
+        // Transactions with nothing left give way first, so their room is never taken from a partly refunded one.
+        for Pass := 1 to 2 do
+            foreach TransactionKey in TransactionIDs do
+                if (Excess > 0) and ((Pass = 1) = (TransactionLeft.Get(TransactionKey) = 0)) then begin
+                    Cut := CutTransactionLines(DocPaymentLine, TransactionKey, SmallerOf(TransactionHeld.Get(TransactionKey) - TransactionLeft.Get(TransactionKey), Excess), SpfyTransactionBuffer, OpenAuthorizations, CapturedAuthorizations, CapturedOpenAuthorizations);
+                    TransactionHeld.Set(TransactionKey, TransactionHeld.Get(TransactionKey) - Cut);
+                    Excess -= Cut;
+                end;
+
+        foreach TransactionKey in TransactionIDs do
+            CapRequestedAmounts(DocPaymentLine, TransactionKey, TransactionLeft.Get(TransactionKey) - TransactionHeld.Get(TransactionKey), SpfyTransactionBuffer, OpenAuthorizations, CapturedAuthorizations, CapturedOpenAuthorizations);
+    end;
+
+    /// <summary>
+    /// The Shopify transaction of money already taken that the line holds. On an authorization Shopify still holds open, only a line BC captured
+    /// holds money taken, and only once Shopify reports a capture of it (a line marked captured with no capture took nothing yet); the other
+    /// lines are fitted to the document afterwards. False for a line without a transaction in the buffer.
+    /// </summary>
+    local procedure SettledTransactionOfLine(PaymentLine: Record "NPR Magento Payment Line"; var SpfyTransactionBuffer: Record "NPR Spfy Transaction Buffer"; OpenAuthorizations: Dictionary of [Text, Decimal]; CapturedAuthorizations: Dictionary of [Text, Decimal]; CapturedOpenAuthorizations: List of [Text]; var TransactionID: Text[30]): Boolean
+    var
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        TransactionID := CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(PaymentLine.RecordId(), "NPR Spfy ID Type"::"Entry ID"), 1, MaxStrLen(TransactionID));
+        if TransactionID = '' then
+            exit(false);
+        if OpenAuthorizations.ContainsKey(TransactionID) then
+            exit((PaymentLine."Date Captured" <> 0D) and CapturedOpenAuthorizations.Contains(TransactionID));
+        if CapturedAuthorizations.ContainsKey(TransactionID) then
+            exit(true);
+        exit(SpfyTransactionBuffer.Get(TransactionID));
+    end;
+
+    /// <summary>
+    /// What a transaction of money Shopify has already taken has left for the document after its refunds and other invoices, never below zero.
+    /// </summary>
+    local procedure SettledAmountLeft(TransactionID: Text[30]; DocumentTableNo: Integer; DocumentNo: Code[20]; var SpfyTransactionBuffer: Record "NPR Spfy Transaction Buffer"; OrderTransactions: JsonArray; OpenAuthorizations: Dictionary of [Text, Decimal]; CapturedAuthorizations: Dictionary of [Text, Decimal]) AmountLeft: Decimal
+    begin
+        if OpenAuthorizations.ContainsKey(TransactionID) then
+            AmountLeft := CapturedAmountLeft(OrderTransactions, TransactionID, DocumentTableNo, DocumentNo, true)
+        else
+            if CapturedAuthorizations.ContainsKey(TransactionID) then
+                AmountLeft := CapturedAmountLeft(OrderTransactions, TransactionID, DocumentTableNo, DocumentNo, false)
+            else begin
+                SpfyTransactionBuffer.Get(TransactionID);
+                AmountLeft := AmountLeftAfterOtherInvoices(SpfyTransactionBuffer, OrderTransactions, DocumentTableNo, DocumentNo);
+            end;
+        if AmountLeft < 0 then
+            AmountLeft := 0;
+    end;
+
+    /// <summary>
+    /// Cuts the transaction's lines, last line first, by up to the given amount, and returns what was cut.
+    /// </summary>
+    local procedure CutTransactionLines(var DocPaymentLine: Record "NPR Magento Payment Line"; TransactionKey: Text; CutWanted: Decimal; var SpfyTransactionBuffer: Record "NPR Spfy Transaction Buffer"; OpenAuthorizations: Dictionary of [Text, Decimal]; CapturedAuthorizations: Dictionary of [Text, Decimal]; CapturedOpenAuthorizations: List of [Text]) Cut: Decimal
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        TransactionID: Text[30];
+        LineCut: Decimal;
+    begin
+        if CutWanted <= 0 then
+            exit(0);
+        PaymentLine.CopyFilters(DocPaymentLine);
+        PaymentLine.SetRange(Posted, false);
+        PaymentLine.Ascending(false);
+        if PaymentLine.FindSet(true) then
+            repeat
+                if IsCuttable(PaymentLine) and (PaymentLine.Amount > 0) then
+                    if SettledTransactionOfLine(PaymentLine, SpfyTransactionBuffer, OpenAuthorizations, CapturedAuthorizations, CapturedOpenAuthorizations, TransactionID) then
+                        if TransactionID = TransactionKey then begin
+                            LineCut := SmallerOf(PaymentLine.Amount, CutWanted - Cut);
+                            CutSettledLine(PaymentLine, LineCut);
+                            Cut += LineCut;
+                        end;
+            until (PaymentLine.Next() = 0) or (Cut >= CutWanted);
+    end;
+
+    /// <summary>
+    /// Lowers the requested amount of the transaction's lines, first line first, so that together they ask for no more than the transaction has
+    /// left beyond what they hold. A line keeps asking for at least its amount: a refund within the order total stays for its credit memo.
+    /// </summary>
+    local procedure CapRequestedAmounts(var DocPaymentLine: Record "NPR Magento Payment Line"; TransactionKey: Text; Room: Decimal; var SpfyTransactionBuffer: Record "NPR Spfy Transaction Buffer"; OpenAuthorizations: Dictionary of [Text, Decimal]; CapturedAuthorizations: Dictionary of [Text, Decimal]; CapturedOpenAuthorizations: List of [Text])
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        TransactionID: Text[30];
+        NewRequestedAmount: Decimal;
+        RequestedAmount: Decimal;
+    begin
+        if Room < 0 then
+            Room := 0;
+        PaymentLine.CopyFilters(DocPaymentLine);
+        PaymentLine.SetRange(Posted, false);
+        if PaymentLine.FindSet(true) then
+            repeat
+                if IsCuttable(PaymentLine) then
+                    if SettledTransactionOfLine(PaymentLine, SpfyTransactionBuffer, OpenAuthorizations, CapturedAuthorizations, CapturedOpenAuthorizations, TransactionID) then
+                        if TransactionID = TransactionKey then begin
+                            RequestedAmount := PaymentLine."Requested Amount";
+                            if RequestedAmount = 0 then
+                                RequestedAmount := PaymentLine.Amount;
+                            NewRequestedAmount := SmallerOf(RequestedAmount, PaymentLine.Amount + Room);
+                            if NewRequestedAmount < PaymentLine.Amount then
+                                NewRequestedAmount := PaymentLine.Amount;
+                            Room -= NewRequestedAmount - PaymentLine.Amount;
+                            if NewRequestedAmount < RequestedAmount then begin
+                                FillUnsetRequestedAmounts(PaymentLine);
+                                SetRequestedAmount(PaymentLine, NewRequestedAmount);
+                                PaymentLine.Modify(true);
+                            end;
+                        end;
+            until PaymentLine.Next() = 0;
+    end;
+
+    /// <summary>
+    /// A voucher line BC captured has been redeemed from the voucher already, so its amount is booked.
+    /// </summary>
+    local procedure IsCuttable(PaymentLine: Record "NPR Magento Payment Line"): Boolean
+    begin
+        exit(not ((PaymentLine."Payment Type" = PaymentLine."Payment Type"::Voucher) and (PaymentLine."Date Captured" <> 0D)));
+    end;
+
+    /// <summary>
+    /// Shopify gave the cut back, so the line asks for no more than it still holds and a release cannot grow it back. A voucher's reservation
+    /// follows the line.
+    /// </summary>
+    local procedure CutSettledLine(var PaymentLine: Record "NPR Magento Payment Line"; Cut: Decimal)
+    var
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        SalesHeader: Record "Sales Header";
+        NpRvModulePayPartial: Codeunit "NPR NpRv Module Pay. - Partial";
+    begin
+        FillUnsetRequestedAmounts(PaymentLine);
+        PaymentLine.SetAmountKeepingStoreCurrency(PaymentLine.Amount - Cut);
+        SetRequestedAmount(PaymentLine, PaymentLine.Amount);
+        PaymentLine.Modify(true);
+
+        if PaymentLine."Payment Type" <> PaymentLine."Payment Type"::Voucher then
+            exit;
+        NpRvSalesLine.SetCurrentKey("Document Source", "Document Type", "Document No.", "Document Line No.");
+        NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
+        NpRvSalesLine.SetRange("Document Type", PaymentLine."Document Type");
+        NpRvSalesLine.SetRange("Document No.", PaymentLine."Document No.");
+        NpRvSalesLine.SetRange("Document Line No.", PaymentLine."Line No.");
+        NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
+        NpRvSalesLine.SetRange(Posted, false);
+        if NpRvSalesLine.FindFirst() then
+            if SalesHeader.Get(PaymentLine."Document Type", PaymentLine."Document No.") then
+                NpRvModulePayPartial.KeepReservationInStep(NpRvSalesLine, PaymentLine, SalesHeader);
+    end;
+
+    /// <summary>
+    /// A line that never had its requested amounts set asks for its amounts, as the voucher release reads it. The Ecommerce document creates
+    /// voucher lines that way.
+    /// </summary>
+    local procedure FillUnsetRequestedAmounts(var PaymentLine: Record "NPR Magento Payment Line")
+    begin
+        if PaymentLine."Requested Amount" = 0 then
+            PaymentLine."Requested Amount" := PaymentLine.Amount;
+        if PaymentLine."Requested Amt. (Store Curr.)" = 0 then
+            PaymentLine."Requested Amt. (Store Curr.)" := PaymentLine."Amount (Store Currency)";
+    end;
+
+    /// <summary>
+    /// Sets the requested amount and scales the requested store currency amount with it, at the rate of the requested amounts.
+    /// </summary>
+    local procedure SetRequestedAmount(var PaymentLine: Record "NPR Magento Payment Line"; NewRequestedAmount: Decimal)
+    begin
+        if PaymentLine."Requested Amount" <> 0 then
+            PaymentLine."Requested Amt. (Store Curr.)" := PaymentLine.RoundStoreCurrencyAmount(PaymentLine."Requested Amt. (Store Curr.)" * NewRequestedAmount / PaymentLine."Requested Amount");
+        PaymentLine."Requested Amount" := NewRequestedAmount;
     end;
 
     /// <summary>
@@ -664,17 +926,28 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
     local procedure SuccessfullyCapturedAmount(OrderTransactions: JsonArray; AuthorizationID: Text[30]) CapturedAmount: Decimal
     var
         JsonHelper: Codeunit "NPR Json Helper";
-        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         OrderTransaction: JsonToken;
         CaptureKindTok: Label 'CAPTURE', Locked = true;
-        SuccessStatusTok: Label 'SUCCESS', Locked = true;
     begin
         foreach OrderTransaction in OrderTransactions do
-            if (JsonHelper.GetJText(OrderTransaction, 'kind', false).ToUpper() = CaptureKindTok) and
-               (JsonHelper.GetJText(OrderTransaction, 'status', false).ToUpper() = SuccessStatusTok) and
-               (SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(OrderTransaction, 'parentTransaction.id', false), '/') = AuthorizationID)
-            then
+            if IsSuccessfulChild(OrderTransaction, CaptureKindTok, AuthorizationID) then
                 CapturedAmount += JsonHelper.GetJDecimal(OrderTransaction, 'amountSet.presentmentMoney.amount', false);
+    end;
+
+    /// <summary>
+    /// Whether an order transaction is a successful transaction of the given kind made against the given parent transaction.
+    /// </summary>
+    local procedure IsSuccessfulChild(OrderTransaction: JsonToken; Kind: Text; ParentTransactionID: Text[30]): Boolean
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SuccessStatusTok: Label 'SUCCESS', Locked = true;
+    begin
+        if JsonHelper.GetJText(OrderTransaction, 'kind', false).ToUpper() <> Kind then
+            exit(false);
+        if JsonHelper.GetJText(OrderTransaction, 'status', false).ToUpper() <> SuccessStatusTok then
+            exit(false);
+        exit(SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(OrderTransaction, 'parentTransaction.id', false), '/') = ParentTransactionID);
     end;
 
     /// <summary>

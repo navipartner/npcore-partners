@@ -124,11 +124,29 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         SalesHeader.ReadIsolation := IsolationLevel::UpdLock;
         SalesHeader.Get(_SpfyEcomSalesDocPrcssr.MapSalesDocumentType(LogEntry."Document Type"), LogEntry."Created Sales Doc No.");
         if LogEntry."Document Type" = LogEntry."Document Type"::Order then
-            UpdateSalesLines(LogEntry, SalesHeader, DetailsResponse, FulfillmentCache, true);
+            RefreshCreatedOrder(LogEntry, SalesHeader, DetailsResponse, FulfillmentCache);
 
         PostAndDeleteDocument(LogEntry, SalesHeader);
 
         exit(true);
+    end;
+
+    /// <summary>
+    /// Brings an order created from its Ecommerce document in line with Shopify before it is posted. The Ecommerce document does not take
+    /// Shopify's refunds into account, so they come off here.
+    /// </summary>
+    local procedure RefreshCreatedOrder(LogEntry: Record "NPR Spfy Event Log Entry"; SalesHeader: Record "Sales Header"; Response: JsonToken; var FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache")
+    begin
+        UpdateSalesLines(LogEntry, SalesHeader, Response, FulfillmentCache, true);
+        UpdatePaymentLines(LogEntry, SalesHeader, Response);
+    end;
+
+    internal procedure RefreshCreatedOrderFromJson(SalesHeader: Record "Sales Header"; Response: JsonToken; LogEntry: Record "NPR Spfy Event Log Entry")
+    var
+        FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache";
+    begin
+        _SpfyAPIOrderHelper.BuildFulfillmentCacheFromOrderJson(Response, FulfillmentCache);
+        RefreshCreatedOrder(LogEntry, SalesHeader, Response, FulfillmentCache);
     end;
 
     internal procedure IsSalesDocumentReady(EcomSalesHeader: Record "NPR Ecom Sales Header"; LogEntry: Record "NPR Spfy Event Log Entry"): Boolean

@@ -1534,6 +1534,668 @@ codeunit 85547 "NPR Spfy Pmt Line Alloc Tests"
         _Assert.AreEqual(0, LibBilling.AmountQueueEntriesSince(StartEntryNo), 'A line of an authorization Shopify took no money from must not be billed.');
     end;
 
+    [Test]
+    procedure OrderEditedBelowGiftCard_NcQueue_GiftCardLineKeepsWhatShopifyKept()
+    var
+        OrderNo: Code[20];
+    begin
+        // [SCENARIO] On the NC task queue, a sales order edited in Shopify below its gift card payment, with the difference refunded to the gift card, keeps on its voucher line only what Shopify kept on the gift card, and the voucher reservation follows.
+        Initialize();
+
+        // [GIVEN] Sales order 16.50 still carrying the import's voucher line of 100, reserved on the voucher, and a card line of 649.10
+        OrderNo := 'SPFYPA-SO20';
+        InsertOrder(OrderNo, 16.5);
+        AddOrderVoucherReservation(AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::Voucher, 100, _GiftCardTxnId));
+        AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method", 649.10, _AuthorizationTxnId);
+
+        // [WHEN] The payment lines are refreshed from a card authorization of 649.10, a gift card sale of 100 and a refund of 83.50 to the gift card
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), RefundedGiftCardJson(649.10, 100, 83.5));
+
+        // [THEN] The voucher line pays the 16.50 Shopify kept on the gift card and asks for no more, in the store currency too
+        _Assert.AreEqual(16.5, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The voucher line must not keep money Shopify gave back to the gift card.');
+        _Assert.AreEqual(16.5, OrderLinesRequestedAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The release must not grow the voucher line back to the refunded amount.');
+        _Assert.AreEqual(16.5, OrderLinesStoreCurrencyAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The store-currency amount must follow the amount.');
+        // [THEN] The voucher stays reserved for 16.50 only
+        _Assert.AreEqual(16.5, OrderVoucherReservation(OrderNo), 'The voucher reservation must follow the voucher line.');
+        // [THEN] The card pays nothing
+        _Assert.AreEqual(0, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method"), 'The card must not pay any part of an order the gift card covers.');
+    end;
+
+    [Test]
+    procedure OrderEditedBelowGiftCard_TaskList_GiftCardLineKeepsWhatShopifyKept()
+    var
+        OrderNo: Code[20];
+    begin
+        // [SCENARIO] On the Shopify Task List, a sales order edited in Shopify below its gift card payment, with the difference refunded to the gift card, keeps on its voucher line only what Shopify kept on the gift card, and the voucher reservation follows.
+        Initialize();
+
+        // [GIVEN] Sales order 16.50 still carrying the import's voucher line of 100, reserved on the voucher, and a card line of 649.10
+        OrderNo := 'SPFYPA-SO21';
+        InsertOrder(OrderNo, 16.5);
+        AddOrderVoucherReservation(AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::Voucher, 100, _GiftCardTxnId));
+        AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method", 649.10, _AuthorizationTxnId);
+
+        // [WHEN] The payment lines are refreshed from a card authorization of 649.10, a gift card sale of 100 and a refund of 83.50 to the gift card
+        UpdatePaymentLines(true, OrderRecordId(OrderNo), RefundedGiftCardJson(649.10, 100, 83.5));
+
+        // [THEN] The voucher line pays the 16.50 Shopify kept on the gift card and asks for no more, in the store currency too
+        _Assert.AreEqual(16.5, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The voucher line must not keep money Shopify gave back to the gift card.');
+        _Assert.AreEqual(16.5, OrderLinesRequestedAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The release must not grow the voucher line back to the refunded amount.');
+        _Assert.AreEqual(16.5, OrderLinesStoreCurrencyAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The store-currency amount must follow the amount.');
+        // [THEN] The voucher stays reserved for 16.50 only
+        _Assert.AreEqual(16.5, OrderVoucherReservation(OrderNo), 'The voucher reservation must follow the voucher line.');
+        // [THEN] The card pays nothing
+        _Assert.AreEqual(0, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method"), 'The card must not pay any part of an order the gift card covers.');
+    end;
+
+    [Test]
+    procedure OrderEditedBelowGiftCardInOtherStoreCurrency_NcQueue_StoreCurrencyAmountsFollowTheCut()
+    var
+        GiftCardPaymentLine: Record "NPR Magento Payment Line";
+        OrderNo: Code[20];
+    begin
+        // [SCENARIO] On the NC task queue, a voucher line cut to what Shopify kept on the gift card keeps its store currency amounts at the line's own rate.
+        Initialize();
+
+        // [GIVEN] Sales order 16.50 carrying a voucher line of 100, reserved on the voucher, which is 75 in the store currency
+        OrderNo := 'SPFYPA-SO30';
+        InsertOrder(OrderNo, 16.5);
+        GiftCardPaymentLine := AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::Voucher, 100, _GiftCardTxnId);
+        GiftCardPaymentLine."Amount (Store Currency)" := 75;
+        GiftCardPaymentLine."Requested Amt. (Store Curr.)" := 75;
+        GiftCardPaymentLine.Modify();
+        AddOrderVoucherReservation(GiftCardPaymentLine);
+
+        // [WHEN] The payment lines are refreshed from a gift card sale of 100 and a refund of 83.50 to the gift card
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), PartlyRefundedGiftCardJson(100, 83.5));
+
+        // [THEN] The voucher line pays and asks for 16.50, which is 12.38 in the store currency
+        _Assert.AreEqual(16.5, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The voucher line must not keep money Shopify gave back to the gift card.');
+        _Assert.AreEqual(12.38, OrderLinesStoreCurrencyAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The store currency amount must follow the cut at the line''s rate.');
+        _Assert.AreEqual(12.38, OrderLinesRequestedStoreCurrencyAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The requested store currency amount must follow the cut at the line''s rate.');
+    end;
+
+    [Test]
+    procedure GiftCardLineReducedAtReleaseThenRefunded_NcQueue_AsksForNoMoreThanShopifyKept()
+    var
+        OrderNo: Code[20];
+    begin
+        // [SCENARIO] On the NC task queue, a voucher line an earlier release already reduced asks, once cut for a gift card refund, for no more than Shopify kept on the gift card, so a later release cannot grow it back.
+        Initialize();
+
+        // [GIVEN] Sales order 16.50 carrying a voucher line of 100 that an earlier release reduced to 50
+        OrderNo := 'SPFYPA-SO31';
+        InsertOrder(OrderNo, 16.5);
+        SetAmount(AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::Voucher, 100, _GiftCardTxnId), 50);
+
+        // [WHEN] The payment lines are refreshed from a gift card sale of 100 and a refund of 83.50 to the gift card
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), PartlyRefundedGiftCardJson(100, 83.5));
+
+        // [THEN] The voucher line pays and asks for 16.50
+        _Assert.AreEqual(16.5, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The voucher line must not keep money Shopify gave back to the gift card.');
+        _Assert.AreEqual(16.5, OrderLinesRequestedAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The voucher line must not ask for more than Shopify kept.');
+        // [THEN] The requested store currency amount follows at the rate of the requested amount, not of the reduced amount
+        _Assert.AreEqual(16.5, OrderLinesRequestedStoreCurrencyAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The requested store currency amount must be scaled from the requested amount.');
+    end;
+
+    [Test]
+    procedure GiftCardLineFromEcommerceDocumentRefunded_NcQueue_RequestedAmountsFollowTheCut()
+    var
+        GiftCardPaymentLine: Record "NPR Magento Payment Line";
+        OrderNo: Code[20];
+    begin
+        // [SCENARIO] On the NC task queue, a voucher line the Ecommerce document created with a store currency amount but neither requested amount gets both requested amounts set in step when it is cut.
+        Initialize();
+
+        // [GIVEN] Sales order 16.50 carrying a voucher line of 100, 75 in the store currency, with no requested amount and no requested store currency amount
+        OrderNo := 'SPFYPA-SO32';
+        InsertOrder(OrderNo, 16.5);
+        GiftCardPaymentLine := AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::Voucher, 100, _GiftCardTxnId);
+        GiftCardPaymentLine."Requested Amount" := 0;
+        GiftCardPaymentLine."Amount (Store Currency)" := 75;
+        GiftCardPaymentLine."Requested Amt. (Store Curr.)" := 0;
+        GiftCardPaymentLine.Modify();
+        AddOrderVoucherReservation(GiftCardPaymentLine);
+
+        // [WHEN] The payment lines are refreshed from a gift card sale of 100 and a refund of 83.50 to the gift card
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), PartlyRefundedGiftCardJson(100, 83.5));
+
+        // [THEN] The voucher line pays and asks for 16.50, which is 12.38 in the store currency
+        _Assert.AreEqual(16.5, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The voucher line must not keep money Shopify gave back to the gift card.');
+        _Assert.AreEqual(16.5, OrderLinesRequestedAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The voucher line must ask for what it holds.');
+        _Assert.AreEqual(12.38, OrderLinesStoreCurrencyAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The store currency amount must follow the cut at the line''s rate.');
+        _Assert.AreEqual(12.38, OrderLinesRequestedStoreCurrencyAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The requested store currency amount must be set in step with the requested amount.');
+    end;
+
+    [Test]
+    procedure GiftCardLineReducedAtReleaseBeforeTheRefund_NcQueue_AsksForNoMoreThanShopifyKept()
+    var
+        OrderNo: Code[20];
+    begin
+        // [SCENARIO] On the NC task queue, a voucher line a release already brought down to the order total asks, once Shopify refunded the rest of the gift card, for no more than Shopify kept, although nothing is cut.
+        Initialize();
+
+        // [GIVEN] Sales order 50 carrying a voucher line of 100 that a release reduced to 50, still asking for 100
+        OrderNo := 'SPFYPA-SO42';
+        InsertOrder(OrderNo, 50);
+        SetAmount(AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::Voucher, 100, _GiftCardTxnId), 50);
+
+        // [WHEN] The payment lines are refreshed from a gift card sale of 100 and a refund of 50 to the gift card
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), PartlyRefundedGiftCardJson(100, 50));
+
+        // [THEN] The voucher line keeps paying 50 and asks for 50, in the store currency too
+        _Assert.AreEqual(50, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The voucher line already fits the order.');
+        _Assert.AreEqual(50, OrderLinesRequestedAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'A later release must not grow the line beyond what Shopify kept on the gift card.');
+        _Assert.AreEqual(50, OrderLinesRequestedStoreCurrencyAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The requested store currency amount must follow the requested amount.');
+    end;
+
+    [Test]
+    procedure GiftCardRefundWithinWhatTheOrderInvoices_NcQueue_StaysOnTheLine()
+    var
+        OrderNo: Code[20];
+    begin
+        // [SCENARIO] On the NC task queue, a gift card refund the order total still covers stays on the voucher line, since it is for goods the order invoices and their credit memo puts it back on the gift card.
+        Initialize();
+
+        // [GIVEN] Sales order 200 carrying a voucher line of 200
+        OrderNo := 'SPFYPA-SO22';
+        InsertOrder(OrderNo, 200);
+        AddOrderVoucherReservation(AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::Voucher, 200, _GiftCardTxnId));
+
+        // [WHEN] The payment lines are refreshed from a gift card sale of 200 and a refund of 100 to the gift card
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), PartlyRefundedGiftCardJson(200, 100));
+
+        // [THEN] The voucher line and its reservation keep the 200, and the line still asks for its 200
+        _Assert.AreEqual(200, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'A refund within what the order invoices must stay on the voucher line.');
+        _Assert.AreEqual(200, OrderVoucherReservation(OrderNo), 'The voucher reservation must stay as it is.');
+        _Assert.AreEqual(200, OrderLinesRequestedAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'A line must keep asking for at least what it holds.');
+    end;
+
+    [Test]
+    procedure GiftCardRefundBeyondTheExcess_NcQueue_CutsOnlyTheExcess()
+    var
+        OrderNo: Code[20];
+    begin
+        // [SCENARIO] On the NC task queue, a voucher line is cut only by what it holds beyond the order total, even when Shopify refunded more of the gift card, because the rest of the refund is for goods the order invoices.
+        Initialize();
+
+        // [GIVEN] Sales order 50 carrying a voucher line of 100
+        OrderNo := 'SPFYPA-SO23';
+        InsertOrder(OrderNo, 50);
+        AddOrderVoucherReservation(AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::Voucher, 100, _GiftCardTxnId));
+
+        // [WHEN] The payment lines are refreshed from a gift card sale of 100 and a refund of 83.50 to the gift card
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), PartlyRefundedGiftCardJson(100, 83.5));
+
+        // [THEN] The voucher line and its reservation are cut to the order's 50
+        _Assert.AreEqual(50, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The voucher line must be cut by its excess only.');
+        _Assert.AreEqual(50, OrderVoucherReservation(OrderNo), 'The voucher reservation must follow the voucher line.');
+    end;
+
+    [Test]
+    procedure GiftCardRefundSmallerThanTheExcess_NcQueue_CutsOnlyWhatShopifyGaveBack()
+    var
+        OrderNo: Code[20];
+    begin
+        // [SCENARIO] On the NC task queue, a voucher line on an order its lines exceed by more than Shopify refunded of the gift card is cut only by the refund, never below what Shopify kept on the gift card.
+        Initialize();
+
+        // [GIVEN] Sales order 10 carrying a voucher line of 100
+        OrderNo := 'SPFYPA-SO34';
+        InsertOrder(OrderNo, 10);
+        AddOrderVoucherReservation(AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::Voucher, 100, _GiftCardTxnId));
+
+        // [WHEN] The payment lines are refreshed from a gift card sale of 100 and a refund of 50 to the gift card
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), PartlyRefundedGiftCardJson(100, 50));
+
+        // [THEN] The voucher line and its reservation keep the 50 Shopify kept on the gift card
+        _Assert.AreEqual(50, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The voucher line must not be cut below what Shopify kept on the gift card.');
+        _Assert.AreEqual(50, OrderVoucherReservation(OrderNo), 'The voucher reservation must follow the voucher line.');
+    end;
+
+    [Test]
+    procedure OpenCardLineNextToRefundedGiftCard_NcQueue_IsFittedInstead()
+    var
+        OrderNo: Code[20];
+    begin
+        // [SCENARIO] On the NC task queue, the card line of an open authorization gives way when an order's lines add up to more than its total, before any gift card refund is taken off the voucher line.
+        Initialize();
+
+        // [GIVEN] Sales order 250 carrying a voucher line of 200 and a card line of 100
+        OrderNo := 'SPFYPA-SO24';
+        InsertOrder(OrderNo, 250);
+        AddOrderVoucherReservation(AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::Voucher, 200, _GiftCardTxnId));
+        AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method", 100, _AuthorizationTxnId);
+
+        // [WHEN] The payment lines are refreshed from a card authorization of 100, a gift card sale of 200 and a refund of 100 to the gift card
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), RefundedGiftCardJson(100, 200, 100));
+
+        // [THEN] The voucher line keeps its 200 and the card line is fitted to the 50 left
+        _Assert.AreEqual(200, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The gift card refund must not be taken off while the card can give way.');
+        _Assert.AreEqual(50, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method"), 'The card must pay only what the voucher leaves.');
+    end;
+
+    [Test]
+    procedure PartlyRefundedCardSaleOnReducedOrder_NcQueue_IsCutToWhatShopifyKept()
+    var
+        OrderNo: Code[20];
+    begin
+        // [SCENARIO] On the NC task queue, the card line of a sale Shopify partly refunded after the order was reduced keeps only what Shopify kept of the sale.
+        Initialize();
+
+        // [GIVEN] Sales order 70 carrying a card line of 100 for a card sale
+        OrderNo := 'SPFYPA-SO25';
+        InsertOrder(OrderNo, 70);
+        AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method", 100, _CardSaleTxnId);
+
+        // [WHEN] The payment lines are refreshed from the card sale of 100 and a refund of 30 to the card
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), PartlyRefundedCardSaleJson(100, 30));
+
+        // [THEN] The card line pays and asks for 70
+        _Assert.AreEqual(70, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method"), 'The card line must not keep money Shopify gave back to the card.');
+        _Assert.AreEqual(70, OrderLinesRequestedAmount(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method"), 'The card line must not ask for the refunded money again.');
+    end;
+
+    [Test]
+    procedure FullyRefundedLineNextToPartlyRefundedGiftCard_NcQueue_GivesWayFirst()
+    var
+        OrderNo: Code[20];
+    begin
+        // [SCENARIO] On the NC task queue, the line of a sale Shopify refunded in full gives up its amount before a partly refunded gift card line is cut, so the gift card keeps what the order still needs from it.
+        Initialize();
+
+        // [GIVEN] Sales order 100 carrying a card line of 100 for a card sale and, after it, a voucher line of 100
+        OrderNo := 'SPFYPA-SO26';
+        InsertOrder(OrderNo, 100);
+        AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method", 100, _CardSaleTxnId);
+        AddOrderVoucherReservation(AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::Voucher, 100, _GiftCardTxnId));
+
+        // [WHEN] The payment lines are refreshed from the card sale of 100 refunded in full and a gift card sale of 100 with 50 refunded
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), FullyRefundedCardSaleAndPartlyRefundedGiftCardJson(100, 100, 50));
+
+        // [THEN] The refunded card line is gone and the voucher line keeps its 100
+        _Assert.AreEqual(0, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method"), 'A fully refunded sale must not keep its line.');
+        _Assert.AreEqual(100, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The gift card must not give up room the refunded card line held.');
+        _Assert.AreEqual(100, OrderVoucherReservation(OrderNo), 'The voucher reservation must stay as it is.');
+    end;
+
+    [Test]
+    procedure RefundedCaptureOnReducedOrder_NcQueue_CardLineKeepsWhatShopifyKept()
+    var
+        OrderNo: Code[20];
+    begin
+        // [SCENARIO] On the NC task queue, the card line of an authorization Shopify captured and then partly refunded, after the order was reduced, keeps only what Shopify kept of the capture.
+        Initialize();
+
+        // [GIVEN] Sales order 70 carrying a card line of 100 for an authorization
+        OrderNo := 'SPFYPA-SO28';
+        InsertOrder(OrderNo, 70);
+        AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method", 100, _AuthorizationTxnId);
+
+        // [WHEN] The payment lines are refreshed from the authorization of 100, captured in full, and a refund of 30 of that capture
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), RefundedCaptureJson(100, 30));
+
+        // [THEN] The card line pays and asks for 70
+        _Assert.AreEqual(70, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method"), 'The card line must not keep money Shopify gave back of the capture.');
+        _Assert.AreEqual(70, OrderLinesRequestedAmount(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method"), 'The card line must not ask for the refunded money again.');
+    end;
+
+    [Test]
+    procedure RefundedCaptureOnReducedOrder_TaskList_CardLineKeepsWhatShopifyKept()
+    var
+        OrderNo: Code[20];
+    begin
+        // [SCENARIO] On the Shopify Task List, the card line of an authorization Shopify captured and then partly refunded, after the order was reduced, keeps only what Shopify kept of the capture.
+        Initialize();
+
+        // [GIVEN] Sales order 70 carrying a card line of 100 for an authorization
+        OrderNo := 'SPFYPA-SO29';
+        InsertOrder(OrderNo, 70);
+        AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method", 100, _AuthorizationTxnId);
+
+        // [WHEN] The payment lines are refreshed from the authorization of 100, captured in full, and a refund of 30 of that capture
+        UpdatePaymentLines(true, OrderRecordId(OrderNo), RefundedCaptureJson(100, 30));
+
+        // [THEN] The card line pays and asks for 70
+        _Assert.AreEqual(70, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method"), 'The card line must not keep money Shopify gave back of the capture.');
+        _Assert.AreEqual(70, OrderLinesRequestedAmount(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method"), 'The card line must not ask for the refunded money again.');
+    end;
+
+    [Test]
+    procedure RefundedCaptureOnEmptyInvoice_NcQueue_NewLineTakesTheCapture()
+    var
+        InvoiceNo: Code[20];
+    begin
+        // [SCENARIO] On the NC task queue, a new card line on a posted invoice still takes what Shopify captured when part of the capture was refunded, since a refund of invoiced goods is settled by its credit memo.
+        Initialize();
+
+        // [GIVEN] Invoice 100 without payment lines
+        InvoiceNo := 'SPFYPA-NC28';
+        InsertInvoice(InvoiceNo, 100);
+
+        // [WHEN] The payment lines are built from the authorization of 100, captured in full, and a refund of 30 of that capture
+        UpdatePaymentLines(false, InvoiceRecordId(InvoiceNo), RefundedCaptureJson(100, 30));
+
+        // [THEN] The card line pays the whole invoice
+        _Assert.AreEqual(100, InvoiceLinesAmount(InvoiceNo, Enum::"NPR Magento Payment Type"::"Payment Method"), 'A refund of invoiced goods must be left to its credit memo.');
+    end;
+
+    [Test]
+    procedure RefundedGiftCardLineOnPostedInvoice_NcQueue_IsNotCut()
+    var
+        InvoiceNo: Code[20];
+    begin
+        // [SCENARIO] On the NC task queue, a gift card line on a posted invoice is not cut for a refund to the gift card, because its money is booked and a refund after posting goes through a credit memo.
+        Initialize();
+
+        // [GIVEN] Invoice 50 carrying a voucher line of 100
+        InvoiceNo := 'SPFYPA-NC29';
+        InsertInvoice(InvoiceNo, 50);
+        AddInvoicePaymentLine(InvoiceNo, Enum::"NPR Magento Payment Type"::Voucher, 100, _GiftCardTxnId);
+
+        // [WHEN] The payment lines are rebuilt from a gift card sale of 100 and a refund of 83.50 to the gift card
+        UpdatePaymentLines(false, InvoiceRecordId(InvoiceNo), PartlyRefundedGiftCardJson(100, 83.5));
+
+        // [THEN] The voucher line keeps its 100
+        _Assert.AreEqual(100, InvoiceLinesAmount(InvoiceNo, Enum::"NPR Magento Payment Type"::Voucher), 'A posted invoice''s payment line must not be cut.');
+    end;
+
+    [Test]
+    procedure RefundedGiftCardLineOnReturnOrder_NcQueue_IsNotCut()
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        SalesHeader: Record "Sales Header";
+        ReturnOrderNo: Code[20];
+    begin
+        // [SCENARIO] On the NC task queue, a payment line on a return order is not cut for a refund, because a credit document's lines are refunds themselves.
+        Initialize();
+
+        // [GIVEN] Return order 50 carrying a voucher line of 100
+        ReturnOrderNo := 'SPFYPA-RO1';
+        InsertSalesDocument(SalesHeader."Document Type"::"Return Order", ReturnOrderNo, 50);
+        AddPaymentLine(Database::"Sales Header", Enum::"Sales Document Type"::"Return Order", ReturnOrderNo, Enum::"NPR Magento Payment Type"::Voucher, 100, _GiftCardTxnId);
+        SalesHeader.Get(SalesHeader."Document Type"::"Return Order", ReturnOrderNo);
+
+        // [WHEN] The payment lines are refreshed from a gift card sale of 100 and a refund of 83.50 to the gift card
+        UpdatePaymentLines(false, SalesHeader.RecordId(), PartlyRefundedGiftCardJson(100, 83.5));
+
+        // [THEN] The voucher line keeps its 100
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        PaymentLine.SetRange("Document Type", PaymentLine."Document Type"::"Return Order");
+        PaymentLine.SetRange("Document No.", ReturnOrderNo);
+        PaymentLine.CalcSums(Amount);
+        _Assert.AreEqual(100, PaymentLine.Amount, 'A return order''s payment line must not be cut.');
+    end;
+
+    [Test]
+    procedure OrderCreatedFromEcommerceDocumentWithoutRefunds_LinesStayAsTheyAre()
+    var
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        OrderNo: Code[20];
+    begin
+        // [SCENARIO] A sales order created from its Ecommerce document for an order Shopify has not refunded keeps its payment lines and voucher reservation as the document created them.
+        Initialize();
+
+        // [GIVEN] Sales order 749.10 created from the Ecommerce document with the gift card's 100, reserved on the voucher, and a card line of 649.10
+        OrderNo := 'SPFYPA-SO33';
+        InsertOrder(OrderNo, 749.1);
+        AddOrderVoucherReservation(AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::Voucher, 100, _GiftCardTxnId));
+        AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method", 649.10, _AuthorizationTxnId);
+        // [GIVEN] The Shopify order's event log entry
+        LogEntry."Store Code" := CopyStr(_StoreCodeLbl, 1, MaxStrLen(LogEntry."Store Code"));
+        LogEntry."Shopify ID" := OrderNo;
+
+        // [WHEN] The created order is refreshed from Shopify's order, whose transactions are a card authorization of 649.10 and a gift card sale of 100
+        SpfyEcomSalesDocImport.RefreshCreatedOrderFromJson(OrderHeader(OrderNo), OrderResponseJson(CardAndGiftCardJson(649.10, 100)), LogEntry);
+
+        // [THEN] The voucher line, its reservation and the card line are unchanged
+        _Assert.AreEqual(100, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The voucher line must stay as created.');
+        _Assert.AreEqual(100, OrderVoucherReservation(OrderNo), 'The voucher reservation must stay as created.');
+        _Assert.AreEqual(649.10, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method"), 'The card line must stay as created.');
+    end;
+
+    [Test]
+    procedure OrderCreatedFromEcommerceDocument_GiftCardLineKeepsWhatShopifyKept()
+    var
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        OrderNo: Code[20];
+    begin
+        // [SCENARIO] A sales order created from its Ecommerce document for an order Shopify already edited below its gift card payment has the refund taken off its voucher line before it is posted.
+        Initialize();
+
+        // [GIVEN] Sales order 16.50 created from the Ecommerce document with the gift card's full 100, reserved on the voucher, and a card line of 649.10
+        OrderNo := 'SPFYPA-SO27';
+        InsertOrder(OrderNo, 16.5);
+        AddOrderVoucherReservation(AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::Voucher, 100, _GiftCardTxnId));
+        AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method", 649.10, _AuthorizationTxnId);
+        // [GIVEN] The Shopify order's event log entry
+        LogEntry."Store Code" := CopyStr(_StoreCodeLbl, 1, MaxStrLen(LogEntry."Store Code"));
+        LogEntry."Shopify ID" := OrderNo;
+
+        // [WHEN] The created order is refreshed from Shopify's order, whose transactions are a card authorization of 649.10, a gift card sale of 100 and a refund of 83.50 to the gift card
+        SpfyEcomSalesDocImport.RefreshCreatedOrderFromJson(OrderHeader(OrderNo), OrderResponseJson(RefundedGiftCardJson(649.10, 100, 83.5)), LogEntry);
+
+        // [THEN] The voucher line and its reservation are cut to 16.50 and the card pays nothing
+        _Assert.AreEqual(16.5, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The voucher line must not keep money Shopify gave back to the gift card.');
+        _Assert.AreEqual(16.5, OrderVoucherReservation(OrderNo), 'The voucher reservation must follow the voucher line.');
+        _Assert.AreEqual(0, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method"), 'The card must not pay any part of an order the gift card covers.');
+    end;
+
+    [Test]
+    procedure GiftCardOnTwoLinesRefunded_NcQueue_LinesTogetherKeepWhatShopifyKept()
+    var
+        CapturedLine: Record "NPR Magento Payment Line";
+        RestLine: Record "NPR Magento Payment Line";
+        OrderNo: Code[20];
+    begin
+        // [SCENARIO] On the NC task queue, a gift card paid on two voucher lines, one BC captured for virtual items and one for the rest, keeps on the two lines together only what Shopify kept on the gift card.
+        Initialize();
+
+        // [GIVEN] Sales order 30 carrying a captured voucher line of 30 and a voucher line of 70, both for the same gift card sale
+        OrderNo := 'SPFYPA-SO35';
+        InsertOrder(OrderNo, 30);
+        CapturedLine := AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::Voucher, 30, _GiftCardTxnId);
+        MarkCaptured(CapturedLine);
+        RestLine := AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::Voucher, 70, _GiftCardTxnId);
+
+        // [WHEN] The payment lines are refreshed from a gift card sale of 100 and a refund of 70 to the gift card
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), PartlyRefundedGiftCardJson(100, 70));
+
+        // [THEN] The voucher lines add up to the 30 Shopify kept: the captured line keeps its 30 and the other line pays nothing
+        _Assert.AreEqual(30, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The lines of one gift card must not hold more than Shopify kept on it.');
+        _Assert.AreEqual(30, LineAmount(CapturedLine), 'The captured voucher line must keep what was redeemed at capture.');
+        _Assert.AreEqual(0, LineAmount(RestLine), 'The other voucher line must give up what Shopify gave back.');
+    end;
+
+    [Test]
+    procedure GiftCardOnTwoLinesRefunded_TaskList_LinesTogetherKeepWhatShopifyKept()
+    var
+        CapturedLine: Record "NPR Magento Payment Line";
+        RestLine: Record "NPR Magento Payment Line";
+        OrderNo: Code[20];
+    begin
+        // [SCENARIO] On the Shopify Task List, a gift card paid on two voucher lines, one BC captured for virtual items and one for the rest, keeps on the two lines together only what Shopify kept on the gift card.
+        Initialize();
+
+        // [GIVEN] Sales order 30 carrying a captured voucher line of 30 and a voucher line of 70, both for the same gift card sale
+        OrderNo := 'SPFYPA-SO43';
+        InsertOrder(OrderNo, 30);
+        CapturedLine := AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::Voucher, 30, _GiftCardTxnId);
+        MarkCaptured(CapturedLine);
+        RestLine := AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::Voucher, 70, _GiftCardTxnId);
+
+        // [WHEN] The payment lines are refreshed from a gift card sale of 100 and a refund of 70 to the gift card
+        UpdatePaymentLines(true, OrderRecordId(OrderNo), PartlyRefundedGiftCardJson(100, 70));
+
+        // [THEN] The voucher lines add up to the 30 Shopify kept: the captured line keeps its 30 and the other line pays nothing
+        _Assert.AreEqual(30, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The lines of one gift card must not hold more than Shopify kept on it.');
+        _Assert.AreEqual(30, LineAmount(CapturedLine), 'The captured voucher line must keep what was redeemed at capture.');
+        _Assert.AreEqual(0, LineAmount(RestLine), 'The other voucher line must give up what Shopify gave back.');
+    end;
+
+    [Test]
+    procedure CapturedGiftCardLineOnReducedOrder_NcQueue_IsNotCut()
+    var
+        CapturedLine: Record "NPR Magento Payment Line";
+        RestLine: Record "NPR Magento Payment Line";
+        OrderNo: Code[20];
+    begin
+        // [SCENARIO] On the NC task queue, a voucher line BC captured keeps its amount when the order shrinks below it, because the voucher was redeemed for it at capture; the refund of that part is left to a credit memo.
+        Initialize();
+
+        // [GIVEN] Sales order 15 carrying a captured voucher line of 30 and a voucher line of 70, both for the same gift card sale
+        OrderNo := 'SPFYPA-SO36';
+        InsertOrder(OrderNo, 15);
+        CapturedLine := AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::Voucher, 30, _GiftCardTxnId);
+        MarkCaptured(CapturedLine);
+        RestLine := AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::Voucher, 70, _GiftCardTxnId);
+
+        // [WHEN] The payment lines are refreshed from a gift card sale of 100 and a refund of 85 to the gift card
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), PartlyRefundedGiftCardJson(100, 85));
+
+        // [THEN] The other voucher line pays nothing and the captured line keeps its 30
+        _Assert.AreEqual(0, LineAmount(RestLine), 'The voucher line BC did not capture must give way first.');
+        _Assert.AreEqual(30, LineAmount(CapturedLine), 'A captured voucher line must not be cut below what was redeemed from the voucher.');
+    end;
+
+    [Test]
+    procedure RefundedCaptureOfOpenAuthorization_NcQueue_CapturedLineKeepsWhatShopifyKept()
+    var
+        CardLine: Record "NPR Magento Payment Line";
+        OrderNo: Code[20];
+    begin
+        // [SCENARIO] On the NC task queue, a card line BC captured on an authorization Shopify still holds partly open keeps, after the order was reduced, only what Shopify kept of the capture.
+        Initialize();
+
+        // [GIVEN] Sales order 100 carrying a captured card line of 100 for an authorization and a voucher line of 50
+        OrderNo := 'SPFYPA-SO37';
+        InsertOrder(OrderNo, 100);
+        CardLine := AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method", 100, _AuthorizationTxnId);
+        MarkCaptured(CardLine);
+        AddOrderVoucherReservation(AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::Voucher, 50, _GiftCardTxnId));
+
+        // [WHEN] The payment lines are refreshed from an authorization of 120 with 20 still open, a capture of 100, a refund of 50 of that capture and a gift card sale of 50
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), PartlyCapturedRefundedCardAndGiftCardJson(120, 20, 100, 50, 50));
+
+        // [THEN] The card line keeps the 50 Shopify kept of the capture and the voucher line its 50
+        _Assert.AreEqual(50, LineAmount(CardLine), 'A captured line must not keep money Shopify gave back of the capture.');
+        _Assert.AreEqual(50, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The gift card Shopify kept in full must keep its line.');
+    end;
+
+    [Test]
+    procedure CardLineMarkedCapturedWithoutAShopifyCapture_NcQueue_IsNotCut()
+    var
+        CardLine: Record "NPR Magento Payment Line";
+        OrderNo: Code[20];
+    begin
+        // [SCENARIO] On the NC task queue, a card line marked captured on an authorization Shopify reports no capture for keeps its amount, because nothing shows what Shopify took for it.
+        Initialize();
+
+        // [GIVEN] Sales order 50 carrying a card line of 100 marked captured
+        OrderNo := 'SPFYPA-SO38';
+        InsertOrder(OrderNo, 50);
+        CardLine := AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method", 100, _AuthorizationTxnId);
+        MarkCaptured(CardLine);
+
+        // [WHEN] The payment lines are refreshed from an open authorization of 100 with no capture
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), PartlyCapturedCardJson(100, 100));
+
+        // [THEN] The card line keeps its 100
+        _Assert.AreEqual(100, LineAmount(CardLine), 'A line marked captured without a capture in Shopify must be left as it is.');
+    end;
+
+    [Test]
+    procedure PartlyInvoicedGiftCardRefundedOnReducedOrder_NcQueue_KeepsWhatTheOtherInvoicesLeft()
+    var
+        OrderNo: Code[20];
+        InvoiceNo: Code[20];
+        OpenRefundTxnId: Text[30];
+    begin
+        // [SCENARIO] On the NC task queue, a voucher line on a reduced order keeps what the gift card has left after its refunds and what another invoice took, with a refund a credit memo booked given back to it.
+        Initialize();
+        OpenRefundTxnId := TransactionId(16);
+
+        // [GIVEN] A posted invoice that took 150 of the gift card, and a credit memo that booked a refund of 50
+        InvoiceNo := 'SPFYPA-NC30';
+        InsertInvoice(InvoiceNo, 150);
+        AddInvoicePaymentLine(InvoiceNo, Enum::"NPR Magento Payment Type"::Voucher, 150, _GiftCardTxnId);
+        AddCreditMemoPaymentLine('SPFYPA-CM30', 50, _GiftCardRefundTxnId);
+        // [GIVEN] Sales order 60 carrying a voucher line of the 150 the invoice left
+        OrderNo := 'SPFYPA-SO39';
+        InsertOrder(OrderNo, 60);
+        AddOrderVoucherReservation(AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::Voucher, 150, _GiftCardTxnId));
+
+        // [WHEN] The payment lines are refreshed from a gift card sale of 300, the refund of 50 the credit memo booked and a refund of 40 no credit document booked
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), GiftCardWithBookedAndOpenRefundJson(300, 50, OpenRefundTxnId, 40));
+
+        // [THEN] The voucher line keeps 110: the 300 less the 150 invoiced, the 40 refund not booked yet, and nothing for the booked refund
+        _Assert.AreEqual(110, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::Voucher), 'The line must keep what the gift card has left after other invoices and open refunds.');
+        _Assert.AreEqual(110, OrderVoucherReservation(OrderNo), 'The voucher reservation must follow the voucher line.');
+    end;
+
+    [Test]
+    procedure PartlyInvoicedCaptureRefundedOnReducedOrder_NcQueue_KeepsWhatTheOtherInvoicesLeft()
+    var
+        FirstCaptureTxnId: Text[30];
+        OpenRefundTxnId: Text[30];
+        SecondCaptureTxnId: Text[30];
+        OrderNo: Code[20];
+        InvoiceNo: Code[20];
+    begin
+        // [SCENARIO] On the NC task queue, the card line of an authorization captured in two parts keeps, on a reduced order, what the captures have left after their refunds and what another invoice took, with a refund a credit memo booked given back to it.
+        Initialize();
+        FirstCaptureTxnId := TransactionId(17);
+        SecondCaptureTxnId := TransactionId(18);
+        OpenRefundTxnId := TransactionId(16);
+
+        // [GIVEN] A posted invoice that took 150 of the authorization, and a credit memo that booked a refund of 50 of the first capture
+        InvoiceNo := 'SPFYPA-NC31';
+        InsertInvoice(InvoiceNo, 150);
+        AddInvoicePaymentLine(InvoiceNo, Enum::"NPR Magento Payment Type"::"Payment Method", 150, _AuthorizationTxnId);
+        AddCreditMemoPaymentLine('SPFYPA-CM31', 50, _CardRefundTxnId);
+        // [GIVEN] Sales order 60 carrying a card line of the 150 the invoice left
+        OrderNo := 'SPFYPA-SO40';
+        InsertOrder(OrderNo, 60);
+        AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method", 150, _AuthorizationTxnId);
+
+        // [WHEN] The payment lines are refreshed from an authorization of 300 captured as 200 and 100, the refund of 50 of the first capture the credit memo booked and a refund of 40 of the second no credit document booked
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), TwoCapturesWithBookedAndOpenRefundJson(FirstCaptureTxnId, 200, SecondCaptureTxnId, 100, 50, OpenRefundTxnId, 40));
+
+        // [THEN] The card line keeps 110: the 300 captured less the 150 invoiced, the 40 refund not booked yet, and nothing for the booked refund
+        _Assert.AreEqual(110, OrderLinesAmount(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method"), 'The line must keep what the captures have left after other invoices and open refunds.');
+    end;
+
+    [Test]
+    procedure OpenAuthorizationWithUncapturedInvoiceLine_NcQueue_CapturedOrderLineKeepsItsCapture()
+    var
+        CardLine: Record "NPR Magento Payment Line";
+        CaptureTxnId: Text[30];
+        OrderNo: Code[20];
+        InvoiceNo: Code[20];
+    begin
+        // [SCENARIO] On the NC task queue, an invoice line of an authorization Shopify still holds open does not count against the captures until BC captured it, so a captured order line keeps what Shopify captured for it.
+        Initialize();
+        CaptureTxnId := TransactionId(19);
+
+        // [GIVEN] A posted invoice carrying an uncaptured card line of 100 for the authorization
+        InvoiceNo := 'SPFYPA-NC32';
+        InsertInvoice(InvoiceNo, 100);
+        AddInvoicePaymentLine(InvoiceNo, Enum::"NPR Magento Payment Type"::"Payment Method", 100, _AuthorizationTxnId);
+        // [GIVEN] Sales order 40 carrying a captured card line of 200 for the same authorization
+        OrderNo := 'SPFYPA-SO41';
+        InsertOrder(OrderNo, 40);
+        CardLine := AddOrderPaymentLine(OrderNo, Enum::"NPR Magento Payment Type"::"Payment Method", 200, _AuthorizationTxnId);
+        MarkCaptured(CardLine);
+
+        // [WHEN] The payment lines are refreshed from an authorization of 300 with 100 still open, a capture of 200 and a refund of 50 of that capture
+        UpdatePaymentLines(false, OrderRecordId(OrderNo), PartlyCapturedRefundedJson(300, 100, CaptureTxnId, 200, 50));
+
+        // [THEN] The card line keeps the 150 Shopify kept of its capture
+        _Assert.AreEqual(150, LineAmount(CardLine), 'An uncaptured invoice line must not count against what Shopify captured.');
+    end;
+
     local procedure Initialize()
     var
         Currency: Record Currency;
@@ -1646,10 +2308,17 @@ codeunit 85547 "NPR Spfy Pmt Line Alloc Tests"
     local procedure InsertOrder(OrderNo: Code[20]; AmountInclVAT: Decimal)
     var
         SalesHeader: Record "Sales Header";
+    begin
+        InsertSalesDocument(SalesHeader."Document Type"::Order, OrderNo, AmountInclVAT);
+    end;
+
+    local procedure InsertSalesDocument(DocumentType: Enum "Sales Document Type"; OrderNo: Code[20]; AmountInclVAT: Decimal)
+    var
+        SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
     begin
         SalesHeader.Init();
-        SalesHeader."Document Type" := SalesHeader."Document Type"::Order;
+        SalesHeader."Document Type" := DocumentType;
         SalesHeader."No." := OrderNo;
         SalesHeader."Posting Date" := WorkDate();
         SalesHeader."NPR External Order No." := OrderNo;
@@ -1705,10 +2374,62 @@ codeunit 85547 "NPR Spfy Pmt Line Alloc Tests"
         SpfyAssignedIDMgt.AssignShopifyID(PaymentLine.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyTransactionId, false);
     end;
 
+    /// <summary>
+    /// Reserves the voucher for the voucher line, as the order import does when it adds the gift card's payment line.
+    /// </summary>
+    local procedure AddOrderVoucherReservation(PaymentLine: Record "NPR Magento Payment Line")
+    var
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Voucher: Record "NPR NpRv Voucher";
+        VoucherNoTok: Label 'SPFYPMTGC01', Locked = true;
+    begin
+        Voucher.Get(VoucherNoTok);
+        NpRvSalesLine.Init();
+        NpRvSalesLine.Id := CreateGuid();
+        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Payment Line";
+        NpRvSalesLine."Document Type" := PaymentLine."Document Type";
+        NpRvSalesLine."Document No." := PaymentLine."Document No.";
+        NpRvSalesLine."Document Line No." := PaymentLine."Line No.";
+        NpRvSalesLine.Type := NpRvSalesLine.Type::Payment;
+        NpRvSalesLine."Voucher Type" := Voucher."Voucher Type";
+        NpRvSalesLine."Voucher No." := Voucher."No.";
+        NpRvSalesLine."Reference No." := Voucher."Reference No.";
+        NpRvSalesLine.Amount := PaymentLine.Amount;
+        NpRvSalesLine."Reservation Line Id" := PaymentLine.SystemId;
+        NpRvSalesLine.Insert();
+    end;
+
+    local procedure OrderVoucherReservation(OrderNo: Code[20]): Decimal
+    var
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+    begin
+        NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
+        NpRvSalesLine.SetRange("Document Type", NpRvSalesLine."Document Type"::Order);
+        NpRvSalesLine.SetRange("Document No.", OrderNo);
+        NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
+        NpRvSalesLine.CalcSums(Amount);
+        exit(NpRvSalesLine.Amount);
+    end;
+
     local procedure MarkPosted(PaymentLine: Record "NPR Magento Payment Line")
     begin
         PaymentLine.Posted := true;
         PaymentLine.Modify();
+    end;
+
+    /// <summary>
+    /// Marks the line captured by BC; for a voucher line that means the voucher was redeemed for it at capture.
+    /// </summary>
+    local procedure MarkCaptured(PaymentLine: Record "NPR Magento Payment Line")
+    begin
+        PaymentLine."Date Captured" := WorkDate();
+        PaymentLine.Modify();
+    end;
+
+    local procedure LineAmount(PaymentLine: Record "NPR Magento Payment Line"): Decimal
+    begin
+        PaymentLine.Find();
+        exit(PaymentLine.Amount);
     end;
 
     local procedure InvoiceRecordId(InvoiceNo: Code[20]): RecordId
@@ -1839,6 +2560,110 @@ codeunit 85547 "NPR Spfy Pmt Line Alloc Tests"
         exit(StrSubstNo(TransactionsTok, AuthorizationJson(AuthorizedAmount), GiftCardSaleJson(GiftCardAmount), RefundJson(_GiftCardRefundTxnId, _GiftCardTxnId, 'gift_card', RefundedAmount)));
     end;
 
+    local procedure PartlyRefundedGiftCardJson(GiftCardAmount: Decimal; RefundedAmount: Decimal): Text
+    var
+        TransactionsTok: Label '[%1,%2]', Locked = true;
+    begin
+        exit(StrSubstNo(TransactionsTok, GiftCardSaleJson(GiftCardAmount), RefundJson(_GiftCardRefundTxnId, _GiftCardTxnId, 'gift_card', RefundedAmount)));
+    end;
+
+    /// <summary>
+    /// An authorization Shopify captured in full, and a refund of that capture, which Shopify parents to the capture.
+    /// </summary>
+    local procedure RefundedCaptureJson(AuthorizedAmount: Decimal; RefundedAmount: Decimal): Text
+    var
+        TransactionsTok: Label '[%1,%2,%3]', Locked = true;
+    begin
+        exit(StrSubstNo(TransactionsTok,
+            AuthorizationJson(AuthorizedAmount, 0), CaptureJson(TransactionId(14), _AuthorizationTxnId, AuthorizedAmount),
+            RefundJson(_CardRefundTxnId, TransactionId(14), _GatewayLbl, RefundedAmount)));
+    end;
+
+    /// <summary>
+    /// An authorization Shopify still holds partly open, a capture of part of it, a refund of that capture, which Shopify parents to the capture, and a gift card sale.
+    /// </summary>
+    local procedure PartlyCapturedRefundedCardAndGiftCardJson(AuthorizedAmount: Decimal; UnsettledAmount: Decimal; CapturedAmount: Decimal; RefundedAmount: Decimal; GiftCardAmount: Decimal): Text
+    var
+        TransactionsTok: Label '[%1,%2,%3,%4]', Locked = true;
+    begin
+        exit(StrSubstNo(TransactionsTok,
+            AuthorizationJson(AuthorizedAmount, UnsettledAmount), CaptureJson(TransactionId(15), _AuthorizationTxnId, CapturedAmount),
+            RefundJson(_CardRefundTxnId, TransactionId(15), _GatewayLbl, RefundedAmount), GiftCardSaleJson(GiftCardAmount)));
+    end;
+
+    /// <summary>
+    /// An authorization Shopify still holds partly open, a capture of part of it, and a refund of that capture.
+    /// </summary>
+    local procedure PartlyCapturedRefundedJson(AuthorizedAmount: Decimal; UnsettledAmount: Decimal; CaptureTxnId: Text; CapturedAmount: Decimal; RefundedAmount: Decimal): Text
+    var
+        TransactionsTok: Label '[%1,%2,%3]', Locked = true;
+    begin
+        exit(StrSubstNo(TransactionsTok,
+            AuthorizationJson(AuthorizedAmount, UnsettledAmount), CaptureJson(CaptureTxnId, _AuthorizationTxnId, CapturedAmount),
+            RefundJson(_CardRefundTxnId, CaptureTxnId, _GatewayLbl, RefundedAmount)));
+    end;
+
+    /// <summary>
+    /// A gift card sale with two refunds: the gift card refund transaction a credit memo books in the test, and another one.
+    /// </summary>
+    local procedure GiftCardWithBookedAndOpenRefundJson(GiftCardAmount: Decimal; BookedRefundAmount: Decimal; OpenRefundTxnId: Text; OpenRefundAmount: Decimal): Text
+    var
+        TransactionsTok: Label '[%1,%2,%3]', Locked = true;
+    begin
+        exit(StrSubstNo(TransactionsTok, GiftCardSaleJson(GiftCardAmount),
+            RefundJson(_GiftCardRefundTxnId, _GiftCardTxnId, 'gift_card', BookedRefundAmount), RefundJson(OpenRefundTxnId, _GiftCardTxnId, 'gift_card', OpenRefundAmount)));
+    end;
+
+    /// <summary>
+    /// An authorization Shopify captured in full in two captures, a refund of the first capture (the card refund transaction a credit memo books in the test)
+    /// and a refund of the second.
+    /// </summary>
+    local procedure TwoCapturesWithBookedAndOpenRefundJson(FirstCaptureTxnId: Text; FirstCaptureAmount: Decimal; SecondCaptureTxnId: Text; SecondCaptureAmount: Decimal; BookedRefundAmount: Decimal; OpenRefundTxnId: Text; OpenRefundAmount: Decimal): Text
+    var
+        TransactionsTok: Label '[%1,%2,%3,%4,%5]', Locked = true;
+    begin
+        exit(StrSubstNo(TransactionsTok,
+            AuthorizationJson(FirstCaptureAmount + SecondCaptureAmount, 0),
+            CaptureJson(FirstCaptureTxnId, _AuthorizationTxnId, FirstCaptureAmount), CaptureJson(SecondCaptureTxnId, _AuthorizationTxnId, SecondCaptureAmount),
+            RefundJson(_CardRefundTxnId, FirstCaptureTxnId, _GatewayLbl, BookedRefundAmount), RefundJson(OpenRefundTxnId, SecondCaptureTxnId, _GatewayLbl, OpenRefundAmount)));
+    end;
+
+    local procedure FullyRefundedCardSaleAndPartlyRefundedGiftCardJson(CardSaleAmount: Decimal; GiftCardAmount: Decimal; GiftCardRefundedAmount: Decimal): Text
+    var
+        TransactionsTok: Label '[%1,%2,%3,%4]', Locked = true;
+    begin
+        exit(StrSubstNo(TransactionsTok,
+            CardSaleJson(CardSaleAmount), RefundJson(_CardRefundTxnId, _CardSaleTxnId, _GatewayLbl, CardSaleAmount),
+            GiftCardSaleJson(GiftCardAmount), RefundJson(_GiftCardRefundTxnId, _GiftCardTxnId, 'gift_card', GiftCardRefundedAmount)));
+    end;
+
+    /// <summary>
+    /// Shopify's order as the Ecommerce import reads it, with no line items, fulfillments or shipping lines and the given transactions.
+    /// </summary>
+    local procedure OrderResponseJson(TransactionsJson: Text): JsonToken
+    var
+        Response: JsonToken;
+        OrderTok: Label '{"data":{"order":{"lineItems":[],"fulfillments":[],"shippingLines":[],"transactions":%1}}}', Locked = true;
+    begin
+        Response.ReadFrom(StrSubstNo(OrderTok, TransactionsJson));
+        exit(Response);
+    end;
+
+    local procedure OrderHeader(OrderNo: Code[20]): Record "Sales Header"
+    var
+        SalesHeader: Record "Sales Header";
+    begin
+        SalesHeader.Get(SalesHeader."Document Type"::Order, OrderNo);
+        exit(SalesHeader);
+    end;
+
+    local procedure PartlyRefundedCardSaleJson(CardSaleAmount: Decimal; RefundedAmount: Decimal): Text
+    var
+        TransactionsTok: Label '[%1,%2]', Locked = true;
+    begin
+        exit(StrSubstNo(TransactionsTok, CardSaleJson(CardSaleAmount), RefundJson(_CardRefundTxnId, _CardSaleTxnId, _GatewayLbl, RefundedAmount)));
+    end;
+
     local procedure GiftCardOnlyJson(GiftCardAmount: Decimal): Text
     var
         TransactionsTok: Label '[%1]', Locked = true;
@@ -1939,6 +2764,30 @@ codeunit 85547 "NPR Spfy Pmt Line Alloc Tests"
         PaymentLine.SetRange("Payment Type", PaymentType);
         PaymentLine.CalcSums(Amount);
         exit(PaymentLine.Amount);
+    end;
+
+    local procedure OrderLinesRequestedAmount(OrderNo: Code[20]; PaymentType: Enum "NPR Magento Payment Type"): Decimal
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+    begin
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        PaymentLine.SetRange("Document Type", PaymentLine."Document Type"::Order);
+        PaymentLine.SetRange("Document No.", OrderNo);
+        PaymentLine.SetRange("Payment Type", PaymentType);
+        PaymentLine.CalcSums("Requested Amount");
+        exit(PaymentLine."Requested Amount");
+    end;
+
+    local procedure OrderLinesRequestedStoreCurrencyAmount(OrderNo: Code[20]; PaymentType: Enum "NPR Magento Payment Type"): Decimal
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+    begin
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        PaymentLine.SetRange("Document Type", PaymentLine."Document Type"::Order);
+        PaymentLine.SetRange("Document No.", OrderNo);
+        PaymentLine.SetRange("Payment Type", PaymentType);
+        PaymentLine.CalcSums("Requested Amt. (Store Curr.)");
+        exit(PaymentLine."Requested Amt. (Store Curr.)");
     end;
 
     local procedure OrderCardLine(OrderNo: Code[20]; var PaymentLine: Record "NPR Magento Payment Line")

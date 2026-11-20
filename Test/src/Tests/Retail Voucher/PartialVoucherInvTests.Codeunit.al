@@ -1010,6 +1010,89 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         _Assert.AreEqual(746, PostedStoreCurrencyAmount(Database::"Sales Cr.Memo Header", CreditMemoNo, "NPR Magento Payment Type"::"Payment Method"), 'The store currency share must come back with it.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ShopifyOrderEditedBelowGiftCardPostsWithTheGiftCardPayingWhatShopifyKept()
+    var
+        SalesHeader: Record "Sales Header";
+        Voucher: Record "NPR NpRv Voucher";
+        InvoiceNo: Code[20];
+    begin
+        // [SCENARIO] A Shopify order edited below its SHOPIFY gift card payment, with the difference refunded to the gift card, posts once its payment lines are refreshed, and the gift card pays what Shopify kept on it.
+        Initialize();
+
+        // [GIVEN] A Shopify order of 16.50 + 732.60, paid 649.10 by a card authorization and 100 by a SHOPIFY gift card
+        CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypeShopify.Code, 100, 649.10, 16.5, 732.6, 0);
+        // [GIVEN] The 732.60 line was removed in Shopify, which refunded 83.50 to the gift card
+        SetLastItemLineQuantityToZero(SalesHeader);
+        // [GIVEN] The order's payment lines are refreshed from Shopify's transactions before posting, as the order import does
+        RefreshShopifyPaymentLines(SalesHeader, 649.10, 100, 83.5);
+
+        // [WHEN] The order is posted
+        InvoiceNo := _LibrarySales.PostSalesDocument(SalesHeader, true, true);
+
+        // [THEN] The gift card pays the 16.50 and the card nothing
+        _Assert.AreEqual(-16.5, VoucherPaymentEntryAmount(Voucher."No.", InvoiceNo), 'The gift card must pay what Shopify kept on it.');
+        _Assert.AreEqual(0, InvoicePaymentAmount(InvoiceNo, "NPR Magento Payment Type"::"Payment Method"), 'The card must pay nothing.');
+        _Assert.AreEqual(0, CustomerBalance(SalesHeader."Bill-to Customer No."), 'The invoice must be fully paid.');
+        // [THEN] The voucher keeps the 83.50 Shopify gave back and holds no reservation
+        Voucher.CalcFields(Amount, "Reserved Amount");
+        _Assert.AreEqual(83.5, Voucher.Amount, 'The voucher must keep what Shopify gave back to the gift card.');
+        _Assert.AreEqual(0, Voucher."Reserved Amount", 'Nothing must stay reserved once the order is invoiced.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ShopifyOrderEditedBelowGiftCardRefreshFreesTheRefundedReservation()
+    var
+        SalesHeader: Record "Sales Header";
+        Voucher: Record "NPR NpRv Voucher";
+    begin
+        // [SCENARIO] Refreshing the payment lines of a Shopify order edited below its SHOPIFY gift card payment frees the part of the voucher's reservation Shopify gave back to the gift card.
+        Initialize();
+
+        // [GIVEN] A Shopify order of 16.50 + 732.60, paid 649.10 by a card authorization and 100 by a SHOPIFY gift card, which reserves 100 on the voucher
+        CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypeShopify.Code, 100, 649.10, 16.5, 732.6, 0);
+        // [GIVEN] The 732.60 line was removed in Shopify, which refunded 83.50 to the gift card
+        SetLastItemLineQuantityToZero(SalesHeader);
+
+        // [WHEN] The order's payment lines are refreshed from Shopify's transactions
+        RefreshShopifyPaymentLines(SalesHeader, 649.10, 100, 83.5);
+
+        // [THEN] The voucher line pays 16.50 and the voucher stays reserved for 16.50 only
+        _Assert.AreEqual(16.5, OrderPaymentAmount(SalesHeader, "NPR Magento Payment Type"::Voucher), 'The voucher line must pay what Shopify kept on the gift card.');
+        Voucher.CalcFields("Reserved Amount");
+        _Assert.AreEqual(16.5, Voucher."Reserved Amount", 'The voucher must stay reserved for what the order still pays with it.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ShopifyOrderEditedBelowDefaultVoucherPostsWithTheRestAsAReturnVoucher()
+    var
+        SalesHeader: Record "Sales Header";
+        Voucher: Record "NPR NpRv Voucher";
+        InvoiceNo: Code[20];
+    begin
+        // [SCENARIO] A Shopify order edited below its DEFAULT voucher payment, with the difference refunded to the gift card, posts once its payment lines are refreshed; the DEFAULT module redeems the whole voucher and returns the rest as a return voucher.
+        Initialize();
+
+        // [GIVEN] A Shopify order of 16.50 + 732.60, paid 649.10 by a card authorization and 100 by a DEFAULT voucher
+        CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypeDefault.Code, 100, 649.10, 16.5, 732.6, 0);
+        // [GIVEN] The 732.60 line was removed in Shopify, which refunded 83.50 to the gift card
+        SetLastItemLineQuantityToZero(SalesHeader);
+        // [GIVEN] The order's payment lines are refreshed from Shopify's transactions before posting, as the order import does
+        RefreshShopifyPaymentLines(SalesHeader, 649.10, 100, 83.5);
+
+        // [WHEN] The order is posted
+        InvoiceNo := _LibrarySales.PostSalesDocument(SalesHeader, true, true);
+
+        // [THEN] The DEFAULT voucher is redeemed in full, as that module always does
+        _Assert.AreEqual(-100, VoucherPaymentEntryAmount(Voucher."No.", InvoiceNo), 'A DEFAULT voucher cannot keep a remainder, so it is redeemed in full.');
+        // [THEN] The voucher payments on the invoice net to the 16.50, the rest going to a return voucher, and the invoice is paid
+        _Assert.AreEqual(16.5, InvoicePaymentAmount(InvoiceNo, "NPR Magento Payment Type"::Voucher), 'The voucher lines must net to what the order still owed.');
+        _Assert.AreEqual(0, CustomerBalance(SalesHeader."Bill-to Customer No."), 'The invoice must be fully paid.');
+    end;
+
     local procedure Initialize()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -1144,6 +1227,67 @@ codeunit 85553 "NPR Partial Voucher Inv. Tests"
         CreateOrderPaidByCardAndVoucher(SalesHeader, Voucher, _VoucherTypePartial.Code, 800, 0, 400, 400, 300);
         CreateVoucher(SecondVoucher, _VoucherTypeShopify.Code, 300);
         NpRvSalesDocMgt.RedeemVoucher(SalesHeader, SecondVoucher."Reference No.");
+    end;
+
+    /// <summary>
+    /// Sizes the order's last item line to nothing, as the Shopify order import does with a line removed in Shopify.
+    /// </summary>
+    local procedure SetLastItemLineQuantityToZero(SalesHeader: Record "Sales Header")
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetRange(Type, SalesLine.Type::Item);
+        SalesLine.FindLast();
+        SalesLine.Validate(Quantity, 0);
+        SalesLine.Modify(true);
+    end;
+
+    /// <summary>
+    /// Ties the order's card and voucher payment lines to a Shopify card authorization and gift card sale, and refreshes them from those
+    /// transactions and a refund to the gift card, as the Shopify order import does before it posts the order.
+    /// </summary>
+    local procedure RefreshShopifyPaymentLines(var SalesHeader: Record "Sales Header"; AuthorizedAmount: Decimal; GiftCardAmount: Decimal; GiftCardRefundAmount: Decimal)
+    var
+        NcTask: Record "NPR Nc Task";
+        PaymentLine: Record "NPR Magento Payment Line";
+        TempSpfyTransactionBuffer: Record "NPR Spfy Transaction Buffer" temporary;
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt.";
+        SpfyCapturePayment: Codeunit "NPR Spfy Capture Payment";
+        Transactions: JsonArray;
+        Transaction: JsonToken;
+        AuthorizationTxnId: Text[30];
+        GiftCardTxnId: Text[30];
+        AuthorizationTok: Label '{"id":"gid://shopify/OrderTransaction/%1","kind":"AUTHORIZATION","status":"SUCCESS","gateway":"shopify_payments","amountSet":{"presentmentMoney":{"amount":"%2","currencyCode":"%3"},"shopMoney":{"amount":"%2","currencyCode":"%3"}},"totalUnsettledSet":{"presentmentMoney":{"amount":"%2","currencyCode":"%3"},"shopMoney":{"amount":"%2","currencyCode":"%3"}},"receiptJson":"{}"}', Locked = true;
+        GiftCardSaleTok: Label '{"id":"gid://shopify/OrderTransaction/%1","kind":"SALE","status":"SUCCESS","gateway":"gift_card","amountSet":{"presentmentMoney":{"amount":"%2","currencyCode":"%3"},"shopMoney":{"amount":"%2","currencyCode":"%3"}},"receiptJson":"{}"}', Locked = true;
+        RefundTok: Label '{"id":"gid://shopify/OrderTransaction/%1","kind":"REFUND","status":"SUCCESS","gateway":"gift_card","parentTransaction":{"id":"gid://shopify/OrderTransaction/%2","kind":"SALE"},"amountSet":{"presentmentMoney":{"amount":"%3","currencyCode":"%4"},"shopMoney":{"amount":"%3","currencyCode":"%4"}},"receiptJson":"{}"}', Locked = true;
+        TransactionsTok: Label '[%1,%2,%3]', Locked = true;
+        StoreCodeTok: Label 'PVI-SPFY', Locked = true;
+    begin
+        AuthorizationTxnId := '2465' + SalesHeader."No." + '1';
+        GiftCardTxnId := '2465' + SalesHeader."No." + '2';
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
+        PaymentLine.SetRange("Document No.", SalesHeader."No.");
+        PaymentLine.FindSet();
+        repeat
+            if PaymentLine."Payment Type" = PaymentLine."Payment Type"::Voucher then
+                SpfyAssignedIDMgt.AssignShopifyID(PaymentLine.RecordId(), "NPR Spfy ID Type"::"Entry ID", GiftCardTxnId, false)
+            else
+                SpfyAssignedIDMgt.AssignShopifyID(PaymentLine.RecordId(), "NPR Spfy ID Type"::"Entry ID", AuthorizationTxnId, false);
+        until PaymentLine.Next() = 0;
+
+        Transactions.ReadFrom(StrSubstNo(TransactionsTok,
+            StrSubstNo(AuthorizationTok, AuthorizationTxnId, Format(AuthorizedAmount, 0, 9), _GLSetup."LCY Code"),
+            StrSubstNo(GiftCardSaleTok, GiftCardTxnId, Format(GiftCardAmount, 0, 9), _GLSetup."LCY Code"),
+            StrSubstNo(RefundTok, GiftCardTxnId + '9', GiftCardTxnId, Format(GiftCardRefundAmount, 0, 9), _GLSetup."LCY Code")));
+        NcTask."Record ID" := SalesHeader.RecordId();
+        NcTask."Store Code" := StoreCodeTok;
+        foreach Transaction in Transactions do
+            SpfyCapturePayment.ProcessTransaction(Transaction, NcTask, TempSpfyTransactionBuffer);
+        SpfyCapturePayment.UpdatePmtLines(NcTask, Transactions, TempSpfyTransactionBuffer);
+        SalesHeader.Find();
     end;
 
     local procedure DeleteLastItemLine(SalesHeader: Record "Sales Header")

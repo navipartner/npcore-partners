@@ -69,7 +69,7 @@
     /// <summary>
     /// The voucher stays reserved for what the order still pays with it, so a payment cut here frees the rest of the voucher.
     /// </summary>
-    local procedure KeepReservationInStep(var NpRvSalesLine: Record "NPR NpRv Sales Line"; MagentoPaymentLine: Record "NPR Magento Payment Line"; SalesHeader: Record "Sales Header")
+    internal procedure KeepReservationInStep(var NpRvSalesLine: Record "NPR NpRv Sales Line"; MagentoPaymentLine: Record "NPR Magento Payment Line"; SalesHeader: Record "Sales Header")
     var
         ReservationLCY: Decimal;
     begin
