@@ -735,6 +735,14 @@ codeunit 85242 "NPR Library - Restaurant"
         WaiterPadLine.Modify();
     end;
 
+    internal procedure AddWaiterPadOrderNote(WaiterPadNo: Code[20]; NoteText: Text; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
+    begin
+        // An order note as the Insert Comment action saves it: not attached, No. '*'
+        AddWaiterPadCommentLine(WaiterPadNo, NoteText, 0, WaiterPadLine);
+        WaiterPadLine."No." := '*';
+        WaiterPadLine.Modify();
+    end;
+
     local procedure ClearLineNoSoTheTableAssignsIt(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
     begin
         // Init() leaves the primary key alone, so a caller that passes the same record variable twice - one call to

@@ -32,6 +32,8 @@
     end;
 
     internal procedure MergeWaiterPadLine(FromWaiterPad: Record "NPR NPRE Waiter Pad"; var FromWaiterPadLine: Record "NPR NPRE Waiter Pad Line"; ToWaiterPad: Record "NPR NPRE Waiter Pad")
+    var
+        OrderNotesMgt: Codeunit "NPR NPRE Order Notes Mgt.";
     begin
         //An attached comment moves in its own turn, after its parent, so the target keeps the order of the source
         if IsAttachedComment(FromWaiterPadLine) then begin
@@ -41,7 +43,7 @@
                 MoveAttachedComment(FromWaiterPadLine, ToWaiterPad, true);
             exit;
         end;
-        if FromWaiterPadLine.Quantity <= 0 then
+        if OrderNotesMgt.IsOrderNote(FromWaiterPadLine) or (FromWaiterPadLine.Quantity <= 0) then
             exit;
 
         MoveWaiterPadLine(FromWaiterPad, FromWaiterPadLine, FromWaiterPadLine.Quantity, ToWaiterPad);
@@ -365,6 +367,7 @@
     var
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
         WaiterPadLine2: Record "NPR NPRE Waiter Pad Line";
+        OrderNotesMgt: Codeunit "NPR NPRE Order Notes Mgt.";
         HasItemAddOnLink: Boolean;
         NewLine: Boolean;
         AttachToLineNo: Integer;
@@ -429,11 +432,16 @@
                 WaiterPadLine.Description := SaleLinePOS.Description;
                 WaiterPadLine."Description 2" := SaleLinePOS."Description 2";
             end;
-        end else
+        end else begin
             if (WaiterPadLine."Line Type" = WaiterPadLine."Line Type"::Comment) and (WaiterPadLine."Attached to Line No." <> 0) then begin
                 WaiterPadLine."Attached to Line No." := 0;
                 WaiterPadLine.Indentation := 0;
             end;
+            if OrderNotesMgt.IsOrderNote(WaiterPadLine) then begin
+                WaiterPadLine.Description := SaleLinePOS.Description;
+                WaiterPadLine."Description 2" := SaleLinePOS."Description 2";
+            end;
+        end;
         WaiterPadLine.Modify();
 
         WaiterPadLine.Mark := NewLine or (WaiterPadLine."Quantity (Base)" <> WaiterPadLine2."Quantity (Base)");

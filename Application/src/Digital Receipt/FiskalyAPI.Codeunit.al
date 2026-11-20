@@ -332,6 +332,7 @@ POSEntrySalesLine: Record "NPR POS Entry Sales Line"; var
     var
         POSUnit: Record "NPR POS Unit";
         POSReceiptProfile: Record "NPR POS Receipt Profile";
+        OrderNotesMgt: Codeunit "NPR NPRE Order Notes Mgt.";
         LineJsonObject: JsonObject;
         VatAmountJsonObject: JsonObject;
         ItemJsonObject: JsonObject;
@@ -400,7 +401,10 @@ POSEntrySalesLine: Record "NPR POS Entry Sales Line"; var
         ItemJsonObject.Add('price_per_unit', Format(UnitPrice, 0, '<Precision,2:2><Standard Format,2>'));
         ItemJsonObject.Add('full_amount', Format(FullAmount, 0, '<Precision,2:2><Standard Format,2>'));
 
-        ItemJsonObject.Add('number', POSEntrySalesLine."No.");
+        if (POSEntrySalesLine.Type = POSEntrySalesLine.Type::Comment) and (POSEntrySalesLine."No." = OrderNotesMgt.OrderNoteMarker()) then
+            ItemJsonObject.Add('number', '')
+        else
+            ItemJsonObject.Add('number', POSEntrySalesLine."No.");
         ItemJsonObject.Add('quantity', Format(POSEntrySalesLine.Quantity, 0, '<Precision,2:2><Standard Format,2>'));
 
         LineJsonObject.Add('vat_amounts', VatAmountsJsonArray);

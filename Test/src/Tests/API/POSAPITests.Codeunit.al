@@ -27,6 +27,8 @@ codeunit 85157 "NPR POS API Tests"
         _LookupMenuItem: Record "NPR NPRE Menu Item";
         _MessageCount: Integer;
         AbsentTok: Label 'absent', Locked = true;
+        CommentSaleLineTxt: Label '%1 "%2", No. "%3", quantity %4', Locked = true, Comment = '%1 = line type, %2 = description, %3 = No., %4 = quantity';
+        CreateCommentLineFailedErr: Label 'Creating a comment line through the API with code "%1" should succeed', Locked = true, Comment = '%1 = code sent';
         NotInResponseTok: Label 'the line is not in the response', Locked = true;
         SaleLineAttachmentTxt: Label 'isAddon %1, appliesToLine %2, code %3', Locked = true, Comment = '%1 = isAddon, %2 = appliesToLine, %3 = code';
 
@@ -1574,6 +1576,85 @@ codeunit 85157 "NPR POS API Tests"
         Assert.AreEqual(
             StrSubstNo(SaleLineAttachmentTxt, 'true', FormatGuid(DishLineId), _AddonItem."No."), SaleLineAttachment(SaleLines, AddonLineId),
             'S17.c: ADDON-M should report isAddon true, the DISH line as appliesToLine and its item number as code, as today.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CommentLine_CreatedWithBlankCode_MarkedAndNote()
+    var
+        SaleLine: Record "NPR POS Sale Line";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        Assert: Codeunit Assert;
+        SaleId: Guid;
+        SaleLineId: Guid;
+    begin
+        // [SCENARIO] A comment line created through the POS Sale Line API with a blank code gets No. "*", which the API returns, and is an order note of the waiter pad its sale is saved to
+        InitializeRestaurant();
+
+        // [GIVEN] A sale created through the API, and a waiter pad of the restaurant
+        CreateSaleAndWaiterPad(SaleId, WaiterPad);
+
+        // [WHEN] The comment "Milk allergy" is created through the POS Sale Line API with a blank code, and the sale is saved to the waiter pad
+        SaleLineId := CreateGuid();
+        CreateCommentLineAndSaveToPad(SaleId, SaleLineId, '', 'Milk allergy', WaiterPad);
+
+        // [THEN] The API returns code "*", the sale line is the comment "Milk allergy" with No. "*" and quantity 1, and the pad lists it as an order note
+        Assert.AreEqual('*', ApiSaleLineCode(SaleId, SaleLineId), 'S14.f: the POS Sale Line API should return code "*" for a comment created with a blank code.');
+        SaleLine.GetBySystemId(SaleLineId);
+        Assert.AreEqual(
+            StrSubstNo(CommentSaleLineTxt, SaleLine."Line Type"::Comment, 'Milk allergy', '*', 1),
+            StrSubstNo(CommentSaleLineTxt, SaleLine."Line Type", SaleLine.Description, SaleLine."No.", SaleLine.Quantity),
+            'S14.f: the sale line should be the comment "Milk allergy" with No. "*" and quantity 1.');
+        Assert.AreEqual(
+            'Milk allergy', PadOrderNotes(WaiterPad."No."), 'S1.l: the comment created with a blank code should be an order note of the waiter pad.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CommentLine_CreatedWithStarCode_Note()
+    var
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        Assert: Codeunit Assert;
+        SaleId: Guid;
+    begin
+        // [SCENARIO] A comment line created through the POS Sale Line API with code "*" is an order note of the waiter pad its sale is saved to
+        InitializeRestaurant();
+
+        // [GIVEN] A sale created through the API, and a waiter pad of the restaurant
+        CreateSaleAndWaiterPad(SaleId, WaiterPad);
+
+        // [WHEN] The comment "Milk allergy" is created through the POS Sale Line API with code "*", and the sale is saved to the waiter pad
+        CreateCommentLineAndSaveToPad(SaleId, CreateGuid(), '*', 'Milk allergy', WaiterPad);
+
+        // [THEN] The pad lists "Milk allergy" as an order note
+        Assert.AreEqual(
+            'Milk allergy', PadOrderNotes(WaiterPad."No."), 'S1.k: the comment created with code "*" should be an order note of the waiter pad.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CommentLine_CreatedWithOtherCode_Kept()
+    var
+        SaleLine: Record "NPR POS Sale Line";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        Assert: Codeunit Assert;
+        SaleId: Guid;
+        SaleLineId: Guid;
+    begin
+        // [SCENARIO] A comment line created through the POS Sale Line API with the code "VAT" keeps that code, as today, and is no order note of the waiter pad its sale is saved to
+        InitializeRestaurant();
+
+        // [GIVEN] A sale created through the API, and a waiter pad of the restaurant
+        CreateSaleAndWaiterPad(SaleId, WaiterPad);
+
+        // [WHEN] The comment "VAT removed from sale: 2.40" is created through the POS Sale Line API with code "VAT", and the sale is saved to the waiter pad
+        SaleLineId := CreateGuid();
+        CreateCommentLineAndSaveToPad(SaleId, SaleLineId, 'VAT', 'VAT removed from sale: 2.40', WaiterPad);
+
+        // [THEN] The sale line keeps No. "VAT", and the pad lists no order note
+        SaleLine.GetBySystemId(SaleLineId);
+        Assert.AreEqual('VAT', SaleLine."No.", 'S14.g: the comment created with code "VAT" should keep No. "VAT", as today.');
+        Assert.AreEqual('', PadOrderNotes(WaiterPad."No."), 'S1.m: the comment created with code "VAT" should not be an order note of the waiter pad.');
     end;
 
     [Test]
@@ -6094,6 +6175,73 @@ codeunit 85157 "NPR POS API Tests"
     begin
         SaleLine.Get('code', JToken);
         exit(JToken.AsValue().AsText());
+    end;
+
+    local procedure CreateSaleAndWaiterPad(var SaleId: Guid; var WaiterPad: Record "NPR NPRE Waiter Pad")
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
+        Assert: Codeunit Assert;
+        Body: JsonObject;
+        CustomerDetails: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        QueryParams: Dictionary of [Text, Text];
+    begin
+        SaleId := CreateGuid();
+        Assert.IsTrue(
+            LibraryNPRetailAPI.IsSuccessStatusCode(LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers)),
+            'Create sale should succeed');
+        WaiterPadMgt.CreateNewWaiterPad(_Seating.Code, 1, '', CustomerDetails, WaiterPad);
+    end;
+
+    local procedure CreateCommentLineAndSaveToPad(SaleId: Guid; SaleLineId: Guid; LineCode: Text; Description: Text; var WaiterPad: Record "NPR NPRE Waiter Pad")
+    var
+        POSSale: Record "NPR POS Sale";
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        Assert: Codeunit Assert;
+        Body: JsonObject;
+        Headers: Dictionary of [Text, Text];
+        QueryParams: Dictionary of [Text, Text];
+    begin
+        Body.Add('type', 'Comment');
+        Body.Add('code', LineCode);
+        Body.Add('description', Description);
+        Assert.IsTrue(
+            LibraryNPRetailAPI.IsSuccessStatusCode(
+                LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId), Body, QueryParams, Headers)),
+            StrSubstNo(CreateCommentLineFailedErr, LineCode));
+        POSSale.GetBySystemId(SaleId);
+        WaiterPad.Find();
+        WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(POSSale, WaiterPad, false);
+    end;
+
+    local procedure ApiSaleLineCode(SaleId: Guid; SaleLineId: Guid): Text
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Body: JsonObject;
+        Response: JsonObject;
+        Headers: Dictionary of [Text, Text];
+        QueryParams: Dictionary of [Text, Text];
+    begin
+        Response := LibraryNPRetailAPI.CallApi('GET', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Get sale line should succeed');
+        exit(GetLineCode(LibraryNPRetailAPI.GetResponseBody(Response)));
+    end;
+
+    local procedure PadOrderNotes(WaiterPadNo: Code[20]) JoinedNotes: Text
+    var
+        OrderNotesMgt: Codeunit "NPR NPRE Order Notes Mgt.";
+        Notes: List of [Text];
+        Note: Text;
+    begin
+        OrderNotesMgt.GetWaiterPadNotes(WaiterPadNo, Notes);
+        foreach Note in Notes do begin
+            if JoinedNotes <> '' then
+                JoinedNotes += ', ';
+            JoinedNotes += Note;
+        end;
     end;
 }
 #endif

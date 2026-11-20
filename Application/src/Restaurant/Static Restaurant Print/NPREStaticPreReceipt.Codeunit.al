@@ -81,10 +81,17 @@ codeunit 6248673 "NPR NPRE Static Pre Receipt"
                         Printer.AddTextField(1, 0, '  ' + Format(TempBuffer.Quantity) + ' x ');
                     Printer.AddTextField(2, 0, '  ' + NestedIndent(TempBuffer.Indentation) + TempBuffer.Description);
                 end else begin
-                    Printer.AddTextField(1, 0, Format(TempBuffer.Quantity) + ' x ');
+                    if TempBuffer."Line Type" = TempBuffer."Line Type"::Comment then
+                        Printer.AddTextField(1, 0, '')
+                    else
+                        Printer.AddTextField(1, 0, Format(TempBuffer.Quantity) + ' x ');
                     Printer.AddTextField(2, 0, TempBuffer.Description);
                 end;
-                Printer.AddTextField(3, 2, Format(TempBuffer."Amount Incl. VAT", 0, '<Precision,2:2><Standard Format,2>'));
+                //A comment keeps an empty amount field, so its row keeps the three-column widths of the item rows
+                if TempBuffer."Line Type" = TempBuffer."Line Type"::Comment then
+                    Printer.AddTextField(3, 2, '')
+                else
+                    Printer.AddTextField(3, 2, Format(TempBuffer."Amount Incl. VAT", 0, '<Precision,2:2><Standard Format,2>'));
             until TempBuffer.Next() = 0;
 
         Printer.SetPadChar('-');

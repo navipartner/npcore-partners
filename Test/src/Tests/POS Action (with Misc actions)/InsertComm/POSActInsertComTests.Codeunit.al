@@ -25,6 +25,7 @@ codeunit 85071 "NPR POS Act. Insert Com. Tests"
         PlacementTxt: Label '"%1": %2, indentation %3, No. %4, quantity %5, attached to %6', Locked = true, Comment = '%1 = comment text, %2 = position, %3 = indentation, %4 = No., %5 = quantity, %6 = line it is attached to';
         PositionAtLineTxt: Label 'at line %1', Locked = true, Comment = '%1 = line number';
         RowMismatchTxt: Label '%1: expected <%2>, actual <%3>. ', Locked = true, Comment = '%1 = scenario row, %2 = expected value, %3 = actual value';
+        VATRemovedCommentTxt: Label 'VAT removed from sale: %1', Locked = true, Comment = '%1 = VAT amount removed';
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
@@ -97,6 +98,87 @@ codeunit 85071 "NPR POS Act. Insert Com. Tests"
         CheckRow('S1.c', StrSubstNo(AttachedToTxt, 'No onions', 'DISH'), RunInsertCommentOnNewDish(true, 'No onions'), Mismatches);
         CheckRow('S1.d', StrSubstNo(AttachedToTxt, 'No onions, no garlic', 'DISH'), RunInsertCommentOnNewDish(true, 'No onions, no garlic'), Mismatches);
         Assert.AreEqual('', Mismatches, 'Rows S1.b, S1.c and S1.d: the Indent parameter decides whether the comment is attached to the selected DISH.');
+    end;
+
+    #endregion
+
+    #region The order-note marker
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure InsertComment_NoIndent_MarkedWithStar()
+    var
+        DishSaleLinePOS: Record "NPR POS Sale Line";
+        NewSaleLinePOS: Record "NPR POS Sale Line";
+        BusinessLogic: Codeunit "NPR POS Action - Insert Comm B";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        Mismatches: Text;
+    begin
+        // [SCENARIO] A comment inserted without Indent gets No. "*" and stays an ordinary comment at the end of the sale
+        Initialize();
+
+        // [GIVEN] A sale with DISH
+        StartSale();
+        AddItemLine('DISH', 0, DishSaleLinePOS);
+
+        // [WHEN] The waiter inserts the comment "Milk allergy" without Indent
+        POSSession.GetSaleLine(POSSaleLine);
+        BusinessLogic.InputPosCommentLine('Milk allergy', false, POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(NewSaleLinePOS);
+
+        // [THEN] The comment is the last line of the sale, not attached, at indentation 0, with No. "*"
+        CheckRow('S14.a placement', StrSubstNo(NotAttachedAtTheEndTxt, 'Milk allergy'), DescribeInsertedComment(NewSaleLinePOS, 'Milk allergy'), Mismatches);
+        CheckRow('S14.a indentation', '0', Format(NewSaleLinePOS.Indentation), Mismatches);
+        CheckRow('S14.a No.', '*', NewSaleLinePOS."No.", Mismatches);
+        Assert.AreEqual('', Mismatches, 'Row S14.a: a comment inserted without Indent gets No. "*" and stays an ordinary comment at the end.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SetSaleVAT_CommentLine_NotMarked()
+    var
+        CommentSaleLinePOS: Record "NPR POS Sale Line";
+        Item: Record Item;
+        ItemVATPostingSetup: Record "VAT Posting Setup";
+        NoVATPostingSetup: Record "VAT Posting Setup";
+        SalePOS: Record "NPR POS Sale";
+        LibraryERM: Codeunit "Library - ERM";
+        SetSaleVATB: Codeunit "NPR POS Action-Set Sale VAT-B.";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        Mismatches: Text;
+    begin
+        // [SCENARIO] The Set Sale VAT action writes its comment line with a blank No., as before the order-note marker
+        Initialize();
+
+        // [GIVEN] A sale with an item priced 12.00 including 25% VAT, and a VAT business posting group with 0% VAT for that item
+        StartSale();
+        _LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 12;
+        Item.Modify();
+        _LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+        LibraryERM.CreateVATPostingSetupWithAccounts(NoVATPostingSetup, NoVATPostingSetup."VAT Calculation Type"::"Normal VAT", 0);
+        LibraryERM.CreateVATPostingSetup(ItemVATPostingSetup, NoVATPostingSetup."VAT Bus. Posting Group", Item."VAT Prod. Posting Group");
+        ItemVATPostingSetup."VAT %" := 0;
+        ItemVATPostingSetup."VAT Calculation Type" := ItemVATPostingSetup."VAT Calculation Type"::"Normal VAT";
+        ItemVATPostingSetup.Validate("Sales VAT Account", LibraryERM.CreateGLAccountNo());
+        ItemVATPostingSetup.Validate("Purchase VAT Account", LibraryERM.CreateGLAccountNo());
+        ItemVATPostingSetup.Modify();
+
+        // [WHEN] Set Sale VAT moves the sale to that group and adds its comment line
+        POSSession.GetSale(POSSale);
+        POSSession.GetSaleLine(POSSaleLine);
+        SetSaleVATB.ChangeSaleVATBusPostingGroup(POSSale, POSSaleLine, '', NoVATPostingSetup."VAT Bus. Posting Group", true);
+
+        // [THEN] The sale has the comment "VAT removed from sale: 2.40" with a blank No.
+        POSSale.GetCurrentSale(SalePOS);
+        CommentSaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        CommentSaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        CommentSaleLinePOS.SetRange("Line Type", CommentSaleLinePOS."Line Type"::Comment);
+        Assert.IsTrue(CommentSaleLinePOS.FindFirst(), 'S14.c: Set Sale VAT should have added a comment line to the sale.');
+        CheckRow('S14.c comment text', StrSubstNo(VATRemovedCommentTxt, 2.40), CommentSaleLinePOS.Description, Mismatches);
+        CheckRow('S14.c No.', '', CommentSaleLinePOS."No.", Mismatches);
+        Assert.AreEqual('', Mismatches, 'Row S14.c: the Set Sale VAT comment keeps a blank No., as today.');
     end;
 
     #endregion

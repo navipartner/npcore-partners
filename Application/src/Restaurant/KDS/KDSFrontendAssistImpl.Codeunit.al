@@ -241,10 +241,16 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
         NotificationEntry: Record "NPR NPRE Notification Entry";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
         NotificationHandler: Codeunit "NPR NPRE Notification Handler";
+        OrderNotesMgt: Codeunit "NPR NPRE Order Notes Mgt.";
         KitchenReqStationsQry: Query "NPR NPRE Kitchen Req. Stations";
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
+        OrderNotesSpan: Codeunit "NPR Sentry Span";
         CustomerDetailsDic: Dictionary of [Text, List of [Text]];
+        PadNotesCache: Dictionary of [Code[20], List of [Text]];
+        OrderNotes: List of [Text];
+        NotesStart: DateTime;
+        NotesDuration: Duration;
         KitchenRequests: JsonArray;
         KitchenStations: JsonArray;
         KitchenRequest: JsonObject;
@@ -314,6 +320,10 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
                     OrderHdr.Add('orderReadyNotifStatusName', StatusEnumValueName(NotificationEntry."Notification Send Status"))
                 else
                     OrderHdr.Add('orderReadyNotifStatusName', NullJsonValue);
+                NotesStart := CurrentDateTime();
+                OrderNotesMgt.GetOrderNotes(KitchenReqStationsQry.Order_ID, PadNotesCache, OrderNotes);
+                NotesDuration += CurrentDateTime() - NotesStart;
+                OrderHdr.Add('orderNotes', ListToJsonArray(OrderNotes));
             end;
 
             //Kitchen order line
@@ -359,6 +369,9 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
             FinishOrder(OrderHdr, KitchenRequests, CustomerDetailsDic, Orders);
         end;
 
+        Sentry.StartSpan(OrderNotesSpan, 'bc.restaurant.kds.order-notes');
+        OrderNotesSpan.SetStartTime(CurrentDateTime() - NotesDuration);
+        OrderNotesSpan.Finish();
         Span.Finish();
     end;
 

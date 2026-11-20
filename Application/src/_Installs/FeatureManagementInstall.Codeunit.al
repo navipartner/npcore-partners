@@ -93,6 +93,7 @@ codeunit 6151434 "NPR Feature Management Install"
         AddFeature(Feature::"Shopify Order No. Without Prefix");
         AddFeature(Feature::"JQ Notifications via NP Email");
         AddFeature(Feature::"Pay by Link Notif. via NP Email");
+        AddFeature(Feature::"Order Notes in Kitchen Ticket Header");
 
         if ExistingFeature.FindSet() then
             repeat

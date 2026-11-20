@@ -381,7 +381,7 @@ codeunit 85409 "NPR NPRE W/Pad SplitMergeTests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure SplitBill_DishMovedAwayFromAnOrdinaryComment_OrdinaryCommentHandledAsToday()
+    procedure SplitBill_DishMovedAwayFromAnOrderNote_OrderNoteCopiedToTheNewBill()
     var
         BeerLine: Record "NPR NPRE Waiter Pad Line";
         CommentLine: Record "NPR NPRE Waiter Pad Line";
@@ -391,33 +391,33 @@ codeunit 85409 "NPR NPRE W/Pad SplitMergeTests"
         BillLines: JsonArray;
         Mismatches: Text;
     begin
-        // [SCENARIO] An ordinary comment does not travel with a split dish: it stays, or is deleted when only comments are left
+        // [SCENARIO] A split dish takes a copy of the order note to the new bill: the note stays on the source pad, or is deleted with it when only comments are left
         Initialize();
 
-        // [GIVEN] Per row, a source pad with an unsent DISH, the ordinary "Table 6 VIP" and the row's other lines, and a new bill
+        // [GIVEN] Per row, a source pad with an unsent DISH, the order note "Table 6 VIP" and the row's other lines, and a new bill
         // [WHEN] DISH is split to the new bill
-        // [THEN] "Table 6 VIP" stays with BEER, or is deleted with nothing else left, as today
+        // [THEN] The new bill holds DISH and a copy of "Table 6 VIP"; the source keeps "Table 6 VIP" with BEER, or loses it with nothing else left
         CreatePad(SourcePad);
         AddRoleLine(SourcePad, 'DISH', 1, 0, true, DishLine);
         AddRoleLine(SourcePad, 'BEER', 1, 0, true, BeerLine);
-        _LibraryRestaurant.AddWaiterPadCommentLine(SourcePad."No.", 'Table 6 VIP', 0, CommentLine);
+        _LibraryRestaurant.AddWaiterPadOrderNote(SourcePad."No.", 'Table 6 VIP', CommentLine);
         CreatePad(TargetPad);
         Clear(BillLines);
         AddBillLine(BillLines, DishLine, 1);
         SplitBill(SourcePad, BillLines, TargetPad);
         CheckRow('S8.e source pad', 'BEER 1; Table 6 VIP', PadContent(SourcePad."No."), Mismatches);
-        CheckRow('S8.e new pad', 'DISH 1', PadContent(TargetPad."No."), Mismatches);
+        CheckRow('S8.e new pad (S10.a)', 'DISH 1; Table 6 VIP', PadContent(TargetPad."No."), Mismatches);
 
         CreatePad(SourcePad);
         AddRoleLine(SourcePad, 'DISH', 1, 0, true, DishLine);
-        _LibraryRestaurant.AddWaiterPadCommentLine(SourcePad."No.", 'Table 6 VIP', 0, CommentLine);
+        _LibraryRestaurant.AddWaiterPadOrderNote(SourcePad."No.", 'Table 6 VIP', CommentLine);
         CreatePad(TargetPad);
         Clear(BillLines);
         AddBillLine(BillLines, DishLine, 1);
         SplitBill(SourcePad, BillLines, TargetPad);
         CheckRow('S8.k source pad', '', PadContent(SourcePad."No."), Mismatches);
-        CheckRow('S8.k new pad', 'DISH 1', PadContent(TargetPad."No."), Mismatches);
-        _Assert.AreEqual('', Mismatches, 'Rows S8.e and S8.k: ordinary comments behave as today on a split bill.');
+        CheckRow('S8.k new pad (S10.b)', 'DISH 1; Table 6 VIP', PadContent(TargetPad."No."), Mismatches);
+        _Assert.AreEqual('', Mismatches, 'Rows S8.e and S8.k (S10.a, S10.b): the order note stays on the source pad as today and a copy follows DISH to the new bill.');
     end;
 
     [Test]
@@ -592,7 +592,7 @@ codeunit 85409 "NPR NPRE W/Pad SplitMergeTests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure MergeWaiterPad_PadWithAnOrdinaryComment_OrdinaryCommentDeletedAsToday()
+    procedure MergeWaiterPad_PadWithAnOrderNote_OrderNoteAddedToPadB()
     var
         CommentLine: Record "NPR NPRE Waiter Pad Line";
         DishLine: Record "NPR NPRE Waiter Pad Line";
@@ -601,20 +601,22 @@ codeunit 85409 "NPR NPRE W/Pad SplitMergeTests"
         PadB: Record "NPR NPRE Waiter Pad";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
     begin
-        // [SCENARIO] An ordinary comment is not moved by a merge and goes with the emptied pad, as today
-        // [GIVEN] Pad A with an unsent DISH and the ordinary "Table 6 VIP", and pad B that already holds a line of its own
+        // [SCENARIO] A merge adds the order note of pad A to the end of pad B, and the emptied pad A keeps no lines
+        // [GIVEN] Pad A with an unsent DISH and the order note "Table 6 VIP", and pad B that already holds a line of its own
         Initialize();
         CreatePad(PadA);
         AddRoleLine(PadA, 'DISH', 1, 0, true, DishLine);
-        _LibraryRestaurant.AddWaiterPadCommentLine(PadA."No.", 'Table 6 VIP', 0, CommentLine);
+        _LibraryRestaurant.AddWaiterPadOrderNote(PadA."No.", 'Table 6 VIP', CommentLine);
         CreatePadWithOwnLine(PadB, OtherLine);
 
         // [WHEN] Pad A is merged into pad B
         WaiterPadMgt.MergeWaiterPad(PadA, PadB);
 
-        // [THEN] Pad B holds DISH and pad A holds nothing
-        _Assert.AreEqual('OTHER 1; DISH 1', PadContent(PadB."No."), 'S9.c: pad B should hold its own line and DISH, without "Table 6 VIP".');
-        _Assert.AreEqual('', PadContent(PadA."No."), 'S9.c: pad A should hold no lines; "Table 6 VIP" is deleted as today.');
+        // [THEN] Pad B holds its own line, DISH and "Table 6 VIP" at the end, and pad A holds nothing
+        _Assert.AreEqual(
+            'OTHER 1; DISH 1; Table 6 VIP', PadContent(PadB."No."),
+            'S9.c (S11.a): pad B should hold its own line, DISH and then a copy of the order note "Table 6 VIP".');
+        _Assert.AreEqual('', PadContent(PadA."No."), 'S9.c (S11.a): pad A should hold no lines; its "Table 6 VIP" is deleted when it closes.');
     end;
 
     [Test]
@@ -671,7 +673,7 @@ codeunit 85409 "NPR NPRE W/Pad SplitMergeTests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure MergeWaiterPad_CommentBeforeAnAddOnOrBeforeItsParentOrOrdinary_MergedAsToday()
+    procedure MergeWaiterPad_CommentBeforeAnAddOnOrBeforeItsParentOrAnOrderNote_MergedAsSpecified()
     var
         AddOnMLine: Record "NPR NPRE Waiter Pad Line";
         CommentLine: Record "NPR NPRE Waiter Pad Line";
@@ -682,7 +684,7 @@ codeunit 85409 "NPR NPRE W/Pad SplitMergeTests"
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
         Mismatches: Text;
     begin
-        // [SCENARIO] A merge keeps today's result for a comment placed before an add-on of its parent or before its parent, and for an ordinary comment
+        // [SCENARIO] A merge keeps today's result for a comment placed before an add-on of its parent or before its parent, and adds an order note of pad A to the end of pad B
         Initialize();
 
         // [GIVEN] Per row, pad A with DISH and the row's lines in the row's order, and pad B that already holds a line of its own
@@ -698,10 +700,10 @@ codeunit 85409 "NPR NPRE W/Pad SplitMergeTests"
 
         CreatePad(PadA);
         AddRoleLine(PadA, 'DISH', 1, 0, true, DishLine);
-        _LibraryRestaurant.AddWaiterPadCommentLine(PadA."No.", 'Table 6 VIP', 0, CommentLine);
+        _LibraryRestaurant.AddWaiterPadOrderNote(PadA."No.", 'Table 6 VIP', CommentLine);
         CreatePadWithOwnLine(PadB, OtherLine);
         WaiterPadMgt.MergeWaiterPad(PadA, PadB);
-        CheckRow('S9.i pad B', 'OTHER; DISH', PadLineOrder(PadB."No."), Mismatches);
+        CheckRow('S9.i pad B (S11.a)', 'OTHER; DISH; Table 6 VIP', PadLineOrder(PadB."No."), Mismatches);
 
         CreatePad(PadA);
         AddRoleLine(PadA, 'DISH', 1, 0, true, DishLine);
@@ -711,7 +713,7 @@ codeunit 85409 "NPR NPRE W/Pad SplitMergeTests"
         WaiterPadMgt.MergeWaiterPad(PadA, PadB);
         CheckRow('S9.j pad B', 'OTHER; DISH; No onions > DISH', PadLineOrder(PadB."No."), Mismatches);
         CheckRow('S9.j pad A comments', '', CommentsOnPad(PadA."No."), Mismatches);
-        _Assert.AreEqual('', Mismatches, 'Rows S9.h, S9.i and S9.j: a merge keeps today''s result for these comments.');
+        _Assert.AreEqual('', Mismatches, 'Rows S9.h, S9.i (S11.a) and S9.j: a merge keeps the attached comments as today and adds the order note to the end of pad B.');
     end;
 
     [Test]
@@ -968,7 +970,7 @@ codeunit 85409 "NPR NPRE W/Pad SplitMergeTests"
         SplitBillB.ProcessWaiterPadSplit(WaiterPadNo, Bills.AsToken(), 0);
     end;
 
-    local procedure PadContent(WaiterPadNo: Code[20]) Content: Text
+    internal procedure PadContent(WaiterPadNo: Code[20]) Content: Text
     var
         ParentLine: Record "NPR NPRE Waiter Pad Line";
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
@@ -1016,7 +1018,7 @@ codeunit 85409 "NPR NPRE W/Pad SplitMergeTests"
             until CommentLine.Next() = 0;
     end;
 
-    local procedure CommentsOnPad(WaiterPadNo: Code[20]) Comments: Text
+    internal procedure CommentsOnPad(WaiterPadNo: Code[20]) Comments: Text
     var
         CommentLine: Record "NPR NPRE Waiter Pad Line";
     begin
@@ -1041,7 +1043,7 @@ codeunit 85409 "NPR NPRE W/Pad SplitMergeTests"
             Mismatches += StrSubstNo(RowMismatchTxt, RowId, Expected, Actual);
     end;
 
-    local procedure PadLineOrder(WaiterPadNo: Code[20]) LineOrder: Text
+    internal procedure PadLineOrder(WaiterPadNo: Code[20]) LineOrder: Text
     var
         ParentLine: Record "NPR NPRE Waiter Pad Line";
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";

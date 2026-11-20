@@ -21,10 +21,10 @@ codeunit 6151331 "NPR POS Action - Insert Comm B"
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
         SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Comment;
         SaleLinePOS.Description := CommentDescription;
+        SaleLinePOS."No." := '*';
 
         if NewLineNo <> 0 then begin
             SaleLinePOS."Line No." := NewLineNo;
-            SaleLinePOS."No." := '*';
             SaleLinePOS.Indentation := TargetSaleLinePOS.Indentation + 1;
 
             SaleLinePOSAddOn.Init();

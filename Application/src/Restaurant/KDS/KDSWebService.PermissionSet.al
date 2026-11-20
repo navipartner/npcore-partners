@@ -16,6 +16,7 @@ permissionset 6014405 "NPR KDS WebService"
         codeunit "NPR NPRE Waiter Pad Mgt." = X,
         codeunit "NPR NPRE Restaurant Print" = X,
         codeunit "NPR NPRE Seating Mgt." = X,
+        codeunit "NPR NPRE Order Notes Mgt." = X,
         tabledata "NPR NPRE Kitchen Order" = RIM,
         tabledata "NPR NPRE Kitchen Order Counter" = RIM,
         tabledata "NPR NPRE Kitchen Request" = RIM,
@@ -42,6 +43,7 @@ permissionset 6014405 "NPR KDS WebService"
         tabledata "NPR POS Info NPRE Waiter Pad" = RMD,
         query "NPR NPRE Kitchen Req. Stations" = X,
         query "NPR NPRE Kitchen Req. w Source" = X,
-        query "NPR NPRE Kitch.Req.Src. by Doc" = X;
+        query "NPR NPRE Kitch.Req.Src. by Doc" = X,
+        query "NPR NPRE Kitch.Ord.Src. by Doc" = X;
 }
 #endif

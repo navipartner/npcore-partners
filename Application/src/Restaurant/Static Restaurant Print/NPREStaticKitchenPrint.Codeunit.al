@@ -15,6 +15,8 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
     var
         TempPrinterDeviceSettings: Record "NPR Printer Device Settings" temporary;
         KitchenPrintMgt: Codeunit "NPR NPRE Kitchen Print Mgt";
+        OrderNotesMgt: Codeunit "NPR NPRE Order Notes Mgt.";
+        PrintNotesInHeader: Boolean;
         KitchenOrderIDs: List of [BigInteger];
         KitchenStationDescriptions: List of [Text];
     begin
@@ -22,6 +24,9 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
         KitchenOrderIDs := KitchenPrintMgt.GetLatestKDSOrderIDsFromSendLog(TempWPadLineOutBuffer);
         KitchenStationDescriptions := KitchenPrintMgt.GetKitchenStationDescriptions(TempWPadLineOutBuffer);
         KitchenPrintMgt.GetGroupedPrintLines(TempWPadLineOutBuffer);
+        PrintNotesInHeader := OrderNotesMgt.HeaderNotesEnabled();
+        if PrintNotesInHeader then
+            OrderNotesMgt.RemoveOrderNotesFromBody(TempWPadLineOutBuffer);
         KitchenPrintMgt.MergeIdenticalLines(TempWPadLineOutBuffer);
         if not TempWPadLineOutBuffer.FindFirst() then
             exit;
@@ -30,15 +35,18 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
         Printer.SetTwoColumnDistribution(0.15, 0.85);
         Printer.SetThreeColumnDistribution(0.33, 0.33, 0.33);
 
-        AddReceiptInformation(TempWPadLineOutBuffer, KitchenOrderIDs, KitchenStationDescriptions);
+        AddReceiptInformation(TempWPadLineOutBuffer, PrintNotesInHeader, KitchenOrderIDs, KitchenStationDescriptions);
 
         Printer.ProcessBuffer(OutputCodeunitId, Enum::"NPR Line Printer Device"::Epson, TempPrinterDeviceSettings);
     end;
 
-    local procedure AddReceiptInformation(var WPadLineOutBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer"; KitchenOrderIDs: List of [BigInteger]; KitchenStationDescriptions: List of [Text])
+    local procedure AddReceiptInformation(var WPadLineOutBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer"; PrintNotesInHeader: Boolean; KitchenOrderIDs: List of [BigInteger]; KitchenStationDescriptions: List of [Text])
     var
         TempRestaurantPrintHeader: Record "NPR NPRE Rest. Print Header" temporary;
         KitchenPrintMgt: Codeunit "NPR NPRE Kitchen Print Mgt";
+        OrderNotesMgt: Codeunit "NPR NPRE Order Notes Mgt.";
+        Notes: List of [Text];
+        Note: Text;
         B21FontLbl: Label 'B21', Locked = true;
         B22FontLbl: Label 'B22', Locked = true;
         B12FontLbl: Label 'B12', Locked = true;
@@ -110,6 +118,17 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
         if TempRestaurantPrintHeader."Seating Description" <> '' then
             Printer.AddLine(TempRestaurantPrintHeader."Seating Description", 1);
         Printer.AddLine(NumberOfGuestsLbl + Format(TempRestaurantPrintHeader."Number of Guests"), 1);
+        if PrintNotesInHeader then begin
+            OrderNotesMgt.GetWaiterPadNotes(WPadLineOutBuffer."Waiter Pad No.", Notes);
+            if Notes.Count() > 0 then begin
+                Printer.SetPadChar('-');
+                Printer.AddLine('', 0);
+                Printer.SetFont(B22FontLbl);
+                foreach Note in Notes do
+                    PrintHeaderNote(Note, 28); // a note has the whole B22 line: 28 chars on 80mm paper
+                Printer.SetFont(B21FontLbl);
+            end;
+        end;
 
         Printer.SetPadChar('-');
         Printer.AddLine('', 0);
@@ -171,6 +190,17 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
             Printer.AddTextField(2, 0, Indent + TextChunk);
         end;
 
+        Printer.SetBold(false);
+    end;
+
+    local procedure PrintHeaderNote(NoteText: Text; MaxLineLength: Integer)
+    var
+        RemainingText: Text;
+    begin
+        RemainingText := DelChr(NoteText, '<', ' ');
+        Printer.SetBold(true);
+        while RemainingText <> '' do
+            Printer.AddLine(GetNextTextChunk(RemainingText, MaxLineLength), 0);
         Printer.SetBold(false);
     end;
 

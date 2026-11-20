@@ -174,9 +174,18 @@
                 trigger RefreshPage()
                 begin
                     CurrPage.Update(false);
+                    ClearOrderNotesIfListIsEmpty();
                     if IsExpediteMode then
                         CurrPage."Kitchen Stations".Page.Update(false);
                 end;
+            }
+        }
+        area(factboxes)
+        {
+            part(OrderNotes; "NPR NPRE Order Notes Factbox")
+            {
+                Caption = 'Order Notes';
+                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -207,6 +216,7 @@
                         CurrPage.SetSelectionFilter(KitchenRequest);
                         KitchenOrderMgt.SetRequestLinesAsServed(KitchenRequest);
                         CurrPage.Update(false);
+                        ClearOrderNotesIfListIsEmpty();
                     end;
                 }
                 action(StartProduction)
@@ -224,6 +234,7 @@
                     trigger OnAction()
                     begin
                         RunKitchenStationRelatedAction(KitchenStationAction::"Start Production");
+                        ClearOrderNotesIfListIsEmpty();
                     end;
                 }
                 action(EndProduction)
@@ -241,6 +252,7 @@
                     trigger OnAction()
                     begin
                         RunKitchenStationRelatedAction(KitchenStationAction::"End Production");
+                        ClearOrderNotesIfListIsEmpty();
                     end;
                 }
             }
@@ -283,6 +295,7 @@
                     trigger OnAction()
                     begin
                         ToggleFinishedFilter();
+                        ClearOrderNotesIfListIsEmpty();
                     end;
                 }
                 action(HideFinished)
@@ -300,6 +313,7 @@
                     trigger OnAction()
                     begin
                         ToggleFinishedFilter();
+                        ClearOrderNotesIfListIsEmpty();
                     end;
                 }
                 action(ShowServed)
@@ -317,6 +331,7 @@
                     trigger OnAction()
                     begin
                         ToggleServedFilter();
+                        ClearOrderNotesIfListIsEmpty();
                     end;
                 }
                 action(HideServed)
@@ -334,6 +349,7 @@
                     trigger OnAction()
                     begin
                         ToggleServedFilter();
+                        ClearOrderNotesIfListIsEmpty();
                     end;
                 }
             }
@@ -393,6 +409,18 @@
     begin
         Rec.GetSeatingAndWaiter(AssignedWaiters, SeatingCodes, SeatingNos);
         HideLineStatusValue := IsExpediteMode and (Rec."Parent Request No." <> 0);
+    end;
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        CurrPage.OrderNotes.Page.SetOrderId(Rec."Order ID");
+    end;
+
+    local procedure ClearOrderNotesIfListIsEmpty()
+    begin
+        //OnAfterGetCurrRecord does not run when a refresh leaves the list without a record
+        if Rec.IsEmpty() then
+            CurrPage.OrderNotes.Page.SetOrderId(0);
     end;
 
     local procedure GetPageCaption(): Text

@@ -1152,7 +1152,7 @@ codeunit 85405 "NPR NPRE W/Pad RoundTripTests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure SaleWithOrdinaryComment_SavedToPad_CommentNotAttachedWithBlankNo()
+    procedure SaleWithOrdinaryComment_SavedToPad_CommentNotAttachedMarkedWithStar()
     var
         DishSaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
@@ -1161,7 +1161,7 @@ codeunit 85405 "NPR NPRE W/Pad RoundTripTests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSession: Codeunit "NPR POS Session";
     begin
-        // [SCENARIO] An ordinary comment is saved to the pad as today: not attached, with a blank No.
+        // [SCENARIO] An ordinary comment is saved to the pad not attached, with the No. "*" the Insert Comment action gives it
         // [GIVEN] A sale with DISH and the ordinary comment "Table 6 VIP", and a new pad
         Initialize();
         StartEmptySale(POSSession, SalePOS);
@@ -1173,10 +1173,10 @@ codeunit 85405 "NPR NPRE W/Pad RoundTripTests"
         // [WHEN] The sale is saved onto the pad
         SaveSaleToPad(SalePOS, WaiterPad);
 
-        // [THEN] The pad holds DISH and the comment, not attached and with a blank No.
+        // [THEN] The pad holds DISH and the comment, not attached and with No. "*"
         _Assert.AreEqual(
-            'DISH; Table 6 VIP (No. "", indentation 0)', PadLineSequence(WaiterPad."No."),
-            'S6.b: "Table 6 VIP" should be saved as an ordinary pad comment with a blank No.');
+            'DISH; Table 6 VIP (No. "*", indentation 0)', PadLineSequence(WaiterPad."No."),
+            'S14.d: "Table 6 VIP" should be saved as an ordinary pad comment, not attached, with No. "*".');
     end;
 
     [Test]

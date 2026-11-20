@@ -368,6 +368,47 @@ codeunit 85557 "NPR NPRE Kitchen Ticket Tests"
             'On the kitchen ticket and the pre-receipt, "no dressing" should print two spaces deeper than "No onions", and "No onions" in line with Salad, so it does not read as a note on Salad.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure PreReceipt_CommentLines_TextOnlyInTheDescriptionColumn()
+    var
+        CommentLine: Record "NPR NPRE Waiter Pad Line";
+        NoteLine: Record "NPR NPRE Waiter Pad Line";
+        SteakLine: Record "NPR NPRE Waiter Pad Line";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        TempPreReceipt: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary;
+        Base64Convert: Codeunit "Base64 Convert";
+        PreReceiptPrintHandler: Codeunit "NPR Retail Print Handler";
+        PrintJob: Text;
+        Mismatches: Text;
+    begin
+        // [SCENARIO] On the pre-receipt a comment line prints only its text, in the description column of the item rows: no quantity and no amount
+        Initialize();
+
+        // [GIVEN] A pad with Steak, "No onions" attached to Steak, and the order note "Milk allergy"
+        AssignUserToPOSUnit();
+        CreatePad(WaiterPad);
+        AddRoleLine(WaiterPad, 'Steak', 0, SteakLine);
+        _LibraryRestaurant.AddWaiterPadAttachedComment(WaiterPad."No.", 'No onions', SteakLine, CommentLine);
+        _LibraryRestaurant.AddWaiterPadOrderNote(WaiterPad."No.", 'Milk allergy', NoteLine);
+        SelectForTicket(TempPreReceipt, SteakLine, '');
+
+        // [WHEN] The pre-receipt of the pad is printed
+        BindSubscription(PreReceiptPrintHandler);
+        Codeunit.Run(Codeunit::"NPR NPRE Static Pre Receipt", TempPreReceipt);
+        UnbindSubscription(PreReceiptPrintHandler);
+        PrintJob := Base64Convert.FromBase64(PreReceiptPrintHandler.GetPrintJobBase64());
+
+        // [THEN] Both comments fill a field as wide as the Steak description, and their rows carry no " x " and no amount
+        CheckRow('"Milk allergy" field width', Format(FieldWidth(PrintJob, 'Steak')), Format(FieldWidth(PrintJob, 'Milk allergy')), Mismatches);
+        CheckRow('"No onions" field width', Format(FieldWidth(PrintJob, 'Steak')), Format(FieldWidth(PrintJob, 'No onions')), Mismatches);
+        CheckRow('"Milk allergy" row has a quantity or an amount', Format(false), Format(HasQuantityOrAmount(PrintedRow(PrintJob, 'Milk allergy'))), Mismatches);
+        CheckRow('"No onions" row has a quantity or an amount', Format(false), Format(HasQuantityOrAmount(PrintedRow(PrintJob, 'No onions'))), Mismatches);
+        _Assert.AreEqual(
+            '', Mismatches,
+            'On the pre-receipt, "Milk allergy" and "No onions" should print only their text, in a field as wide as the Steak description, with no quantity and no amount.');
+    end;
+
     local procedure Initialize()
     var
         RestaurantSetup: Record "NPR NPRE Restaurant Setup";
@@ -471,6 +512,35 @@ codeunit 85557 "NPR NPRE Kitchen Ticket Tests"
         DishCommentIndent := SpacesBefore(PrintJob, 'No onions', PrintName);
         CheckRow(PrintName + ', spaces before "no dressing"', Format(DishCommentIndent + 2), Format(AddOnCommentIndent), Mismatches);
         CheckRow(PrintName + ', spaces before "No onions"', Format(AddOnIndent), Format(DishCommentIndent), Mismatches);
+    end;
+
+    local procedure FieldWidth(PrintJob: Text; FieldText: Text) Width: Integer
+    var
+        Position: Integer;
+        EndPosition: Integer;
+    begin
+        // A left-aligned field is its text padded with spaces to the column width, so its width runs from its own leading spaces to its last trailing space
+        Position := StrPos(PrintJob, FieldText);
+        _Assert.AreNotEqual(0, Position, StrSubstNo(NotPrintedTxt, FieldText, 'pre-receipt'));
+        EndPosition := Position + StrLen(FieldText);
+        while (EndPosition <= StrLen(PrintJob)) and (PrintJob[EndPosition] = ' ') do
+            EndPosition += 1;
+        Width := SpacesBefore(PrintJob, FieldText, 'pre-receipt') + EndPosition - Position;
+    end;
+
+    local procedure PrintedRow(PrintJob: Text; FieldText: Text) Row: Text
+    var
+        TypeHelper: Codeunit "Type Helper";
+        PrintedLine: Text;
+    begin
+        foreach PrintedLine in PrintJob.Split(TypeHelper.LFSeparator()) do
+            if PrintedLine.Contains(FieldText) then
+                exit(PrintedLine);
+    end;
+
+    local procedure HasQuantityOrAmount(Row: Text): Boolean
+    begin
+        exit(Row.Contains(' x ') or Row.Contains('0.00') or Row.Contains('0,00'));
     end;
 
     local procedure SpacesBefore(PrintJob: Text; FieldText: Text; PrintName: Text) Spaces: Integer

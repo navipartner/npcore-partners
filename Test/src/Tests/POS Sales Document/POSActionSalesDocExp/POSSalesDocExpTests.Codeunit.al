@@ -191,6 +191,50 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         Assert.AreEqual('No onions', SalesLine.Description, 'S18.a: the sales line should carry the description "No onions".');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure OrdinaryComment_SaleEnds_POSEntryLineMarked()
+    var
+        CommentSaleLinePOS: Record "NPR POS Sale Line";
+        Item: Record Item;
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        SalePOS: Record "NPR POS Sale";
+        Assert: Codeunit Assert;
+        InsertCommentB: Codeunit "NPR POS Action - Insert Comm B";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        SalesDocumentExportMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+    begin
+        // [SCENARIO] A comment inserted without Indent ends on the POS entry as a Comment line that keeps its No. "*"
+        InitializeData();
+
+        // [GIVEN] A sale for a customer with a DISH and the comment "Milk allergy" inserted without Indent
+        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, _Salesperson, POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        Item."Unit Price" := 10;
+        Item.Modify();
+        NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        _POSSession.GetSaleLine(POSSaleLine);
+        InsertCommentB.InputPosCommentLine('Milk allergy', false, POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(CommentSaleLinePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, _Customer."No.", false);
+
+        // [WHEN] The sale ends by its export to a sales order
+        _POSSession.GetSale(POSSale);
+        SalesDocumentExportMgt.SetDocumentTypeOrder();
+        SalesDocumentExportMgt.ProcessPOSSale(POSSale);
+
+        // [THEN] The POS entry has a Comment line "Milk allergy" with No. "*"
+        Assert.IsTrue(POSEntrySalesLine.GetBySystemId(CommentSaleLinePOS.SystemId), 'S14.e: the POS entry should have a line for "Milk allergy".');
+        Assert.AreEqual(POSEntrySalesLine.Type::Comment, POSEntrySalesLine.Type, 'S14.e: the POS entry line of "Milk allergy" should be of type Comment.');
+        Assert.AreEqual('Milk allergy', POSEntrySalesLine.Description, 'S14.e: the POS entry line should carry the description "Milk allergy".');
+        Assert.AreEqual('*', POSEntrySalesLine."No.", 'S14.e: the POS entry line of "Milk allergy" should keep the No. "*" the Insert Comment action gave it.');
+    end;
+
     #region Asynchronous posting of an order with an attached comment
     [Test]
     [TestPermissions(TestPermissions::Disabled)]

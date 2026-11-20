@@ -180,21 +180,42 @@ codeunit 6151362 "NPR POSAction Split Bill-B"
         FromWaiterPad: Record "NPR NPRE Waiter Pad";
         FromWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         TempAttachedBillLine: Record "NPR NPRE Waiter Pad Line" temporary;
+        TempSourceNote: Record "NPR NPRE Waiter Pad Line" temporary;
         ToWaiterPad: Record "NPR NPRE Waiter Pad";
         JsonHelper: Codeunit "NPR Json Helper";
+        OrderNotesMgt: Codeunit "NPR NPRE Order Notes Mgt.";
         RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
         Bill: JsonToken;
         BillLine: JsonToken;
         BillLines: JsonToken;
+        MoveQty: Decimal;
+        TargetSources: Dictionary of [Code[20], List of [Code[20]]];
+        SnapshotPads: List of [Code[20]];
+        Sources: List of [Code[20]];
         TouchedFromWaiterPadList: List of [Code[20]];
         TouchedToWaiterPadList: List of [Code[20]];
+        SourceWaiterPadNo: Code[20];
         TouchedWaiterPadNo: Code[20];
     begin
         if not Bills.IsArray() then
             exit;
         CurrWaiterPad.Get(WaiterPadNo);
         _WaiterPadPOSMgt.ClearMovedWaiterPadLineMap();
+
+        //Every source pad is snapshotted before any line moves, so order notes copied during the split are not passed on
+        foreach Bill in Bills.AsArray() do
+            if Bill.SelectToken('items', BillLines) and BillLines.IsArray() then
+                if BillLines.AsArray().Count > 0 then begin
+                    ToWaiterPad."No." := CopyStr(JsonHelper.GetJCode(Bill, 'id', true), 1, MaxStrLen(ToWaiterPad."No."));
+                    foreach BillLine in BillLines.AsArray() do
+                        if ResolveBillLine(BillLine, ToWaiterPad, FromWaiterPadLine, MoveQty) then
+                            if not SnapshotPads.Contains(FromWaiterPadLine."Waiter Pad No.") then begin
+                                SnapshotPads.Add(FromWaiterPadLine."Waiter Pad No.");
+                                OrderNotesMgt.SnapshotOrderNotes(FromWaiterPadLine."Waiter Pad No.", TempSourceNote);
+                            end;
+                end;
+
         foreach Bill in Bills.AsArray() do
             if Bill.SelectToken('items', BillLines) and BillLines.IsArray() then
                 if BillLines.AsArray().Count > 0 then begin
@@ -203,7 +224,7 @@ codeunit 6151362 "NPR POSAction Split Bill-B"
                     //The bill lists main items and their add-on lines in whatever order the front end sends them. Move the main
                     //items first, so an add-on that follows its main item onto this bill can be re-attached to it there.
                     foreach BillLine in BillLines.AsArray() do
-                        if MoveBillLineToWaiterPad(BillLine, ToWaiterPad, TouchedFromWaiterPadList, TouchedToWaiterPadList) then
+                        if MoveBillLineToWaiterPad(BillLine, ToWaiterPad, TouchedFromWaiterPadList, TouchedToWaiterPadList, TargetSources) then
                             ChangesFound := true;
 
                     //Then the add-on lines, in source line number order. Line numbers only ever grow, so an add-on applied to
@@ -216,11 +237,17 @@ codeunit 6151362 "NPR POSAction Split Bill-B"
                         repeat
                             if FromWaiterPadLine.Get(TempAttachedBillLine."Waiter Pad No.", TempAttachedBillLine."Line No.") then
                                 if MoveWaiterPadLineToBill(
-                                    FromWaiterPadLine, TempAttachedBillLine.Quantity, ToWaiterPad, TouchedFromWaiterPadList, TouchedToWaiterPadList)
+                                    FromWaiterPadLine, TempAttachedBillLine.Quantity, ToWaiterPad, TouchedFromWaiterPadList, TouchedToWaiterPadList, TargetSources)
                                 then
                                     ChangesFound := true;
                         until TempAttachedBillLine.Next() = 0;
                 end;
+
+        foreach TouchedWaiterPadNo in TouchedToWaiterPadList do begin
+            TargetSources.Get(TouchedWaiterPadNo, Sources);
+            foreach SourceWaiterPadNo in Sources do
+                OrderNotesMgt.CopyOrderNotes(TempSourceNote, SourceWaiterPadNo, TouchedWaiterPadNo);
+        end;
 
         foreach TouchedWaiterPadNo in TouchedFromWaiterPadList do begin
             FromWaiterPad.Get(TouchedWaiterPadNo);
@@ -240,7 +267,7 @@ codeunit 6151362 "NPR POSAction Split Bill-B"
         end;
     end;
 
-    local procedure MoveBillLineToWaiterPad(BillLine: JsonToken; ToWaiterPad: Record "NPR NPRE Waiter Pad"; var TouchedFromWaiterPadList: List of [Code[20]]; var TouchedToWaiterPadList: List of [Code[20]]): Boolean
+    local procedure MoveBillLineToWaiterPad(BillLine: JsonToken; ToWaiterPad: Record "NPR NPRE Waiter Pad"; var TouchedFromWaiterPadList: List of [Code[20]]; var TouchedToWaiterPadList: List of [Code[20]]; var TargetSources: Dictionary of [Code[20], List of [Code[20]]]): Boolean
     var
         FromWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         MoveQty: Decimal;
@@ -251,7 +278,7 @@ codeunit 6151362 "NPR POSAction Split Bill-B"
         if FromWaiterPadLine."Attached to Line No." <> 0 then
             exit(false);
 
-        exit(MoveWaiterPadLineToBill(FromWaiterPadLine, MoveQty, ToWaiterPad, TouchedFromWaiterPadList, TouchedToWaiterPadList));
+        exit(MoveWaiterPadLineToBill(FromWaiterPadLine, MoveQty, ToWaiterPad, TouchedFromWaiterPadList, TouchedToWaiterPadList, TargetSources));
     end;
 
     local procedure BufferAttachedBillLine(BillLine: JsonToken; ToWaiterPad: Record "NPR NPRE Waiter Pad"; var TempAttachedBillLine: Record "NPR NPRE Waiter Pad Line" temporary)
@@ -290,12 +317,20 @@ codeunit 6151362 "NPR POSAction Split Bill-B"
         exit(FromWaiterPadLine."Waiter Pad No." <> ToWaiterPad."No.");
     end;
 
-    local procedure MoveWaiterPadLineToBill(var FromWaiterPadLine: Record "NPR NPRE Waiter Pad Line"; MoveQty: Decimal; ToWaiterPad: Record "NPR NPRE Waiter Pad"; var TouchedFromWaiterPadList: List of [Code[20]]; var TouchedToWaiterPadList: List of [Code[20]]): Boolean
+    local procedure MoveWaiterPadLineToBill(var FromWaiterPadLine: Record "NPR NPRE Waiter Pad Line"; MoveQty: Decimal; ToWaiterPad: Record "NPR NPRE Waiter Pad"; var TouchedFromWaiterPadList: List of [Code[20]]; var TouchedToWaiterPadList: List of [Code[20]]; var TargetSources: Dictionary of [Code[20], List of [Code[20]]]): Boolean
     var
         FromWaiterPad: Record "NPR NPRE Waiter Pad";
+        Sources: List of [Code[20]];
+        LineHadQuantity: Boolean;
     begin
         FromWaiterPad.Get(FromWaiterPadLine."Waiter Pad No.");
+        LineHadQuantity := FromWaiterPadLine.Quantity > 0;
         _WaiterPadPOSMgt.SplitWaiterPadLine(FromWaiterPad, FromWaiterPadLine, MoveQty, ToWaiterPad);
+        if not TargetSources.ContainsKey(ToWaiterPad."No.") then
+            TargetSources.Add(ToWaiterPad."No.", Sources);
+        TargetSources.Get(ToWaiterPad."No.", Sources);
+        if LineHadQuantity and not Sources.Contains(FromWaiterPad."No.") then
+            Sources.Add(FromWaiterPad."No.");
         if not TouchedFromWaiterPadList.Contains(FromWaiterPad."No.") then
             TouchedFromWaiterPadList.Add(FromWaiterPad."No.");
         if not TouchedToWaiterPadList.Contains(ToWaiterPad."No.") then

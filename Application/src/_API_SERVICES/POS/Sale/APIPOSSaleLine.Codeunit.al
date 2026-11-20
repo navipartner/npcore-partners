@@ -236,6 +236,8 @@ codeunit 6248630 "NPR API POS Sale Line"
         if NameIndex = 0 then
             exit(false);
         POSSaleLine."Line Type" := Enum::"NPR POS Sale Line Type".FromInteger(LineType.Ordinals.Get(NameIndex));
+        if (POSSaleLine."Line Type" = POSSaleLine."Line Type"::Comment) and (POSSaleLine."No." = '') then
+            POSSaleLine."No." := '*';
 
         if POSSaleLine."Line Type" = POSSaleLine."Line Type"::"POS Payment" then
             exit(false);

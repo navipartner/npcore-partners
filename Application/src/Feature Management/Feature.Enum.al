@@ -225,4 +225,9 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'License-Based Module Access';
         Implementation = "NPR Feature Management" = "NPR License Module Access Feat";
     }
+    value(340; "Order Notes in Kitchen Ticket Header")
+    {
+        Caption = 'Order Notes in Kitchen Ticket Header';
+        Implementation = "NPR Feature Management" = "NPR NPRE Order Notes Feature";
+    }
 }

@@ -179,7 +179,9 @@
 
     procedure MergeWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad"; var MergeToWaiterPad: Record "NPR NPRE Waiter Pad") OK: Boolean
     var
+        TempSourceNote: Record "NPR NPRE Waiter Pad Line" temporary;
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        OrderNotesMgt: Codeunit "NPR NPRE Order Notes Mgt.";
         RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
@@ -218,6 +220,9 @@
             repeat
                 _WaiterPadPOSMgt.MergeWaiterPadLine(WaiterPad, WaiterPadLine, MergeToWaiterPad);
             until WaiterPadLine.Next() = 0;
+
+        OrderNotesMgt.SnapshotOrderNotes(WaiterPad."No.", TempSourceNote);
+        OrderNotesMgt.CopyOrderNotes(TempSourceNote, WaiterPad."No.", MergeToWaiterPad."No.");
 
         TryCloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Split/Merge Waiter Pad");
 
