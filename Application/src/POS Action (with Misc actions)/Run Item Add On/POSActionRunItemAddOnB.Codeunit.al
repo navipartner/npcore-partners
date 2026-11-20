@@ -2,6 +2,14 @@ codeunit 6150919 "NPR POS Action: RunItemAddOn B"
 {
     Access = Internal;
 
+    var
+        _OpenedOnItemInsert: Boolean;
+
+    procedure SetOpenedOnItemInsert(OpenedOnItemInsert: Boolean)
+    begin
+        _OpenedOnItemInsert := OpenedOnItemInsert;
+    end;
+
     procedure RunItemAddOns(AppliesToLineNo: Integer; ApplyItemAddOnNo: Code[20]; CompulsoryAddOn: Boolean; SkipItemAvailabilityCheck: Boolean; UserSelectionRequired: Boolean; UserSelectionJToken: JsonToken)
     var
         ItemAddOn: Record "NPR NpIa Item AddOn";
@@ -33,6 +41,7 @@ codeunit 6150919 "NPR POS Action: RunItemAddOn B"
         end;
 
         Clear(ItemAddOnMgt);
+        ItemAddOnMgt.SetOpenedOnItemInsert(_OpenedOnItemInsert);
         if not UserSelectionRequired then
             ItemAddOnMgt.InsertMandatoryPOSAddOnLinesSilent(ItemAddOn, POSSession, AppliesToLineNo, CompulsoryAddOn)
         else begin

@@ -220,10 +220,13 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn" implements "NPR IPOS Workflow"
         UserSelectionJToken: JsonToken;
         ApplyItemAddOnNo: Code[20];
         CompulsoryAddOn: Boolean;
+        OpenedOnItemInsert: Boolean;
         SkipItemAvailabilityCheck: Boolean;
         UserSelectionRequired: Boolean;
     begin
         ApplyItemAddOnNo := CopyStr(Context.GetString('ApplyItemAddOnNo'), 1, MaxStrLen(ApplyItemAddOnNo));
+        if Context.GetBoolean('OpenedOnItemInsert', OpenedOnItemInsert) then
+            POSActRunItemAddOnB.SetOpenedOnItemInsert(OpenedOnItemInsert);
         if not Context.GetBoolean('CompulsoryAddOn', CompulsoryAddOn) then
             CompulsoryAddOn := false;
         if not Context.GetBooleanParameter('SkipItemAvailabilityCheck', SkipItemAvailabilityCheck) then

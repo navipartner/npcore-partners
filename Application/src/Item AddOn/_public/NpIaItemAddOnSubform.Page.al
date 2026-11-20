@@ -74,7 +74,7 @@
                 field(Mandatory; Rec.Mandatory)
                 {
 
-                    ToolTip = 'Specifies if salesperson can omit inserting the line to the sale.';
+                    ToolTip = 'Specifies if salesperson can omit inserting the line to the sale. On a Select line, it specifies that one of the options must be chosen.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Use Unit Price"; Rec."Use Unit Price")

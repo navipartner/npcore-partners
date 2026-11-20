@@ -38,7 +38,10 @@
             trigger OnValidate()
             begin
                 if Type = Type::Select then
-                    validate("Item No.", '');
+                    validate("Item No.", '')
+                else
+                    if Quantity = 0 then
+                        Mandatory := false;
             end;
         }
         field(15; "Item No."; Code[20])
@@ -160,7 +163,8 @@
             begin
                 if Quantity = 0 then begin
                     "Fixed Quantity" := false;
-                    Mandatory := false;
+                    if Type = Type::Quantity then
+                        Mandatory := false;
                 end else
                     TestField("Item No.");
             end;
@@ -194,7 +198,7 @@
 
             trigger OnValidate()
             begin
-                if Mandatory then
+                if Mandatory and (Type = Type::Quantity) then
                     TestField(Quantity);
             end;
         }

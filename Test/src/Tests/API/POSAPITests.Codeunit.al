@@ -1503,6 +1503,77 @@ codeunit 85157 "NPR POS API Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleLine_WithMandatorySelectAddon_ChosenLineCanBeDeleted()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        ItemAddOnLineOpt: Record "NPR NpIa ItemAddOn Line Opt.";
+        OptionItem: Record Item;
+        ParentItem: Record Item;
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        SaleId: Guid;
+        SaleLineId: Guid;
+        AddonLineId: Guid;
+    begin
+        // [SCENARIO] Mandatory on a Select line only requires a choice, so the guest can still remove or change the chosen option
+        InitializeAddon();
+
+        // [GIVEN] A parent item whose add-on has a Mandatory Select line with one option
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(ParentItem, _POSUnit, _POSStore);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(OptionItem, _POSUnit, _POSStore);
+        LibraryRestaurant.CreateItemAddon(ItemAddOn);
+        LibraryRestaurant.LinkItemToAddon(ParentItem, ItemAddOn."No.");
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, ItemAddOn."No.", _AddonItem."No.",
+            ItemAddOnLine."Use Unit Price"::"Non-Zero", 0);
+        ItemAddOnLine.Type := ItemAddOnLine.Type::Select;
+        ItemAddOnLine."Item No." := '';
+        ItemAddOnLine.Quantity := 0;
+        ItemAddOnLine.Validate(Mandatory, true);
+        ItemAddOnLine.Modify();
+        LibraryRestaurant.CreateItemAddonLineOption(ItemAddOnLineOpt, ItemAddOnLine, OptionItem."No.",
+            ItemAddOnLineOpt."Use Unit Price"::"Non-Zero", 0);
+        Commit();
+
+        // [GIVEN] A sale where the guest chose that option
+        SaleId := CreateGuid();
+        SaleLineId := CreateGuid();
+        AddonLineId := CreateGuid();
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        Body.Add('type', 'Item');
+        Body.Add('code', ParentItem."No.");
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create parent sale line should succeed');
+
+        Clear(Body);
+        Body.Add('lineId', FormatGuid(AddonLineId));
+        Body.Add('parentLineId', FormatGuid(SaleLineId));
+        Body.Add('addonNo', ItemAddOn."No.");
+        Body.Add('addonLineNo', Format(ItemAddOnLine."Line No."));
+        Body.Add('selectedOptionLineNo', Format(ItemAddOnLineOpt."Line No."));
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId) + '/addon', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create addon line should succeed');
+
+        // [WHEN] The chosen add-on line is deleted
+        Clear(Body);
+        Response := LibraryNPRetailAPI.CallApi('DELETE', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(AddonLineId), Body, QueryParams, Headers);
+
+        // [THEN] The delete succeeds
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'The chosen option of a Mandatory Select line must stay deletable');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure SaleLine_WithAddon_UseUnitPriceNonZero_WithPrice_Success()
     var
         LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";

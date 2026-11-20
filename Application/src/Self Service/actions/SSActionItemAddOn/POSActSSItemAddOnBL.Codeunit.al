@@ -285,6 +285,7 @@ codeunit 6060027 "NPR POSAct. SS Item AddOn-BL"
             SaleLinePOS.Validate("Discount %", ItemAddOnLineOption."Discount %");
             POSSaleLine.InsertLine(SaleLinePOS);
 
+            NpIaItemAddOnLine.Mandatory := false;
             InsertAddOn(SaleLinePOS, NpIaItemAddOnLine, MasterLineNumber);
         end;
 

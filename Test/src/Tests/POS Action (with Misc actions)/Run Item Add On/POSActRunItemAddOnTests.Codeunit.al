@@ -127,6 +127,191 @@ codeunit 85140 "NPR POS Act. RunItemAddOnTests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure RunItemAddOn_MandatorySelectLine_RequiresAChoice()
+    var
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        OptionItem: Record Item;
+        ParentItem: Record Item;
+        ParentSaleLine: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+        POSActionRunItemAddOn: Codeunit "NPR POS Action: RunItemAddOn B";
+        ConfigJObject: JsonObject;
+        NoSelection: JsonObject;
+        JToken: JsonToken;
+        AddOnNo: Code[20];
+    begin
+        // [SCENARIO] A Mandatory Select line makes the cashier choose an option, and the chosen line stays removable
+
+        // [GIVEN] A sale with a parent item line, and a Select add-on line set to Mandatory
+        InitializeSale(SalePOS);
+        CreateSaleItem(ParentItem, 10);
+        CreateSaleItem(OptionItem, 4);
+        AddOnNo := CreateSelectAddOn(ParentItem, OptionItem);
+        ItemAddOnLine.Get(AddOnNo, 10000);
+        ItemAddOnLine.Validate(Mandatory, true);
+        ItemAddOnLine.Validate(Quantity, 0);
+        ItemAddOnLine.Modify();
+        _Assert.IsTrue(ItemAddOnLine.Mandatory, 'A zero Quantity must not clear Mandatory on a Select line.');
+        AddParentItemLine(ParentItem, 1, SalePOS, ParentSaleLine);
+
+        // [WHEN] The cashier dialog is built
+        ItemAddOn.Get(AddOnNo);
+        ConfigJObject := ItemAddOnMgt.GenerateItemAddOnConfigJson(SalePOS, ParentSaleLine, ItemAddOn);
+
+        // [THEN] The Select group is required
+        ConfigJObject.SelectToken('settings[0].required', JToken);
+        _Assert.IsTrue(JToken.AsValue().AsBoolean(), 'A Mandatory Select group must be required in the dialog.');
+
+        // [WHEN] The cashier picks option 10000
+        RunItemAddOnWithOption(ParentSaleLine, AddOnNo, OptionItem, 10000);
+
+        // [THEN] The chosen line is not locked as mandatory
+        FindAddOnLink(ParentSaleLine, SaleLinePOSAddOn);
+        _Assert.IsFalse(SaleLinePOSAddOn.Mandatory, 'The chosen option line must stay removable.');
+
+        // [WHEN/THEN] Confirming the dialog without a choice is refused
+        asserterror POSActionRunItemAddOn.RunItemAddOns(ParentSaleLine."Line No.", AddOnNo, false, true, true, NoSelection.AsToken());
+        _Assert.ExpectedError('You must choose an option for');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RunItemAddOn_CompulsoryDialogCancelledWithMandatorySelect_RemovesTheItem()
+    var
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        OptionItem: Record Item;
+        ParentItem: Record Item;
+        ParentSaleLine: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        POSActionRunItemAddOn: Codeunit "NPR POS Action: RunItemAddOn B";
+        Cancelled: JsonValue;
+        AddOnNo: Code[20];
+    begin
+        // [SCENARIO] Cancelling the add-on dialog that opened with the item removes the item, so it can't be sold without a mandatory choice
+
+        // [GIVEN] A sale with a parent item line, and a Select add-on line set to Mandatory
+        InitializeSale(SalePOS);
+        CreateSaleItem(ParentItem, 10);
+        CreateSaleItem(OptionItem, 4);
+        AddOnNo := CreateSelectAddOn(ParentItem, OptionItem);
+        ItemAddOnLine.Get(AddOnNo, 10000);
+        ItemAddOnLine.Validate(Mandatory, true);
+        ItemAddOnLine.Modify();
+        AddParentItemLine(ParentItem, 1, SalePOS, ParentSaleLine);
+
+        // [WHEN] The cashier cancels the dialog that opened when the item was added
+        Cancelled.SetValueToNull();
+        POSActionRunItemAddOn.SetOpenedOnItemInsert(true);
+        POSActionRunItemAddOn.RunItemAddOns(ParentSaleLine."Line No.", AddOnNo, true, true, true, Cancelled.AsToken());
+
+        // [THEN] The item is removed from the sale
+        _Assert.IsFalse(ParentSaleLine.Find(), 'The item must be removed when its mandatory choice is cancelled.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RunItemAddOn_CompulsoryDialogConfirmedWithoutMandatoryChoice_RemovesTheItem()
+    var
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        OptionItem: Record Item;
+        ParentItem: Record Item;
+        ParentSaleLine: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        POSActionRunItemAddOn: Codeunit "NPR POS Action: RunItemAddOn B";
+        EmptyRadio: JsonObject;
+        AddOnNo: Code[20];
+    begin
+        // [SCENARIO] Confirming the add-on dialog that opened with the item, without the mandatory choice, removes the item
+
+        // [GIVEN] A sale with a parent item line, and a Select add-on line set to Mandatory
+        InitializeSale(SalePOS);
+        CreateSaleItem(ParentItem, 10);
+        CreateSaleItem(OptionItem, 4);
+        AddOnNo := CreateSelectAddOn(ParentItem, OptionItem);
+        ItemAddOnLine.Get(AddOnNo, 10000);
+        ItemAddOnLine.Validate(Mandatory, true);
+        ItemAddOnLine.Modify();
+        AddParentItemLine(ParentItem, 1, SalePOS, ParentSaleLine);
+
+        // [WHEN] The cashier confirms the dialog with the radio left empty
+        EmptyRadio.Add('10000', '{}');
+        POSActionRunItemAddOn.SetOpenedOnItemInsert(true);
+        asserterror POSActionRunItemAddOn.RunItemAddOns(ParentSaleLine."Line No.", AddOnNo, true, true, true, EmptyRadio.AsToken());
+
+        // [THEN] The choice is refused and the item is removed from the sale
+        _Assert.ExpectedError('You must choose an option for');
+        _Assert.IsFalse(ParentSaleLine.Find(), 'The item must be removed when its mandatory choice is missing.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RunItemAddOn_ReopenedDialogCancelledWithMandatorySelect_KeepsTheItem()
+    var
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        OptionItem: Record Item;
+        ParentItem: Record Item;
+        ParentSaleLine: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        POSActionRunItemAddOn: Codeunit "NPR POS Action: RunItemAddOn B";
+        Cancelled: JsonValue;
+        AddOnNo: Code[20];
+    begin
+        // [SCENARIO] Cancelling the add-on dialog the cashier opened on an item already in the sale keeps the item
+
+        // [GIVEN] A sale with a parent item line without add-on lines, and a Select add-on line set to Mandatory
+        InitializeSale(SalePOS);
+        CreateSaleItem(ParentItem, 10);
+        CreateSaleItem(OptionItem, 4);
+        AddOnNo := CreateSelectAddOn(ParentItem, OptionItem);
+        ItemAddOnLine.Get(AddOnNo, 10000);
+        ItemAddOnLine.Validate(Mandatory, true);
+        ItemAddOnLine.Modify();
+        AddParentItemLine(ParentItem, 1, SalePOS, ParentSaleLine);
+
+        // [WHEN] The cashier opens the dialog from the add-on button and cancels it
+        Cancelled.SetValueToNull();
+        POSActionRunItemAddOn.RunItemAddOns(ParentSaleLine."Line No.", AddOnNo, true, true, true, Cancelled.AsToken());
+
+        // [THEN] The item stays in the sale
+        _Assert.IsTrue(ParentSaleLine.Find(), 'The item must stay when a reopened dialog is cancelled.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RunItemAddOn_MandatorySelectZeroQuantityOptionChosen_IsAccepted()
+    var
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        ItemAddOnLineOpt: Record "NPR NpIa ItemAddOn Line Opt.";
+        OptionItem: Record Item;
+        ParentItem: Record Item;
+        ParentSaleLine: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        AddOnNo: Code[20];
+    begin
+        // [SCENARIO] Choosing an option with zero quantity (a "None" choice) satisfies a Mandatory Select line
+
+        // [GIVEN] A Mandatory Select add-on line whose option 10000 has Quantity 0
+        InitializeSale(SalePOS);
+        CreateSaleItem(ParentItem, 10);
+        CreateSaleItem(OptionItem, 4);
+        AddOnNo := CreateSelectAddOn(ParentItem, OptionItem);
+        ItemAddOnLine.Get(AddOnNo, 10000);
+        ItemAddOnLine.Validate(Mandatory, true);
+        ItemAddOnLine.Modify();
+        ItemAddOnLineOpt.Get(AddOnNo, 10000, 10000);
+        ItemAddOnLineOpt.Quantity := 0;
+        ItemAddOnLineOpt.Modify();
+        AddParentItemLine(ParentItem, 1, SalePOS, ParentSaleLine);
+
+        // [WHEN/THEN] The cashier picks that option and no missing-choice error is raised
+        RunItemAddOnWithOption(ParentSaleLine, AddOnNo, OptionItem, 10000);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure EndSale_ItemAddOnSale_PostsBothTheParentAndTheChildLine()
     var
         ChildItem: Record Item;

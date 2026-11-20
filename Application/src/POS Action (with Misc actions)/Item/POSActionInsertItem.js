@@ -105,7 +105,7 @@ let main = async ({
 
   if (addItemAddOn) {
     await workflow.run("RUN_ITEM_ADDONS", {
-      context: { BaseLineNo: baseLineNo },
+      context: { BaseLineNo: baseLineNo, OpenedOnItemInsert: true },
       parameters: { SkipItemAvailabilityCheck: true },
     });
     if (!parameters.SkipItemAvailabilityCheck) {

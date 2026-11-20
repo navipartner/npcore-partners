@@ -4,6 +4,12 @@
 
     var
         IsAutoSplitKeyRecord: Boolean;
+        _OpenedOnItemInsert: Boolean;
+
+    procedure SetOpenedOnItemInsert(OpenedOnItemInsert: Boolean)
+    begin
+        _OpenedOnItemInsert := OpenedOnItemInsert;
+    end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale Line", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeletePOSSaleLine(var Rec: Record "NPR POS Sale Line"; RunTrigger: Boolean)
@@ -208,6 +214,8 @@
                         ItemAddOnLine.Type::Select:
                             begin
                                 ItemAddOn_LineJObject.Add('type', 'radio');
+                                if ItemAddOnLine.Mandatory then
+                                    ItemAddOn_LineJObject.Add('required', true);
                                 Clear(ValueJObject);
                                 if AddOnSaleLinePOS."No." <> '' then
                                     ValueJObject := SelectedOptionValue(AddOnSaleLinePOS, ItemAddOnLine);
@@ -390,10 +398,18 @@
         SelectedOptionLineNo: Integer;
         SelectedOptionLineNos: Dictionary of [Integer, Integer];
         NullGuid: Guid;
+        MissingLineCaption: Text;
+        Parsed: Boolean;
+        MandatoryChoiceMissingErr: Label 'You must choose an option for %1.', Comment = '%1 = add-on line caption';
     begin
         if SelectedAddOnLines.IsValue() then
-            if SelectedAddOnLines.AsValue().IsNull() then
+            if SelectedAddOnLines.AsValue().IsNull() then begin
+                if _OpenedOnItemInsert and MandatorySelectChoiceMissing(ItemAddOn, SelectedOptionLineNos, POSSession, AppliesToLineNo, CompulsoryAddOn, MissingLineCaption) then begin
+                    RemoveBaseLine(POSSession, AppliesToLineNo);
+                    exit(false);
+                end;
                 exit(InsertMandatoryPOSAddOnLines(ItemAddOn, POSSession, AppliesToLineNo, false, CompulsoryAddOn));
+            end;
 
         TempItemAddOnLine.Reset();
         TempItemAddOnLine.DeleteAll();
@@ -401,12 +417,20 @@
         SelectedAddonLineKeys := SelectedAddOnLines.AsObject().Keys();
         foreach AddonLineKey in SelectedAddonLineKeys do begin
             SelectedAddOnLines.AsObject().Get(AddonLineKey, JToken);
-            if ParsePOSAddOnLine(ItemAddOn, JToken, AddonLineKey, ItemAddOnLine, SelectedOptionLineNo) then begin
+            Parsed := ParsePOSAddOnLine(ItemAddOn, JToken, AddonLineKey, ItemAddOnLine, SelectedOptionLineNo);
+            // A chosen option with zero quantity still counts as a choice
+            if SelectedOptionLineNo <> 0 then
+                SelectedOptionLineNos.Set(ItemAddOnLine."Line No.", SelectedOptionLineNo);
+            if Parsed then begin
                 TempItemAddOnLine := ItemAddOnLine;
                 TempItemAddOnLine.Insert();
-                if SelectedOptionLineNo <> 0 then
-                    SelectedOptionLineNos.Set(ItemAddOnLine."Line No.", SelectedOptionLineNo);
             end;
+        end;
+
+        if MandatorySelectChoiceMissing(ItemAddOn, SelectedOptionLineNos, POSSession, AppliesToLineNo, CompulsoryAddOn, MissingLineCaption) then begin
+            if _OpenedOnItemInsert then
+                RemoveBaseLine(POSSession, AppliesToLineNo);
+            Error(MandatoryChoiceMissingErr, MissingLineCaption);
         end;
 
         ItemAddOnLine.SetRange("AddOn No.", ItemAddOn."No.");
@@ -463,6 +487,31 @@
         DiscountManagement.RecalculateAllSaleLinePOS(SalePOS);
 
         exit(true);
+    end;
+
+    local procedure MandatorySelectChoiceMissing(ItemAddOn: Record "NPR NpIa Item AddOn"; SelectedOptionLineNos: Dictionary of [Integer, Integer]; POSSession: Codeunit "NPR POS Session"; AppliesToLineNo: Integer; CompulsoryAddOn: Boolean; var MissingLineCaption: Text): Boolean
+    var
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        ItemAddOnLineOption: Record "NPR NpIa ItemAddOn Line Opt.";
+        ItemAddOnUnit: Codeunit "NPR NpIa Item AddOn";
+    begin
+        ItemAddOnLine.SetRange("AddOn No.", ItemAddOn."No.");
+        ItemAddOnLine.SetRange(Mandatory, true);
+        ItemAddOnLine.SetRange(Type, ItemAddOnLine.Type::Select);
+        ItemAddOnLine.SetFilter(IncludeFromDate, '<=%1', Today());
+        ItemAddOnLine.SetFilter(IncludeUntilDate, '=%1|>=%2', 0D, Today());
+        ItemAddOnUnit.FilterItemAddOnLine(ItemAddOnLine, ItemAddOn, POSSession, AppliesToLineNo, CompulsoryAddOn);
+        if ItemAddOnLine.FindSet() then
+            repeat
+                ItemAddOnLineOption.SetRange("AddOn No.", ItemAddOnLine."AddOn No.");
+                ItemAddOnLineOption.SetRange("AddOn Line No.", ItemAddOnLine."Line No.");
+                ItemAddOnLineOption.SetFilter("Item No.", '<>%1', '');
+                // Lines without valid options are not shown in the popup, so they can't be required
+                if not ItemAddOnLineOption.IsEmpty() and not SelectedOptionLineNos.ContainsKey(ItemAddOnLine."Line No.") then begin
+                    MissingLineCaption := GetLineCaption(ItemAddOnLine, 0);
+                    exit(true);
+                end;
+            until ItemAddOnLine.Next() = 0;
     end;
 
     procedure InsertMandatoryPOSAddOnLinesSilent(ItemAddOn: Record "NPR NpIa Item AddOn"; POSSession: Codeunit "NPR POS Session"; AppliesToLineNo: Integer; CompulsoryAddOn: Boolean): Boolean

@@ -191,6 +191,8 @@ codeunit 6184624 "NPR API POS Sale Line V2"
             TempItemAddOnLine."Discount %" := ItemAddOnLineOpt."Discount %";
             TempItemAddOnLine."Fixed Quantity" := ItemAddOnLineOpt."Fixed Quantity";
             TempItemAddOnLine."Per Unit" := ItemAddOnLineOpt."Per Unit";
+            // Mandatory on a Select line only requires a choice; the chosen line stays deletable
+            TempItemAddOnLine.Mandatory := false;
             if ItemAddOnLineOpt.Quantity <> 0 then
                 TempItemAddOnLine.Quantity := ItemAddOnLineOpt.Quantity;
         end else
