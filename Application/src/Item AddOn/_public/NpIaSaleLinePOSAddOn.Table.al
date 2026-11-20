@@ -47,6 +47,7 @@
             Caption = 'Applies-to Line No.';
             DataClassification = CustomerContent;
         }
+        // Blank means the line is attached without an item add-on, for example an attached comment.
         field(32; "AddOn No."; Code[20])
         {
             Caption = 'AddOn No.';

@@ -11,6 +11,8 @@ codeunit 6150795 "NPR POS Action - Insert Comm." implements "NPR IPOS Workflow"
         ParamEditDesc_DescLbl: Label 'Enable/Disable Description edit';
         ParamEditDesc_OptLbl: Label 'Yes,No', Locked = true;
         ParamEditDesc_OptCptLbl: Label 'Yes,No';
+        ParamIndent_CptLbl: Label 'Indent';
+        ParamIndent_DescLbl: Label 'Attach the comment to the selected line';
         Prompt_EnterComment: Label 'Enter Comment';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
@@ -24,6 +26,7 @@ codeunit 6150795 "NPR POS Action - Insert Comm." implements "NPR IPOS Workflow"
                                           ParamEditDesc_CptLbl,
                                           ParamEditDesc_DescLbl,
                                           ParamEditDesc_OptCptLbl);
+        WorkflowConfig.AddBooleanParameter('Indent', false, ParamIndent_CptLbl, ParamIndent_DescLbl);
         WorkflowConfig.AddLabel('prompt', Prompt_EnterComment);
     end;
 
@@ -32,12 +35,15 @@ codeunit 6150795 "NPR POS Action - Insert Comm." implements "NPR IPOS Workflow"
         POSSaleLine: Record "NPR POS Sale Line";
         BusinessLogic: Codeunit "NPR POS Action - Insert Comm B";
         CommentDescription: Text[100];
+        Indent: Boolean;
     begin
         CommentDescription := CopyStr(Context.GetString('NewDescription'), 1, MaxStrLen(POSSaleLine.Description));
+        if not Context.GetBooleanParameter('Indent', Indent) then
+            Indent := false;
 
         case Step of
             'InsertComment':
-                BusinessLogic.InputPosCommentLine(CommentDescription, SaleLine);
+                BusinessLogic.InputPosCommentLine(CommentDescription, Indent, SaleLine);
         end;
     end;
 

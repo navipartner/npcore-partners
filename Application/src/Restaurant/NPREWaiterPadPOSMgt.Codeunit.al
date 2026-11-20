@@ -16,17 +16,50 @@
 
     procedure SplitWaiterPadLine(var FromWaiterPad: Record "NPR NPRE Waiter Pad"; var FromWaiterPadLine: Record "NPR NPRE Waiter Pad Line"; MoveQty: Decimal; ToWaiterPad: Record "NPR NPRE Waiter Pad")
     var
+        CommentsLeaveSource: Boolean;
+        ParentLineNo: Integer;
+    begin
+        if MoveQty > FromWaiterPadLine.Quantity then
+            MoveQty := FromWaiterPadLine.Quantity;
+        if MoveQty <= 0 then
+            exit;
+        if IsAttachedComment(FromWaiterPadLine) then
+            exit;
+        ParentLineNo := FromWaiterPadLine."Line No.";
+
+        CommentsLeaveSource := MoveWaiterPadLine(FromWaiterPad, FromWaiterPadLine, MoveQty, ToWaiterPad);
+        CarryAttachedComments(FromWaiterPad, ParentLineNo, ToWaiterPad, CommentsLeaveSource);
+    end;
+
+    internal procedure MergeWaiterPadLine(FromWaiterPad: Record "NPR NPRE Waiter Pad"; var FromWaiterPadLine: Record "NPR NPRE Waiter Pad Line"; ToWaiterPad: Record "NPR NPRE Waiter Pad")
+    begin
+        //An attached comment moves in its own turn, after its parent, so the target keeps the order of the source
+        if IsAttachedComment(FromWaiterPadLine) then begin
+            if _MovedWaiterPadLineMap.ContainsKey(
+                MovedWaiterPadLineKey(FromWaiterPadLine."Waiter Pad No.", FromWaiterPadLine."Attached to Line No.", ToWaiterPad."No."))
+            then
+                MoveAttachedComment(FromWaiterPadLine, ToWaiterPad, true);
+            exit;
+        end;
+        if FromWaiterPadLine.Quantity <= 0 then
+            exit;
+
+        MoveWaiterPadLine(FromWaiterPad, FromWaiterPadLine, FromWaiterPadLine.Quantity, ToWaiterPad);
+    end;
+
+    local procedure IsAttachedComment(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"): Boolean
+    begin
+        exit((WaiterPadLine."Line Type" = WaiterPadLine."Line Type"::Comment) and (WaiterPadLine."Attached to Line No." <> 0));
+    end;
+
+    local procedure MoveWaiterPadLine(FromWaiterPad: Record "NPR NPRE Waiter Pad"; var FromWaiterPadLine: Record "NPR NPRE Waiter Pad Line"; MoveQty: Decimal; ToWaiterPad: Record "NPR NPRE Waiter Pad") CommentsLeaveSource: Boolean
+    var
         FlowStatus: Record "NPR NPRE Flow Status";
         NewWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
         RestPrint: Codeunit "NPR NPRE Restaurant Print";
         FullLineTransfer: Boolean;
     begin
-        if MoveQty > FromWaiterPadLine.Quantity then
-            MoveQty := FromWaiterPadLine.Quantity;
-        if MoveQty <= 0 then
-            exit;
-
         FullLineTransfer := MoveQty = FromWaiterPadLine.Quantity;
 
         NewWaiterPadLine := FromWaiterPadLine;
@@ -59,14 +92,44 @@
         FromWaiterPadLine.CalcFields("Sent to Kitchen");
         FromWaiterPadLine.Validate(Quantity, FromWaiterPadLine.Quantity - NewWaiterPadLine.Quantity);
         FromWaiterPadLine.Validate("Billed Quantity", FromWaiterPadLine."Billed Quantity" - NewWaiterPadLine."Billed Quantity");
-        if not FromWaiterPadLine."Sent to Kitchen" and (FromWaiterPadLine.Quantity = 0) and (FromWaiterPadLine."Billed Quantity" = 0) then
-            FromWaiterPadLine.Delete(true)
-        else begin
+        if not FromWaiterPadLine."Sent to Kitchen" and (FromWaiterPadLine.Quantity = 0) and (FromWaiterPadLine."Billed Quantity" = 0) then begin
+            FromWaiterPadLine.Delete(true);
+            CommentsLeaveSource := true;
+        end else begin
             FromWaiterPadLine."Amount Incl. VAT" := 0;
             FromWaiterPadLine."Amount Excl. VAT" := 0;
             FromWaiterPadLine."Discount Amount" := 0;
             FromWaiterPadLine.Modify();
+            CommentsLeaveSource := FromWaiterPadLine.Quantity <= FromWaiterPadLine."Billed Quantity";
         end;
+    end;
+
+    local procedure CarryAttachedComments(FromWaiterPad: Record "NPR NPRE Waiter Pad"; FromParentLineNo: Integer; ToWaiterPad: Record "NPR NPRE Waiter Pad"; RemoveFromSource: Boolean)
+    var
+        CommentWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+    begin
+        CommentWaiterPadLine.SetCurrentKey("Waiter Pad No.", "Attached to Line No.");
+        CommentWaiterPadLine.SetRange("Waiter Pad No.", FromWaiterPad."No.");
+        CommentWaiterPadLine.SetRange("Attached to Line No.", FromParentLineNo);
+        CommentWaiterPadLine.SetRange("Line Type", CommentWaiterPadLine."Line Type"::Comment);
+        if not CommentWaiterPadLine.FindSet(RemoveFromSource) then
+            exit;
+        repeat
+            MoveAttachedComment(CommentWaiterPadLine, ToWaiterPad, RemoveFromSource);
+        until CommentWaiterPadLine.Next() = 0;
+    end;
+
+    local procedure MoveAttachedComment(var CommentWaiterPadLine: Record "NPR NPRE Waiter Pad Line"; ToWaiterPad: Record "NPR NPRE Waiter Pad"; RemoveFromSource: Boolean)
+    var
+        NewCommentWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+    begin
+        NewCommentWaiterPadLine := CommentWaiterPadLine;
+        NewCommentWaiterPadLine."Waiter Pad No." := ToWaiterPad."No.";
+        NewCommentWaiterPadLine."Line No." := 0;
+        NewCommentWaiterPadLine.Insert(true);
+        RelinkMovedWaiterPadLine(CommentWaiterPadLine, ToWaiterPad, NewCommentWaiterPadLine);
+        if RemoveFromSource then
+            CommentWaiterPadLine.Delete(true);
     end;
 
     internal procedure ClearMovedWaiterPadLineMap()
@@ -129,6 +192,7 @@
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         TempLineRelation: Record "Line Number Buffer" temporary;
+        TempBufferedWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary;
         TempTouchedWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary;
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
@@ -154,7 +218,8 @@
             Sentry.StartSpan(LinesSpan, 'bc.restaurant.waiterpad.save-from-pos.move-lines');
             if SaleLinePOS.FindSet(CleanupSale) then
                 repeat
-                    MoveSaleLineFromPOSToWaiterPad(SalePOS, SaleLinePOS, WaiterPad, WaiterPadLine, TempLineRelation);
+                    MoveSaleLineFromPOSToWaiterPad(SalePOS, SaleLinePOS, WaiterPad, WaiterPadLine, TempLineRelation, TempBufferedWaiterPadLine);
+                    UpdateBufferedWaiterPadLine(TempBufferedWaiterPadLine, WaiterPadLine);
                     TempTouchedWaiterPadLine := WaiterPadLine;
                     TempTouchedWaiterPadLine.Insert();
                 until SaleLinePOS.Next() = 0;
@@ -296,7 +361,7 @@
         WaiterPad.Modify();
     end;
 
-    local procedure MoveSaleLineFromPOSToWaiterPad(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; var LineRelation: Record "Line Number Buffer")
+    local procedure MoveSaleLineFromPOSToWaiterPad(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; var LineRelation: Record "Line Number Buffer"; var TempBufferedWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary)
     var
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
         WaiterPadLine2: Record "NPR NPRE Waiter Pad Line";
@@ -336,7 +401,7 @@
             WaiterPadLine."Qty. per Unit of Measure" := SaleLinePOS."Qty. per Unit of Measure";
             WaiterPadLine."Sale Retail ID" := SalePOS.SystemId;
             WaiterPadLine."Sale Line Retail ID" := SaleLinePOS.SystemId;
-            WaiterPadLine."Line No." := NewWaiterPadLineNo(WaiterPad."No.", AttachToLineNo);
+            WaiterPadLine."Line No." := NewWaiterPadLineNo(WaiterPad."No.", AttachToLineNo, TempBufferedWaiterPadLine);
             WaiterPadLine.Insert(true);
 
             WaiterPadMgt.AssignWPadLinePrintCategories(WaiterPadLine, true);
@@ -358,8 +423,17 @@
         WaiterPadLine."VAT Prod. Posting Group" := SaleLinePOS."VAT Prod. Posting Group";
         WaiterPadLine."Order No. from Web" := SaleLinePOS."Order No. from Web";
         WaiterPadLine."Order Line No. from Web" := SaleLinePOS."Order Line No. from Web";
-        if HasItemAddOnLink then
+        if HasItemAddOnLink then begin
             CopyItemAddOnLinkInfoToWPLine(WaiterPadLine, SaleLinePOSAddOn, AttachToLineNo);
+            if WaiterPadLine."Line Type" = WaiterPadLine."Line Type"::Comment then begin
+                WaiterPadLine.Description := SaleLinePOS.Description;
+                WaiterPadLine."Description 2" := SaleLinePOS."Description 2";
+            end;
+        end else
+            if (WaiterPadLine."Line Type" = WaiterPadLine."Line Type"::Comment) and (WaiterPadLine."Attached to Line No." <> 0) then begin
+                WaiterPadLine."Attached to Line No." := 0;
+                WaiterPadLine.Indentation := 0;
+            end;
         WaiterPadLine.Modify();
 
         WaiterPadLine.Mark := NewLine or (WaiterPadLine."Quantity (Base)" <> WaiterPadLine2."Quantity (Base)");
@@ -434,13 +508,14 @@
         SaleLinePOS.SetSkipUpdateDependantQuantity(true);
 
         SaleLinePOS."Line Type" := WaiterPadLine."Line Type";
-        if SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Comment then
-            SaleLinePOS."No." := WaiterPadLine."No.";
+        SaleLinePOS."No." := WaiterPadLine."No.";
         SaleLinePOS."Variant Code" := WaiterPadLine."Variant Code";
 
         SaleLinePOS.Description := WaiterPadLine.Description;
         SaleLinePOS."Description 2" := WaiterPadLine."Description 2";
         SaleLinePOS.Indentation := WaiterPadLine.Indentation;
+        if IsAttachedCommentWithoutParent(WaiterPadLine, LineRelation) then
+            SaleLinePOS.Indentation := 0;
         SaleLinePOS."Order No. from Web" := WaiterPadLine."Order No. from Web";
         SaleLinePOS."Order Line No. from Web" := WaiterPadLine."Order Line No. from Web";
         if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::Item then
@@ -483,6 +558,13 @@
         WaiterPadLine."Sale Retail ID" := SalePOS.SystemId;
         WaiterPadLine."Sale Line Retail ID" := SaleLinePOS.SystemId;
         WaiterPadLine.Modify();
+    end;
+
+    local procedure IsAttachedCommentWithoutParent(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; var LineRelation: Record "Line Number Buffer"): Boolean
+    begin
+        if (WaiterPadLine."Line Type" <> WaiterPadLine."Line Type"::Comment) or (WaiterPadLine."Attached to Line No." = 0) then
+            exit(false);
+        exit(not LineRelation.Get(WaiterPadLine."Attached to Line No."));
     end;
 
     local procedure HideOnPOSSale(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"): Boolean
@@ -1024,10 +1106,11 @@
         exit(LineRelation."New Line Number");
     end;
 
-    local procedure NewWaiterPadLineNo(WaiterPadNo: Code[20]; AttachToLineNo: Integer): Integer
+    local procedure NewWaiterPadLineNo(WaiterPadNo: Code[20]; AttachToLineNo: Integer; var TempBufferedWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary): Integer
     var
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         Sentry: Codeunit "NPR Sentry";
+        VisitedLineNos: List of [Integer];
         NewLineNo: Integer;
         PrecedingLineNo: Integer;
         GapExhaustedTxt: Label 'Waiter pad %1: no free line number left between %2 and %3, so an item add-on line of main line %4 had to be appended at the end of the waiter pad. It will be shown below the wrong main line, and the misplacement is permanent.', Locked = true, Comment = 'Logged to Sentry, not shown to the user. Reached only after the 10000 gap between two waiter pad lines has been subdivided about thirteen times.';
@@ -1035,13 +1118,9 @@
         if AttachToLineNo = 0 then
             exit(0);
 
-        PrecedingLineNo := AttachToLineNo;
-        WaiterPadLine.SetCurrentKey("Waiter Pad No.", "Attached to Line No.");
-        WaiterPadLine.SetRange("Waiter Pad No.", WaiterPadNo);
-        WaiterPadLine.SetRange("Attached to Line No.", AttachToLineNo);
-        if WaiterPadLine.FindLast() then
-            if WaiterPadLine."Line No." > PrecedingLineNo then
-                PrecedingLineNo := WaiterPadLine."Line No.";
+        if TempBufferedWaiterPadLine.IsEmpty() then
+            BufferWaiterPadLines(WaiterPadNo, TempBufferedWaiterPadLine);
+        PrecedingLineNo := LastLineNoOfGroup(TempBufferedWaiterPadLine, AttachToLineNo, VisitedLineNos);
 
         WaiterPadLine.Reset();
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPadNo);
@@ -1057,13 +1136,62 @@
         exit(NewLineNo);
     end;
 
+    local procedure LastLineNoOfGroup(var TempBufferedWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary; LineNo: Integer; var VisitedLineNos: List of [Integer]) LastLineNo: Integer
+    var
+        TempChildWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary;
+        ChildLastLineNo: Integer;
+    begin
+        LastLineNo := LineNo;
+        //Each line is walked once, so a cycle in corrupt link data cannot recurse without end
+        if VisitedLineNos.Contains(LineNo) then
+            exit;
+        VisitedLineNos.Add(LineNo);
+        TempChildWaiterPadLine.Copy(TempBufferedWaiterPadLine, true);
+        TempChildWaiterPadLine.SetCurrentKey("Waiter Pad No.", "Attached to Line No.");
+        TempChildWaiterPadLine.SetRange("Attached to Line No.", LineNo);
+        if TempChildWaiterPadLine.FindSet() then
+            repeat
+                ChildLastLineNo := LastLineNoOfGroup(TempBufferedWaiterPadLine, TempChildWaiterPadLine."Line No.", VisitedLineNos);
+                if ChildLastLineNo > LastLineNo then
+                    LastLineNo := ChildLastLineNo;
+            until TempChildWaiterPadLine.Next() = 0;
+    end;
+
+    local procedure BufferWaiterPadLines(WaiterPadNo: Code[20]; var TempBufferedWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary)
+    var
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+    begin
+        WaiterPadLine.SetRange("Waiter Pad No.", WaiterPadNo);
+        if WaiterPadLine.FindSet() then
+            repeat
+                TempBufferedWaiterPadLine := WaiterPadLine;
+                TempBufferedWaiterPadLine.Insert();
+            until WaiterPadLine.Next() = 0;
+    end;
+
+    local procedure UpdateBufferedWaiterPadLine(var TempBufferedWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary; WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
+    begin
+        //The buffer is filled from the pad the first time a new attached line needs a position; until then there is nothing to keep current
+        if TempBufferedWaiterPadLine.IsEmpty() then
+            exit;
+        TempBufferedWaiterPadLine := WaiterPadLine;
+        if not TempBufferedWaiterPadLine.Insert() then
+            TempBufferedWaiterPadLine.Modify();
+    end;
+
     local procedure CopyItemAddOnLinkInfoFromWPLine(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; SaleLinePOS: Record "NPR POS Sale Line"; var LineRelation: Record "Line Number Buffer")
     var
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
     begin
-        if (WaiterPadLine."Attached to Line No." = 0) or (WaiterPadLine."AddOn No." = '') then
+        if WaiterPadLine."Attached to Line No." = 0 then
             exit;
-        LineRelation.Get(WaiterPadLine."Attached to Line No.");
+        if WaiterPadLine."AddOn No." = '' then begin
+            if WaiterPadLine."Line Type" <> WaiterPadLine."Line Type"::Comment then
+                exit;
+            if not LineRelation.Get(WaiterPadLine."Attached to Line No.") then
+                exit;
+        end else
+            LineRelation.Get(WaiterPadLine."Attached to Line No.");
 
         SaleLinePOSAddOn.Init();
         SaleLinePOSAddOn."Register No." := SaleLinePOS."Register No.";

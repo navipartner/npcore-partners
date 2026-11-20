@@ -1456,6 +1456,7 @@
         AddOnSaleLine.SetRange("Sale Type", POSSaleLine."Sale Type");
         AddOnSaleLine.SetRange("Sale Date", POSSaleLine.Date);
         AddOnSaleLine.SetRange("Applies-to Line No.", POSSaleLine."Line No.");
+        AddOnSaleLine.SetFilter("AddOn No.", '<>%1', '');
         if (not AddOnSaleLine.FindFirst()) then
             exit;
 

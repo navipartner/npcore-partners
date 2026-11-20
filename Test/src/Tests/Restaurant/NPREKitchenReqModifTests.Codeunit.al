@@ -17,6 +17,14 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         _POSInitialized: Boolean;
         _RestaurantInitialized: Boolean;
         MainCourseStepTok: Label 'MAIN', Locked = true;
+        FlaggedTok: Label 'flagged', Locked = true;
+        ModifierQuantityTxt: Label 'quantity %1, quantity (base) %2', Locked = true, Comment = '%1 = quantity, %2 = quantity (base)';
+        ModifierRowTxt: Label '%1|%2|%3|%4|%5', Locked = true, Comment = '%1 = description, %2 = line type, %3 = indentation, %4 = No., %5 = quantity';
+        NotAttachedTok: Label 'nothing', Locked = true;
+        NotFlaggedTok: Label 'not flagged', Locked = true;
+        NotInTheSaleTok: Label 'not in the sale', Locked = true;
+        RecalledCommentTxt: Label 'No. "%1", attached to %2', Locked = true, Comment = '%1 = No. of the comment line, %2 = No. of the line it is attached to';
+        RowMismatchTxt: Label '%1: expected <%2>, actual <%3>. ', Locked = true, Comment = '%1 = scenario row, %2 = expected value, %3 = actual value';
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
@@ -721,6 +729,315 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         _Assert.AreEqual(NoOnionsTok, KitchenRequestModifier.Description, 'The modifier line should carry the comment text.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure StarCommentAttachedToDish_SentToKitchen_ModifierIsACommentRowWithItsIndentation()
+    var
+        MainItem: Record Item;
+        CommentWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        MainWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+    begin
+        // [SCENARIO] A comment attached to a dish reaches the dish request as a Comment modifier with quantity 0, No. "*" and the comment's indentation
+        // [GIVEN] A pad with DISH 10000 and "No onions" attached to it, saved from the POS with No. "*"
+        Initialize();
+        CreateDishItem(MainItem);
+        _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadAttachedComment(WaiterPad."No.", 'No onions', MainWaiterPadLine, CommentWaiterPadLine);
+
+        // [WHEN] The waiter pad is sent to the kitchen
+        SendWaiterPadToKitchen(WaiterPad);
+
+        // [THEN] The DISH request has the single modifier "No onions", type Comment, indentation 1, No. "*", quantity 0
+        _Assert.AreEqual(
+            ModifierRow('No onions', Enum::"NPR POS Sale Line Type"::Comment, 1, '*', 0),
+            ModifierRows(GetKitchenRequestNo(WaiterPad."No.", MainWaiterPadLine."Line No.")),
+            'S12.a: the DISH request should list "No onions" as its only modifier, a Comment with indentation 1.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CommentsOfAddOns_SentToKitchen_ListedAfterTheirAddOnInTheDishModifiers()
+    var
+        AddOnKItem: Record Item;
+        AddOnMItem: Record Item;
+        MainItem: Record Item;
+        AddOnKLine: Record "NPR NPRE Waiter Pad Line";
+        AddOnMLine: Record "NPR NPRE Waiter Pad Line";
+        CommentLine: Record "NPR NPRE Waiter Pad Line";
+        MainLine: Record "NPR NPRE Waiter Pad Line";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        AddOnKRow: Text;
+        AddOnMRow: Text;
+        Mismatches: Text;
+    begin
+        // [SCENARIO] The dish request lists its direct children in line order, each followed by the comments attached to it; an add-on request lists its own comments as today
+        Initialize();
+
+        // [GIVEN] Per row, a pad with DISH, ADDON-K (its own request) and ADDON-M attached to DISH, and the row's comments
+        // [WHEN] The waiter pad is sent to the kitchen
+        // [THEN] The DISH request and the ADDON-K request list the row's modifiers in the row's order
+        CreateDishWithBothAddOns(WaiterPad, MainItem, AddOnKItem, AddOnMItem, MainLine, AddOnKLine, AddOnMLine);
+        _LibraryRestaurant.AddWaiterPadAttachedComment(WaiterPad."No.", 'extra hot', AddOnMLine, CommentLine);
+        SendWaiterPadToKitchen(WaiterPad);
+        AddOnKRow := ModifierRow(AddOnKLine.Description, Enum::"NPR POS Sale Line Type"::Item, 1, AddOnKItem."No.", 1);
+        AddOnMRow := ModifierRow(AddOnMLine.Description, Enum::"NPR POS Sale Line Type"::Item, 1, AddOnMItem."No.", 1);
+        CheckRow(
+            'S12.b DISH', AddOnKRow + '; ' + AddOnMRow + '; ' + ModifierRow('extra hot', Enum::"NPR POS Sale Line Type"::Comment, 2, '*', 0),
+            ModifierRows(GetKitchenRequestNo(WaiterPad."No.", MainLine."Line No.")), Mismatches);
+        CheckRow('S12.b ADDON-K', '', ModifierRows(GetKitchenRequestNo(WaiterPad."No.", AddOnKLine."Line No.")), Mismatches);
+
+        CreateDishWithBothAddOns(WaiterPad, MainItem, AddOnKItem, AddOnMItem, MainLine, AddOnKLine, AddOnMLine);
+        _LibraryRestaurant.AddWaiterPadAttachedComment(WaiterPad."No.", 'well done', AddOnKLine, CommentLine);
+        SendWaiterPadToKitchen(WaiterPad);
+        AddOnKRow := ModifierRow(AddOnKLine.Description, Enum::"NPR POS Sale Line Type"::Item, 1, AddOnKItem."No.", 1);
+        AddOnMRow := ModifierRow(AddOnMLine.Description, Enum::"NPR POS Sale Line Type"::Item, 1, AddOnMItem."No.", 1);
+        CheckRow(
+            'S12.c DISH', AddOnKRow + '; ' + ModifierRow('well done', Enum::"NPR POS Sale Line Type"::Comment, 2, '*', 0) + '; ' + AddOnMRow,
+            ModifierRows(GetKitchenRequestNo(WaiterPad."No.", MainLine."Line No.")), Mismatches);
+        CheckRow(
+            'S12.c ADDON-K', ModifierRow('well done', Enum::"NPR POS Sale Line Type"::Comment, 2, '*', 0),
+            ModifierRows(GetKitchenRequestNo(WaiterPad."No.", AddOnKLine."Line No.")), Mismatches);
+
+        CreateDishItem(MainItem);
+        CreateDishItem(AddOnKItem);
+        _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", AddOnKItem."No.", 1, MainLine."Line No.", AddOnKLine);
+        _LibraryRestaurant.AddWaiterPadAttachedComment(WaiterPad."No.", 'well done', AddOnKLine, CommentLine);
+        _LibraryRestaurant.AddWaiterPadAttachedComment(WaiterPad."No.", 'No onions', MainLine, CommentLine);
+        SendWaiterPadToKitchen(WaiterPad);
+        AddOnKRow := ModifierRow(AddOnKLine.Description, Enum::"NPR POS Sale Line Type"::Item, 1, AddOnKItem."No.", 1);
+        CheckRow(
+            'S12.d DISH',
+            AddOnKRow + '; ' + ModifierRow('well done', Enum::"NPR POS Sale Line Type"::Comment, 2, '*', 0) + '; ' + ModifierRow('No onions', Enum::"NPR POS Sale Line Type"::Comment, 1, '*', 0),
+            ModifierRows(GetKitchenRequestNo(WaiterPad."No.", MainLine."Line No.")), Mismatches);
+        CheckRow(
+            'S12.d ADDON-K', ModifierRow('well done', Enum::"NPR POS Sale Line Type"::Comment, 2, '*', 0),
+            ModifierRows(GetKitchenRequestNo(WaiterPad."No.", AddOnKLine."Line No.")), Mismatches);
+        _Assert.AreEqual('', Mismatches, 'Rows S12.b, S12.c and S12.d: the kitchen request modifiers of DISH and ADDON-K.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CommentOfAnAddOnWithAQuantityOnItsLine_SentToKitchen_CommentModifierHasQuantityZero()
+    var
+        AddOnMItem: Record Item;
+        MainItem: Record Item;
+        KitchenRequestModifier: Record "NPR NPRE Kitchen Req. Modif.";
+        AddOnMLine: Record "NPR NPRE Waiter Pad Line";
+        CommentLine: Record "NPR NPRE Waiter Pad Line";
+        MainLine: Record "NPR NPRE Waiter Pad Line";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+    begin
+        // [SCENARIO] A comment modifier has quantity 0, also when the waiter pad line of the comment carries a quantity
+        // [GIVEN] A pad with DISH, ADDON-M attached to DISH and "extra hot" attached to ADDON-M, with quantity 2 on the line of "extra hot"
+        Initialize();
+        CreateDishItem(MainItem);
+        CreateAddOnItem(AddOnMItem);
+        _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", AddOnMItem."No.", 1, MainLine."Line No.", AddOnMLine);
+        _LibraryRestaurant.AddWaiterPadAttachedComment(WaiterPad."No.", 'extra hot', AddOnMLine, CommentLine);
+        CommentLine.Quantity := 2;
+        CommentLine."Quantity (Base)" := 2;
+        CommentLine.Modify();
+
+        // [WHEN] The waiter pad is sent to the kitchen
+        SendWaiterPadToKitchen(WaiterPad);
+
+        // [THEN] The "extra hot" modifier of the DISH request has quantity 0 and quantity (base) 0
+        KitchenRequestModifier.SetRange("Request No.", GetKitchenRequestNo(WaiterPad."No.", MainLine."Line No."));
+        KitchenRequestModifier.SetRange(Description, 'extra hot');
+        _Assert.IsTrue(KitchenRequestModifier.FindFirst(), 'S12.b-qty: "extra hot" should be a modifier of the DISH request.');
+        _Assert.AreEqual(
+            StrSubstNo(ModifierQuantityTxt, 0, 0), StrSubstNo(ModifierQuantityTxt, KitchenRequestModifier.Quantity, KitchenRequestModifier."Quantity (Base)"),
+            'S12.b-qty: the "extra hot" modifier of the DISH request should have quantity 0 and quantity (base) 0, whatever quantity its waiter pad line has.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure OrdinaryCommentAfterADish_SentToKitchen_NotAModifierOfTheDish()
+    var
+        MainItem: Record Item;
+        CommentWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        MainWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+    begin
+        // [SCENARIO] A comment that is not attached is not a modifier of the dish it follows
+        // [GIVEN] A pad with DISH 10000 and the ordinary "Table 6 VIP" 20000
+        Initialize();
+        CreateDishItem(MainItem);
+        _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainWaiterPadLine);
+        _LibraryRestaurant.AddWaiterPadCommentLine(WaiterPad."No.", 'Table 6 VIP', 0, CommentWaiterPadLine);
+
+        // [WHEN] The waiter pad is sent to the kitchen
+        SendWaiterPadToKitchen(WaiterPad);
+
+        // [THEN] The DISH request has no modifiers
+        _Assert.AreEqual(
+            '', ModifierRows(GetKitchenRequestNo(WaiterPad."No.", MainWaiterPadLine."Line No.")), 'S12.e: "Table 6 VIP" should not be a modifier of DISH.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CommentOfADishChangedAfterSending_PadSentAgain_StationsFlaggedOnlyWhenTheCommentChanged()
+    var
+        MainItem: Record Item;
+        CommentLine: Record "NPR NPRE Waiter Pad Line";
+        MainLine: Record "NPR NPRE Waiter Pad Line";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        RequestNo: BigInteger;
+        Mismatches: Text;
+    begin
+        // [SCENARIO] Adding or deleting a comment of a dish after sending flags the dish stations; sending again with no change does not
+        Initialize();
+
+        // [GIVEN] Per row, the row's pad sent to the kitchen and accepted by the stations
+        // [WHEN] The row's change is made and the pad is sent again
+        // [THEN] The DISH stations are flagged as the row says
+        CreateDishItem(MainItem);
+        _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainLine);
+        RequestNo := SendAndAcceptRequest(WaiterPad, MainLine);
+        _LibraryRestaurant.AddWaiterPadAttachedComment(WaiterPad."No.", 'No onions', MainLine, CommentLine);
+        SendWaiterPadToKitchen(WaiterPad);
+        CheckRow('S13.a DISH stations', FlaggedTok, StationsFlagged(RequestNo), Mismatches);
+
+        CreatePadWithCommentedDish(WaiterPad, MainLine, CommentLine);
+        RequestNo := SendAndAcceptRequest(WaiterPad, MainLine);
+        SendWaiterPadToKitchen(WaiterPad);
+        CheckRow('S13.c DISH stations', NotFlaggedTok, StationsFlagged(RequestNo), Mismatches);
+
+        CreatePadWithCommentedDish(WaiterPad, MainLine, CommentLine);
+        RequestNo := SendAndAcceptRequest(WaiterPad, MainLine);
+        CommentLine.Find();
+        CommentLine.Delete(true);
+        SendWaiterPadToKitchen(WaiterPad);
+        CheckRow('S13.f DISH stations', FlaggedTok, StationsFlagged(RequestNo), Mismatches);
+        _Assert.AreEqual('', Mismatches, 'Rows S13.a, S13.c and S13.f: only a changed comment of DISH flags its stations.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CommentAddedToAnAddOnAfterSending_PadSentAgain_DishStationsFlagged()
+    var
+        AddOnKItem: Record Item;
+        AddOnMItem: Record Item;
+        MainItem: Record Item;
+        AddOnKLine: Record "NPR NPRE Waiter Pad Line";
+        AddOnMLine: Record "NPR NPRE Waiter Pad Line";
+        CommentLine: Record "NPR NPRE Waiter Pad Line";
+        MainLine: Record "NPR NPRE Waiter Pad Line";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        AddOnKRequestNo: BigInteger;
+        DishRequestNo: BigInteger;
+        Mismatches: Text;
+    begin
+        // [SCENARIO] A comment added to an add-on after sending changes the dish modifiers, so the dish stations are flagged as for an add-on change
+        Initialize();
+
+        // [GIVEN] Per row, a pad with DISH and the row's add-on, sent to the kitchen and accepted by the stations
+        // [WHEN] The row's comment is attached to the add-on and the pad is sent again
+        // [THEN] The DISH stations, and the ADDON-K stations when ADDON-K has a request, are flagged
+        CreateDishItem(MainItem);
+        CreateAddOnItem(AddOnMItem);
+        _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", AddOnMItem."No.", 1, MainLine."Line No.", AddOnMLine);
+        DishRequestNo := SendAndAcceptRequest(WaiterPad, MainLine);
+        _LibraryRestaurant.AddWaiterPadAttachedComment(WaiterPad."No.", 'extra hot', AddOnMLine, CommentLine);
+        SendWaiterPadToKitchen(WaiterPad);
+        CheckRow('S13.b DISH stations', FlaggedTok, StationsFlagged(DishRequestNo), Mismatches);
+
+        CreateDishItem(MainItem);
+        CreateDishItem(AddOnKItem);
+        _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", AddOnKItem."No.", 1, MainLine."Line No.", AddOnKLine);
+        DishRequestNo := SendAndAcceptRequest(WaiterPad, MainLine);
+        AddOnKRequestNo := GetKitchenRequestNo(WaiterPad."No.", AddOnKLine."Line No.");
+        AcceptRequest(AddOnKRequestNo);
+        _LibraryRestaurant.AddWaiterPadAttachedComment(WaiterPad."No.", 'well done', AddOnKLine, CommentLine);
+        SendWaiterPadToKitchen(WaiterPad);
+        CheckRow('S13.g DISH stations', FlaggedTok, StationsFlagged(DishRequestNo), Mismatches);
+        CheckRow('S13.g ADDON-K stations', FlaggedTok, StationsFlagged(AddOnKRequestNo), Mismatches);
+        _Assert.AreEqual('', Mismatches, 'Rows S13.b and S13.g: a comment added to an add-on after sending flags the stations of DISH.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure PadWithAttachedComment_RecalledAndSavedWithoutAChange_NoStationFlagged()
+    var
+        CommentLine: Record "NPR NPRE Waiter Pad Line";
+        MainLine: Record "NPR NPRE Waiter Pad Line";
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSSession: Codeunit "NPR POS Session";
+        RequestNo: BigInteger;
+    begin
+        // [SCENARIO] Recalling a sent pad with an attached comment and saving it back unchanged does not ask the kitchen to accept a change
+        // [GIVEN] A pad with DISH and "No onions" attached, sent to the kitchen and accepted by the stations
+        Initialize();
+        CreatePadWithCommentedDish(WaiterPad, MainLine, CommentLine);
+        RequestNo := SendAndAcceptRequest(WaiterPad, MainLine);
+
+        // [WHEN] The pad is recalled to the POS
+        RecallPad(WaiterPad, POSSession, SalePOS);
+
+        // [THEN] "No onions" is back in the sale with No. "*", attached to DISH
+        _Assert.AreEqual(
+            StrSubstNo(RecalledCommentTxt, '*', MainLine."No."), RecalledComment(SalePOS, 'No onions'),
+            'S13.d: after the recall "No onions" should be in the sale with No. "*", attached to DISH, as on the pad.');
+
+        // [WHEN] The sale is saved back to the pad without changes
+        SaveSaleToPad(SalePOS, WaiterPad);
+
+        // [THEN] No DISH station is flagged
+        _Assert.AreEqual(NotFlaggedTok, StationsFlagged(RequestNo), 'S13.d: recalling and saving again without a change should not flag the DISH stations.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure AttachedCommentTextChangedInPOS_SavedBack_DishModifierChangedAndStationsFlagged()
+    var
+        MainItem: Record Item;
+        CommentLine: Record "NPR NPRE Waiter Pad Line";
+        MainLine: Record "NPR NPRE Waiter Pad Line";
+        CommentSaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSSession: Codeunit "NPR POS Session";
+        RequestNo: BigInteger;
+    begin
+        // [SCENARIO] Changing the text of an attached comment after sending reaches the dish request on the next save and flags its stations
+        // [GIVEN] A pad with DISH and "No onions" attached, sent to the kitchen and accepted by the stations, recalled to the POS
+        Initialize();
+        CreateDishItem(MainItem);
+        _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainLine);
+        _LibraryRestaurant.AddWaiterPadCommentLine(WaiterPad."No.", 'No onions', MainLine."Line No.", CommentLine);
+        RequestNo := SendAndAcceptRequest(WaiterPad, MainLine);
+        RecallPad(WaiterPad, POSSession, SalePOS);
+
+        // [WHEN] The text of "No onions" is changed to "No onions, no garlic" in the POS and the sale is saved back
+        CommentSaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        CommentSaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        CommentSaleLinePOS.SetRange(Description, 'No onions');
+        CommentSaleLinePOS.FindFirst();
+        CommentSaleLinePOS.Description := 'No onions, no garlic';
+        CommentSaleLinePOS.Modify();
+        SaveSaleToPad(SalePOS, WaiterPad);
+
+        // [THEN] The DISH request modifier carries the new text and the DISH stations are flagged
+        _Assert.AreEqual(
+            ModifierRow('No onions, no garlic', Enum::"NPR POS Sale Line Type"::Comment, 1, '', 0), ModifierRows(RequestNo),
+            'S13.e: the DISH request modifier should carry the changed text "No onions, no garlic".');
+        _Assert.AreEqual(FlaggedTok, StationsFlagged(RequestNo), 'S13.e: changing the comment text should flag the DISH stations.');
+    end;
+
     local procedure Initialize()
     var
         KitchenStation: Record "NPR NPRE Kitchen Station";
@@ -856,6 +1173,128 @@ codeunit 85347 "NPR NPRE Kitchen Modif. Tests"
         _Assert.AreEqual(1, KitchenRequestModifier.Count(), 'The kitchen request should have exactly one modifier line.');
         KitchenRequestModifier.FindFirst();
         exit(KitchenRequestModifier."No.");
+    end;
+
+    local procedure CreateDishWithBothAddOns(var WaiterPad: Record "NPR NPRE Waiter Pad"; var MainItem: Record Item; var AddOnKItem: Record Item; var AddOnMItem: Record Item; var MainLine: Record "NPR NPRE Waiter Pad Line"; var AddOnKLine: Record "NPR NPRE Waiter Pad Line"; var AddOnMLine: Record "NPR NPRE Waiter Pad Line")
+    begin
+        CreateDishItem(MainItem);
+        CreateDishItem(AddOnKItem);
+        CreateAddOnItem(AddOnMItem);
+        _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", AddOnKItem."No.", 1, MainLine."Line No.", AddOnKLine);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", AddOnMItem."No.", 1, MainLine."Line No.", AddOnMLine);
+    end;
+
+    local procedure CreatePadWithCommentedDish(var WaiterPad: Record "NPR NPRE Waiter Pad"; var MainLine: Record "NPR NPRE Waiter Pad Line"; var CommentLine: Record "NPR NPRE Waiter Pad Line")
+    var
+        MainItem: Record Item;
+    begin
+        CreateDishItem(MainItem);
+        _LibraryRestaurant.CreateWaiterPadForSeating(_Seating.Code, WaiterPad);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", MainItem."No.", 1, 0, MainLine);
+        _LibraryRestaurant.AddWaiterPadAttachedComment(WaiterPad."No.", 'No onions', MainLine, CommentLine);
+    end;
+
+    local procedure SendAndAcceptRequest(WaiterPad: Record "NPR NPRE Waiter Pad"; WaiterPadLine: Record "NPR NPRE Waiter Pad Line") RequestNo: BigInteger
+    begin
+        SendWaiterPadToKitchen(WaiterPad);
+        RequestNo := GetKitchenRequestNo(WaiterPad."No.", WaiterPadLine."Line No.");
+        AcceptRequest(RequestNo);
+    end;
+
+    local procedure AcceptRequest(RequestNo: BigInteger)
+    var
+        KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station";
+    begin
+        KitchenRequestStation.SetRange("Request No.", RequestNo);
+        _Assert.RecordIsNotEmpty(KitchenRequestStation);
+        KitchenRequestStation.ModifyAll("Qty. Change Not Accepted", false);
+    end;
+
+    local procedure StationsFlagged(RequestNo: BigInteger): Text
+    var
+        KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station";
+    begin
+        KitchenRequestStation.SetRange("Request No.", RequestNo);
+        if KitchenRequestStation.IsEmpty() then
+            exit(NotFlaggedTok);
+        KitchenRequestStation.SetRange("Qty. Change Not Accepted", false);
+        if KitchenRequestStation.IsEmpty() then
+            exit(FlaggedTok);
+        exit(NotFlaggedTok);
+    end;
+
+    local procedure ModifierRows(RequestNo: BigInteger) Rows: Text
+    var
+        KitchenRequestModifier: Record "NPR NPRE Kitchen Req. Modif.";
+    begin
+        KitchenRequestModifier.SetRange("Request No.", RequestNo);
+        if KitchenRequestModifier.FindSet() then
+            repeat
+                if Rows <> '' then
+                    Rows += '; ';
+                Rows += ModifierRow(
+                    KitchenRequestModifier.Description, KitchenRequestModifier."Line Type", KitchenRequestModifier.Indentation,
+                    KitchenRequestModifier."No.", KitchenRequestModifier.Quantity);
+            until KitchenRequestModifier.Next() = 0;
+    end;
+
+    local procedure ModifierRow(Description: Text; LineType: Enum "NPR POS Sale Line Type"; Indentation: Integer; No: Text; Quantity: Decimal): Text
+    begin
+        exit(StrSubstNo(ModifierRowTxt, Description, LineType, Indentation, No, Quantity));
+    end;
+
+    local procedure RecallPad(WaiterPad: Record "NPR NPRE Waiter Pad"; var POSSession: Codeunit "NPR POS Session"; var SalePOS: Record "NPR POS Sale")
+    var
+        POSSale: Codeunit "NPR POS Sale";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+    begin
+        _LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, _POSUnit, POSSale);
+        WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(WaiterPad, POSSession);
+        POSSale.GetCurrentSale(SalePOS);
+    end;
+
+    local procedure RecalledComment(SalePOS: Record "NPR POS Sale"; CommentText: Text): Text
+    var
+        CommentSaleLinePOS: Record "NPR POS Sale Line";
+        ParentSaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        AttachedTo: Text;
+    begin
+        CommentSaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        CommentSaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        CommentSaleLinePOS.SetRange(Description, CommentText);
+        if not CommentSaleLinePOS.FindFirst() then
+            exit(NotInTheSaleTok);
+
+        AttachedTo := NotAttachedTok;
+        SaleLinePOSAddOn.SetRange("Register No.", CommentSaleLinePOS."Register No.");
+        SaleLinePOSAddOn.SetRange("Sales Ticket No.", CommentSaleLinePOS."Sales Ticket No.");
+        SaleLinePOSAddOn.SetRange("Sale Date", CommentSaleLinePOS.Date);
+        SaleLinePOSAddOn.SetRange("Sale Line No.", CommentSaleLinePOS."Line No.");
+        SaleLinePOSAddOn.SetFilter("Applies-to Line No.", '<>%1', 0);
+        if SaleLinePOSAddOn.FindFirst() then
+            if ParentSaleLinePOS.Get(
+                CommentSaleLinePOS."Register No.", CommentSaleLinePOS."Sales Ticket No.", CommentSaleLinePOS.Date,
+                CommentSaleLinePOS."Sale Type", SaleLinePOSAddOn."Applies-to Line No.")
+            then
+                AttachedTo := ParentSaleLinePOS."No.";
+        exit(StrSubstNo(RecalledCommentTxt, CommentSaleLinePOS."No.", AttachedTo));
+    end;
+
+    local procedure SaveSaleToPad(var SalePOS: Record "NPR POS Sale"; var WaiterPad: Record "NPR NPRE Waiter Pad")
+    var
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+    begin
+        SalePOS.Find();
+        WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, WaiterPad, true);
+    end;
+
+    local procedure CheckRow(RowId: Text; Expected: Text; Actual: Text; var Mismatches: Text)
+    begin
+        if Expected <> Actual then
+            Mismatches += StrSubstNo(RowMismatchTxt, RowId, Expected, Actual);
     end;
 }
 #endif

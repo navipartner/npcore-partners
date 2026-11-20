@@ -400,6 +400,78 @@ codeunit 85039 "NPR French Compliance Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('PageHandler_POSPaymentBinCheckpoint_LookupOK')]
+    procedure MonthlyPeriodArchiveOfASaleWithAnAttachedComment_CommentHasAnEmptyProductCode()
+    var
+        FRAuditSetup: Record "NPR FR Audit Setup";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        WorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
+        Assert: Codeunit Assert;
+        FrenchArchiveHandler: Codeunit "NPR French Archive Handler";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
+        POSSaleWrapper: Codeunit "NPR POS Sale";
+        POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
+        TempBlob: Codeunit "Temp Blob";
+        ArchiveInStream: InStream;
+        CheckpointEntryNo: Integer;
+        CommentLineNo: Integer;
+        ItemLineNo: Integer;
+        SaleEntryNo: Integer;
+        CommentProductCode: Text;
+        ItemProductCode: Text;
+        ArchiveXml: XmlDocument;
+        CommentSalesLineMissingMsg: Label 'F3: the archive should hold a SalesLine for the comment "No sugar" (POS entry %1, line %2)', Locked = true;
+        ItemProductCodeMsg: Label 'F3: the archive SalesLine of the item %1 should carry the item no. as ProductCode', Locked = true;
+        ItemSalesLineMissingMsg: Label 'F3: the archive should hold a SalesLine for the item %1 (POS entry %2, line %3)', Locked = true;
+    begin
+        // [SCENARIO] The NF525 period archive writes an empty ProductCode for a comment attached to an item, and the item no. for the item
+        InitializeData();
+
+        // [GIVEN] F3: a French POS unit whose closed monthly period holds a cash sale of an item with the comment "No sugar" attached to it (No. "*")
+        FRAuditSetup.Get();
+        Evaluate(FRAuditSetup."Monthly Workshift Duration", '<-1D>');
+        FRAuditSetup.Modify();
+        _FRAuditMgt.Destruct();
+        SaleEntryNo := DoItemSaleWithAttachedComment('No sugar');
+        POSEntrySalesLine.SetRange("POS Entry No.", SaleEntryNo);
+        POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Comment);
+        POSEntrySalesLine.FindFirst();
+        Assert.AreEqual('*', POSEntrySalesLine."No.", 'F3: the attached comment "No sugar" should reach the POS entry with No. "*"');
+        CommentLineNo := POSEntrySalesLine."Line No.";
+        POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Item);
+        POSEntrySalesLine.FindFirst();
+        ItemLineNo := POSEntrySalesLine."Line No.";
+        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, _Salesperson, POSSaleWrapper);
+        CheckpointEntryNo := POSWorkshiftCheckpoint.EndWorkshift(1, _POSUnit."No.", 0);
+        WorkshiftCheckpoint.SetRange("POS Entry No.", CheckpointEntryNo);
+        WorkshiftCheckpoint.SetRange("Period Type", 'FR_NF525_MONTH');
+        WorkshiftCheckpoint.FindFirst();
+
+        // [WHEN] The monthly period is archived
+        BindSubscription(FrenchArchiveHandler);
+        POSAuditLogMgt.ArchiveWorkshiftPeriod(WorkshiftCheckpoint);
+        UnbindSubscription(FrenchArchiveHandler);
+
+        // [THEN] The archive SalesLine of the comment has an empty ProductCode
+        FrenchArchiveHandler.GetBlob(TempBlob);
+        TempBlob.CreateInStream(ArchiveInStream, TextEncoding::UTF8);
+        XmlDocument.ReadFrom(ArchiveInStream, ArchiveXml);
+        Assert.IsTrue(
+            FindArchiveProductCode(ArchiveXml, SaleEntryNo, CommentLineNo, CommentProductCode),
+            StrSubstNo(CommentSalesLineMissingMsg, SaleEntryNo, CommentLineNo));
+        Assert.AreEqual('', CommentProductCode, 'F3: the archive SalesLine of the comment "No sugar" should have an empty ProductCode');
+
+        // [THEN] The archive SalesLine of the item has the item no. as ProductCode
+        Assert.IsTrue(
+            FindArchiveProductCode(ArchiveXml, SaleEntryNo, ItemLineNo, ItemProductCode),
+            StrSubstNo(ItemSalesLineMissingMsg, _Item."No.", SaleEntryNo, ItemLineNo));
+        Assert.AreEqual(_Item."No.", ItemProductCode, StrSubstNo(ItemProductCodeMsg, _Item."No."));
+        _FRAuditMgt.Destruct();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure LoginSetupValidation()
     var
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -706,6 +778,47 @@ codeunit 85039 "NPR French Compliance Tests"
         _POSSession.ClearAll();
         Clear(_POSSession);
         Exit(POSEntry."Entry No.");
+    end;
+
+    local procedure DoItemSaleWithAttachedComment(CommentText: Text[100]): Integer
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSSaleRecord: Record "NPR POS Sale";
+        Assert: Codeunit Assert;
+        InsertCommentB: Codeunit "NPR POS Action - Insert Comm B";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleWrapper: Codeunit "NPR POS Sale";
+    begin
+        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, _Salesperson, POSSaleWrapper);
+        POSSaleWrapper.GetCurrentSale(POSSaleRecord);
+        NPRLibraryPOSMock.CreateItemLine(_POSSession, _Item."No.", 1);
+        _POSSession.GetSaleLine(POSSaleLine);
+        InsertCommentB.InputPosCommentLine(CommentText, true, POSSaleLine);
+        Assert.IsTrue(
+            NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, _Item."Unit Price", ''),
+            'The cash sale of the item with an attached comment should end');
+        POSEntry.SetRange("Document No.", POSSaleRecord."Sales Ticket No.");
+        POSEntry.FindFirst();
+        _POSSession.ClearAll();
+        Clear(_POSSession);
+        exit(POSEntry."Entry No.");
+    end;
+
+    local procedure FindArchiveProductCode(ArchiveXml: XmlDocument; POSEntryNo: Integer; LineNo: Integer; var ProductCode: Text): Boolean
+    var
+        ProductCodeNode: XmlNode;
+        SalesLineNode: XmlNode;
+        SalesLineXPathTxt: Label '//*[SystemEntryKey=''%1'']/SalesLines/SalesLine[LineNo=''%2'']', Locked = true;
+    begin
+        ProductCode := '';
+        if not ArchiveXml.SelectSingleNode(StrSubstNo(SalesLineXPathTxt, Format(POSEntryNo, 0, 9), Format(LineNo, 0, 9)), SalesLineNode) then
+            exit(false);
+        if SalesLineNode.SelectSingleNode('ProductCode', ProductCodeNode) then
+            ProductCode := ProductCodeNode.AsXmlElement().InnerText()
+        else
+            ProductCode := '<no element>';
+        exit(true);
     end;
 
     local procedure DoItemAndVoucherSale(): Integer

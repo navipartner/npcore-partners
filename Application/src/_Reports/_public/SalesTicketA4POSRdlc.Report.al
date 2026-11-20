@@ -151,6 +151,9 @@
                 var
                     Item: Record Item;
                 begin
+                    if Type = Type::Comment then
+                        "No." := '';
+
                     if (Type = Type::Item) and Item.Get("No.") and Item."NPR No Print on Reciept" then
                         CurrReport.Skip();
 

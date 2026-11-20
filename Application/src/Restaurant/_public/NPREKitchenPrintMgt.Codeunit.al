@@ -169,11 +169,26 @@ codeunit 6151178 "NPR NPRE Kitchen Print Mgt"
         until WaiterPadLine.Next() = 0;
     end;
 
+    [Obsolete('Use GetGroupedPrintLines instead. It adds the comments attached to a printed line and groups the lines by attachment.', '2026-10-16')]
     procedure GetPrintLines(var WPadLineOutBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary)
+    begin
+        GetGroupedPrintLines(WPadLineOutBuffer);
+    end;
+
+    /// <summary>
+    /// Fills the buffer with the selected waiter pad lines, the comments attached to them and the unattached comments that follow them, grouped by attachment.
+    /// </summary>
+    /// <param name="WPadLineOutBuffer">Temporary buffer that holds the selected lines of one print category and serving step on entry, and the lines to print on exit.</param>
+    procedure GetGroupedPrintLines(var WPadLineOutBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary)
     var
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        TempPrintWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary;
+        TempRootWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary;
+        EmittedLines: List of [Text];
+        TrailingCommentLineNos: List of [Integer];
         PrintCategoryCode: Code[20];
         ServingStep: Code[10];
+        SelectedLineNo: Integer;
         EntryNo: Integer;
     begin
         if not WPadLineOutBuffer.FindSet() then
@@ -184,8 +199,10 @@ codeunit 6151178 "NPR NPRE Kitchen Print Mgt"
 
         repeat
             if WaiterPadLine.Get(WPadLineOutBuffer."Waiter Pad No.", WPadLineOutBuffer."Waiter Pad Line No.") then begin
+                SelectedLineNo := WaiterPadLine."Line No.";
                 WaiterPadLine.Mark(true);
                 AddComments(WaiterPadLine);
+                MarkAttachedComments(WaiterPadLine, SelectedLineNo);
             end;
         until WPadLineOutBuffer.Next() = 0;
 
@@ -197,16 +214,99 @@ codeunit 6151178 "NPR NPRE Kitchen Print Mgt"
         if not WaiterPadLine.FindSet() then
             exit;
         repeat
-            EntryNo += 1;
-            WPadLineOutBuffer.Init();
-            WPadLineOutBuffer."Entry No." := EntryNo;
-            WPadLineOutBuffer."Waiter Pad No." := WaiterPadLine."Waiter Pad No.";
-            WPadLineOutBuffer."Waiter Pad Line No." := WaiterPadLine."Line No.";
-            WPadLineOutBuffer."Print Category Code" := PrintCategoryCode;
-            WPadLineOutBuffer."Serving Step" := ServingStep;
-            FillLineData(WaiterPadLine, PrintCategoryCode, ServingStep, WPadLineOutBuffer);
-            WPadLineOutBuffer.Insert();
+            TempPrintWaiterPadLine := WaiterPadLine;
+            TempPrintWaiterPadLine.Insert();
         until WaiterPadLine.Next() = 0;
+
+        TempRootWaiterPadLine.Copy(TempPrintWaiterPadLine, true);
+        TempRootWaiterPadLine.FindSet();
+        repeat
+            if not IsOrdinaryComment(TempRootWaiterPadLine) then
+                if not IsSelected(TempPrintWaiterPadLine, TempRootWaiterPadLine."Waiter Pad No.", TempRootWaiterPadLine."Attached to Line No.") then
+                    AddPrintGroup(TempPrintWaiterPadLine, TempRootWaiterPadLine, PrintCategoryCode, ServingStep, WPadLineOutBuffer, EntryNo, EmittedLines, true, TrailingCommentLineNos);
+        until TempRootWaiterPadLine.Next() = 0;
+
+        TempRootWaiterPadLine.FindSet();
+        repeat
+            if not IsOrdinaryComment(TempRootWaiterPadLine) then
+                AddPrintGroup(TempPrintWaiterPadLine, TempRootWaiterPadLine, PrintCategoryCode, ServingStep, WPadLineOutBuffer, EntryNo, EmittedLines, true, TrailingCommentLineNos);
+        until TempRootWaiterPadLine.Next() = 0;
+
+        TempRootWaiterPadLine.FindSet();
+        repeat
+            if IsOrdinaryComment(TempRootWaiterPadLine) then
+                AddPrintGroup(TempPrintWaiterPadLine, TempRootWaiterPadLine, PrintCategoryCode, ServingStep, WPadLineOutBuffer, EntryNo, EmittedLines, false, TrailingCommentLineNos);
+        until TempRootWaiterPadLine.Next() = 0;
+    end;
+
+    local procedure AddPrintGroup(var TempPrintWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary; PrintWaiterPadLine: Record "NPR NPRE Waiter Pad Line"; PrintCategoryCode: Code[20]; ServingStep: Code[10]; var WPadLineOutBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary; var EntryNo: Integer; var EmittedLines: List of [Text]; IsTopLevel: Boolean; var TrailingCommentLineNos: List of [Integer])
+    var
+        TempChildWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary;
+        TempCommentWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary;
+        NextWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        LineKey: Text;
+        CommentLineNo: Integer;
+    begin
+        LineKey := PrintWaiterPadLine."Waiter Pad No." + '|' + Format(PrintWaiterPadLine."Line No.");
+        if EmittedLines.Contains(LineKey) then
+            exit;
+        EmittedLines.Add(LineKey);
+
+        EntryNo += 1;
+        WPadLineOutBuffer.Init();
+        WPadLineOutBuffer."Entry No." := EntryNo;
+        WPadLineOutBuffer."Waiter Pad No." := PrintWaiterPadLine."Waiter Pad No.";
+        WPadLineOutBuffer."Waiter Pad Line No." := PrintWaiterPadLine."Line No.";
+        WPadLineOutBuffer."Print Category Code" := PrintCategoryCode;
+        WPadLineOutBuffer."Serving Step" := ServingStep;
+        FillLineData(PrintWaiterPadLine, PrintCategoryCode, ServingStep, WPadLineOutBuffer);
+        WPadLineOutBuffer.Insert();
+
+        if PrintWaiterPadLine."Line Type" = PrintWaiterPadLine."Line Type"::Comment then
+            exit;
+
+        TempChildWaiterPadLine.Copy(TempPrintWaiterPadLine, true);
+        TempChildWaiterPadLine.Reset();
+        TempChildWaiterPadLine.SetRange("Waiter Pad No.", PrintWaiterPadLine."Waiter Pad No.");
+        TempChildWaiterPadLine.SetRange("Attached to Line No.", PrintWaiterPadLine."Line No.");
+        if TempChildWaiterPadLine.FindSet() then
+            repeat
+                AddPrintGroup(TempPrintWaiterPadLine, TempChildWaiterPadLine, PrintCategoryCode, ServingStep, WPadLineOutBuffer, EntryNo, EmittedLines, false, TrailingCommentLineNos);
+            until TempChildWaiterPadLine.Next() = 0;
+
+        NextWaiterPadLine.SetRange("Waiter Pad No.", PrintWaiterPadLine."Waiter Pad No.");
+        NextWaiterPadLine := PrintWaiterPadLine;
+        while (NextWaiterPadLine.Next() <> 0) and (NextWaiterPadLine."Line Type" = NextWaiterPadLine."Line Type"::Comment) do
+            if NextWaiterPadLine."Attached to Line No." = 0 then
+                if IsSelected(TempPrintWaiterPadLine, NextWaiterPadLine."Waiter Pad No.", NextWaiterPadLine."Line No.") then
+                    if IsTopLevel then
+                        AddPrintGroup(TempPrintWaiterPadLine, NextWaiterPadLine, PrintCategoryCode, ServingStep, WPadLineOutBuffer, EntryNo, EmittedLines, false, TrailingCommentLineNos)
+                    else
+                        TrailingCommentLineNos.Add(NextWaiterPadLine."Line No.");
+
+        if not IsTopLevel then
+            exit;
+        //An ordinary comment found after a line inside the group prints after the whole group of the top-level line
+        TempCommentWaiterPadLine.Copy(TempPrintWaiterPadLine, true);
+        foreach CommentLineNo in TrailingCommentLineNos do
+            if TempCommentWaiterPadLine.Get(PrintWaiterPadLine."Waiter Pad No.", CommentLineNo) then
+                AddPrintGroup(TempPrintWaiterPadLine, TempCommentWaiterPadLine, PrintCategoryCode, ServingStep, WPadLineOutBuffer, EntryNo, EmittedLines, false, TrailingCommentLineNos);
+        Clear(TrailingCommentLineNos);
+    end;
+
+    local procedure IsOrdinaryComment(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"): Boolean
+    begin
+        exit((WaiterPadLine."Line Type" = WaiterPadLine."Line Type"::Comment) and (WaiterPadLine."Attached to Line No." = 0));
+    end;
+
+    local procedure IsSelected(var TempPrintWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary; WaiterPadNo: Code[20]; LineNo: Integer): Boolean
+    var
+        TempSelectedWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary;
+    begin
+        if LineNo = 0 then
+            exit(false);
+        TempSelectedWaiterPadLine.Copy(TempPrintWaiterPadLine, true);
+        exit(TempSelectedWaiterPadLine.Get(WaiterPadNo, LineNo));
     end;
 
     internal procedure MergeIdenticalLines(var WPadLineOutBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary)
@@ -320,10 +420,26 @@ codeunit 6151178 "NPR NPRE Kitchen Print Mgt"
     begin
         WaiterPadLine2.SetRange("Waiter Pad No.", WaiterPadLine."Waiter Pad No.");
         WaiterPadLine2 := WaiterPadLine;
-        while (WaiterPadLine2.Next() <> 0) and (WaiterPadLine2."Line Type" = WaiterPadLine2."Line Type"::Comment) do begin
-            WaiterPadLine := WaiterPadLine2;
-            WaiterPadLine.Mark := true;
-        end;
+        while (WaiterPadLine2.Next() <> 0) and (WaiterPadLine2."Line Type" = WaiterPadLine2."Line Type"::Comment) do
+            if WaiterPadLine2."Attached to Line No." = 0 then begin
+                WaiterPadLine := WaiterPadLine2;
+                WaiterPadLine.Mark := true;
+            end;
+    end;
+
+    internal procedure MarkAttachedComments(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; ParentLineNo: Integer)
+    var
+        CommentWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+    begin
+        CommentWaiterPadLine.SetCurrentKey("Waiter Pad No.", "Attached to Line No.");
+        CommentWaiterPadLine.SetRange("Waiter Pad No.", WaiterPadLine."Waiter Pad No.");
+        CommentWaiterPadLine.SetRange("Attached to Line No.", ParentLineNo);
+        CommentWaiterPadLine.SetRange("Line Type", CommentWaiterPadLine."Line Type"::Comment);
+        if CommentWaiterPadLine.FindSet() then
+            repeat
+                WaiterPadLine := CommentWaiterPadLine;
+                WaiterPadLine.Mark(true);
+            until CommentWaiterPadLine.Next() = 0;
     end;
 
     local procedure CollectPlainMainLineEntryNos(var WPadLineOutBuffer: Record "NPR NPRE W.Pad.Line Out.Buffer" temporary; var PlainLineEntryNos: List of [Integer])

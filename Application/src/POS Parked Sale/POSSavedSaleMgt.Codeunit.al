@@ -480,6 +480,7 @@
         POSSaleTaxLineNode: XmlNode;
         xSalePOS: Record "NPR POS Sale";
         UpdateDim: Boolean;
+        LinksRestored: Boolean;
         POSCrossRefLbl: Label '%1_%2', Locked = true;
     begin
         if not XmlDoc.GetRoot(Root) then
@@ -611,6 +612,7 @@
                 POSInfoTransaction.Insert(true);
             end;
 
+            LinksRestored := false;
             Element.SelectNodes('item_addons/item_addon', ItemAddonNodes);
             foreach ItemAddonNode in ItemAddonNodes do begin
                 NpIaSaleLinePOSAddOn.Init();
@@ -621,6 +623,11 @@
                 NpIaSaleLinePOSAddOn."Sales Ticket No." := SalePOS."Sales Ticket No.";
                 NpIaSaleLinePOSAddOn."Sale Date" := SalePOS.Date;
                 NpIaSaleLinePOSAddOn.Insert(true);
+                LinksRestored := true;
+            end;
+            if LinksRestored then begin
+                SaleLinePOS.Find();
+                SaleLinePOS.Modify();
             end;
 
             Element.SelectNodes('retail_vouchers/retail_voucher', RetailVoucherNodes);

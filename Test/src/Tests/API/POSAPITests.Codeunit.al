@@ -26,6 +26,9 @@ codeunit 85157 "NPR POS API Tests"
         _EFTMappingInitialized: Boolean;
         _LookupMenuItem: Record "NPR NPRE Menu Item";
         _MessageCount: Integer;
+        AbsentTok: Label 'absent', Locked = true;
+        NotInResponseTok: Label 'the line is not in the response', Locked = true;
+        SaleLineAttachmentTxt: Label 'isAddon %1, appliesToLine %2, code %3', Locked = true, Comment = '%1 = isAddon, %2 = appliesToLine, %3 = code';
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
@@ -1499,6 +1502,78 @@ codeunit 85157 "NPR POS API Tests"
         Assert.AreEqual(FirstOption."Line No.", JToken.AsValue().AsInteger(), 'selectedOptionLineNo should follow the option change');
         SaleLineObj.Get('perUnit', JToken);
         Assert.IsFalse(JToken.AsValue().AsBoolean(), 'perUnit should follow the option change');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleWithAttachedAndOrdinaryComments_SaleLinesRead_AttachmentReportedPerLine()
+    var
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        CommentSaleLine: Record "NPR POS Sale Line";
+        DishSaleLine: Record "NPR POS Sale Line";
+        OrdinaryCommentSaleLine: Record "NPR POS Sale Line";
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        Assert: Codeunit Assert;
+        Body: JsonObject;
+        Response: JsonObject;
+        ResponseBody: JsonObject;
+        JToken: JsonToken;
+        SaleLines: JsonArray;
+        Headers: Dictionary of [Text, Text];
+        QueryParams: Dictionary of [Text, Text];
+        AddonLineId: Guid;
+        DishLineId: Guid;
+        SaleId: Guid;
+    begin
+        // [SCENARIO] The POS Sale Line API reports an attached comment as attached to its dish with code "*", an ordinary comment as not attached, and an add-on as today
+        InitializeAddon();
+
+        // [GIVEN] A sale with DISH, ADDON-M attached to DISH, "No onions" attached to DISH and the ordinary "Table 6 VIP"
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, _ItemAddon."No.", _AddonItem."No.", ItemAddOnLine."Use Unit Price"::Always, 15);
+        SaleId := CreateGuid();
+        DishLineId := CreateGuid();
+        AddonLineId := CreateGuid();
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+        Clear(Body);
+        Body.Add('type', 'Item');
+        Body.Add('code', _Item."No.");
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(DishLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create parent sale line should succeed');
+        Clear(Body);
+        Body.Add('lineId', FormatGuid(AddonLineId));
+        Body.Add('parentLineId', FormatGuid(DishLineId));
+        Body.Add('addonNo', _ItemAddon."No.");
+        Body.Add('addonLineNo', Format(ItemAddOnLine."Line No."));
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(DishLineId) + '/addon', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create addon line should succeed');
+        DishSaleLine.GetBySystemId(DishLineId);
+        LibraryPOSMock.CreateAttachedCommentLine(DishSaleLine, 'No onions', 0, CommentSaleLine);
+        InsertOrdinaryCommentLine(DishSaleLine, 'Table 6 VIP', OrdinaryCommentSaleLine);
+
+        // [WHEN] The sale lines are read through the API
+        QueryParams.Add('withLines', 'true');
+        Clear(Body);
+        Response := LibraryNPRetailAPI.CallApi('GET', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+
+        // [THEN] Each line reports isAddon, appliesToLine and code as the row says
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Get sale should succeed');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        ResponseBody.Get('saleLines', JToken);
+        SaleLines := JToken.AsArray();
+        Assert.AreEqual(
+            StrSubstNo(SaleLineAttachmentTxt, 'true', FormatGuid(DishLineId), '*'), SaleLineAttachment(SaleLines, CommentSaleLine.SystemId),
+            'S17.a: the comment attached to DISH should report isAddon true, the DISH line as appliesToLine and code "*".');
+        Assert.AreEqual(
+            StrSubstNo(SaleLineAttachmentTxt, 'false', AbsentTok, ''), SaleLineAttachment(SaleLines, OrdinaryCommentSaleLine.SystemId),
+            'S17.b: the ordinary comment should report isAddon false, no appliesToLine and a blank code.');
+        Assert.AreEqual(
+            StrSubstNo(SaleLineAttachmentTxt, 'true', FormatGuid(DishLineId), _AddonItem."No."), SaleLineAttachment(SaleLines, AddonLineId),
+            'S17.c: ADDON-M should report isAddon true, the DISH line as appliesToLine and its item number as code, as today.');
     end;
 
     [Test]
@@ -5968,6 +6043,57 @@ codeunit 85157 "NPR POS API Tests"
     local procedure FormatGuid(Id: Guid): Text
     begin
         exit(Format(Id, 0, 4).ToLower());
+    end;
+
+    local procedure InsertOrdinaryCommentLine(SaleLineOfTheSale: Record "NPR POS Sale Line"; CommentText: Text[100]; var CommentSaleLine: Record "NPR POS Sale Line")
+    var
+        LastSaleLine: Record "NPR POS Sale Line";
+    begin
+        LastSaleLine.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
+        LastSaleLine.SetRange("Register No.", SaleLineOfTheSale."Register No.");
+        LastSaleLine.SetRange("Sales Ticket No.", SaleLineOfTheSale."Sales Ticket No.");
+        LastSaleLine.FindLast();
+
+        CommentSaleLine.Init();
+        CommentSaleLine."Register No." := SaleLineOfTheSale."Register No.";
+        CommentSaleLine."Sales Ticket No." := SaleLineOfTheSale."Sales Ticket No.";
+        CommentSaleLine.Date := SaleLineOfTheSale.Date;
+        CommentSaleLine."Sale Type" := SaleLineOfTheSale."Sale Type";
+        CommentSaleLine."Line No." := LastSaleLine."Line No." + 10000;
+        CommentSaleLine."Line Type" := CommentSaleLine."Line Type"::Comment;
+        CommentSaleLine.Description := CommentText;
+        CommentSaleLine.Insert(true);
+    end;
+
+    local procedure SaleLineAttachment(SaleLines: JsonArray; SaleLineId: Guid): Text
+    var
+        SaleLine: JsonObject;
+        JToken: JsonToken;
+        SaleLineToken: JsonToken;
+        AppliesToLine: Text;
+        i: Integer;
+    begin
+        for i := 0 to SaleLines.Count() - 1 do begin
+            SaleLines.Get(i, SaleLineToken);
+            SaleLine := SaleLineToken.AsObject();
+            SaleLine.Get('id', JToken);
+            if JToken.AsValue().AsText() = FormatGuid(SaleLineId) then begin
+                AppliesToLine := AbsentTok;
+                if SaleLine.Get('appliesToLine', JToken) then
+                    AppliesToLine := JToken.AsValue().AsText();
+                SaleLine.Get('isAddon', JToken);
+                exit(StrSubstNo(SaleLineAttachmentTxt, Format(JToken.AsValue().AsBoolean(), 0, 9), AppliesToLine, GetLineCode(SaleLine)));
+            end;
+        end;
+        exit(NotInResponseTok);
+    end;
+
+    local procedure GetLineCode(SaleLine: JsonObject): Text
+    var
+        JToken: JsonToken;
+    begin
+        SaleLine.Get('code', JToken);
+        exit(JToken.AsValue().AsText());
     end;
 }
 #endif

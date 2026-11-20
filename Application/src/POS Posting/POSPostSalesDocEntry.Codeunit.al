@@ -220,7 +220,8 @@ codeunit 6184928 "NPR POS Post Sales Doc.Entry"
                 POSEntrySalesLine.Get(POSEntrySLineRelation."POS Entry No.", POSEntrySLineRelation."POS Entry Buff.Sales Line No.");
                 SalesLine.Get(POSEntrySLineRelation."Sale Document Type", POSEntrySLineRelation."Sale Document No.", POSEntrySLineRelation."Sale Line No.");
 
-                SalesLine.TestField("No.", POSEntrySalesLine."No.");
+                if POSEntrySalesLine.Type <> POSEntrySalesLine.Type::Comment then
+                    SalesLine.TestField("No.", POSEntrySalesLine."No.");
                 case SalesHeaderIn."Document Type" of
                     "Sales Document Type"::Order,
                     "Sales Document Type"::"Credit Memo",

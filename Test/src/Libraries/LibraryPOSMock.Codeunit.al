@@ -500,4 +500,62 @@ codeunit 85003 "NPR Library - POS Mock"
 
         Commit();
     end;
+
+    procedure CreateAttachedCommentLine(ParentSaleLinePOS: Record "NPR POS Sale Line"; CommentText: Text; LineNo: Integer; var CommentSaleLinePOS: Record "NPR POS Sale Line")
+    var
+        LastSaleLinePOS: Record "NPR POS Sale Line";
+    begin
+        // Writes the link and the comment line directly, without the Insert Comment action; LineNo 0 appends to the sale
+        if LineNo = 0 then begin
+            LastSaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
+            LastSaleLinePOS.SetRange("Register No.", ParentSaleLinePOS."Register No.");
+            LastSaleLinePOS.SetRange("Sales Ticket No.", ParentSaleLinePOS."Sales Ticket No.");
+            LastSaleLinePOS.FindLast();
+            LineNo := LastSaleLinePOS."Line No." + 10000;
+        end;
+
+        CommentSaleLinePOS.Init();
+        CommentSaleLinePOS."Register No." := ParentSaleLinePOS."Register No.";
+        CommentSaleLinePOS."Sales Ticket No." := ParentSaleLinePOS."Sales Ticket No.";
+        CommentSaleLinePOS.Date := ParentSaleLinePOS.Date;
+        CommentSaleLinePOS."Sale Type" := ParentSaleLinePOS."Sale Type";
+        CommentSaleLinePOS."Line No." := LineNo;
+        InsertSaleLineLink(CommentSaleLinePOS, ParentSaleLinePOS, 10000, '');
+
+        CommentSaleLinePOS."Line Type" := CommentSaleLinePOS."Line Type"::Comment;
+        CommentSaleLinePOS."No." := '*';
+        CommentSaleLinePOS.Description := CopyStr(CommentText, 1, MaxStrLen(CommentSaleLinePOS.Description));
+        CommentSaleLinePOS.Indentation := ParentSaleLinePOS.Indentation + 1;
+        CommentSaleLinePOS.Insert(true);
+    end;
+
+    procedure AttachSaleLineAsItemAddOn(var AddOnSaleLinePOS: Record "NPR POS Sale Line"; ParentSaleLinePOS: Record "NPR POS Sale Line"; AddOnNo: Code[20])
+    begin
+        InsertSaleLineLink(AddOnSaleLinePOS, ParentSaleLinePOS, 10000, AddOnNo);
+        AddOnSaleLinePOS.Find();
+        AddOnSaleLinePOS.Indentation := ParentSaleLinePOS.Indentation + 1;
+        AddOnSaleLinePOS.Modify();
+    end;
+
+    procedure InsertSaleLineLink(SaleLinePOS: Record "NPR POS Sale Line"; ParentSaleLinePOS: Record "NPR POS Sale Line"; LinkLineNo: Integer)
+    begin
+        InsertSaleLineLink(SaleLinePOS, ParentSaleLinePOS, LinkLineNo, '');
+    end;
+
+    local procedure InsertSaleLineLink(SaleLinePOS: Record "NPR POS Sale Line"; ParentSaleLinePOS: Record "NPR POS Sale Line"; LinkLineNo: Integer; AddOnNo: Code[20])
+    var
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+    begin
+        SaleLinePOSAddOn.Init();
+        SaleLinePOSAddOn."Register No." := SaleLinePOS."Register No.";
+        SaleLinePOSAddOn."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
+        SaleLinePOSAddOn."Sale Date" := SaleLinePOS.Date;
+        SaleLinePOSAddOn."Sale Line No." := SaleLinePOS."Line No.";
+        SaleLinePOSAddOn."Line No." := LinkLineNo;
+        SaleLinePOSAddOn."Applies-to Line No." := ParentSaleLinePOS."Line No.";
+        SaleLinePOSAddOn."AddOn No." := AddOnNo;
+        if AddOnNo <> '' then
+            SaleLinePOSAddOn."AddOn Line No." := 10000;
+        SaleLinePOSAddOn.Insert(true);
+    end;
 }

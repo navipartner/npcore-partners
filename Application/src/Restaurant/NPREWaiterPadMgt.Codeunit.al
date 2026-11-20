@@ -205,11 +205,19 @@
 
         WaiterPadLine.Reset();
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
-        if WaiterPadLine.FindSet() then begin
+        if WaiterPadLine.FindSet(true) then begin
             repeat
-                _WaiterPadPOSMgt.SplitWaiterPadLine(WaiterPad, WaiterPadLine, WaiterPadLine.Quantity, MergeToWaiterPad);
+                _WaiterPadPOSMgt.MergeWaiterPadLine(WaiterPad, WaiterPadLine, MergeToWaiterPad);
             until WaiterPadLine.Next() = 0;
         end;
+
+        //An attached comment placed before its parent was passed over while its parent had not moved yet
+        WaiterPadLine.SetRange("Line Type", WaiterPadLine."Line Type"::Comment);
+        WaiterPadLine.SetFilter("Attached to Line No.", '<>%1', 0);
+        if WaiterPadLine.FindSet(true) then
+            repeat
+                _WaiterPadPOSMgt.MergeWaiterPadLine(WaiterPad, WaiterPadLine, MergeToWaiterPad);
+            until WaiterPadLine.Next() = 0;
 
         TryCloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Split/Merge Waiter Pad");
 

@@ -21,7 +21,7 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
         //Kitchen order and station are read from the lines as they were dispatched, before merging drops repeated lines.
         KitchenOrderIDs := KitchenPrintMgt.GetLatestKDSOrderIDsFromSendLog(TempWPadLineOutBuffer);
         KitchenStationDescriptions := KitchenPrintMgt.GetKitchenStationDescriptions(TempWPadLineOutBuffer);
-        KitchenPrintMgt.GetPrintLines(TempWPadLineOutBuffer);
+        KitchenPrintMgt.GetGroupedPrintLines(TempWPadLineOutBuffer);
         KitchenPrintMgt.MergeIdenticalLines(TempWPadLineOutBuffer);
         if not TempWPadLineOutBuffer.FindFirst() then
             exit;
@@ -122,12 +122,16 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
             repeat
                 if WPadLineOutBuffer."Attached to Line No." <> 0 then begin
                     Printer.SetFont(B12FontLbl);
-                    PrintWrappedDescriptionLine('  ' + Format(WPadLineOutBuffer.Quantity) + ' x ', '  ' + WPadLineOutBuffer.Description, KitchenDescriptionLineMaxLength, false);
+                    if WPadLineOutBuffer."Line Type" = WPadLineOutBuffer."Line Type"::Comment then
+                        PrintWrappedDescriptionLine('', NestedIndent(WPadLineOutBuffer.Indentation), WPadLineOutBuffer.Description, KitchenDescriptionLineMaxLength, false)
+                    else
+                        PrintWrappedDescriptionLine('  ' + Format(WPadLineOutBuffer.Quantity) + ' x ', NestedIndent(WPadLineOutBuffer.Indentation), WPadLineOutBuffer.Description, KitchenDescriptionLineMaxLength, false);
                     Printer.SetFont(B21FontLbl);
                 end else begin
                     Printer.SetFont(B22FontLbl);
                     PrintWrappedDescriptionLine(
                         Format(WPadLineOutBuffer.Quantity) + ' x ',
+                        '',
                         WPadLineOutBuffer.Description,
                         KitchenDescriptionLineMaxLength,
                         WPadLineOutBuffer."Line Type" <> WPadLineOutBuffer."Line Type"::Comment);
@@ -144,27 +148,38 @@ codeunit 6248674 "NPR NPRE Static Kitchen Print"
         Printer.AddLine('PAPERCUT', 0);
     end;
 
-    local procedure PrintWrappedDescriptionLine(LeftColumnText: Text; DescriptionText: Text; MaxLineLength: Integer; Bold: Boolean)
+    local procedure PrintWrappedDescriptionLine(LeftColumnText: Text; Indent: Text; DescriptionText: Text; MaxLineLength: Integer; Bold: Boolean)
     var
         RemainingText: Text;
         TextChunk: Text;
     begin
         RemainingText := DelChr(DescriptionText, '<', ' ');
+        MaxLineLength -= StrLen(Indent);
+        if MaxLineLength < 1 then
+            MaxLineLength := 1;
 
         Printer.SetBold(Bold);
 
         Printer.AddTextField(1, 0, LeftColumnText);
         TextChunk := GetNextTextChunk(RemainingText, MaxLineLength);
-        Printer.AddTextField(2, 0, TextChunk);
+        Printer.AddTextField(2, 0, Indent + TextChunk);
 
         while RemainingText <> '' do begin
             Printer.NewLine();
             Printer.AddTextField(1, 0, '');
             TextChunk := GetNextTextChunk(RemainingText, MaxLineLength);
-            Printer.AddTextField(2, 0, TextChunk);
+            Printer.AddTextField(2, 0, Indent + TextChunk);
         end;
 
         Printer.SetBold(false);
+    end;
+
+    local procedure NestedIndent(Indentation: Integer): Text
+    begin
+        //A line attached one level deep keeps the plain layout; each level below it is indented two more spaces
+        if Indentation <= 1 then
+            exit('');
+        exit(PadStr('', 2 * (Indentation - 1)));
     end;
 
     local procedure GetNextTextChunk(var RemainingText: Text; MaxLineLength: Integer): Text

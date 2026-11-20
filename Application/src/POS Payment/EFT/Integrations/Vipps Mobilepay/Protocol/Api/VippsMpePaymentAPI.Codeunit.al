@@ -269,7 +269,7 @@ codeunit 6184699 "NPR Vipps Mp ePayment API"
                     clear(OrderLine);
                     clear(UnitInfo);
                     OrderLine.Add('name', POSSaleLineRec.Description);
-                    if ((POSSaleLineRec."Line Type" = POSSaleLineRec."Line Type"::Comment) and (POSSaleLineRec."No." = '')) then
+                    if ((POSSaleLineRec."Line Type" = POSSaleLineRec."Line Type"::Comment) and (POSSaleLineRec."No." in ['', '*'])) then
                         OrderLine.Add('id', 'Comment')
                     else
                         OrderLine.Add('id', POSSaleLineRec."No.");

@@ -170,6 +170,8 @@
                                     }
                                     trigger OnAfterGetRecord()
                                     begin
+                                        if ("POS Sales Line".Type = "POS Sales Line".Type::Comment) and ("POS Sales Line"."No." = '*') then
+                                            "POS Sales Line"."No." := '';
                                         possaleslinecreatedat := Format("POS Sales Line"."POS Sale Line Created At", 0, '<Year4>-<Month,2>-<Day,2>T<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2><Second dec.><Comma,.>Z');
                                     end;
                                 }

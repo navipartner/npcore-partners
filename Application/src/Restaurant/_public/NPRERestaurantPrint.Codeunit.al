@@ -620,6 +620,7 @@
         KitchenPrintMgt: Codeunit "NPR NPRE Kitchen Print Mgt";
         Sentry: Codeunit "NPR Sentry";
         Span: Codeunit "NPR Sentry Span";
+        SelectedLineNo: Integer;
     begin
         Sentry.StartSpan(Span, 'bc.restaurant.waiterpad.send-to-print-legacy');
         if PrintTemplateBuffer.FindFirst() then
@@ -659,8 +660,10 @@
                             PrintTemplateBuffer.FindSet();
                             repeat
                                 WaiterPadLine.Get(PrintTemplateBuffer."Waiter Pad No.", PrintTemplateBuffer."Waiter Pad Line No.");
+                                SelectedLineNo := WaiterPadLine."Line No.";
                                 WaiterPadLine.Mark(true);
                                 KitchenPrintMgt.AddComments(WaiterPadLine);
+                                KitchenPrintMgt.MarkAttachedComments(WaiterPadLine, SelectedLineNo);
                             until PrintTemplateBuffer.Next() = 0;
                             WaiterPadLine.SetRange("Waiter Pad No.", PrintTemplateBuffer."Waiter Pad No.");
                             WaiterPadLine.SetRange("Print Category Filter", PrintTemplateBuffer."Print Category Code");

@@ -306,6 +306,54 @@ codeunit 85412 "NPR NPRE Print Dispatch Tests"
         RestoreNewPrintExperience();
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure LegacyRoute_AttachedCommentAfterAnotherLine_PrintsOnItsDishTicket()
+    var
+        PrintTempl: Record "NPR NPRE Print Templ.";
+        KitchenCategory: Record "NPR NPRE Print/Prod. Cat.";
+        BarCategory: Record "NPR NPRE Print/Prod. Cat.";
+        DishItem: Record Item;
+        BeerItem: Record Item;
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        DishLine: Record "NPR NPRE Waiter Pad Line";
+        BeerLine: Record "NPR NPRE Waiter Pad Line";
+        CommentLine: Record "NPR NPRE Waiter Pad Line";
+        RetailPrintHandler: Codeunit "NPR Retail Print Handler";
+        DishJob: Integer;
+        BeerJob: Integer;
+    begin
+        // [SCENARIO] With the feature flag off, a comment attached to a dish prints on the dish's ticket, though another line sits between them on the pad
+        // [GIVEN] The retail print template route, a template split by print category, and a pad with DISH for the kitchen, then BEER for the bar, then a comment attached to DISH
+        Initialize();
+        SetNewPrintExperience(false);
+        _LibraryRestaurant.CreatePrintCategory(KitchenCategory);
+        _LibraryRestaurant.CreatePrintCategory(BarCategory);
+        CreateLegacyPrintTemplate(PrintTempl."Split Print Jobs By"::"Print Category");
+        CreatePadWithRoutedLine(WaiterPad, DishItem, DishLine, MainCourseStepTok, KitchenCategory.Code);
+        AddRoutedLine(WaiterPad, BeerItem, BeerLine, MainCourseStepTok, BarCategory.Code);
+        _LibraryRestaurant.AddWaiterPadAttachedComment(WaiterPad."No.", 'No onions', DishLine, CommentLine);
+        _TestRPPreprocess.ClearCaptured();
+
+        // [WHEN] The pad is sent to the kitchen
+        BindSubscription(RetailPrintHandler);
+        SendToKitchen(WaiterPad);
+        UnbindSubscription(RetailPrintHandler);
+
+        // [THEN] The comment is on the DISH ticket, and the BEER ticket carries BEER alone
+        DishJob := _TestRPPreprocess.JobIndexContainingLine(DishLine."Line No.");
+        BeerJob := _TestRPPreprocess.JobIndexContainingLine(BeerLine."Line No.");
+        _Assert.AreNotEqual(0, DishJob, 'DISH should be on a ticket. Without it the comment check below is vacuous.');
+        _Assert.AreEqual(
+            DishJob, _TestRPPreprocess.JobIndexContainingLine(CommentLine."Line No."),
+            'The comment attached to DISH should be on the DISH ticket, though BEER sits between them on the pad.');
+        _Assert.AreNotEqual(0, BeerJob, 'BEER should be on a ticket.');
+        _Assert.AreNotEqual(DishJob, BeerJob, 'Splitting by print category should put BEER on a ticket of its own.');
+        _Assert.AreEqual(
+            1, _TestRPPreprocess.JobLineCount(BeerJob), 'The BEER ticket should carry BEER alone, not the comment that follows BEER on the pad.');
+        RestoreNewPrintExperience();
+    end;
+
     #endregion
 
     #region Old and New parity on the shared orchestration

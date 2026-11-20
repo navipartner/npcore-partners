@@ -10,6 +10,7 @@ codeunit 85405 "NPR NPRE W/Pad RoundTripTests"
         _Seating: Record "NPR NPRE Seating";
         _SeatingLocation: Record "NPR NPRE Seating Location";
         _ServFlowProfile: Record "NPR NPRE Serv.Flow Profile";
+        _ItemAddOn: Record "NPR NpIa Item AddOn";
         _Assert: Codeunit Assert;
         _LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         _LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -19,6 +20,11 @@ codeunit 85405 "NPR NPRE W/Pad RoundTripTests"
         _POSInitialized: Boolean;
         _RestaurantInitialized: Boolean;
         MainCourseStepTok: Label 'MAIN', Locked = true;
+        AttachedEntryTxt: Label '%1 > %2', Locked = true, Comment = '%1 = line description, %2 = description of the line it is attached to';
+        CommentEntryTxt: Label '%1 (No. "%2", indentation %3)', Locked = true, Comment = '%1 = comment entry, %2 = No., %3 = indentation';
+        MissingParentTxt: Label '(missing)', Locked = true;
+        RowMismatchTxt: Label '%1: expected <%2>, actual <%3>. ', Locked = true, Comment = '%1 = scenario row, %2 = expected value, %3 = actual value';
+        SnapshotEntryTxt: Label '%1|%2|%3|%4|%5|%6|%7; ', Locked = true, Comment = '%1 = line no., %2 = line type, %3 = No., %4 = description, %5 = attached to line no., %6 = indentation, %7 = quantity';
 
     #region POS sale to waiter pad
 
@@ -1110,6 +1116,487 @@ codeunit 85405 "NPR NPRE W/Pad RoundTripTests"
 
     #endregion
 
+    #region Attached comments
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleWithCommentsOnDishAndAddOn_SavedToNewPad_PadHoldsThemInPOSOrderAttachedToTheirLines()
+    var
+        AddOnMSaleLinePOS: Record "NPR POS Sale Line";
+        DishSaleLinePOS: Record "NPR POS Sale Line";
+        ExtraHotSaleLinePOS: Record "NPR POS Sale Line";
+        NoOnionsSaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        // [SCENARIO] Saving a sale to a new pad turns each attached comment into a "*" pad comment attached to its parent's pad line, in POS order
+        // [GIVEN] A sale: DISH, ADDON-M attached to DISH, "extra hot" attached to ADDON-M, "No onions" attached to DISH; and a new pad
+        Initialize();
+        StartEmptySale(POSSession, SalePOS);
+        AddRoleSaleLine(POSSession, 'DISH', DishSaleLinePOS);
+        AddRoleSaleLine(POSSession, 'ADDON-M', AddOnMSaleLinePOS);
+        _LibraryPOSMock.AttachSaleLineAsItemAddOn(AddOnMSaleLinePOS, DishSaleLinePOS, _ItemAddOn."No.");
+        _LibraryPOSMock.CreateAttachedCommentLine(AddOnMSaleLinePOS, 'extra hot', 0, ExtraHotSaleLinePOS);
+        _LibraryPOSMock.CreateAttachedCommentLine(DishSaleLinePOS, 'No onions', 0, NoOnionsSaleLinePOS);
+        CreatePad(WaiterPad);
+
+        // [WHEN] The sale is saved onto the pad
+        SaveSaleToPad(SalePOS, WaiterPad);
+
+        // [THEN] The pad lines follow the POS order, each comment attached to its parent's pad line with No. "*" and its indentation
+        _Assert.AreEqual(
+            'DISH; ADDON-M > DISH; extra hot > ADDON-M (No. "*", indentation 2); No onions > DISH (No. "*", indentation 1)', PadLineSequence(WaiterPad."No."),
+            'S6.a: the new pad should hold DISH, ADDON-M, "extra hot" attached to ADDON-M and "No onions" attached to DISH, in that order.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleWithOrdinaryComment_SavedToPad_CommentNotAttachedWithBlankNo()
+    var
+        DishSaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        BusinessLogic: Codeunit "NPR POS Action - Insert Comm B";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        // [SCENARIO] An ordinary comment is saved to the pad as today: not attached, with a blank No.
+        // [GIVEN] A sale with DISH and the ordinary comment "Table 6 VIP", and a new pad
+        Initialize();
+        StartEmptySale(POSSession, SalePOS);
+        AddRoleSaleLine(POSSession, 'DISH', DishSaleLinePOS);
+        POSSession.GetSaleLine(POSSaleLine);
+        BusinessLogic.InputPosCommentLine('Table 6 VIP', POSSaleLine);
+        CreatePad(WaiterPad);
+
+        // [WHEN] The sale is saved onto the pad
+        SaveSaleToPad(SalePOS, WaiterPad);
+
+        // [THEN] The pad holds DISH and the comment, not attached and with a blank No.
+        _Assert.AreEqual(
+            'DISH; Table 6 VIP (No. "", indentation 0)', PadLineSequence(WaiterPad."No."),
+            'S6.b: "Table 6 VIP" should be saved as an ordinary pad comment with a blank No.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CommentsAddedOnARecalledPad_SavedAndRecalled_PadAndPOSKeepThePOSOrder()
+    var
+        Mismatches: Text;
+    begin
+        // [SCENARIO] Comments added to a recalled pad land directly after their parent's group on the pad, in POS order, whichever is added first
+        Initialize();
+
+        // [GIVEN] Per row, a recalled pad with DISH 10000, ADDON-K 15000 attached to DISH and BEER 20000
+        // [WHEN] The waiter adds the row's comments in the row's order and saves; the pad is recalled again
+        // [THEN] The pad and the recalled sale both read DISH, ADDON-K, "well done", "No onions", BEER
+        AddCommentsToRecalledPadInOrder('S6.c', 'ADDON-K', 'well done', 'DISH', 'No onions', Mismatches);
+        AddCommentsToRecalledPadInOrder('S6.d', 'DISH', 'No onions', 'ADDON-K', 'well done', Mismatches);
+        _Assert.AreEqual('', Mismatches, 'Rows S6.c and S6.d: the pad and a recall keep the POS order of the comments added to a recalled pad.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CommentAddedWithoutAFreeLineNoAfterItsGroup_SavedAndRecalled_AppendedAtTheEndStillAttached()
+    var
+        AddOnKPadLine: Record "NPR NPRE Waiter Pad Line";
+        BeerPadLine: Record "NPR NPRE Waiter Pad Line";
+        DishPadLine: Record "NPR NPRE Waiter Pad Line";
+        DishSaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        // [SCENARIO] With no free pad line number after the dish's group, the comment goes to the end of the pad and stays attached to the dish
+        // [GIVEN] A pad with DISH 10000, ADDON-K 10001 attached to DISH and BEER 10002, recalled into a sale
+        Initialize();
+        CreatePad(WaiterPad);
+        AddRolePadLine(WaiterPad, 'DISH', 10000, 0, DishPadLine);
+        AddRolePadLine(WaiterPad, 'ADDON-K', 10001, DishPadLine."Line No.", AddOnKPadLine);
+        AddRolePadLine(WaiterPad, 'BEER', 10002, 0, BeerPadLine);
+        RecallPad(WaiterPad, POSSession, SalePOS);
+
+        // [WHEN] The waiter adds "No onions" on DISH and saves
+        FindSaleLineByDescription(SalePOS, 'DISH', DishSaleLinePOS);
+        InsertIndentedComment(POSSession, DishSaleLinePOS, 'No onions');
+        SaveSaleToPad(SalePOS, WaiterPad);
+
+        // [THEN] "No onions" is the last pad line, after BEER, attached to DISH
+        _Assert.AreEqual(
+            'DISH; ADDON-K > DISH; BEER; No onions > DISH (No. "*", indentation 1)', PadLineSequence(WaiterPad."No."),
+            'S6.e: without a free line number after the group of DISH, "No onions" should be appended after BEER and stay attached to DISH.');
+
+        // [WHEN] The pad is recalled again
+        RecallPad(WaiterPad, POSSession, SalePOS);
+
+        // [THEN] The sale reads DISH, ADDON-K, BEER and "No onions" indented under DISH
+        _Assert.AreEqual(
+            'DISH; ADDON-K > DISH; BEER; No onions > DISH (No. "*", indentation 1)', SaleLineSequence(SalePOS),
+            'S6.e: a recall should show DISH, ADDON-K, BEER and then "No onions" attached to DISH.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure PadWithAttachedComments_RecalledAndSavedAgain_AttachedAgainAndPadUnchanged()
+    var
+        AddOnMPadLine: Record "NPR NPRE Waiter Pad Line";
+        DishPadLine: Record "NPR NPRE Waiter Pad Line";
+        ExtraHotPadLine: Record "NPR NPRE Waiter Pad Line";
+        NoOnionsPadLine: Record "NPR NPRE Waiter Pad Line";
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSSession: Codeunit "NPR POS Session";
+        PadBefore: Text;
+    begin
+        // [SCENARIO] A recalled attached comment is attached to its parent again, keeps its "*" and indentation, and saving again changes nothing
+        // [GIVEN] A pad with DISH and "No onions" attached to it
+        Initialize();
+        CreatePad(WaiterPad);
+        AddRolePadLine(WaiterPad, 'DISH', 0, 0, DishPadLine);
+        _LibraryRestaurant.AddWaiterPadAttachedComment(WaiterPad."No.", 'No onions', DishPadLine, NoOnionsPadLine);
+        PadBefore := PadSnapshot(WaiterPad."No.");
+
+        // [WHEN] The pad is recalled
+        RecallPad(WaiterPad, POSSession, SalePOS);
+
+        // [THEN] "No onions" is attached to DISH, indented, with No. "*"
+        _Assert.AreEqual(
+            'DISH; No onions > DISH (No. "*", indentation 1)', SaleLineSequence(SalePOS),
+            'S7.a: after the recall "No onions" should be attached to DISH with No. "*".');
+
+        // [WHEN] The sale is saved back without changes
+        SaveSaleToPad(SalePOS, WaiterPad);
+
+        // [THEN] The pad lines are as before
+        _Assert.AreEqual(PadBefore, PadSnapshot(WaiterPad."No."), 'S7.a: saving the recalled sale again should leave the pad lines unchanged.');
+
+        // [GIVEN] A pad with DISH, ADDON-M attached to DISH and "extra hot" attached to ADDON-M
+        CreatePad(WaiterPad);
+        AddRolePadLine(WaiterPad, 'DISH', 0, 0, DishPadLine);
+        AddRolePadLine(WaiterPad, 'ADDON-M', 0, DishPadLine."Line No.", AddOnMPadLine);
+        _LibraryRestaurant.AddWaiterPadAttachedComment(WaiterPad."No.", 'extra hot', AddOnMPadLine, ExtraHotPadLine);
+        PadBefore := PadSnapshot(WaiterPad."No.");
+
+        // [WHEN] The pad is recalled
+        RecallPad(WaiterPad, POSSession, SalePOS);
+
+        // [THEN] "extra hot" is attached to ADDON-M, indented, with No. "*"
+        _Assert.AreEqual(
+            'DISH; ADDON-M > DISH; extra hot > ADDON-M (No. "*", indentation 2)', SaleLineSequence(SalePOS),
+            'S7.b: after the recall "extra hot" should be attached to ADDON-M with No. "*".');
+
+        // [WHEN] The sale is saved back without changes
+        SaveSaleToPad(SalePOS, WaiterPad);
+
+        // [THEN] The pad lines are as before
+        _Assert.AreEqual(PadBefore, PadSnapshot(WaiterPad."No."), 'S7.b: saving the recalled sale again should leave the pad lines unchanged.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CommentWhoseDishWasDeletedOnThePad_RecalledAndSaved_LoadsAndIsSavedNotAttached()
+    var
+        DishPadLine: Record "NPR NPRE Waiter Pad Line";
+        NoOnionsPadLine: Record "NPR NPRE Waiter Pad Line";
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        // [SCENARIO] A comment still attached to a dish deleted on the waiter pad page loads without error as an unattached "*" comment, and a save detaches it on the pad
+        // [GIVEN] A pad with DISH and "No onions" attached to it, where DISH is then deleted on the pad
+        Initialize();
+        CreatePad(WaiterPad);
+        AddRolePadLine(WaiterPad, 'DISH', 0, 0, DishPadLine);
+        _LibraryRestaurant.AddWaiterPadAttachedComment(WaiterPad."No.", 'No onions', DishPadLine, NoOnionsPadLine);
+        DishPadLine.Delete(true);
+
+        // [WHEN] The pad is recalled
+        RecallPad(WaiterPad, POSSession, SalePOS);
+
+        // [THEN] "No onions" is on the sale, not attached, not indented, with No. "*"
+        _Assert.AreEqual(
+            'No onions (No. "*", indentation 0)', SaleLineSequence(SalePOS),
+            'S7.c: a comment whose DISH is gone should load not attached, with indentation 0 and No. "*".');
+
+        // [WHEN] The sale is saved back
+        SaveSaleToPad(SalePOS, WaiterPad);
+
+        // [THEN] The pad line of "No onions" is no longer attached
+        _Assert.AreEqual(
+            'No onions (No. "*", indentation 0)', PadLineSequence(WaiterPad."No."),
+            'S7.c: after the save the pad line of "No onions" should no longer be attached.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleWithAnAddOnOfAnAddOnAfterTheNextAddOn_SavedToNewPad_EachAddOnAfterItsParentsGroup()
+    var
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        // [SCENARIO] Saving a sale places each new add-on after the last pad line of its parent's group, so an add-on that the POS put inside another add-on's group is saved after that group
+        // [GIVEN] A sale: BURGER, FRIES attached to BURGER, BACON attached to BURGER, KETCHUP attached to FRIES, in that POS order; and a new pad
+        Initialize();
+        StartBurgerSaleWithKetchupOnFriesAfterBacon(POSSession, SalePOS);
+        CreatePad(WaiterPad);
+
+        // [WHEN] The sale is saved onto the pad
+        SaveSaleToPad(SalePOS, WaiterPad);
+
+        // [THEN] KETCHUP follows FRIES, and BACON comes after the whole group of FRIES
+        _Assert.AreEqual(
+            'BURGER; FRIES > BURGER; KETCHUP > FRIES; BACON > BURGER', PadLineSequence(WaiterPad."No."),
+            'S6.f: the new pad should hold BURGER, FRIES, KETCHUP attached to FRIES, then BACON attached to BURGER.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure PadSavedFromASaleWithAnAddOnOfAnAddOn_Recalled_SaleHasThePadOrder()
+    var
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        // [SCENARIO] A pad saved from a sale with an add-on inside another add-on's group recalls with each add-on after its parent's group
+        // [GIVEN] A sale: BURGER, FRIES attached to BURGER, BACON attached to BURGER, KETCHUP attached to FRIES, in that POS order, saved onto a new pad
+        Initialize();
+        StartBurgerSaleWithKetchupOnFriesAfterBacon(POSSession, SalePOS);
+        CreatePad(WaiterPad);
+        SaveSaleToPad(SalePOS, WaiterPad);
+
+        // [WHEN] The pad is recalled into a sale
+        RecallPad(WaiterPad, POSSession, SalePOS);
+
+        // [THEN] The sale reads BURGER, FRIES, KETCHUP attached to FRIES, then BACON attached to BURGER
+        _Assert.AreEqual(
+            'BURGER; FRIES > BURGER; KETCHUP > FRIES; BACON > BURGER', SaleLineSequence(SalePOS),
+            'S6.f recall: the recalled sale should read BURGER, FRIES, KETCHUP attached to FRIES, then BACON attached to BURGER.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleWithCommentsOnAnAddOnAndItsDish_SavedToNewPad_EachCommentAfterItsParentsGroup()
+    var
+        AddOnMSaleLinePOS: Record "NPR POS Sale Line";
+        DishSaleLinePOS: Record "NPR POS Sale Line";
+        ExtraHotSaleLinePOS: Record "NPR POS Sale Line";
+        NoOnionsSaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        // [SCENARIO] Saving a sale places a comment of an add-on after the add-on, and a comment of the dish after the whole group of the dish
+        // [GIVEN] A sale: DISH, ADDON-M attached to DISH, "extra hot" attached to ADDON-M, "No onions" attached to DISH, in that POS order; and a new pad
+        Initialize();
+        StartEmptySale(POSSession, SalePOS);
+        AddRoleSaleLine(POSSession, 'DISH', DishSaleLinePOS);
+        AddRoleSaleLine(POSSession, 'ADDON-M', AddOnMSaleLinePOS);
+        _LibraryPOSMock.AttachSaleLineAsItemAddOn(AddOnMSaleLinePOS, DishSaleLinePOS, _ItemAddOn."No.");
+        _LibraryPOSMock.CreateAttachedCommentLine(AddOnMSaleLinePOS, 'extra hot', 0, ExtraHotSaleLinePOS);
+        _LibraryPOSMock.CreateAttachedCommentLine(DishSaleLinePOS, 'No onions', 0, NoOnionsSaleLinePOS);
+        CreatePad(WaiterPad);
+
+        // [WHEN] The sale is saved onto the pad
+        SaveSaleToPad(SalePOS, WaiterPad);
+
+        // [THEN] "extra hot" follows ADDON-M and "No onions" follows the group of DISH, each a "*" comment attached to its parent
+        _Assert.AreEqual(
+            'DISH; ADDON-M > DISH; extra hot > ADDON-M (No. "*", indentation 2); No onions > DISH (No. "*", indentation 1)', PadLineSequence(WaiterPad."No."),
+            'S6.g: the new pad should hold DISH, ADDON-M, "extra hot" attached to ADDON-M, then "No onions" attached to DISH.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CommentAddedOnADishWhoseAddOnCommentIsAtTheEndOfThePad_Saved_AppendedAfterTheWholeGroup()
+    var
+        AddOnKPadLine: Record "NPR NPRE Waiter Pad Line";
+        BeerPadLine: Record "NPR NPRE Waiter Pad Line";
+        DishPadLine: Record "NPR NPRE Waiter Pad Line";
+        WellDonePadLine: Record "NPR NPRE Waiter Pad Line";
+        DishSaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        // [SCENARIO] A comment added on a dish goes after the highest pad line of the dish's whole group, also when a comment of its add-on comes after the next dish, as on an older pad
+        // [GIVEN] A pad with DISH 10000, ADDON-K 12000 attached to DISH, BEER 20000 and "well done" 30000 attached to ADDON-K, recalled into a sale
+        Initialize();
+        CreatePad(WaiterPad);
+        AddRolePadLine(WaiterPad, 'DISH', 10000, 0, DishPadLine);
+        AddRolePadLine(WaiterPad, 'ADDON-K', 12000, DishPadLine."Line No.", AddOnKPadLine);
+        AddRolePadLine(WaiterPad, 'BEER', 20000, 0, BeerPadLine);
+        _LibraryRestaurant.AddWaiterPadAttachedComment(WaiterPad."No.", 'well done', AddOnKPadLine, WellDonePadLine);
+        RecallPad(WaiterPad, POSSession, SalePOS);
+
+        // [WHEN] The waiter adds "No onions" on DISH and saves
+        FindSaleLineByDescription(SalePOS, 'DISH', DishSaleLinePOS);
+        InsertIndentedComment(POSSession, DishSaleLinePOS, 'No onions');
+        SaveSaleToPad(SalePOS, WaiterPad);
+
+        // [THEN] "No onions" is the last pad line, after "well done", attached to DISH
+        _Assert.AreEqual(
+            'DISH; ADDON-K > DISH; BEER; well done > ADDON-K (No. "*", indentation 2); No onions > DISH (No. "*", indentation 1)', PadLineSequence(WaiterPad."No."),
+            'S6.h: "No onions" should be appended after "well done", the highest pad line of the DISH group, and stay attached to DISH.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CommentAddedOnADishWhoseEarlierAddOnHasTheLastLine_Saved_AppendedAfterTheWholeGroup()
+    var
+        AddOnKPadLine: Record "NPR NPRE Waiter Pad Line";
+        AddOnMPadLine: Record "NPR NPRE Waiter Pad Line";
+        BeerPadLine: Record "NPR NPRE Waiter Pad Line";
+        DishPadLine: Record "NPR NPRE Waiter Pad Line";
+        WellDonePadLine: Record "NPR NPRE Waiter Pad Line";
+        DishSaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        // [SCENARIO] A comment added on a dish goes after the highest pad line of the dish's whole group, also when that line belongs to an earlier add-on and not to the dish's last add-on
+        // [GIVEN] A pad with DISH 10000, ADDON-K 12000 and ADDON-M 14000 attached to DISH, BEER 20000 and "well done" 30000 attached to ADDON-K, recalled into a sale
+        Initialize();
+        CreatePad(WaiterPad);
+        AddRolePadLine(WaiterPad, 'DISH', 10000, 0, DishPadLine);
+        AddRolePadLine(WaiterPad, 'ADDON-K', 12000, DishPadLine."Line No.", AddOnKPadLine);
+        AddRolePadLine(WaiterPad, 'ADDON-M', 14000, DishPadLine."Line No.", AddOnMPadLine);
+        AddRolePadLine(WaiterPad, 'BEER', 20000, 0, BeerPadLine);
+        _LibraryRestaurant.AddWaiterPadAttachedComment(WaiterPad."No.", 'well done', AddOnKPadLine, WellDonePadLine);
+        RecallPad(WaiterPad, POSSession, SalePOS);
+
+        // [WHEN] The waiter adds "No onions" on DISH and saves
+        FindSaleLineByDescription(SalePOS, 'DISH', DishSaleLinePOS);
+        InsertIndentedComment(POSSession, DishSaleLinePOS, 'No onions');
+        SaveSaleToPad(SalePOS, WaiterPad);
+
+        // [THEN] "No onions" is the last pad line, after "well done" of the earlier add-on ADDON-K, attached to DISH
+        _Assert.AreEqual(
+            'DISH; ADDON-K > DISH; ADDON-M > DISH; BEER; well done > ADDON-K (No. "*", indentation 2); No onions > DISH (No. "*", indentation 1)', PadLineSequence(WaiterPad."No."),
+            'S6.i: "No onions" should be appended after "well done", the highest pad line of the DISH group, which belongs to the earlier add-on ADDON-K.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IndentedCommentOnDishPaidLater_RecalledAndSavedBack_HiddenAndStillAttached()
+    var
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSSession: Codeunit "NPR POS Session";
+        NoOnionsTok: Label 'No onions', Locked = true;
+    begin
+        // [SCENARIO] A comment written on a dish in the POS is hidden with the dish once the dish is paid, and stays attached to it on the pad
+        // [GIVEN] A sale with DISH-A, DISH-B and "No onions" on DISH-A, saved to a new pad, after which DISH-A is paid
+        Initialize();
+        SaveSaleWithIndentedCommentToNewPad(POSSession, 'DISH-B', false, 'DISH-A', NoOnionsTok, 'DISH-A', WaiterPad);
+
+        // [WHEN] The pad is recalled into a sale
+        RecallPad(WaiterPad, POSSession, SalePOS);
+
+        // [THEN] The sale holds DISH-B only
+        _Assert.AreEqual('DISH-B', SaleLineSequence(SalePOS), 'The recalled sale should hold DISH-B only, neither the paid DISH-A nor its "No onions".');
+
+        // [WHEN] The sale is saved back onto the pad
+        SaveSaleToPad(SalePOS, WaiterPad);
+
+        // [THEN] The pad still holds DISH-A and "No onions" attached to DISH-A with No. "*" and indentation 1
+        _Assert.AreEqual(
+            'DISH-A; No onions > DISH-A (No. "*", indentation 1); DISH-B', PadLineSequence(WaiterPad."No."),
+            'Saving back should keep the hidden "No onions" on the pad, attached to DISH-A with No. "*" and indentation 1.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IndentedCommentOnPaidDishWithUnpaidAddOn_Recalled_CommentOnSaleAttachedToDish()
+    var
+        DishSaleLinePOS: Record "NPR POS Sale Line";
+        NoOnionsSaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSSession: Codeunit "NPR POS Session";
+        NoOnionsTok: Label 'No onions', Locked = true;
+    begin
+        // [SCENARIO] A comment on a paid dish is shown with the dish while an add-on of the dish is still to pay
+        // [GIVEN] A sale with DISH-A, ADDON attached to DISH-A as an item add-on and "No onions" on DISH-A, saved to a new pad, after which DISH-A is paid
+        Initialize();
+        SaveSaleWithIndentedCommentToNewPad(POSSession, 'ADDON', true, 'DISH-A', NoOnionsTok, 'DISH-A', WaiterPad);
+
+        // [WHEN] The pad is recalled into a sale
+        RecallPad(WaiterPad, POSSession, SalePOS);
+
+        // [THEN] The sale holds DISH-A, ADDON attached to DISH-A, and "No onions" attached to DISH-A
+        _Assert.AreEqual(
+            'DISH-A; ADDON > DISH-A; No onions > DISH-A (No. "*", indentation 1)', SaleLineSequence(SalePOS),
+            'The recalled sale should hold DISH-A, ADDON attached to DISH-A and "No onions" attached to DISH-A.');
+        FindSaleLineByDescription(SalePOS, 'DISH-A', DishSaleLinePOS);
+        FindSaleLineByDescription(SalePOS, NoOnionsTok, NoOnionsSaleLinePOS);
+        _Assert.AreEqual(
+            DishSaleLinePOS."Line No.", AppliesToSaleLineNo(NoOnionsSaleLinePOS),
+            '"No onions" should apply to the DISH-A sale line.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IndentedCommentOnPaidAddOnOfUnpaidDish_RecalledAndSavedBack_HiddenWithAddOnAndKept()
+    var
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSSession: Codeunit "NPR POS Session";
+        ExtraCrispyTok: Label 'Extra crispy', Locked = true;
+    begin
+        // [SCENARIO] A comment written on an add-on is hidden with the add-on once the add-on is paid, and stays attached to it on the pad
+        // [GIVEN] A sale with DISH-A, ADDON attached to DISH-A as an item add-on and "Extra crispy" on ADDON, saved to a new pad, after which ADDON is paid
+        Initialize();
+        SaveSaleWithIndentedCommentToNewPad(POSSession, 'ADDON', true, 'ADDON', ExtraCrispyTok, 'ADDON', WaiterPad);
+
+        // [WHEN] The pad is recalled into a sale
+        RecallPad(WaiterPad, POSSession, SalePOS);
+
+        // [THEN] The sale holds DISH-A only
+        _Assert.AreEqual('DISH-A', SaleLineSequence(SalePOS), 'The recalled sale should hold DISH-A only, neither the paid ADDON nor its "Extra crispy".');
+
+        // [WHEN] The sale is saved back onto the pad
+        SaveSaleToPad(SalePOS, WaiterPad);
+
+        // [THEN] The pad still holds "Extra crispy" attached to ADDON with No. "*" and indentation 2
+        _Assert.AreEqual(
+            'DISH-A; ADDON > DISH-A; Extra crispy > ADDON (No. "*", indentation 2)', PadLineSequence(WaiterPad."No."),
+            'Saving back should keep the hidden "Extra crispy" on the pad, attached to ADDON with No. "*" and indentation 2.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IndentedCommentOnOpenDishNextToPaidDish_Recalled_CommentStaysAttached()
+    var
+        DishBSaleLinePOS: Record "NPR POS Sale Line";
+        NoOnionsSaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSSession: Codeunit "NPR POS Session";
+        NoOnionsTok: Label 'No onions', Locked = true;
+    begin
+        // [SCENARIO] Hiding a paid dish leaves the comment of another, unpaid dish on the sale and attached to that dish
+        // [GIVEN] A sale with DISH-A, DISH-B and "No onions" on DISH-B, saved to a new pad, after which DISH-A is paid
+        Initialize();
+        SaveSaleWithIndentedCommentToNewPad(POSSession, 'DISH-B', false, 'DISH-B', NoOnionsTok, 'DISH-A', WaiterPad);
+
+        // [WHEN] The pad is recalled into a sale
+        RecallPad(WaiterPad, POSSession, SalePOS);
+
+        // [THEN] The sale holds DISH-B and "No onions" attached to DISH-B
+        _Assert.AreEqual(
+            'DISH-B; No onions > DISH-B (No. "*", indentation 1)', SaleLineSequence(SalePOS),
+            'The recalled sale should hold DISH-B and "No onions" attached to DISH-B.');
+        FindSaleLineByDescription(SalePOS, 'DISH-B', DishBSaleLinePOS);
+        FindSaleLineByDescription(SalePOS, NoOnionsTok, NoOnionsSaleLinePOS);
+        _Assert.AreEqual(
+            DishBSaleLinePOS."Line No.", AppliesToSaleLineNo(NoOnionsSaleLinePOS),
+            '"No onions" should apply to the DISH-B sale line.');
+    end;
+
+    #endregion
+
     #region Setup helpers
 
     local procedure Initialize()
@@ -1131,6 +1618,7 @@ codeunit 85405 "NPR NPRE W/Pad RoundTripTests"
             _LibraryRestaurant.CreateSeatingLocation(_SeatingLocation, _Restaurant.Code);
             _LibraryRestaurant.CreateSeating(_Seating, _SeatingLocation.Code);
             _LibraryRestaurant.CreateKitchenStation(KitchenStation, _Restaurant.Code);
+            _LibraryRestaurant.CreateItemAddon(_ItemAddOn);
 
             KitchenStationSelection.Init();
             KitchenStationSelection."Restaurant Code" := _Restaurant.Code;
@@ -1330,12 +1818,223 @@ codeunit 85405 "NPR NPRE W/Pad RoundTripTests"
         _Assert.IsTrue(WaiterPadLine.FindFirst(), 'The waiter pad should hold a line for the item.');
     end;
 
+    local procedure AddRoleSaleLine(POSSession: Codeunit "NPR POS Session"; Description: Text[100]; var SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        Item: Record Item;
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+    begin
+        CreateItem(Item);
+        Item.Description := Description;
+        Item.Modify();
+        _LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+    end;
+
+    local procedure AddRolePadLine(WaiterPad: Record "NPR NPRE Waiter Pad"; Description: Text[100]; LineNo: Integer; AttachedToLineNo: Integer; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
+    var
+        Item: Record Item;
+    begin
+        CreateItem(Item);
+        Item.Description := Description;
+        Item.Modify();
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", Item."No.", 1, AttachedToLineNo, LineNo, WaiterPadLine);
+        if AttachedToLineNo = 0 then
+            exit;
+        WaiterPadLine.Find();
+        WaiterPadLine."AddOn No." := _ItemAddOn."No.";
+        WaiterPadLine."AddOn Line No." := 10000;
+        WaiterPadLine.Modify();
+    end;
+
     local procedure AddAddOnPadLine(WaiterPad: Record "NPR NPRE Waiter Pad"; ItemNo: Code[20]; Quantity: Decimal; AttachedToLineNo: Integer; AddOnNo: Code[20]; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
     begin
         _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", ItemNo, Quantity, AttachedToLineNo, WaiterPadLine);
         WaiterPadLine."AddOn No." := AddOnNo;
         WaiterPadLine."AddOn Line No." := 10000;
         WaiterPadLine.Modify();
+    end;
+
+    local procedure RecallPad(WaiterPad: Record "NPR NPRE Waiter Pad"; var POSSession: Codeunit "NPR POS Session"; var SalePOS: Record "NPR POS Sale")
+    var
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+    begin
+        StartEmptySale(POSSession, SalePOS);
+        WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(WaiterPad, POSSession);
+        SalePOS.Find();
+    end;
+
+    local procedure SaveSaleToPad(var SalePOS: Record "NPR POS Sale"; var WaiterPad: Record "NPR NPRE Waiter Pad")
+    var
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+    begin
+        SalePOS.Find();
+        WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, WaiterPad, true);
+    end;
+
+    local procedure FindSaleLineByDescription(SalePOS: Record "NPR POS Sale"; Description: Text; var SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+        SaleLinePOS.Reset();
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange(Description, Description);
+        _Assert.IsTrue(SaleLinePOS.FindFirst(), 'The sale should hold the line the comment is added to.');
+    end;
+
+    local procedure InsertIndentedComment(POSSession: Codeunit "NPR POS Session"; SelectedSaleLinePOS: Record "NPR POS Sale Line"; CommentText: Text[100])
+    var
+        BusinessLogic: Codeunit "NPR POS Action - Insert Comm B";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+    begin
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetPosition(SelectedSaleLinePOS.GetPosition());
+        BusinessLogic.InputPosCommentLine(CommentText, true, POSSaleLine);
+    end;
+
+    local procedure SaveSaleWithIndentedCommentToNewPad(var POSSession: Codeunit "NPR POS Session"; SecondRole: Text[100]; AttachSecondAsAddOn: Boolean; CommentTargetRole: Text; CommentText: Text[100]; BilledRole: Text; var WaiterPad: Record "NPR NPRE Waiter Pad")
+    var
+        DishSaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SecondSaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+    begin
+        StartEmptySale(POSSession, SalePOS);
+        AddRoleSaleLine(POSSession, 'DISH-A', DishSaleLinePOS);
+        AddRoleSaleLine(POSSession, SecondRole, SecondSaleLinePOS);
+        if AttachSecondAsAddOn then
+            _LibraryPOSMock.AttachSaleLineAsItemAddOn(SecondSaleLinePOS, DishSaleLinePOS, _ItemAddOn."No.");
+        FindSaleLineByDescription(SalePOS, CommentTargetRole, SaleLinePOS);
+        InsertIndentedComment(POSSession, SaleLinePOS, CommentText);
+        FindSaleLineByDescription(SalePOS, BilledRole, SaleLinePOS);
+        CreatePad(WaiterPad);
+        SaveSaleToPad(SalePOS, WaiterPad);
+
+        FindPadLineForItem(WaiterPad."No.", SaleLinePOS."No.", WaiterPadLine);
+        _LibraryRestaurant.SetWaiterPadLineBilledQuantity(WaiterPadLine, 1);
+    end;
+
+    local procedure AddCommentsToRecalledPadInOrder(RowId: Text; FirstTarget: Text; FirstComment: Text[100]; SecondTarget: Text; SecondComment: Text[100]; var Mismatches: Text)
+    var
+        AddOnKPadLine: Record "NPR NPRE Waiter Pad Line";
+        BeerPadLine: Record "NPR NPRE Waiter Pad Line";
+        DishPadLine: Record "NPR NPRE Waiter Pad Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSSession: Codeunit "NPR POS Session";
+        ExpectedOrderTxt: Label 'DISH; ADDON-K > DISH; well done > ADDON-K (No. "*", indentation 2); No onions > DISH (No. "*", indentation 1); BEER', Locked = true;
+    begin
+        CreatePad(WaiterPad);
+        AddRolePadLine(WaiterPad, 'DISH', 10000, 0, DishPadLine);
+        AddRolePadLine(WaiterPad, 'ADDON-K', 15000, DishPadLine."Line No.", AddOnKPadLine);
+        AddRolePadLine(WaiterPad, 'BEER', 20000, 0, BeerPadLine);
+        RecallPad(WaiterPad, POSSession, SalePOS);
+
+        FindSaleLineByDescription(SalePOS, FirstTarget, SaleLinePOS);
+        InsertIndentedComment(POSSession, SaleLinePOS, FirstComment);
+        FindSaleLineByDescription(SalePOS, SecondTarget, SaleLinePOS);
+        InsertIndentedComment(POSSession, SaleLinePOS, SecondComment);
+        SaveSaleToPad(SalePOS, WaiterPad);
+        CheckRow(RowId + ' pad', ExpectedOrderTxt, PadLineSequence(WaiterPad."No."), Mismatches);
+
+        RecallPad(WaiterPad, POSSession, SalePOS);
+        CheckRow(RowId + ' recall', ExpectedOrderTxt, SaleLineSequence(SalePOS), Mismatches);
+    end;
+
+    local procedure PadLineSequence(WaiterPadNo: Code[20]) Sequence: Text
+    var
+        ParentPadLine: Record "NPR NPRE Waiter Pad Line";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        Entry: Text;
+    begin
+        WaiterPadLine.SetRange("Waiter Pad No.", WaiterPadNo);
+        if not WaiterPadLine.FindSet() then
+            exit;
+        repeat
+            Entry := WaiterPadLine.Description;
+            if WaiterPadLine."Attached to Line No." <> 0 then
+                if ParentPadLine.Get(WaiterPadNo, WaiterPadLine."Attached to Line No.") then
+                    Entry := StrSubstNo(AttachedEntryTxt, Entry, ParentPadLine.Description)
+                else
+                    Entry := StrSubstNo(AttachedEntryTxt, Entry, MissingParentTxt);
+            if WaiterPadLine."Line Type" = WaiterPadLine."Line Type"::Comment then
+                Entry := StrSubstNo(CommentEntryTxt, Entry, WaiterPadLine."No.", WaiterPadLine.Indentation);
+            AddToSequence(Sequence, Entry);
+        until WaiterPadLine.Next() = 0;
+    end;
+
+    local procedure SaleLineSequence(SalePOS: Record "NPR POS Sale") Sequence: Text
+    var
+        ParentSaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        Entry: Text;
+    begin
+        SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        if not SaleLinePOS.FindSet() then
+            exit;
+        repeat
+            Entry := SaleLinePOS.Description;
+            SaleLinePOSAddOn.SetRange("Register No.", SaleLinePOS."Register No.");
+            SaleLinePOSAddOn.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
+            SaleLinePOSAddOn.SetRange("Sale Date", SaleLinePOS.Date);
+            SaleLinePOSAddOn.SetRange("Sale Line No.", SaleLinePOS."Line No.");
+            SaleLinePOSAddOn.SetFilter("Applies-to Line No.", '<>%1', 0);
+            if SaleLinePOSAddOn.FindFirst() then
+                if ParentSaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", SaleLinePOSAddOn."Applies-to Line No.") then
+                    Entry := StrSubstNo(AttachedEntryTxt, Entry, ParentSaleLinePOS.Description)
+                else
+                    Entry := StrSubstNo(AttachedEntryTxt, Entry, MissingParentTxt);
+            if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::Comment then
+                Entry := StrSubstNo(CommentEntryTxt, Entry, SaleLinePOS."No.", SaleLinePOS.Indentation);
+            AddToSequence(Sequence, Entry);
+        until SaleLinePOS.Next() = 0;
+    end;
+
+    local procedure PadSnapshot(WaiterPadNo: Code[20]) Snapshot: Text
+    var
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+    begin
+        WaiterPadLine.SetRange("Waiter Pad No.", WaiterPadNo);
+        if WaiterPadLine.FindSet() then
+            repeat
+                Snapshot += StrSubstNo(
+                    SnapshotEntryTxt, WaiterPadLine."Line No.", WaiterPadLine."Line Type", WaiterPadLine."No.", WaiterPadLine.Description,
+                    WaiterPadLine."Attached to Line No.", WaiterPadLine.Indentation, WaiterPadLine.Quantity);
+            until WaiterPadLine.Next() = 0;
+    end;
+
+    local procedure AddToSequence(var Sequence: Text; Entry: Text)
+    begin
+        if Sequence <> '' then
+            Sequence += '; ';
+        Sequence += Entry;
+    end;
+
+    local procedure CheckRow(RowId: Text; Expected: Text; Actual: Text; var Mismatches: Text)
+    begin
+        if Expected <> Actual then
+            Mismatches += StrSubstNo(RowMismatchTxt, RowId, Expected, Actual);
+    end;
+
+    local procedure StartBurgerSaleWithKetchupOnFriesAfterBacon(var POSSession: Codeunit "NPR POS Session"; var SalePOS: Record "NPR POS Sale")
+    var
+        BaconSaleLinePOS: Record "NPR POS Sale Line";
+        BurgerSaleLinePOS: Record "NPR POS Sale Line";
+        FriesSaleLinePOS: Record "NPR POS Sale Line";
+        KetchupSaleLinePOS: Record "NPR POS Sale Line";
+    begin
+        StartEmptySale(POSSession, SalePOS);
+        AddRoleSaleLine(POSSession, 'BURGER', BurgerSaleLinePOS);
+        AddRoleSaleLine(POSSession, 'FRIES', FriesSaleLinePOS);
+        _LibraryPOSMock.AttachSaleLineAsItemAddOn(FriesSaleLinePOS, BurgerSaleLinePOS, _ItemAddOn."No.");
+        AddRoleSaleLine(POSSession, 'BACON', BaconSaleLinePOS);
+        _LibraryPOSMock.AttachSaleLineAsItemAddOn(BaconSaleLinePOS, BurgerSaleLinePOS, _ItemAddOn."No.");
+        AddRoleSaleLine(POSSession, 'KETCHUP', KetchupSaleLinePOS);
+        _LibraryPOSMock.AttachSaleLineAsItemAddOn(KetchupSaleLinePOS, FriesSaleLinePOS, _ItemAddOn."No.");
     end;
 
     local procedure AddCommentNumberedBefore(DishLine: Record "NPR NPRE Waiter Pad Line"; CommentText: Text; var CommentLine: Record "NPR NPRE Waiter Pad Line")

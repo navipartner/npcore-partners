@@ -1086,6 +1086,7 @@
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
     begin
         FilterAttachedItemAddonLines(SaleLinePOS, SaleLinePOS."Line No.", SaleLinePOSAddOn);
+        SaleLinePOSAddOn.SetFilter("AddOn No.", '<>%1', '');
         exit(not SaleLinePOSAddOn.IsEmpty);
     end;
 

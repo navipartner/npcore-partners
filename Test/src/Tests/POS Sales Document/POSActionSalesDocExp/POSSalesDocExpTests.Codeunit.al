@@ -137,6 +137,159 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         SalesShipmentHeader.Get(POSEntrySalesDocLink."Sales Document No");
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CommentAttachedToADish_SaleExportedToSalesOrder_CommentOnThePOSEntryAndATextLineOnTheOrder()
+    var
+        CommentSaleLinePOS: Record "NPR POS Sale Line";
+        DishSaleLinePOS: Record "NPR POS Sale Line";
+        Item: Record Item;
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        SalePOS: Record "NPR POS Sale";
+        Assert: Codeunit Assert;
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        SalesDocumentExportMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+    begin
+        // [SCENARIO] An attached comment ends as a comment line does today: a Comment line on the POS entry, and a text line with a blank No. on the sales document
+
+        // [GIVEN] A sale for a customer with a DISH and "No onions" attached to it with indentation 1
+        InitializeData();
+        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, _Salesperson, POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        Item."Unit Price" := 10;
+        Item.Modify();
+        NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(DishSaleLinePOS);
+        NPRLibraryPOSMock.CreateAttachedCommentLine(DishSaleLinePOS, 'No onions', 0, CommentSaleLinePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, _Customer."No.", false);
+
+        // [WHEN] The sale is exported to a sales order
+        _POSSession.GetSale(POSSale);
+        SalesDocumentExportMgt.SetDocumentTypeOrder();
+        SalesDocumentExportMgt.ProcessPOSSale(POSSale);
+
+        // [THEN] The POS entry has a Comment line "No onions" with No. "*" and indentation 1
+        Assert.IsTrue(POSEntrySalesLine.GetBySystemId(CommentSaleLinePOS.SystemId), 'S18.a: the POS entry should have a line for "No onions".');
+        Assert.AreEqual(POSEntrySalesLine.Type::Comment, POSEntrySalesLine.Type, 'S18.a: the POS entry line of "No onions" should be of type Comment.');
+        Assert.AreEqual('No onions', POSEntrySalesLine.Description, 'S18.a: the POS entry line should carry the description "No onions".');
+        Assert.AreEqual('*', POSEntrySalesLine."No.", 'S18.a: the POS entry line of "No onions" should keep No. "*".');
+        Assert.AreEqual(1, POSEntrySalesLine.Indentation, 'S18.a: the POS entry line of "No onions" should keep indentation 1.');
+
+        // [THEN] The sales order has a text line "No onions" with a blank No.
+        SalesDocumentExportMgt.GetCreatedSalesHeader(SalesHeader);
+        Assert.IsTrue(
+            SalesLine.Get(SalesHeader."Document Type", SalesHeader."No.", CommentSaleLinePOS."Line No."), 'S18.a: the sales order should have a line for "No onions".');
+        Assert.AreEqual('', SalesLine."No.", 'S18.a: the sales line of "No onions" should have a blank No.');
+        Assert.AreEqual('No onions', SalesLine.Description, 'S18.a: the sales line should carry the description "No onions".');
+    end;
+
+    #region Asynchronous posting of an order with an attached comment
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GivenOrderWithAttachedCommentExportedForAsyncPosting_WhenPOSEntryIsPosted_ThenTheOrderIsPosted()
+    var
+        DishSaleLinePOS: Record "NPR POS Sale Line";
+        Item: Record Item;
+        POSEntry: Record "NPR POS Entry";
+        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+        SalesHeader: Record "Sales Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesShipmentHeader: Record "Sales Shipment Header";
+        Assert: Codeunit Assert;
+        OrderNo: Code[20];
+        NotPostedMsg: Label 'F1: the POS entry should post its order %1; its posting error: %2', Locked = true;
+        OrderNotGoneMsg: Label 'F1: the order %1 should be posted and gone', Locked = true;
+        LinkMissingMsg: Label 'F1: the POS entry should link the %1 of the order %2', Locked = true;
+        LinkedDocMissingMsg: Label 'F1: the %1 %2 the POS entry links should exist', Locked = true;
+    begin
+        // [SCENARIO] An order exported from a sale with an attached comment and asynchronous posting posts when its POS entry is posted, as an order without the comment does
+        InitializeData();
+
+        // [GIVEN] F1: a sale of a dish with "No sugar" attached to it (No. "*"), exported for a customer as an order to ship and invoice with asynchronous posting
+        ExportSaleWithAttachedCommentForAsyncPosting(Item, DishSaleLinePOS, OrderNo, POSEntry);
+
+        // [WHEN] The sales documents of the POS entry are posted
+        PostPOSEntrySalesDocuments(POSEntry);
+
+        // [THEN] The POS entry is posted and the order is posted and gone
+        POSEntry.Get(POSEntry."Entry No.");
+        Assert.AreEqual(
+            POSEntry."Post Sales Document Status"::Posted, POSEntry."Post Sales Document Status",
+            StrSubstNo(NotPostedMsg, OrderNo, GetOrderPostingError(POSEntry)));
+        Assert.IsFalse(SalesHeader.Get(SalesHeader."Document Type"::Order, OrderNo), StrSubstNo(OrderNotGoneMsg, OrderNo));
+
+        // [THEN] The POS entry links the posted invoice and the shipment of the order
+        POSEntrySalesDocLink.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntrySalesDocLink.SetRange("POS Entry Reference Type", POSEntrySalesDocLink."POS Entry Reference Type"::HEADER);
+        POSEntrySalesDocLink.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::POSTED_INVOICE);
+        Assert.IsTrue(POSEntrySalesDocLink.FindFirst(), StrSubstNo(LinkMissingMsg, 'posted invoice', OrderNo));
+        Assert.IsTrue(
+            SalesInvoiceHeader.Get(POSEntrySalesDocLink."Sales Document No"),
+            StrSubstNo(LinkedDocMissingMsg, 'posted invoice', POSEntrySalesDocLink."Sales Document No"));
+        Assert.AreEqual(OrderNo, SalesInvoiceHeader."Order No.", 'F1: the posted invoice should be the invoice of the exported order');
+        POSEntrySalesDocLink.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::SHIPMENT);
+        Assert.IsTrue(POSEntrySalesDocLink.FindFirst(), StrSubstNo(LinkMissingMsg, 'shipment', OrderNo));
+        Assert.IsTrue(
+            SalesShipmentHeader.Get(POSEntrySalesDocLink."Sales Document No"),
+            StrSubstNo(LinkedDocMissingMsg, 'shipment', POSEntrySalesDocLink."Sales Document No"));
+        Assert.AreEqual(OrderNo, SalesShipmentHeader."Order No.", 'F1: the shipment should be the shipment of the exported order');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GivenOrderWithAttachedCommentAndItemNoChangedOnTheOrder_WhenPOSEntryIsPosted_ThenPostingFailsOnTheItemNo()
+    var
+        DishSaleLinePOS: Record "NPR POS Sale Line";
+        Item: Record Item;
+        OtherItem: Record Item;
+        POSEntry: Record "NPR POS Entry";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        Assert: Codeunit Assert;
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        OrderNo: Code[20];
+        ExpectedError: Text;
+        PostingError: Text;
+        TestFieldTextLbl: Label '%1 must be equal to ''%2''', Locked = true;
+        NotFailedMsg: Label 'F1: the POS entry of the order %1 with a changed item line should fail to post', Locked = true;
+        WrongErrorMsg: Label 'F1: the posting error should be the No. check of the dish line, expected to contain [%1], actual [%2]', Locked = true;
+        OrderGoneMsg: Label 'F1: the order %1 should stay unposted', Locked = true;
+    begin
+        // [SCENARIO] An order exported with asynchronous posting whose item line got another No. after the export still stops the posting of its POS entry on the No. check
+        InitializeData();
+
+        // [GIVEN] F1: a sale of a dish with "No sugar" attached to it (No. "*"), exported the same way, then the dish's sales line on the order changed to another item
+        ExportSaleWithAttachedCommentForAsyncPosting(Item, DishSaleLinePOS, OrderNo, POSEntry);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(OtherItem, _POSUnit, _POSStore);
+        SalesLine.Get(SalesLine."Document Type"::Order, OrderNo, DishSaleLinePOS."Line No.");
+        SalesLine."No." := OtherItem."No.";
+        SalesLine.Modify();
+
+        // [WHEN] The sales documents of the POS entry are posted
+        PostPOSEntrySalesDocuments(POSEntry);
+
+        // [THEN] The POS entry is not posted, its posting error is the No. check of the dish line, and the order stays
+        POSEntry.Get(POSEntry."Entry No.");
+        Assert.AreEqual(
+            POSEntry."Post Sales Document Status"::"Error while Posting", POSEntry."Post Sales Document Status",
+            StrSubstNo(NotFailedMsg, OrderNo));
+        PostingError := GetOrderPostingError(POSEntry);
+        ExpectedError := StrSubstNo(TestFieldTextLbl, SalesLine.FieldCaption("No."), Item."No.");
+        Assert.IsTrue(
+            StrPos(PostingError, ExpectedError) > 0,
+            StrSubstNo(WrongErrorMsg, ExpectedError, PostingError));
+        Assert.IsTrue(SalesHeader.Get(SalesHeader."Document Type"::Order, OrderNo), StrSubstNo(OrderGoneMsg, OrderNo));
+    end;
+    #endregion Asynchronous posting of an order with an attached comment
+
     #region ExportToOrderWithoutGroupCodeEnabled
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
@@ -854,4 +1007,66 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         VATPostingSetup.Modify(true);
     end;
     #endregion ChangeVATOnVoucher
+
+    #region Asynchronous posting helpers
+    local procedure ExportSaleWithAttachedCommentForAsyncPosting(var Item: Record Item; var DishSaleLinePOS: Record "NPR POS Sale Line"; var OrderNo: Code[20]; var POSEntry: Record "NPR POS Entry")
+    var
+        CommentSaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        SalesHeader: Record "Sales Header";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        SalesDocumentExportMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+    begin
+        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, _Salesperson, POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        Item."Unit Price" := 10;
+        Item.Modify();
+        NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(DishSaleLinePOS);
+        NPRLibraryPOSMock.CreateAttachedCommentLine(DishSaleLinePOS, 'No sugar', 0, CommentSaleLinePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, _Customer."No.", false);
+
+        _POSSession.GetSale(POSSale);
+        SalesDocumentExportMgt.SetDocumentTypeOrder();
+        SalesDocumentExportMgt.SetShip(true);
+        SalesDocumentExportMgt.SetInvoice(true);
+        SalesDocumentExportMgt.SetAsyncPosting(true);
+        SalesDocumentExportMgt.ProcessPOSSale(POSSale);
+        SalesDocumentExportMgt.GetCreatedSalesHeader(SalesHeader);
+        OrderNo := SalesHeader."No.";
+
+        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+        POSEntry.FindFirst();
+    end;
+
+    local procedure PostPOSEntrySalesDocuments(POSEntry: Record "NPR POS Entry")
+    var
+        POSEntryToPost: Record "NPR POS Entry";
+        POSPostEntries: Codeunit "NPR POS Post Entries";
+    begin
+        POSEntryToPost.SetRange("Entry No.", POSEntry."Entry No.");
+        POSPostEntries.SetPostSaleDocuments(true);
+        POSPostEntries.SetStopOnError(false);
+        POSPostEntries.SetPostCompressed(false);
+        POSPostEntries.Run(POSEntryToPost);
+    end;
+
+    local procedure GetOrderPostingError(POSEntry: Record "NPR POS Entry"): Text
+    var
+        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+    begin
+        POSEntrySalesDocLink.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntrySalesDocLink.SetRange("POS Entry Reference Type", POSEntrySalesDocLink."POS Entry Reference Type"::HEADER);
+        POSEntrySalesDocLink.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::ORDER);
+        if not POSEntrySalesDocLink.FindFirst() then
+            exit('');
+        exit(POSEntrySalesDocLink.GetErrorMessage());
+    end;
+    #endregion Asynchronous posting helpers
 }

@@ -64,6 +64,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn" implements "NPR IPOS Workflow"
         ApplyToDialogOptions: JsonArray;
         AddOnNo_Param: Code[20];
         ApplyTo: Integer;
+        CommentLineErr: Label 'You cannot add an item add-on to a comment line. Select the item line instead.';
     begin
         If GetBaseLineNoFromContext(Context, false) <> 0 then begin
             FinishApplyToLineResponse(false, ApplyToDialogOptions, Response);
@@ -71,6 +72,8 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn" implements "NPR IPOS Workflow"
         end;
 
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::Comment then
+            Error(CommentLineErr);
         if not IsChildItemAddOnLine(SaleLinePOS, SaleLinePOSAddOn) then begin
             Context.SetContext('BaseLineNo', FindAppliesToLineNo(SaleLinePOS));
             FinishApplyToLineResponse(false, ApplyToDialogOptions, Response);

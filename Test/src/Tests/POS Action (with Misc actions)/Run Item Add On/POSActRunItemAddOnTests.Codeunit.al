@@ -431,6 +431,83 @@ codeunit 85140 "NPR POS Act. RunItemAddOnTests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure AddOnDialog_DishWithOnlyAnAttachedComment_ProposesTheDefaultQuantityOfTheDishAlone()
+    var
+        ChildItem: Record Item;
+        CommentSaleLine: Record "NPR POS Sale Line";
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ParentItem: Record Item;
+        ParentSaleLine: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+        AddOnDialog: JsonObject;
+    begin
+        // [SCENARIO] A comment attached to a dish is not an attached add-on, so the add-on dialog proposes the quantities it proposes for the dish alone
+
+        // [GIVEN] A sale with a dish whose item add-on has a non-mandatory line with the default quantity 2, and a comment attached to the dish
+        InitializeSale(SalePOS);
+        CreateSaleItem(ParentItem, 10);
+        CreateSaleItem(ChildItem, 4);
+        AddParentItemLine(ParentItem, 1, SalePOS, ParentSaleLine);
+        ItemAddOn.Get(CreateQuantityAddOn(ParentItem, ChildItem, 2, false, false));
+        _LibraryPOSMock.CreateAttachedCommentLine(ParentSaleLine, 'No onions', 0, CommentSaleLine);
+
+        // [WHEN] The add-on dialog is built for the dish
+        AddOnDialog := ItemAddOnMgt.GenerateItemAddOnConfigJson(SalePOS, ParentSaleLine, ItemAddOn);
+
+        // [THEN] It proposes the default quantity 2, as for the dish alone
+        _Assert.AreEqual(
+            2, ProposedQuantityOfFirstAddOnLine(AddOnDialog),
+            'S5.a: with only a comment attached, the add-on dialog should propose the default quantity 2 of the non-mandatory add-on line, the same as for the dish alone.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RunItemAddOnAction_AttachedCommentSelected_ErrorsInsteadOfUsingTheParentAddOn()
+    var
+        ChildItem: Record Item;
+        CommentSaleLine: Record "NPR POS Sale Line";
+        ParentItem: Record Item;
+        ParentSaleLine: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        Context: Codeunit "NPR POS JSON Helper";
+        FrontEnd: Codeunit "NPR POS Front End Management";
+        POSActionRunItemAddOn: Codeunit "NPR POS Action: Run Item AddOn";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSetup: Codeunit "NPR POS Setup";
+        Parameters: JsonObject;
+        Root: JsonObject;
+    begin
+        // [SCENARIO] The Item Addon action on a comment attached to a dish stops with a message, and does not open the add-on of the dish
+
+        // [GIVEN] A sale with a dish that has an item add-on, and a comment attached to the dish
+        InitializeSale(SalePOS);
+        CreateSaleItem(ParentItem, 10);
+        CreateSaleItem(ChildItem, 4);
+        AddParentItemLine(ParentItem, 1, SalePOS, ParentSaleLine);
+        CreateQuantityAddOn(ParentItem, ChildItem, 2, false);
+        _LibraryPOSMock.CreateAttachedCommentLine(ParentSaleLine, 'No onions', 0, CommentSaleLine);
+
+        // [WHEN] The Item Addon action runs with the comment line selected
+        Parameters.Add('ApplyTo', 3);
+        Root.Add('parameters', Parameters);
+        Context.InitializeJObjectParser(Root);
+        _POSSession.GetFrontEnd(FrontEnd, true);
+        _POSSession.GetSale(POSSale);
+        _POSSession.GetSaleLine(POSSaleLine);
+        _POSSession.GetPaymentLine(POSPaymentLine);
+        _POSSession.GetSetup(POSSetup);
+        POSSaleLine.SetPosition(CommentSaleLine.GetPosition());
+        asserterror POSActionRunItemAddOn.RunWorkflow('DefineBaseLineNo', Context, FrontEnd, POSSale, POSSaleLine, POSPaymentLine, POSSetup);
+
+        // [THEN] The action stops with the comment-line message
+        _Assert.ExpectedError('You cannot add an item add-on to a comment line.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure UseUnitPriceRelative_WhereTheAmountWouldBeReadAsAPrice_IsRefused()
     var
         ChildItem: Record Item;
@@ -518,7 +595,12 @@ codeunit 85140 "NPR POS Act. RunItemAddOnTests"
         POSActionRunItemAddOn.RunItemAddOns(ParentSaleLine."Line No.", AddOnNo, false, true, false, UserSelectionJToken);
     end;
 
-    local procedure CreateQuantityAddOn(var ParentItem: Record Item; ChildItem: Record Item; Quantity: Decimal; CopySerialNo: Boolean) AddOnNo: Code[20]
+    local procedure CreateQuantityAddOn(var ParentItem: Record Item; ChildItem: Record Item; Quantity: Decimal; CopySerialNo: Boolean): Code[20]
+    begin
+        exit(CreateQuantityAddOn(ParentItem, ChildItem, Quantity, CopySerialNo, true));
+    end;
+
+    local procedure CreateQuantityAddOn(var ParentItem: Record Item; ChildItem: Record Item; Quantity: Decimal; CopySerialNo: Boolean; FixedAndMandatory: Boolean): Code[20]
     var
         ItemAddOn: Record "NPR NpIa Item AddOn";
         ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
@@ -535,8 +617,8 @@ codeunit 85140 "NPR POS Act. RunItemAddOnTests"
         ItemAddOnLine.Validate(Type, ItemAddOnLine.Type::Quantity);
         ItemAddOnLine.Validate("Item No.", ChildItem."No.");
         ItemAddOnLine.Validate(Quantity, Quantity);
-        ItemAddOnLine.Validate("Fixed Quantity", true);
-        ItemAddOnLine.Validate(Mandatory, true);
+        ItemAddOnLine.Validate("Fixed Quantity", FixedAndMandatory);
+        ItemAddOnLine.Validate(Mandatory, FixedAndMandatory);
         ItemAddOnLine."Use Unit Price" := ItemAddOnLine."Use Unit Price"::Always;
         ItemAddOnLine."Unit Price" := ChildItem."Unit Price";
         ItemAddOnLine."Copy Serial No." := CopySerialNo;
@@ -622,6 +704,18 @@ codeunit 85140 "NPR POS Act. RunItemAddOnTests"
         SaleLine.SetRange("Line Type", SaleLine."Line Type"::Item);
         SaleLine.SetRange("No.", ItemNo);
         SaleLine.FindFirst();
+    end;
+
+    local procedure ProposedQuantityOfFirstAddOnLine(AddOnDialog: JsonObject): Decimal
+    var
+        Setting: JsonToken;
+        Settings: JsonToken;
+        Value: JsonToken;
+    begin
+        AddOnDialog.Get('settings', Settings);
+        Settings.AsArray().Get(0, Setting);
+        Setting.AsObject().Get('value', Value);
+        exit(Value.AsValue().AsDecimal());
     end;
 
     local procedure EndSale()

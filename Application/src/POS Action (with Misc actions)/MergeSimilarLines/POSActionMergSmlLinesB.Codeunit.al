@@ -7,6 +7,7 @@ codeunit 6059982 "NPR POSAction: Merg.Sml.LinesB"
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         TempSaleLinePOSToDelete: Record "NPR POS Sale Line" temporary;
         TempLotSaleLinePOS: Record "NPR POS Sale Line" temporary;
+        TempGroupSaleLinePOS: Record "NPR POS Sale Line" temporary;
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSActMergSimlLinesEvents: Codeunit "NPR POSActMergSimlLinesEvents";
         NoLinesErr: Label 'No adequate sale lines are available in the current sale';
@@ -50,20 +51,28 @@ codeunit 6059982 "NPR POSAction: Merg.Sml.LinesB"
                 if not CollapseSupported then
                     CollectNotCollapsedItem(NotCollapsedItems, SaleLinePOS."No.")
                 else begin
-                    TempSaleLinePOS := SaleLinePOS;
-                    TempSaleLinePOS.Insert();
+                    TempGroupSaleLinePOS.Reset();
+                    TempGroupSaleLinePOS.DeleteAll();
+                    repeat
+                        if not CarriesAttachedComment(SaleLinePOS) then begin
+                            TempGroupSaleLinePOS := SaleLinePOS;
+                            TempGroupSaleLinePOS.Insert();
+                        end;
+                    until SaleLinePOS.Next() = 0;
 
-                    TempSaleLinePOSToDelete := SaleLinePOS;
-                    TempSaleLinePOSToDelete.Insert();
-
-                    while SaleLinePOS.Next() > 0 do begin
-                        TempSaleLinePOS.Quantity += SaleLinePOS.Quantity;
-
-                        TempSaleLinePOSToDelete := SaleLinePOS;
+                    if TempGroupSaleLinePOS.Count() > 1 then begin
+                        TempGroupSaleLinePOS.FindSet();
+                        TempSaleLinePOS := TempGroupSaleLinePOS;
+                        TempSaleLinePOS.Insert();
+                        TempSaleLinePOSToDelete := TempGroupSaleLinePOS;
                         TempSaleLinePOSToDelete.Insert();
+                        while TempGroupSaleLinePOS.Next() > 0 do begin
+                            TempSaleLinePOS.Quantity += TempGroupSaleLinePOS.Quantity;
+                            TempSaleLinePOSToDelete := TempGroupSaleLinePOS;
+                            TempSaleLinePOSToDelete.Insert();
+                        end;
+                        TempSaleLinePOS.Modify();
                     end;
-                    TempSaleLinePOS.Modify();
-
                 end;
             end;
 
@@ -124,6 +133,38 @@ codeunit 6059982 "NPR POSAction: Merg.Sml.LinesB"
             NotCollapsedItems := ItemNo
         else
             NotCollapsedItems += ', ' + ItemNo;
+    end;
+
+    local procedure CarriesAttachedComment(SaleLinePOS: Record "NPR POS Sale Line"): Boolean
+    var
+        VisitedLineNos: List of [Integer];
+    begin
+        exit(CarriesAttachedComment(SaleLinePOS, VisitedLineNos));
+    end;
+
+    local procedure CarriesAttachedComment(SaleLinePOS: Record "NPR POS Sale Line"; var VisitedLineNos: List of [Integer]): Boolean
+    var
+        ChildSaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+    begin
+        // Each line is checked once, so a cycle in corrupt link data cannot recurse without end
+        if VisitedLineNos.Contains(SaleLinePOS."Line No.") then
+            exit(false);
+        VisitedLineNos.Add(SaleLinePOS."Line No.");
+        ItemAddOnMgt.FilterAttachedItemAddonLines(SaleLinePOS, SaleLinePOS."Line No.", SaleLinePOSAddOn);
+        if SaleLinePOSAddOn.FindSet() then
+            repeat
+                if ChildSaleLinePOS.Get(
+                    SaleLinePOSAddOn."Register No.", SaleLinePOSAddOn."Sales Ticket No.", SaleLinePOSAddOn."Sale Date", SaleLinePOSAddOn."Sale Type", SaleLinePOSAddOn."Sale Line No.")
+                then begin
+                    if ChildSaleLinePOS."Line Type" = ChildSaleLinePOS."Line Type"::Comment then
+                        exit(true);
+                    if CarriesAttachedComment(ChildSaleLinePOS, VisitedLineNos) then
+                        exit(true);
+                end;
+            until SaleLinePOSAddOn.Next() = 0;
+        exit(false);
     end;
 
     local procedure DeleteLines(var TempSaleLinePOSToDelete: Record "NPR POS Sale Line" temporary)

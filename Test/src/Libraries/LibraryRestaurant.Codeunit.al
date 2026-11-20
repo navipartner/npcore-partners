@@ -678,6 +678,11 @@ codeunit 85242 "NPR Library - Restaurant"
     end;
 
     procedure AddWaiterPadLine(WaiterPadNo: Code[20]; ItemNo: Code[20]; Quantity: Decimal; AttachedToLineNo: Integer; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
+    begin
+        AddWaiterPadLine(WaiterPadNo, ItemNo, Quantity, AttachedToLineNo, 0, WaiterPadLine);
+    end;
+
+    internal procedure AddWaiterPadLine(WaiterPadNo: Code[20]; ItemNo: Code[20]; Quantity: Decimal; AttachedToLineNo: Integer; LineNo: Integer; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
     var
         Item: Record Item;
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
@@ -685,7 +690,10 @@ codeunit 85242 "NPR Library - Restaurant"
         Item.Get(ItemNo);
 
         WaiterPadLine.Init();
-        ClearLineNoSoTheTableAssignsIt(WaiterPadLine);
+        if LineNo = 0 then
+            ClearLineNoSoTheTableAssignsIt(WaiterPadLine)
+        else
+            WaiterPadLine."Line No." := LineNo;
         WaiterPadLine."Waiter Pad No." := WaiterPadNo;
         WaiterPadLine."Line Type" := WaiterPadLine."Line Type"::Item;
         WaiterPadLine."No." := ItemNo;
@@ -716,6 +724,15 @@ codeunit 85242 "NPR Library - Restaurant"
         if AttachedToLineNo <> 0 then
             WaiterPadLine.Indentation := 1;
         WaiterPadLine.Insert(true);
+    end;
+
+    internal procedure AddWaiterPadAttachedComment(WaiterPadNo: Code[20]; CommentText: Text; ParentWaiterPadLine: Record "NPR NPRE Waiter Pad Line"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
+    begin
+        // An attached comment as a save from the POS writes it: No. '*', one level below its parent
+        AddWaiterPadCommentLine(WaiterPadNo, CommentText, ParentWaiterPadLine."Line No.", WaiterPadLine);
+        WaiterPadLine."No." := '*';
+        WaiterPadLine.Indentation := ParentWaiterPadLine.Indentation + 1;
+        WaiterPadLine.Modify();
     end;
 
     local procedure ClearLineNoSoTheTableAssignsIt(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")

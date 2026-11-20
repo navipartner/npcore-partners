@@ -143,8 +143,45 @@ codeunit 85375 "NPR TM Item AddOn Wallet Tests"
         _Assert.AreNotEqual(FirstTicketSystemId, BundleAsset.AssetSystemId, 'The same ticket was assigned to both wallet bundles.');
     end;
 
-    local procedure CreateWalletAddOnSale(ParentQuantity: Decimal; var ParentItem: Record Item; var ChildItem: Record Item; var SalePOS: Record "NPR POS Sale"; var ParentSaleLine: Record "NPR POS Sale Line"; var ChildSaleLine: Record "NPR POS Sale Line") AddOnNo: Code[20]
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure EndSale_WalletDishWithACommentAttachedBeforeTheAddOn_BundlesAsWithoutTheComment()
     var
+        BundleReference: Record "NPR NpIa POSEntryLineBundleId";
+        ChildItem: Record Item;
+        ChildSaleLine: Record "NPR POS Sale Line";
+        ParentItem: Record Item;
+        ParentSaleLine: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        FirstBundleReference: Text[50];
+    begin
+        // [SCENARIO] A comment attached to a wallet dish before its add-on leaves the dish with the wallet bundles it gets without the comment
+
+        // [GIVEN] A sale of two units of a parent item, "No onions" attached to it, and then its per-unit wallet ticket add-on
+        CreateWalletAddOnSale(2, 'No onions', ParentItem, ChildItem, SalePOS, ParentSaleLine, ChildSaleLine);
+
+        // [WHEN] The sale ends
+        EndSale();
+
+        // [THEN] The parent line carries two distinct, non-blank bundle references, one per sold unit as without the comment
+        BundleReference.SetRange(POSEntrySaleLineId, ParentSaleLine.SystemId);
+        _Assert.AreEqual(2, BundleReference.Count(), 'S5.b: the dish with a comment attached before its wallet add-on should get two wallet bundles, as without the comment.');
+        BundleReference.Get(ParentSaleLine.SystemId, 1);
+        _Assert.AreNotEqual('', BundleReference.ReferenceNumber, 'S5.b: the first wallet bundle reference should not be blank.');
+        FirstBundleReference := BundleReference.ReferenceNumber;
+        BundleReference.Get(ParentSaleLine.SystemId, 2);
+        _Assert.AreNotEqual('', BundleReference.ReferenceNumber, 'S5.b: the second wallet bundle reference should not be blank.');
+        _Assert.AreNotEqual(FirstBundleReference, BundleReference.ReferenceNumber, 'S5.b: the two wallet bundle references should be distinct.');
+    end;
+
+    local procedure CreateWalletAddOnSale(ParentQuantity: Decimal; var ParentItem: Record Item; var ChildItem: Record Item; var SalePOS: Record "NPR POS Sale"; var ParentSaleLine: Record "NPR POS Sale Line"; var ChildSaleLine: Record "NPR POS Sale Line"): Code[20]
+    begin
+        exit(CreateWalletAddOnSale(ParentQuantity, '', ParentItem, ChildItem, SalePOS, ParentSaleLine, ChildSaleLine));
+    end;
+
+    local procedure CreateWalletAddOnSale(ParentQuantity: Decimal; CommentBeforeTheAddOn: Text; var ParentItem: Record Item; var ChildItem: Record Item; var SalePOS: Record "NPR POS Sale"; var ParentSaleLine: Record "NPR POS Sale Line"; var ChildSaleLine: Record "NPR POS Sale Line") AddOnNo: Code[20]
+    var
+        CommentSaleLine: Record "NPR POS Sale Line";
         ItemReference: Record "Item Reference";
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSActionInsertItem: Codeunit "NPR POS Action: Insert Item B";
@@ -165,6 +202,8 @@ codeunit 85375 "NPR TM Item AddOn Wallet Tests"
 
         POSSale.GetCurrentSale(SalePOS);
         ParentSaleLine.Get(SalePOS."Register No.", SalePOS."Sales Ticket No.", SalePOS.Date, ParentSaleLine."Sale Type"::Sale, POSActionInsertItem.GetLineNo());
+        if CommentBeforeTheAddOn <> '' then
+            _LibraryPOSMock.CreateAttachedCommentLine(ParentSaleLine, CommentBeforeTheAddOn, 0, CommentSaleLine);
 
         AddOnNo := CreateWalletItemAddOn(ParentItem, ChildItem);
         POSActionRunItemAddOn.RunItemAddOns(ParentSaleLine."Line No.", AddOnNo, false, true, false, UserSelectionJToken);

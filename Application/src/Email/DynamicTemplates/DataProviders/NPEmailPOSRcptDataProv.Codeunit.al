@@ -237,7 +237,10 @@ codeunit 6151008 "NPR NPEmailPOSRcptDataProv" implements "NPR IDynamicTemplateDa
                 JSalesLine.Add('line_no', POSEntrySalesLine."Line No.");
                 JSalesLine.Add('type', POSEntrySalesLine.Type);
                 JSalesLine.Add('type_text', Format(POSEntrySalesLine.Type));
-                JSalesLine.Add('no', POSEntrySalesLine."No.");
+                if (POSEntrySalesLine.Type = POSEntrySalesLine.Type::Comment) and (POSEntrySalesLine."No." = '*') then
+                    JSalesLine.Add('no', '')
+                else
+                    JSalesLine.Add('no', POSEntrySalesLine."No.");
                 JSalesLine.Add('description', POSEntrySalesLine.Description);
                 JSalesLine.Add('quantity', POSEntrySalesLine.Quantity);
                 JSalesLine.Add('unit_price', POSEntrySalesLine."Unit Price");

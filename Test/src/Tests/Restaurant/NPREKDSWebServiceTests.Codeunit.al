@@ -21,6 +21,7 @@ codeunit 85416 "NPR NPRE KDS Web Service Tests"
         // Declared for its member names only, exactly as the public facade does, so the tests can name the action they run.
         _KitchenAction: Option "Accept Change","Set Production Not Started","Start Production","End Production","Set OnHold","Resume","Set Served","Revoke Serving";
         MainCourseStepTok: Label 'MAIN', Locked = true;
+        PayloadModifierTxt: Label '%1|%2|%3|%4|%5', Locked = true, Comment = '%1 = lineDescription, %2 = type, %3 = indentation, %4 = itemNo, %5 = quantity';
 
     #region What the board is shown
 
@@ -232,6 +233,54 @@ codeunit 85416 "NPR NPRE KDS Web Service Tests"
         _Assert.AreEqual(
             NoOnionsTok, GetText(ObjectAt(LineModifiers, 0), 'lineDescription'),
             'The modifier should carry the comment text the kitchen has to read.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DishWithAddOnsAndAnAddOnComment_BoardRefreshed_LineModifiersInGroupedOrder()
+    var
+        AddOnKItem: Record Item;
+        AddOnMItem: Record Item;
+        DishItem: Record Item;
+        Seating: Record "NPR NPRE Seating";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        AddOnKLine: Record "NPR NPRE Waiter Pad Line";
+        AddOnMLine: Record "NPR NPRE Waiter Pad Line";
+        CommentLine: Record "NPR NPRE Waiter Pad Line";
+        DishLine: Record "NPR NPRE Waiter Pad Line";
+        KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
+        DishRequest: JsonObject;
+        Order: JsonObject;
+        Orders: JsonArray;
+        ExpectedModifiers: Text;
+    begin
+        // [SCENARIO] The board receives the dish modifiers in the grouped order: each add-on followed by the comments attached to it
+        // [GIVEN] A sent pad with DISH, ADDON-K and ADDON-M attached to DISH, and "extra hot" attached to ADDON-M
+        Initialize();
+        _LibraryRestaurant.AddKitchenStationAtStep(_Restaurant.Code, _SeatingLocation.Code, MainCourseStepTok, 0);
+        _LibraryRestaurant.CreateSeating(Seating, _SeatingLocation.Code);
+        _LibraryRestaurant.CreateWaiterPadForSeating(Seating.Code, WaiterPad);
+        AddRoutedLine(WaiterPad, DishItem, DishLine);
+        AddRoutedAttachedLine(WaiterPad, DishLine, AddOnKItem, AddOnKLine);
+        _LibraryPOSMasterData.CreateItemForPOSSaleUsage(AddOnMItem, _POSUnit, _POSStore);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", AddOnMItem."No.", 1, DishLine."Line No.", AddOnMLine);
+        _LibraryRestaurant.AddWaiterPadAttachedComment(WaiterPad."No.", 'extra hot', AddOnMLine, CommentLine);
+        _LibraryRestaurant.SendWaiterPadToKitchen(WaiterPad);
+
+        // [WHEN] The board refreshes
+        SkipServerIDCheck(KDSFrontendAssistImpl);
+        Orders := ResponseOrders(KDSFrontendAssistImpl.RefreshKDSData(_Restaurant.Code, '', false, 0DT, ''));
+
+        // [THEN] The DISH request carries ADDON-K, ADDON-M and then "extra hot" in lineModifiers
+        _Assert.IsTrue(FindOrder(Orders, OrderForPad(WaiterPad."No."), Order), 'S12.b: the order of the pad should be on the board.');
+        _Assert.IsTrue(FindRequestForItem(GetArray(Order, 'kitchenRequests'), DishItem."No.", DishRequest), 'S12.b: the order should carry the DISH request.');
+        ExpectedModifiers :=
+            StrSubstNo(PayloadModifierTxt, AddOnKLine.Description, 'Item', 1, AddOnKItem."No.", 1) + '; ' +
+            StrSubstNo(PayloadModifierTxt, AddOnMLine.Description, 'Item', 1, AddOnMItem."No.", 1) + '; ' +
+            StrSubstNo(PayloadModifierTxt, 'extra hot', 'Comment', 2, '*', 0);
+        _Assert.AreEqual(
+            ExpectedModifiers, PayloadModifiers(GetArray(DishRequest, 'lineModifiers')),
+            'S12.b: lineModifiers of DISH should list ADDON-K, ADDON-M and then "extra hot" attached to ADDON-M.');
     end;
 
     [Test]
@@ -501,6 +550,17 @@ codeunit 85416 "NPR NPRE KDS Web Service Tests"
         _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", Item."No.", 1, 0, WaiterPadLine);
     end;
 
+    local procedure AddRoutedAttachedLine(WaiterPad: Record "NPR NPRE Waiter Pad"; ParentLine: Record "NPR NPRE Waiter Pad Line"; var Item: Record Item; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
+    var
+        ItemRoutingProfile: Record "NPR NPRE Item Routing Profile";
+    begin
+        _LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        _LibraryRestaurant.CreateItemRoutingProfile(ItemRoutingProfile);
+        _LibraryRestaurant.AssignFlowStatusToRoutingProfile(ItemRoutingProfile, MainCourseStepTok);
+        _LibraryRestaurant.LinkItemToRoutingProfile(Item, ItemRoutingProfile.Code);
+        _LibraryRestaurant.AddWaiterPadLine(WaiterPad."No.", Item."No.", 1, ParentLine."Line No.", WaiterPadLine);
+    end;
+
     local procedure ClearStationSelections()
     var
         KitchenStationSelection: Record "NPR NPRE Kitchen Station Slct.";
@@ -631,6 +691,33 @@ codeunit 85416 "NPR NPRE KDS Web Service Tests"
         if not Source.Get(PropertyName, PropertyToken) then
             _Assert.Fail(StrSubstNo('The response carried no %1 value.', PropertyName));
         exit(PropertyToken.AsValue().AsInteger());
+    end;
+
+    local procedure FindRequestForItem(KitchenRequests: JsonArray; ItemNo: Code[20]; var Found: JsonObject): Boolean
+    var
+        RequestIndex: Integer;
+    begin
+        for RequestIndex := 0 to KitchenRequests.Count() - 1 do
+            if GetText(ObjectAt(KitchenRequests, RequestIndex), 'itemNo') = ItemNo then begin
+                Found := ObjectAt(KitchenRequests, RequestIndex);
+                exit(true);
+            end;
+        exit(false);
+    end;
+
+    local procedure PayloadModifiers(LineModifiers: JsonArray) Modifiers: Text
+    var
+        LineModifier: JsonObject;
+        ModifierIndex: Integer;
+    begin
+        for ModifierIndex := 0 to LineModifiers.Count() - 1 do begin
+            LineModifier := ObjectAt(LineModifiers, ModifierIndex);
+            if Modifiers <> '' then
+                Modifiers += '; ';
+            Modifiers += StrSubstNo(
+                PayloadModifierTxt, GetText(LineModifier, 'lineDescription'), GetText(LineModifier, 'type'), GetText(LineModifier, 'indentation'),
+                GetText(LineModifier, 'itemNo'), GetText(LineModifier, 'quantity'));
+        end;
     end;
 
     #endregion

@@ -11,6 +11,134 @@ codeunit 85100 "NPR POS ActMergeSimLines Tests"
         POSPaymentMethod: Record "NPR POS Payment Method";
         POSSession: Codeunit "NPR POS Session";
         POSStore: Record "NPR POS Store";
+        _ItemAddOn: Record "NPR NpIa Item AddOn";
+        AttachedEntryTxt: Label '%1 > %2', Locked = true, Comment = '%1 = line entry, %2 = description of the line it is attached to';
+        ItemEntryTxt: Label '%1 %2', Locked = true, Comment = '%1 = description, %2 = quantity';
+        RowMismatchTxt: Label '%1: expected <%2>, actual <%3>. ', Locked = true, Comment = '%1 = scenario row, %2 = expected value, %3 = actual value';
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure MergeSimilarLines_LineCarriesAnAttachedComment_ThatLineIsNotMerged()
+    var
+        AddOnMSaleLinePOS: Record "NPR POS Sale Line";
+        BeerSaleLinePOS: Record "NPR POS Sale Line";
+        CommentSaleLinePOS: Record "NPR POS Sale Line";
+        BeerItem: Record Item;
+        SalePOS: Record "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSActMrgSimLinesB: Codeunit "NPR POSAction: Merg.Sml.LinesB";
+        Mismatches: Text;
+    begin
+        // [SCENARIO] A line with a comment attached to it, or to a line attached to it, is left out of Merge Similar Lines, and the other identical lines merge as today
+        Initialize();
+
+        // [GIVEN] Per row, a sale with the row's BEER lines and attachments
+        // [WHEN] Similar lines are merged
+        // [THEN] The sale holds the row's lines
+        StartSale(SalePOS);
+        CreateRoleItem('BEER', BeerItem);
+        AddItemLine(BeerItem, BeerSaleLinePOS);
+        AddItemLine(BeerItem, BeerSaleLinePOS);
+        LibraryPOSMock.CreateAttachedCommentLine(BeerSaleLinePOS, 'no ice', 0, CommentSaleLinePOS);
+        POSActMrgSimLinesB.ColapseSaleLines(POSSession, SalePOS);
+        CheckRow('S10.a', 'BEER 1; BEER 1; no ice > BEER', SaleLineSequence(SalePOS), Mismatches);
+
+        StartSale(SalePOS);
+        CreateRoleItem('BEER', BeerItem);
+        AddItemLine(BeerItem, BeerSaleLinePOS);
+        AddItemLine(BeerItem, BeerSaleLinePOS);
+        AddItemLine(BeerItem, BeerSaleLinePOS);
+        LibraryPOSMock.CreateAttachedCommentLine(BeerSaleLinePOS, 'no ice', 0, CommentSaleLinePOS);
+        POSActMrgSimLinesB.ColapseSaleLines(POSSession, SalePOS);
+        CheckRow('S10.b', 'BEER 1; no ice > BEER; BEER 2', SaleLineSequence(SalePOS), Mismatches);
+
+        StartSale(SalePOS);
+        CreateRoleItem('BEER', BeerItem);
+        AddItemLine(BeerItem, BeerSaleLinePOS);
+        AddItemLine(BeerItem, BeerSaleLinePOS);
+        AddAttachedAddOnLine('ADDON-M', BeerSaleLinePOS, AddOnMSaleLinePOS);
+        LibraryPOSMock.CreateAttachedCommentLine(AddOnMSaleLinePOS, 'extra hot', 0, CommentSaleLinePOS);
+        POSActMrgSimLinesB.ColapseSaleLines(POSSession, SalePOS);
+        CheckRow('S10.d', 'BEER 1; BEER 1; ADDON-M 1 > BEER; extra hot > ADDON-M', SaleLineSequence(SalePOS), Mismatches);
+        Assert.AreEqual('', Mismatches, 'Rows S10.a, S10.b and S10.d: a BEER that carries an attached comment in its group is not merged.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure MergeSimilarLines_IdenticalLinesWithoutAttachments_MergedAsToday()
+    var
+        BeerItem: Record Item;
+        BeerSaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        POSActMrgSimLinesB: Codeunit "NPR POSAction: Merg.Sml.LinesB";
+    begin
+        // [SCENARIO] Identical lines with nothing attached still merge into one line
+        // [GIVEN] A sale with two lines of BEER quantity 1
+        Initialize();
+        StartSale(SalePOS);
+        CreateRoleItem('BEER', BeerItem);
+        AddItemLine(BeerItem, BeerSaleLinePOS);
+        AddItemLine(BeerItem, BeerSaleLinePOS);
+
+        // [WHEN] Similar lines are merged
+        POSActMrgSimLinesB.ColapseSaleLines(POSSession, SalePOS);
+
+        // [THEN] One line of BEER quantity 2 is left
+        Assert.AreEqual('BEER 2', SaleLineSequence(SalePOS), 'S10.c: the two BEER lines should merge into one BEER of quantity 2.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure MergeSimilarLines_CyclicAddOnLinks_FinishesAndKeepsTheLineWithAReachableComment()
+    var
+        AddOnMSaleLinePOS: Record "NPR POS Sale Line";
+        BeerSaleLinePOS: Record "NPR POS Sale Line";
+        CommentSaleLinePOS: Record "NPR POS Sale Line";
+        FourthBeerSaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SecondBeerSaleLinePOS: Record "NPR POS Sale Line";
+        BeerItem: Record Item;
+        SalePOS: Record "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSActMrgSimLinesB: Codeunit "NPR POSAction: Merg.Sml.LinesB";
+    begin
+        // [SCENARIO] Merge Similar Lines finishes when add-on links form a cycle; a line that reaches an attached comment only through the cycle is not merged, a line in a cycle without a comment is merged
+        Initialize();
+
+        // [GIVEN] A sale with four BEER lines of quantity 1, ADDON-M attached to the second BEER and "extra hot" attached to ADDON-M
+        StartSale(SalePOS);
+        CreateRoleItem('BEER', BeerItem);
+        AddItemLine(BeerItem, BeerSaleLinePOS);
+        AddItemLine(BeerItem, SecondBeerSaleLinePOS);
+        AddItemLine(BeerItem, BeerSaleLinePOS);
+        AddItemLine(BeerItem, FourthBeerSaleLinePOS);
+        AddAttachedAddOnLine('ADDON-M', SecondBeerSaleLinePOS, AddOnMSaleLinePOS);
+        LibraryPOSMock.CreateAttachedCommentLine(AddOnMSaleLinePOS, 'extra hot', 0, CommentSaleLinePOS);
+
+        // [GIVEN] Corrupt links: the second BEER attached to ADDON-M, which closes a cycle, ADDON-M attached to itself, and the fourth BEER attached to itself
+        LibraryPOSMock.InsertSaleLineLink(SecondBeerSaleLinePOS, AddOnMSaleLinePOS, 10000);
+        LibraryPOSMock.InsertSaleLineLink(AddOnMSaleLinePOS, AddOnMSaleLinePOS, 20000);
+        LibraryPOSMock.InsertSaleLineLink(FourthBeerSaleLinePOS, FourthBeerSaleLinePOS, 10000);
+
+        // [WHEN] Similar lines are merged
+        POSActMrgSimLinesB.ColapseSaleLines(POSSession, SalePOS);
+
+        // [THEN] The second BEER is still on the sale with quantity 1
+        FilterSaleLines(SaleLinePOS, SalePOS, BeerItem."No.");
+        SaleLinePOS.SetRange("Line No.", SecondBeerSaleLinePOS."Line No.");
+        Assert.IsTrue(SaleLinePOS.FindFirst(), 'The second BEER should stay a separate line because its group reaches the comment "extra hot" through the cyclic links.');
+        Assert.AreEqual(1, SaleLinePOS.Quantity, 'The second BEER should keep quantity 1.');
+
+        // [THEN] The first, the third and the fourth BEER are merged into one line of quantity 3
+        SaleLinePOS.SetFilter("Line No.", '<>%1', SecondBeerSaleLinePOS."Line No.");
+        Assert.AreEqual(1, SaleLinePOS.Count(), 'Merge Similar Lines should merge the first, the third and the fourth BEER into one line.');
+        SaleLinePOS.FindFirst();
+        Assert.AreEqual(3, SaleLinePOS.Quantity, 'The merged BEER line should have quantity 3: the fourth BEER is in a cycle that reaches no comment.');
+
+        // [THEN] The comment "extra hot" is still on the sale
+        CommentSaleLinePOS.SetRecFilter();
+        Assert.IsFalse(CommentSaleLinePOS.IsEmpty(), 'The comment "extra hot" attached to ADDON-M should stay on the sale.');
+    end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
@@ -461,5 +589,91 @@ codeunit 85100 "NPR POS ActMergeSimLines Tests"
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange("No.", ItemNo);
+    end;
+
+    local procedure Initialize()
+    var
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+    begin
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore, POSPaymentMethod);
+        if _ItemAddOn."No." <> '' then
+            exit;
+        LibraryRestaurant.CreateItemAddon(_ItemAddOn);
+        Commit();
+    end;
+
+    local procedure StartSale(var SalePOS: Record "NPR POS Sale")
+    var
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+    begin
+        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+    end;
+
+    local procedure CreateRoleItem(Description: Text[100]; var Item: Record Item)
+    var
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+    begin
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item.Description := Description;
+        Item.Modify();
+    end;
+
+    local procedure AddItemLine(Item: Record Item; var SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+    begin
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+    end;
+
+    local procedure AddAttachedAddOnLine(Description: Text[100]; ParentSaleLinePOS: Record "NPR POS Sale Line"; var AddOnSaleLinePOS: Record "NPR POS Sale Line")
+    var
+        Item: Record Item;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+    begin
+        CreateRoleItem(Description, Item);
+        AddItemLine(Item, AddOnSaleLinePOS);
+        LibraryPOSMock.AttachSaleLineAsItemAddOn(AddOnSaleLinePOS, ParentSaleLinePOS, _ItemAddOn."No.");
+    end;
+
+    local procedure SaleLineSequence(SalePOS: Record "NPR POS Sale") Sequence: Text
+    var
+        ParentSaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        Entry: Text;
+    begin
+        SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        if not SaleLinePOS.FindSet() then
+            exit;
+        repeat
+            Entry := SaleLinePOS.Description;
+            if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::Item then
+                Entry := StrSubstNo(ItemEntryTxt, Entry, SaleLinePOS.Quantity);
+            SaleLinePOSAddOn.SetRange("Register No.", SaleLinePOS."Register No.");
+            SaleLinePOSAddOn.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
+            SaleLinePOSAddOn.SetRange("Sale Date", SaleLinePOS.Date);
+            SaleLinePOSAddOn.SetRange("Sale Line No.", SaleLinePOS."Line No.");
+            SaleLinePOSAddOn.SetFilter("Applies-to Line No.", '<>%1', 0);
+            if SaleLinePOSAddOn.FindFirst() then
+                if ParentSaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", SaleLinePOSAddOn."Applies-to Line No.") then
+                    Entry := StrSubstNo(AttachedEntryTxt, Entry, ParentSaleLinePOS.Description);
+            if Sequence <> '' then
+                Sequence += '; ';
+            Sequence += Entry;
+        until SaleLinePOS.Next() = 0;
+    end;
+
+    local procedure CheckRow(RowId: Text; Expected: Text; Actual: Text; var Mismatches: Text)
+    begin
+        if Expected <> Actual then
+            Mismatches += StrSubstNo(RowMismatchTxt, RowId, Expected, Actual);
     end;
 }

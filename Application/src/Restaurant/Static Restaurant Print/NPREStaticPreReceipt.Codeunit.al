@@ -75,8 +75,11 @@ codeunit 6248673 "NPR NPRE Static Pre Receipt"
         if TempBuffer.FindSet() then
             repeat
                 if TempBuffer."Attached to Line No." <> 0 then begin
-                    Printer.AddTextField(1, 0, '  ' + Format(TempBuffer.Quantity) + ' x ');
-                    Printer.AddTextField(2, 0, '  ' + TempBuffer.Description);
+                    if TempBuffer."Line Type" = TempBuffer."Line Type"::Comment then
+                        Printer.AddTextField(1, 0, '')
+                    else
+                        Printer.AddTextField(1, 0, '  ' + Format(TempBuffer.Quantity) + ' x ');
+                    Printer.AddTextField(2, 0, '  ' + NestedIndent(TempBuffer.Indentation) + TempBuffer.Description);
                 end else begin
                     Printer.AddTextField(1, 0, Format(TempBuffer.Quantity) + ' x ');
                     Printer.AddTextField(2, 0, TempBuffer.Description);
@@ -129,5 +132,12 @@ codeunit 6248673 "NPR NPRE Static Pre Receipt"
 
         Printer.SetFont('COMMAND');
         Printer.AddLine('PAPERCUT', 0);
+    end;
+
+    local procedure NestedIndent(Indentation: Integer): Text
+    begin
+        if Indentation <= 1 then
+            exit('');
+        exit(PadStr('', 2 * (Indentation - 1)));
     end;
 }
