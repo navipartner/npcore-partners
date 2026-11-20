@@ -253,11 +253,8 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
     local procedure UpdateTicketReservationAfterFinalize(EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
         TicketRequest: Record "NPR TM Ticket Reservation Req.";
-        TicketResponse: Record "NPR TM Ticket Reserv. Resp.";
-        Ticket: Record "NPR TM Ticket";
-        AccessEntry: Record "NPR TM Ticket Access Entry";
-        DetailedEntry: Record "NPR TM Det. Ticket AccessEntry";
         ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        IssuedScheduleEntryNo: Integer;
     begin
         TicketRequest.Reset();
         TicketRequest.ReadIsolation := TicketRequest.ReadIsolation::UpdLock;
@@ -267,30 +264,9 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
         TicketRequest.FindSet();
         repeat
             if (TicketRequest."Admission Created") then begin
-                TicketResponse.SetCurrentKey("Session Token ID");
-                TicketResponse.SetLoadFields("Request Entry No.");
-                TicketResponse.SetFilter("Session Token ID", '=%1', EcomSalesHeader."Ticket Reservation Token");
-                TicketResponse.SetFilter("Ext. Line Reference No.", '=%1', TicketRequest."Ext. Line Reference No.");
-                if (TicketResponse.FindFirst()) then begin
-                    Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketResponse."Request Entry No.");
-                    if (Ticket.FindFirst()) then begin
-                        AccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
-                        AccessEntry.SetFilter("Admission Code", '=%1', TicketRequest."Admission Code");
-                        if (AccessEntry.FindFirst()) then begin
-                            DetailedEntry.SetCurrentKey("Ticket Access Entry No.");
-                            DetailedEntry.SetLoadFields("External Adm. Sch. Entry No.");
-                            DetailedEntry.SetFilter("Ticket Access Entry No.", '=%1', AccessEntry."Entry No.");
-                            DetailedEntry.SetFilter(Quantity, '>%1', 0);
-                            DetailedEntry.SetFilter(Type, '=%1', DetailedEntry.Type::RESERVATION);
-                            if (not DetailedEntry.FindLast()) then
-                                DetailedEntry.SetFilter(Type, '=%1', DetailedEntry.Type::INITIAL_ENTRY);
-                            if (not DetailedEntry.FindLast()) then
-                                DetailedEntry.init();
-                            if (DetailedEntry."External Adm. Sch. Entry No." <> 0) then
-                                TicketRequest."External Adm. Sch. Entry No." := DetailedEntry."External Adm. Sch. Entry No.";
-                        end;
-                    end;
-                end;
+                IssuedScheduleEntryNo := GetIssuedScheduleEntryNo(EcomSalesHeader."Ticket Reservation Token", TicketRequest);
+                if (IssuedScheduleEntryNo <> 0) then
+                    TicketRequest."External Adm. Sch. Entry No." := IssuedScheduleEntryNo;
 
                 if (TicketRequest."External Adm. Sch. Entry No." > 0) then begin
                     ScheduleEntry.SetLoadFields("Admission Start Date", "Admission Start Time");
@@ -303,6 +279,41 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
             end;
 
         until (TicketRequest.Next() = 0);
+    end;
+
+    local procedure GetIssuedScheduleEntryNo(Token: Text[100]; TicketRequest: Record "NPR TM Ticket Reservation Req."): Integer
+    var
+        TicketResponse: Record "NPR TM Ticket Reserv. Resp.";
+        Ticket: Record "NPR TM Ticket";
+        AccessEntry: Record "NPR TM Ticket Access Entry";
+        DetailedEntry: Record "NPR TM Det. Ticket AccessEntry";
+    begin
+        TicketResponse.SetCurrentKey("Session Token ID");
+        TicketResponse.SetLoadFields("Request Entry No.");
+        TicketResponse.SetFilter("Session Token ID", '=%1', Token);
+        TicketResponse.SetFilter("Ext. Line Reference No.", '=%1', TicketRequest."Ext. Line Reference No.");
+        if (not TicketResponse.FindFirst()) then
+            exit(0);
+
+        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketResponse."Request Entry No.");
+        if (not Ticket.FindFirst()) then
+            exit(0);
+
+        AccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        AccessEntry.SetFilter("Admission Code", '=%1', TicketRequest."Admission Code");
+        if (not AccessEntry.FindFirst()) then
+            exit(0);
+
+        DetailedEntry.SetCurrentKey("Ticket Access Entry No.");
+        DetailedEntry.SetLoadFields("External Adm. Sch. Entry No.");
+        DetailedEntry.SetFilter("Ticket Access Entry No.", '=%1', AccessEntry."Entry No.");
+        DetailedEntry.SetFilter(Quantity, '>%1', 0);
+        DetailedEntry.SetFilter(Type, '=%1', DetailedEntry.Type::RESERVATION);
+        if (not DetailedEntry.FindLast()) then
+            DetailedEntry.SetFilter(Type, '=%1', DetailedEntry.Type::INITIAL_ENTRY);
+        if (not DetailedEntry.FindLast()) then
+            exit(0);
+        exit(DetailedEntry."External Adm. Sch. Entry No.");
     end;
 
     internal procedure BuildTicketTempBufferForDoc(EcomSalesHeader: Record "NPR Ecom Sales Header"; var TempTicket: Record "NPR TM Ticket" temporary)
@@ -580,6 +591,8 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
                 Error(MismatchedErr);
             exit;
         end;
+        // Runs before the first write, so a refused document confirms none of its tickets.
+        CheckIssuedTicketsUsable(EcomSalesHeader2);
 #pragma warning disable AA0139, AL0432
         TicketRequestManager.SetReservationRequestExtraInfo(EcomSalesHeader2."Ticket Reservation Token", EcomSalesHeader2."Sell-to Email", EcomSalesHeader2."External No.", CopyStr(EcomSalesHeader2."Sell-to Name", 1, 100), EcomSalesHeader2."Language Code");
 #pragma warning restore AA0139, AL0432
@@ -591,6 +604,77 @@ codeunit 6248517 "NPR EcomCreateTicketImpl"
                 if TicketRequest.GetBySystemId(EcomSalesLine."Ticket Reservation Line Id") then begin
                     TicketRequestManager.ConfirmReservationRequestWithValidate(EcomSalesHeader2."Ticket Reservation Token", TicketRequest."Ext. Line Reference No.");
                     UpdateTicketOnConfirm(EcomSalesHeader2, EcomSalesLine, TicketRequest);
+                end;
+        until EcomSalesLine.Next() = 0;
+    end;
+
+    local procedure CheckIssuedTicketsUsable(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        GroupRequest: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+        Admission: Record "NPR TM Admission";
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketTimeHelper: Codeunit "NPR TM TimeHelper";
+        LocalNow: DateTime;
+        ExtScheduleEntryNo: Integer;
+        ResponseCode: Integer;
+        ResponseMessage: Text;
+        SlotPassedErr: Label 'Tickets for %1 %2 cannot be confirmed. %3', Comment = '%1 = Line No. field caption, %2 = ecommerce line no., %3 = reason the time slot can no longer be used';
+        SlotCancelledErr: Label 'Tickets for %1 %2 cannot be confirmed. The reserved %3 (%4) for %5 ''%6'' is cancelled, closed or no longer exists.', Comment = '%1 = Line No. field caption, %2 = ecommerce line no., %3 = External Schedule Entry No. field caption, %4 = external schedule entry no., %5 = Admission Code field caption, %6 = admission code';
+        TicketExpiredErr: Label 'Tickets for %1 %2 cannot be confirmed. Ticket %3 expired on %4.', Comment = '%1 = Line No. field caption, %2 = ecommerce line no., %3 = external ticket no., %4 = ticket valid to date';
+    begin
+        SetTicketLinesToProcessFilters(EcomSalesLine, EcomSalesHeader);
+        if not EcomSalesLine.FindSet() then
+            exit;
+
+        TicketRequest.SetLoadFields("Ext. Line Reference No.");
+        GroupRequest.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
+        GroupRequest.SetLoadFields("Ext. Line Reference No.", "Admission Code", "External Adm. Sch. Entry No.");
+        GroupRequest.SetRange("Session Token ID", EcomSalesHeader."Ticket Reservation Token");
+        Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+        Ticket.SetLoadFields("External Ticket No.", "Valid To Date");
+        Ticket.SetFilter("Valid To Date", '<%1', DT2Date(CurrentDateTime()));
+        Admission.SetLoadFields("Prebook Is Required");
+        ScheduleEntry.SetCurrentKey("External Schedule Entry No.");
+        ScheduleEntry.SetLoadFields("Admission Code", "Admission Start Date", "Admission Start Time", "Admission End Date", "Admission End Time", "Event Arrival Until Time");
+        ScheduleEntry.SetRange(Cancelled, false);
+        ScheduleEntry.SetRange("Admission Is", ScheduleEntry."Admission Is"::OPEN);
+        repeat
+            if not IsNullGuid(EcomSalesLine."Ticket Reservation Line Id") then
+                if TicketRequest.GetBySystemId(EcomSalesLine."Ticket Reservation Line Id") then begin
+                    GroupRequest.SetRange("Ext. Line Reference No.", TicketRequest."Ext. Line Reference No.");
+                    GroupRequest.SetRange("Admission Created");
+                    GroupRequest.SetRange("Primary Request Line", true);
+                    if GroupRequest.FindSet() then
+                        repeat
+                            Ticket.SetRange("Ticket Reservation Entry No.", GroupRequest."Entry No.");
+                            if Ticket.FindFirst() then
+                                Error(TicketExpiredErr, EcomSalesLine.FieldCaption("Line No."), EcomSalesLine."Line No.", Ticket."External Ticket No.", Ticket."Valid To Date");
+                        until GroupRequest.Next() = 0;
+
+                    GroupRequest.SetRange("Primary Request Line");
+                    GroupRequest.SetRange("Admission Created", true);
+                    if GroupRequest.FindSet() then
+                        repeat
+                            // Only prebook admissions hold the ticket to its slot. The gate admits other tickets into the slot open at scan time.
+                            if Admission.Get(GroupRequest."Admission Code") then
+                                if Admission."Prebook Is Required" then begin
+                                    ExtScheduleEntryNo := GetIssuedScheduleEntryNo(EcomSalesHeader."Ticket Reservation Token", GroupRequest);
+                                    if ExtScheduleEntryNo <= 0 then
+                                        ExtScheduleEntryNo := GroupRequest."External Adm. Sch. Entry No.";
+                                    if ExtScheduleEntryNo > 0 then begin
+                                        ScheduleEntry.SetRange("External Schedule Entry No.", ExtScheduleEntryNo);
+                                        ScheduleEntry.SetRange("Admission Code", GroupRequest."Admission Code");
+                                        if not ScheduleEntry.FindFirst() then
+                                            Error(SlotCancelledErr, EcomSalesLine.FieldCaption("Line No."), EcomSalesLine."Line No.", ScheduleEntry.FieldCaption("External Schedule Entry No."), ExtScheduleEntryNo, ScheduleEntry.FieldCaption("Admission Code"), GroupRequest."Admission Code");
+                                        LocalNow := TicketTimeHelper.GetLocalTimeAtAdmission(GroupRequest."Admission Code");
+                                        if TicketManager.IsSelectedAdmissionSchEntryExpired(ScheduleEntry, DT2Date(LocalNow), DT2Time(LocalNow), ResponseMessage, ResponseCode) then
+                                            Error(SlotPassedErr, EcomSalesLine.FieldCaption("Line No."), EcomSalesLine."Line No.", ResponseMessage);
+                                    end;
+                                end;
+                        until GroupRequest.Next() = 0;
                 end;
         until EcomSalesLine.Next() = 0;
     end;

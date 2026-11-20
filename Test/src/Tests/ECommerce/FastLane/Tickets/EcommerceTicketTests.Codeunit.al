@@ -1759,6 +1759,1029 @@ codeunit 85160 "NPR Ecommerce Ticket Tests"
         Assert.AreEqual(EcomSalesHeader.SystemId, NewRequest."Ecom Sales Id", 'The new reservation request should be linked to the document');
     end;
 
+    // ---------------------------------------------------------------
+    // ConfirmTickets refuses tickets that can no longer be used
+    // ---------------------------------------------------------------
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmTickets_PrebookSlotDatePassed_Error()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        ItemNo: Code[20];
+        AdmissionCode: Code[20];
+        LocalToday: Date;
+    begin
+        // [SCENARIO] Confirm refuses a prebook ticket whose slot ended on an earlier date
+
+        // [GIVEN] A minted ticket document for a prebook admission
+        ItemNo := CreateSmokeTicketItemNo();
+        AdmissionCode := GetDefaultAdmissionCode(ItemNo);
+        CreateMintedTicketDoc(EcomSalesHeader, EcomSalesLine, ItemNo, 1);
+        SetPrebookRequired(AdmissionCode, true);
+
+        // [GIVEN] The issued slot ended yesterday
+        Assert.IsTrue(FindIssuedScheduleEntry(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, ScheduleEntry), 'Precondition: the ticket must be issued for a slot');
+        LocalToday := AdmissionLocalToday(AdmissionCode);
+        MoveIssuedSlot(ScheduleEntry, LocalToday - 2, LocalToday - 1, ScheduleEntry."Admission End Time", 0T);
+        Commit();
+
+        // [WHEN] The tickets are confirmed
+        asserterror EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+
+        // [THEN] The error names the passed date and nothing is confirmed
+        Assert.ExpectedError('cannot be confirmed');
+        Assert.ExpectedError('is over - today is');
+        AssertTokenStillRegistered(EcomSalesHeader."Ticket Reservation Token");
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmTickets_ApiReservedPrebookSlotPassed_Error()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        LibTicket: Codeunit "NPR Library - Ticket Module";
+        MemberNumber: Code[20];
+        ScannerStation: Code[10];
+        ResponseToken: Text[100];
+        ResponseMessage: Text;
+        ItemNo: Code[20];
+        AdmissionCode: Code[20];
+        ReservedExtEntryNo: Integer;
+        LocalToday: Date;
+    begin
+        // [SCENARIO] Confirm refuses a ticket reserved through the Ticket API when its prebook slot has passed
+
+        // [GIVEN] A prebook admission whose slot was reserved through the Ticket API
+        ScannerStation := 'TEST';
+        ItemNo := LibTicket.CreateScenario_ReservationRequired(1, CalcDate('<+1D>', Today()));
+        AdmissionCode := GetDefaultAdmissionCode(ItemNo);
+        ScheduleEntry.SetRange("Admission Code", AdmissionCode);
+        ScheduleEntry.SetRange("Admission Start Date", CalcDate('<+1D>', Today()));
+        ScheduleEntry.SetRange(Cancelled, false);
+        Assert.IsTrue(ScheduleEntry.FindFirst(), 'Precondition: the admission must have a slot tomorrow');
+        ReservedExtEntryNo := ScheduleEntry."External Schedule Entry No.";
+        Assert.IsTrue(TicketApiLibrary.MakeReservation(1, ItemNo, 1, ReservedExtEntryNo, MemberNumber, ScannerStation, ResponseToken, ResponseMessage), 'MakeReservation should succeed: ' + ResponseMessage);
+
+        // [GIVEN] A captured ecommerce order carrying that token
+        _Lib.InsertEcomDocumentWithReservationToken('PREMADE-SLOTPASSED', ResponseToken, ItemNo, true, EcomSalesHeader);
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.FindFirst();
+        EcomSalesLine.Captured := true;
+        EcomSalesLine.Modify();
+        EcomCreateTicketImpl.UpdateExpiryTimeBasedOnCapturedStatus(EcomSalesHeader);
+
+        // [GIVEN] The reserved slot ended yesterday
+        Assert.IsTrue(FindIssuedScheduleEntry(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, ScheduleEntry), 'Precondition: the ticket must be issued for a slot');
+        Assert.AreEqual(ReservedExtEntryNo, ScheduleEntry."External Schedule Entry No.", 'Precondition: the ticket must be issued for the reserved slot');
+        LocalToday := AdmissionLocalToday(AdmissionCode);
+        MoveIssuedSlot(ScheduleEntry, LocalToday - 2, LocalToday - 1, ScheduleEntry."Admission End Time", 0T);
+        Commit();
+
+        // [WHEN] The tickets are confirmed
+        asserterror EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+
+        // [THEN] The error names the passed date and nothing is confirmed
+        Assert.ExpectedError('cannot be confirmed');
+        Assert.ExpectedError('is over - today is');
+        AssertTokenStillRegistered(EcomSalesHeader."Ticket Reservation Token");
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmTickets_PrebookSlotEndTimePassed_Error()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        ItemNo: Code[20];
+        AdmissionCode: Code[20];
+        LocalToday: Date;
+    begin
+        // [SCENARIO] Confirm refuses a prebook ticket whose slot ended earlier today
+
+        // [GIVEN] A minted ticket document for a prebook admission
+        ItemNo := CreateSmokeTicketItemNo();
+        AdmissionCode := GetDefaultAdmissionCode(ItemNo);
+        CreateMintedTicketDoc(EcomSalesHeader, EcomSalesLine, ItemNo, 1);
+        SetPrebookRequired(AdmissionCode, true);
+
+        // [GIVEN] The issued slot ends today just after midnight and has no arrival cut-off
+        Assert.IsTrue(FindIssuedScheduleEntry(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, ScheduleEntry), 'Precondition: the ticket must be issued for a slot');
+        LocalToday := AdmissionLocalToday(AdmissionCode);
+        MoveIssuedSlot(ScheduleEntry, LocalToday - 1, LocalToday, 000000.001T, 0T);
+        Commit();
+
+        // [WHEN] The tickets are confirmed
+        asserterror EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+
+        // [THEN] The error names the slot end time and nothing is confirmed
+        Assert.ExpectedError('cannot be confirmed');
+        Assert.ExpectedError('ended at');
+        AssertTokenStillRegistered(EcomSalesHeader."Ticket Reservation Token");
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmTickets_PrebookArrivalUntilPassed_Error()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        ItemNo: Code[20];
+        AdmissionCode: Code[20];
+        LocalToday: Date;
+    begin
+        // [SCENARIO] Confirm refuses a prebook ticket whose slot is still running but closed for arrivals
+
+        // [GIVEN] A minted ticket document for a prebook admission
+        ItemNo := CreateSmokeTicketItemNo();
+        AdmissionCode := GetDefaultAdmissionCode(ItemNo);
+        CreateMintedTicketDoc(EcomSalesHeader, EcomSalesLine, ItemNo, 1);
+        SetPrebookRequired(AdmissionCode, true);
+
+        // [GIVEN] The issued slot ends at the end of today, but arrivals closed just after midnight
+        Assert.IsTrue(FindIssuedScheduleEntry(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, ScheduleEntry), 'Precondition: the ticket must be issued for a slot');
+        LocalToday := AdmissionLocalToday(AdmissionCode);
+        MoveIssuedSlot(ScheduleEntry, LocalToday - 1, LocalToday, 235959.999T, 000000.001T);
+        Commit();
+
+        // [WHEN] The tickets are confirmed
+        asserterror EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+
+        // [THEN] The error names the arrival cut-off and nothing is confirmed
+        Assert.ExpectedError('cannot be confirmed');
+        Assert.ExpectedError('closed at');
+        AssertTokenStillRegistered(EcomSalesHeader."Ticket Reservation Token");
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmTickets_PrebookSlotInProgress_Confirms()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        ItemNo: Code[20];
+        AdmissionCode: Code[20];
+        LocalToday: Date;
+    begin
+        // [SCENARIO] Confirm accepts a prebook ticket whose slot is still running
+
+        // [GIVEN] A minted ticket document for a prebook admission
+        ItemNo := CreateSmokeTicketItemNo();
+        AdmissionCode := GetDefaultAdmissionCode(ItemNo);
+        CreateMintedTicketDoc(EcomSalesHeader, EcomSalesLine, ItemNo, 1);
+        SetPrebookRequired(AdmissionCode, true);
+
+        // [GIVEN] The issued slot started yesterday and ends tomorrow
+        Assert.IsTrue(FindIssuedScheduleEntry(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, ScheduleEntry), 'Precondition: the ticket must be issued for a slot');
+        LocalToday := AdmissionLocalToday(AdmissionCode);
+        MoveIssuedSlot(ScheduleEntry, LocalToday - 1, LocalToday + 1, ScheduleEntry."Admission End Time", 0T);
+        Commit();
+
+        // [WHEN] The tickets are confirmed
+        EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+
+        // [THEN] The reservation request is confirmed
+        GetRequestRow(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, TicketRequest);
+        Assert.AreEqual(TicketRequest."Request Status"::CONFIRMED, TicketRequest."Request Status", 'The reservation request should be confirmed');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmTickets_NonPrebookPassedSlot_Confirms()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        ItemNo: Code[20];
+        AdmissionCode: Code[20];
+        LocalToday: Date;
+    begin
+        // [SCENARIO] Confirm ignores the slot of an admission that does not require prebooking
+
+        // [GIVEN] A minted ticket document for an admission without prebooking
+        ItemNo := CreateSmokeTicketItemNo();
+        AdmissionCode := GetDefaultAdmissionCode(ItemNo);
+        CreateMintedTicketDoc(EcomSalesHeader, EcomSalesLine, ItemNo, 1);
+        SetPrebookRequired(AdmissionCode, false);
+
+        // [GIVEN] The issued slot ended yesterday
+        Assert.IsTrue(FindIssuedScheduleEntry(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, ScheduleEntry), 'Precondition: the ticket must be issued for a slot');
+        LocalToday := AdmissionLocalToday(AdmissionCode);
+        MoveIssuedSlot(ScheduleEntry, LocalToday - 2, LocalToday - 1, ScheduleEntry."Admission End Time", 0T);
+        Commit();
+
+        // [WHEN] The tickets are confirmed
+        EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+
+        // [THEN] The reservation request is confirmed
+        GetRequestRow(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, TicketRequest);
+        Assert.AreEqual(TicketRequest."Request Status"::CONFIRMED, TicketRequest."Request Status", 'The reservation request should be confirmed');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmTickets_NotSelectedAdmissionPassedSlot_Confirms()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        PrimaryEntry: Record "NPR TM Admis. Schedule Entry";
+        OptionalEntry: Record "NPR TM Admis. Schedule Entry";
+        PrimaryRequest: Record "NPR TM Ticket Reservation Req.";
+        OptionalRequest: Record "NPR TM Ticket Reservation Req.";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        ItemNo: Code[20];
+        PrimaryAdmissionCode: Code[20];
+        OptionalAdmissionCode: Code[20];
+        LocalToday: Date;
+    begin
+        // [SCENARIO] Confirm ignores the passed slot of an optional admission the customer did not buy
+
+        // [GIVEN] A minted ticket document for an item with a required and an optional admission, both prebook
+        ItemNo := CreateTwoAdmissionTicketItem(1, PrimaryAdmissionCode, OptionalAdmissionCode);
+        CreateMintedTicketDoc(EcomSalesHeader, EcomSalesLine, ItemNo, 1);
+        SetPrebookRequired(PrimaryAdmissionCode, true);
+        SetPrebookRequired(OptionalAdmissionCode, true);
+
+        // [GIVEN] The optional admission is not bought and its slot ended yesterday
+        GetRequestRow(EcomSalesHeader."Ticket Reservation Token", OptionalAdmissionCode, OptionalRequest);
+        Assert.IsFalse(OptionalRequest."Admission Created", 'Precondition: the optional admission must not be bought');
+        if not FindIssuedScheduleEntry(EcomSalesHeader."Ticket Reservation Token", OptionalAdmissionCode, OptionalEntry) then begin
+            // The row has no slot, so give it one. The check must still skip the unbought admission.
+            OptionalEntry.Reset();
+            OptionalEntry.SetRange("Admission Code", OptionalAdmissionCode);
+            OptionalEntry.SetRange(Cancelled, false);
+            OptionalEntry.FindFirst();
+            OptionalRequest."External Adm. Sch. Entry No." := OptionalEntry."External Schedule Entry No.";
+            OptionalRequest.Modify();
+        end;
+        Assert.IsTrue(OptionalEntry."External Schedule Entry No." > 0, 'Precondition: the optional admission must have a slot');
+        LocalToday := AdmissionLocalToday(OptionalAdmissionCode);
+        MoveIssuedSlot(OptionalEntry, LocalToday - 2, LocalToday - 1, OptionalEntry."Admission End Time", 0T);
+
+        // [GIVEN] The slot of the required admission is still running
+        Assert.IsTrue(FindIssuedScheduleEntry(EcomSalesHeader."Ticket Reservation Token", PrimaryAdmissionCode, PrimaryEntry), 'Precondition: the ticket must be issued for a slot');
+        LocalToday := AdmissionLocalToday(PrimaryAdmissionCode);
+        MoveIssuedSlot(PrimaryEntry, LocalToday - 1, LocalToday + 1, PrimaryEntry."Admission End Time", 0T);
+        Commit();
+
+        // [WHEN] The tickets are confirmed
+        EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+
+        // [THEN] The required admission is confirmed and the optional one is left optional
+        GetRequestRow(EcomSalesHeader."Ticket Reservation Token", PrimaryAdmissionCode, PrimaryRequest);
+        Assert.AreEqual(PrimaryRequest."Request Status"::CONFIRMED, PrimaryRequest."Request Status", 'The required admission should be confirmed');
+        GetRequestRow(EcomSalesHeader."Ticket Reservation Token", OptionalAdmissionCode, OptionalRequest);
+        Assert.AreEqual(OptionalRequest."Request Status"::OPTIONAL, OptionalRequest."Request Status", 'The optional admission should be left optional');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmTickets_AlreadyConfirmedThenSlotPassed_NoError()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        ItemNo: Code[20];
+        AdmissionCode: Code[20];
+        LocalToday: Date;
+    begin
+        // [SCENARIO] A repeated confirm of an already confirmed document does not fail when the slot has passed since
+
+        // [GIVEN] A prebook ticket document confirmed while its slot was running
+        ItemNo := CreateSmokeTicketItemNo();
+        AdmissionCode := GetDefaultAdmissionCode(ItemNo);
+        CreateMintedTicketDoc(EcomSalesHeader, EcomSalesLine, ItemNo, 1);
+        SetPrebookRequired(AdmissionCode, true);
+        Assert.IsTrue(FindIssuedScheduleEntry(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, ScheduleEntry), 'Precondition: the ticket must be issued for a slot');
+        LocalToday := AdmissionLocalToday(AdmissionCode);
+        MoveIssuedSlot(ScheduleEntry, LocalToday - 1, LocalToday + 1, ScheduleEntry."Admission End Time", 0T);
+        Commit();
+        EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+        GetRequestRow(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, TicketRequest);
+        Assert.AreEqual(TicketRequest."Request Status"::CONFIRMED, TicketRequest."Request Status", 'Precondition: the first confirm must succeed');
+
+        // [GIVEN] The slot has ended since
+        ScheduleEntry.Get(ScheduleEntry."Entry No.");
+        MoveIssuedSlot(ScheduleEntry, LocalToday - 2, LocalToday - 1, ScheduleEntry."Admission End Time", 0T);
+        Commit();
+
+        // [WHEN] The tickets are confirmed again
+        EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+
+        // [THEN] No error is raised and the request stays confirmed
+        GetRequestRow(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, TicketRequest);
+        Assert.AreEqual(TicketRequest."Request Status"::CONFIRMED, TicketRequest."Request Status", 'The reservation request should stay confirmed');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmTickets_PrebookSlotCancelled_Error()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        ItemNo: Code[20];
+        AdmissionCode: Code[20];
+        LocalToday: Date;
+    begin
+        // [SCENARIO] Confirm refuses a prebook ticket whose slot was cancelled
+
+        // [GIVEN] A minted ticket document for a prebook admission
+        ItemNo := CreateSmokeTicketItemNo();
+        AdmissionCode := GetDefaultAdmissionCode(ItemNo);
+        CreateMintedTicketDoc(EcomSalesHeader, EcomSalesLine, ItemNo, 1);
+        SetPrebookRequired(AdmissionCode, true);
+
+        // [GIVEN] The issued slot is still running but is cancelled
+        Assert.IsTrue(FindIssuedScheduleEntry(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, ScheduleEntry), 'Precondition: the ticket must be issued for a slot');
+        LocalToday := AdmissionLocalToday(AdmissionCode);
+        MoveIssuedSlot(ScheduleEntry, LocalToday - 1, LocalToday + 1, ScheduleEntry."Admission End Time", 0T);
+        ScheduleEntry.Cancelled := true;
+        ScheduleEntry.Modify();
+        Commit();
+
+        // [WHEN] The tickets are confirmed
+        asserterror EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+
+        // [THEN] The error names the cancelled slot and nothing is confirmed
+        Assert.ExpectedError(StrSubstNo('The reserved %1 (%2) for %3 ''%4'' is cancelled, closed or no longer exists.', ScheduleEntry.FieldCaption("External Schedule Entry No."), ScheduleEntry."External Schedule Entry No.", ScheduleEntry.FieldCaption("Admission Code"), AdmissionCode));
+        AssertTokenStillRegistered(EcomSalesHeader."Ticket Reservation Token");
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmTickets_PrebookSlotClosed_Error()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        ItemNo: Code[20];
+        AdmissionCode: Code[20];
+        LocalToday: Date;
+    begin
+        // [SCENARIO] Confirm refuses a prebook ticket whose slot was closed
+
+        // [GIVEN] A minted ticket document for a prebook admission
+        ItemNo := CreateSmokeTicketItemNo();
+        AdmissionCode := GetDefaultAdmissionCode(ItemNo);
+        CreateMintedTicketDoc(EcomSalesHeader, EcomSalesLine, ItemNo, 1);
+        SetPrebookRequired(AdmissionCode, true);
+
+        // [GIVEN] The issued slot is still running but is closed
+        Assert.IsTrue(FindIssuedScheduleEntry(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, ScheduleEntry), 'Precondition: the ticket must be issued for a slot');
+        LocalToday := AdmissionLocalToday(AdmissionCode);
+        MoveIssuedSlot(ScheduleEntry, LocalToday - 1, LocalToday + 1, ScheduleEntry."Admission End Time", 0T);
+        ScheduleEntry."Admission Is" := ScheduleEntry."Admission Is"::CLOSED;
+        ScheduleEntry.Modify();
+        Commit();
+
+        // [WHEN] The tickets are confirmed
+        asserterror EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+
+        // [THEN] The error names the closed slot and nothing is confirmed
+        Assert.ExpectedError(StrSubstNo('The reserved %1 (%2) for %3 ''%4'' is cancelled, closed or no longer exists.', ScheduleEntry.FieldCaption("External Schedule Entry No."), ScheduleEntry."External Schedule Entry No.", ScheduleEntry.FieldCaption("Admission Code"), AdmissionCode));
+        AssertTokenStillRegistered(EcomSalesHeader."Ticket Reservation Token");
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateTicketsProcess_PrebookSlotPassed_ErrorStoredOnLine()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        IncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
+        EcomCreateTicketProcess: Codeunit "NPR EcomCreateTicketProcess";
+        ItemNo: Code[20];
+        AdmissionCode: Code[20];
+        LocalToday: Date;
+    begin
+        // [SCENARIO] The ticket process stores the refusal on the ecom line and marks the document as failed
+
+        // [GIVEN] One failed attempt is the last retry
+        _Lib.GetIncEcomSalesDocSetup(IncEcomSalesDocSetup);
+        IncEcomSalesDocSetup."Max Virtual Item Retry Count" := 1;
+        IncEcomSalesDocSetup.Modify();
+
+        // [GIVEN] A minted ticket document for a prebook admission whose slot ended yesterday
+        ItemNo := CreateSmokeTicketItemNo();
+        AdmissionCode := GetDefaultAdmissionCode(ItemNo);
+        CreateMintedTicketDoc(EcomSalesHeader, EcomSalesLine, ItemNo, 1);
+        SetPrebookRequired(AdmissionCode, true);
+        Assert.IsTrue(FindIssuedScheduleEntry(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, ScheduleEntry), 'Precondition: the ticket must be issued for a slot');
+        LocalToday := AdmissionLocalToday(AdmissionCode);
+        MoveIssuedSlot(ScheduleEntry, LocalToday - 2, LocalToday - 1, ScheduleEntry."Admission End Time", 0T);
+        Commit();
+
+        // [WHEN] The ticket process runs
+        EcomCreateTicketProcess.SetShowError(false);
+        EcomCreateTicketProcess.SetUpdateRetryCount(true);
+        EcomCreateTicketProcess.Run(EcomSalesHeader);
+
+        // [THEN] The line and the header are in error, the error is stored on the line and nothing is confirmed
+        EcomSalesLine.Get(EcomSalesLine.RecordId);
+        Assert.AreEqual(EcomSalesLine."Virtual Item Process Status"::Error, EcomSalesLine."Virtual Item Process Status", 'The line should be in error');
+        Assert.IsTrue(StrPos(EcomSalesLine."Virtual Item Process ErrMsg", 'cannot be confirmed') > 0, 'The line should store the refusal: ' + EcomSalesLine."Virtual Item Process ErrMsg");
+        EcomSalesHeader.Get(EcomSalesHeader.RecordId);
+        Assert.AreEqual(EcomSalesHeader."Ticket Processing Status"::Error, EcomSalesHeader."Ticket Processing Status", 'The ticket processing status should be Error');
+        Assert.AreEqual(1, EcomSalesHeader."Ticket Retry Count", 'The ticket retry count should be 1');
+        AssertTokenStillRegistered(EcomSalesHeader."Ticket Reservation Token");
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmTickets_SecondRequiredAdmissionPassed_Error()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        FirstEntry: Record "NPR TM Admis. Schedule Entry";
+        SecondEntry: Record "NPR TM Admis. Schedule Entry";
+        SecondRequest: Record "NPR TM Ticket Reservation Req.";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        ItemNo: Code[20];
+        FirstAdmissionCode: Code[20];
+        SecondAdmissionCode: Code[20];
+        LocalToday: Date;
+    begin
+        // [SCENARIO] Confirm checks every bought admission of the ticket, not only the primary one
+
+        // [GIVEN] A minted ticket document for an item with two required prebook admissions
+        ItemNo := CreateTwoAdmissionTicketItem(2, FirstAdmissionCode, SecondAdmissionCode);
+        CreateMintedTicketDoc(EcomSalesHeader, EcomSalesLine, ItemNo, 1);
+        SetPrebookRequired(FirstAdmissionCode, true);
+        SetPrebookRequired(SecondAdmissionCode, true);
+        GetRequestRow(EcomSalesHeader."Ticket Reservation Token", SecondAdmissionCode, SecondRequest);
+        Assert.IsTrue(SecondRequest."Admission Created", 'Precondition: the second admission must be bought');
+        Assert.IsFalse(SecondRequest."Primary Request Line", 'Precondition: the second admission must not be the primary request line');
+
+        // [GIVEN] The slot of the first admission is running, the slot of the second one ended yesterday
+        Assert.IsTrue(FindIssuedScheduleEntry(EcomSalesHeader."Ticket Reservation Token", FirstAdmissionCode, FirstEntry), 'Precondition: the first admission must be issued for a slot');
+        LocalToday := AdmissionLocalToday(FirstAdmissionCode);
+        MoveIssuedSlot(FirstEntry, LocalToday - 1, LocalToday + 1, FirstEntry."Admission End Time", 0T);
+        Assert.IsTrue(FindIssuedScheduleEntry(EcomSalesHeader."Ticket Reservation Token", SecondAdmissionCode, SecondEntry), 'Precondition: the second admission must be issued for a slot');
+        LocalToday := AdmissionLocalToday(SecondAdmissionCode);
+        MoveIssuedSlot(SecondEntry, LocalToday - 2, LocalToday - 1, SecondEntry."Admission End Time", 0T);
+        Commit();
+
+        // [WHEN] The tickets are confirmed
+        asserterror EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+
+        // [THEN] The passed slot of the second admission is refused and nothing is confirmed
+        Assert.ExpectedError('cannot be confirmed');
+        Assert.ExpectedError('is over - today is');
+        AssertTokenStillRegistered(EcomSalesHeader."Ticket Reservation Token");
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmTickets_AdmissionAhead_SlotOverLocally_Error()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        ItemNo: Code[20];
+        AdmissionCode: Code[20];
+        SessionNow: DateTime;
+        AdmissionNow: DateTime;
+        SlotEnd: DateTime;
+    begin
+        // [SCENARIO] Confirm refuses a slot that is over by the admission clock, even when the session clock says it is still running
+
+        // [GIVEN] A minted ticket document for a prebook admission in a time zone at least 3 hours ahead of the session
+        ItemNo := CreateSmokeTicketItemNo();
+        AdmissionCode := GetDefaultAdmissionCode(ItemNo);
+        CreateMintedTicketDoc(EcomSalesHeader, EcomSalesLine, ItemNo, 1);
+        SetPrebookRequired(AdmissionCode, true);
+        SetAdmissionTimeZoneFromSession(AdmissionCode, true);
+        SessionNow := CreateDateTime(Today(), Time());
+        AdmissionNow := TimeHelper.GetLocalTimeAtAdmission(AdmissionCode);
+        Assert.IsTrue(AdmissionNow - SessionNow >= 2 * 3600000, 'Precondition: the admission clock must be at least 2 hours ahead of the session clock');
+
+        // [GIVEN] The issued slot ended 1 hour ago by the admission clock
+        Assert.IsTrue(FindIssuedScheduleEntry(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, ScheduleEntry), 'Precondition: the ticket must be issued for a slot');
+        SlotEnd := AdmissionNow - 3600000;
+        MoveIssuedSlot(ScheduleEntry, DT2Date(SlotEnd) - 1, DT2Date(SlotEnd), DT2Time(SlotEnd), 0T);
+        Commit();
+
+        // [WHEN] The tickets are confirmed
+        asserterror EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+
+        // [THEN] The slot is refused and nothing is confirmed
+        Assert.ExpectedError('cannot be confirmed');
+        Assert.ExpectedError('Pick a later');
+        AssertTokenStillRegistered(EcomSalesHeader."Ticket Reservation Token");
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmTickets_AdmissionBehind_SlotRunningLocally_Confirms()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        ItemNo: Code[20];
+        AdmissionCode: Code[20];
+        SessionNow: DateTime;
+        AdmissionNow: DateTime;
+        SlotEnd: DateTime;
+    begin
+        // [SCENARIO] Confirm accepts a slot that is still running by the admission clock, even when the session clock says it is over
+
+        // [GIVEN] A minted ticket document for a prebook admission in a time zone at least 3 hours behind the session
+        ItemNo := CreateSmokeTicketItemNo();
+        AdmissionCode := GetDefaultAdmissionCode(ItemNo);
+        CreateMintedTicketDoc(EcomSalesHeader, EcomSalesLine, ItemNo, 1);
+        SetPrebookRequired(AdmissionCode, true);
+        SetAdmissionTimeZoneFromSession(AdmissionCode, false);
+        SessionNow := CreateDateTime(Today(), Time());
+        AdmissionNow := TimeHelper.GetLocalTimeAtAdmission(AdmissionCode);
+        Assert.IsTrue(SessionNow - AdmissionNow >= 2 * 3600000, 'Precondition: the admission clock must be at least 2 hours behind the session clock');
+
+        // [GIVEN] The issued slot ends 1 hour from now by the admission clock
+        Assert.IsTrue(FindIssuedScheduleEntry(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, ScheduleEntry), 'Precondition: the ticket must be issued for a slot');
+        SlotEnd := AdmissionNow + 3600000;
+        MoveIssuedSlot(ScheduleEntry, DT2Date(SlotEnd) - 1, DT2Date(SlotEnd), DT2Time(SlotEnd), 0T);
+        Commit();
+
+        // [WHEN] The tickets are confirmed
+        EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+
+        // [THEN] The reservation request is confirmed
+        GetRequestRow(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, TicketRequest);
+        Assert.AreEqual(TicketRequest."Request Status"::CONFIRMED, TicketRequest."Request Status", 'The reservation request should be confirmed');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmTickets_PrebookRowWithoutChosenSlot_Confirms()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketResponse: Record "NPR TM Ticket Reserv. Resp.";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        ItemNo: Code[20];
+        AdmissionCode: Code[20];
+        LocalToday: Date;
+    begin
+        // [SCENARIO] A prebook request row without a chosen time slot (-1) is not treated as a cancelled slot
+
+        // [GIVEN] A minted ticket document for a prebook admission whose issued slot is running
+        ItemNo := CreateSmokeTicketItemNo();
+        AdmissionCode := GetDefaultAdmissionCode(ItemNo);
+        CreateMintedTicketDoc(EcomSalesHeader, EcomSalesLine, ItemNo, 1);
+        SetPrebookRequired(AdmissionCode, true);
+        Assert.IsTrue(FindIssuedScheduleEntry(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, ScheduleEntry), 'Precondition: the ticket must be issued for a slot');
+        LocalToday := AdmissionLocalToday(AdmissionCode);
+        MoveIssuedSlot(ScheduleEntry, LocalToday - 1, LocalToday + 1, ScheduleEntry."Admission End Time", 0T);
+
+        // [GIVEN] The request row has no chosen slot
+        GetRequestRow(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, TicketRequest);
+        TicketRequest."External Adm. Sch. Entry No." := -1;
+        TicketRequest.Modify();
+
+        // [GIVEN] The ticket cannot be found through the token's response rows, so the check falls back to the request row
+        TicketResponse.SetRange("Session Token ID", EcomSalesHeader."Ticket Reservation Token");
+        TicketResponse.DeleteAll();
+        Commit();
+
+        // [WHEN] The tickets are confirmed
+        EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+
+        // [THEN] The reservation request is confirmed
+        GetRequestRow(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, TicketRequest);
+        Assert.AreEqual(TicketRequest."Request Status"::CONFIRMED, TicketRequest."Request Status", 'The reservation request should be confirmed');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmTickets_RowSlotStaleTicketSlotValid_Confirms()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        LastScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        IssuedEntryAfterChange: Record "NPR TM Admis. Schedule Entry";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        ItemNo: Code[20];
+        AdmissionCode: Code[20];
+        LocalToday: Date;
+    begin
+        // [SCENARIO] Confirm judges the slot the ticket was issued for, not the slot number left on the request row
+
+        // [GIVEN] A minted ticket document for a prebook admission whose issued slot is running
+        ItemNo := CreateSmokeTicketItemNo();
+        AdmissionCode := GetDefaultAdmissionCode(ItemNo);
+        CreateMintedTicketDoc(EcomSalesHeader, EcomSalesLine, ItemNo, 1);
+        SetPrebookRequired(AdmissionCode, true);
+        Assert.IsTrue(FindIssuedScheduleEntry(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, ScheduleEntry), 'Precondition: the ticket must be issued for a slot');
+        LocalToday := AdmissionLocalToday(AdmissionCode);
+        MoveIssuedSlot(ScheduleEntry, LocalToday - 1, LocalToday + 1, ScheduleEntry."Admission End Time", 0T);
+
+        // [GIVEN] The request row points to a slot that does not exist
+        LastScheduleEntry.SetCurrentKey("External Schedule Entry No.");
+        LastScheduleEntry.FindLast();
+        GetRequestRow(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, TicketRequest);
+        TicketRequest."External Adm. Sch. Entry No." := LastScheduleEntry."External Schedule Entry No." + 1;
+        TicketRequest.Modify();
+        Assert.IsTrue(FindIssuedScheduleEntry(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, IssuedEntryAfterChange), 'Precondition: the issued slot must be found through the ticket, not the row');
+        Assert.AreEqual(ScheduleEntry."Entry No.", IssuedEntryAfterChange."Entry No.", 'Precondition: the issued slot must not depend on the row');
+        Commit();
+
+        // [WHEN] The tickets are confirmed
+        EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+
+        // [THEN] The reservation request is confirmed
+        GetRequestRow(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, TicketRequest);
+        Assert.AreEqual(TicketRequest."Request Status"::CONFIRMED, TicketRequest."Request Status", 'The reservation request should be confirmed');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmTickets_ReservationEntryOverridesInitialEntry_Error()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        LastScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketResponse: Record "NPR TM Ticket Reserv. Resp.";
+        Ticket: Record "NPR TM Ticket";
+        AccessEntry: Record "NPR TM Ticket Access Entry";
+        InitialEntry: Record "NPR TM Det. Ticket AccessEntry";
+        ReservationEntry: Record "NPR TM Det. Ticket AccessEntry";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        ItemNo: Code[20];
+        AdmissionCode: Code[20];
+        LocalToday: Date;
+        MissingExtScheduleEntryNo: Integer;
+    begin
+        // [SCENARIO] Confirm judges the slot of the ticket's reservation entry, not the slot of its initial entry
+
+        // [GIVEN] A minted ticket document for a prebook admission whose issued slot is running
+        ItemNo := CreateSmokeTicketItemNo();
+        AdmissionCode := GetDefaultAdmissionCode(ItemNo);
+        CreateMintedTicketDoc(EcomSalesHeader, EcomSalesLine, ItemNo, 1);
+        SetPrebookRequired(AdmissionCode, true);
+        Assert.IsTrue(FindIssuedScheduleEntry(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, ScheduleEntry), 'Precondition: the ticket must be issued for a slot');
+        LocalToday := AdmissionLocalToday(AdmissionCode);
+        MoveIssuedSlot(ScheduleEntry, LocalToday - 1, LocalToday + 1, ScheduleEntry."Admission End Time", 0T);
+
+        // [GIVEN] The ticket has a reservation entry for a slot that does not exist
+        GetRequestRow(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, TicketRequest);
+        TicketResponse.SetRange("Session Token ID", EcomSalesHeader."Ticket Reservation Token");
+        TicketResponse.SetRange("Ext. Line Reference No.", TicketRequest."Ext. Line Reference No.");
+        TicketResponse.FindFirst();
+        Ticket.SetRange("Ticket Reservation Entry No.", TicketResponse."Request Entry No.");
+        Ticket.FindFirst();
+        AccessEntry.SetRange("Ticket No.", Ticket."No.");
+        AccessEntry.SetRange("Admission Code", AdmissionCode);
+        AccessEntry.FindFirst();
+        InitialEntry.SetRange("Ticket Access Entry No.", AccessEntry."Entry No.");
+        InitialEntry.SetRange(Type, InitialEntry.Type::INITIAL_ENTRY);
+        InitialEntry.SetFilter(Quantity, '>%1', 0);
+        Assert.IsTrue(InitialEntry.FindLast(), 'Precondition: the ticket must have an initial entry');
+
+        LastScheduleEntry.SetCurrentKey("External Schedule Entry No.");
+        LastScheduleEntry.FindLast();
+        MissingExtScheduleEntryNo := LastScheduleEntry."External Schedule Entry No." + 1;
+
+        ReservationEntry := InitialEntry;
+        ReservationEntry."Entry No." := 0;
+        ReservationEntry.Type := ReservationEntry.Type::RESERVATION;
+        ReservationEntry."External Adm. Sch. Entry No." := MissingExtScheduleEntryNo;
+        ReservationEntry.Insert(true);
+        Commit();
+
+        // [WHEN] The tickets are confirmed
+        asserterror EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+
+        // [THEN] The error names the missing slot of the reservation entry and nothing is confirmed
+        Assert.ExpectedError(StrSubstNo('The reserved %1 (%2) for %3 ''%4'' is cancelled, closed or no longer exists.', ScheduleEntry.FieldCaption("External Schedule Entry No."), MissingExtScheduleEntryNo, ScheduleEntry.FieldCaption("Admission Code"), AdmissionCode));
+        AssertTokenStillRegistered(EcomSalesHeader."Ticket Reservation Token");
+
+        // The row was committed and would count as an open reservation on a slot a later test creates with this number.
+        ReservationEntry.Delete();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmTickets_FallbackRowSlotPassed_Error()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketResponse: Record "NPR TM Ticket Reserv. Resp.";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        ItemNo: Code[20];
+        AdmissionCode: Code[20];
+        LocalToday: Date;
+    begin
+        // [SCENARIO] When the ticket cannot be found, Confirm refuses a request row whose slot ended on an earlier date
+
+        // [GIVEN] A minted ticket document for a prebook admission whose issued slot ended yesterday
+        ItemNo := CreateSmokeTicketItemNo();
+        AdmissionCode := GetDefaultAdmissionCode(ItemNo);
+        CreateMintedTicketDoc(EcomSalesHeader, EcomSalesLine, ItemNo, 1);
+        SetPrebookRequired(AdmissionCode, true);
+        Assert.IsTrue(FindIssuedScheduleEntry(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, ScheduleEntry), 'Precondition: the ticket must be issued for a slot');
+        LocalToday := AdmissionLocalToday(AdmissionCode);
+        MoveIssuedSlot(ScheduleEntry, LocalToday - 2, LocalToday - 1, ScheduleEntry."Admission End Time", 0T);
+
+        // [GIVEN] The request row points to the passed slot
+        GetRequestRow(EcomSalesHeader."Ticket Reservation Token", AdmissionCode, TicketRequest);
+        TicketRequest."External Adm. Sch. Entry No." := ScheduleEntry."External Schedule Entry No.";
+        TicketRequest.Modify();
+
+        // [GIVEN] The ticket cannot be found through the token's response rows, so the check falls back to the request row
+        TicketResponse.SetRange("Session Token ID", EcomSalesHeader."Ticket Reservation Token");
+        TicketResponse.DeleteAll();
+        Commit();
+
+        // [WHEN] The tickets are confirmed
+        asserterror EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+
+        // [THEN] The error names the passed date and nothing is confirmed
+        Assert.ExpectedError('cannot be confirmed');
+        Assert.ExpectedError('is over - today is');
+        AssertTokenStillRegistered(EcomSalesHeader."Ticket Reservation Token");
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmTickets_TicketValidityExpired_Error()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomSalesLine2: Record "NPR Ecom Sales Line";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        ItemNo: Code[20];
+    begin
+        // [SCENARIO] Confirm refuses a document when any of its tickets is no longer valid, also a later ticket on a later line
+
+        // [GIVEN] A minted ticket document with two lines of an admission without prebooking, the second line for 2 tickets
+        ItemNo := CreateSmokeTicketItemNo();
+        SetPrebookRequired(GetDefaultAdmissionCode(ItemNo), false);
+        _Lib.CreateEcomSalesHeader(EcomSalesHeader);
+        _Lib.CreateCapturedTicketLine(EcomSalesLine, EcomSalesHeader, ItemNo);
+        _Lib.CreateTicketLine(EcomSalesLine2, EcomSalesHeader, ItemNo, 2, 100);
+        EcomSalesLine2.Captured := true;
+        EcomSalesLine2.Modify();
+        EcomCreateTicketImpl.CreateRequestsForTicketLines(EcomSalesHeader);
+        EcomSalesHeader.Get(EcomSalesHeader.RecordId);
+        EcomSalesLine2.Get(EcomSalesLine2.RecordId);
+
+        // [GIVEN] Only the last ticket of the second line expired yesterday
+        GetPrimaryRequestOfLine(EcomSalesHeader."Ticket Reservation Token", EcomSalesLine2, TicketRequest);
+        Ticket.SetRange("Ticket Reservation Entry No.", TicketRequest."Entry No.");
+        Assert.AreEqual(2, Ticket.Count(), 'Precondition: the second line must have 2 tickets');
+        Ticket.FindLast();
+        Ticket."Valid To Date" := Today() - 1;
+        Ticket.Modify();
+        Commit();
+
+        // [WHEN] The tickets are confirmed
+        asserterror EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+
+        // [THEN] The error names the expired ticket and nothing is confirmed
+        Assert.ExpectedError('expired on');
+        Assert.ExpectedError(Ticket."External Ticket No.");
+        AssertTokenStillRegistered(EcomSalesHeader."Ticket Reservation Token");
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ConfirmTickets_TicketValidUntilToday_Confirms()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+        ItemNo: Code[20];
+    begin
+        // [SCENARIO] Confirm accepts tickets that are valid until today
+
+        // [GIVEN] A minted ticket document with one line for 2 tickets of an admission without prebooking
+        ItemNo := CreateSmokeTicketItemNo();
+        SetPrebookRequired(GetDefaultAdmissionCode(ItemNo), false);
+        CreateMintedTicketDoc(EcomSalesHeader, EcomSalesLine, ItemNo, 2);
+
+        // [GIVEN] Both tickets are valid until today
+        GetPrimaryRequestOfLine(EcomSalesHeader."Ticket Reservation Token", EcomSalesLine, TicketRequest);
+        Ticket.SetRange("Ticket Reservation Entry No.", TicketRequest."Entry No.");
+        Assert.AreEqual(2, Ticket.Count(), 'Precondition: the line must have 2 tickets');
+        Ticket.ModifyAll("Valid To Date", Today());
+        Commit();
+
+        // [WHEN] The tickets are confirmed
+        EcomCreateTicketImpl.ConfirmTickets(EcomSalesHeader);
+
+        // [THEN] The reservation request is confirmed
+        TicketRequest.Get(TicketRequest."Entry No.");
+        Assert.AreEqual(TicketRequest."Request Status"::CONFIRMED, TicketRequest."Request Status", 'The reservation request should be confirmed');
+    end;
+
+    local procedure CreateMintedTicketDoc(var EcomSalesHeader: Record "NPR Ecom Sales Header"; var EcomSalesLine: Record "NPR Ecom Sales Line"; ItemNo: Code[20]; Qty: Decimal)
+    var
+        EcomCreateTicketImpl: Codeunit "NPR EcomCreateTicketImpl";
+    begin
+        SetupEcomHeaderAndTicketLine(EcomSalesHeader, EcomSalesLine, ItemNo, Qty, 100, true);
+        // Mints the requests and tickets and commits.
+        EcomCreateTicketImpl.CreateRequestsForTicketLines(EcomSalesHeader);
+        EcomSalesHeader.Get(EcomSalesHeader.RecordId);
+        EcomSalesLine.Get(EcomSalesLine.RecordId);
+        Assert.AreNotEqual('', EcomSalesHeader."Ticket Reservation Token", 'Precondition: the document must have a reservation token');
+    end;
+
+    local procedure CreateTwoAdmissionTicketItem(RequiredAdmissions: Integer; var DefaultAdmissionCode: Code[20]; var SecondAdmissionCode: Code[20]) ItemNo: Code[20]
+    var
+        TicketBOM: Record "NPR TM Ticket Admission BOM";
+        ScheduleManager: Codeunit "NPR TM Admission Sch. Mgt.";
+        LibTicket: Codeunit "NPR Library - Ticket Module";
+    begin
+        ItemNo := LibTicket.CreateDynamicTicketScenario(2, RequiredAdmissions);
+        DefaultAdmissionCode := GetDefaultAdmissionCode(ItemNo);
+        TicketBOM.SetRange("Item No.", ItemNo);
+        TicketBOM.SetRange(Default, false);
+        TicketBOM.FindFirst();
+        SecondAdmissionCode := TicketBOM."Admission Code";
+        // The library schedules only the last admission.
+        ScheduleManager.CreateAdmissionScheduleTestFramework(DefaultAdmissionCode, true, Today());
+    end;
+
+    local procedure GetDefaultAdmissionCode(ItemNo: Code[20]): Code[20]
+    var
+        TicketBOM: Record "NPR TM Ticket Admission BOM";
+    begin
+        TicketBOM.SetRange("Item No.", ItemNo);
+        TicketBOM.SetRange(Default, true);
+        TicketBOM.FindFirst();
+        exit(TicketBOM."Admission Code");
+    end;
+
+    local procedure GetRequestRow(Token: Text[100]; AdmissionCode: Code[20]; var TicketRequest: Record "NPR TM Ticket Reservation Req.")
+    begin
+        TicketRequest.Reset();
+        TicketRequest.SetRange("Session Token ID", Token);
+        TicketRequest.SetRange("Admission Code", AdmissionCode);
+        Assert.IsTrue(TicketRequest.FindFirst(), 'Precondition: the token must have a reservation request for the admission');
+    end;
+
+    local procedure GetPrimaryRequestOfLine(Token: Text[100]; EcomSalesLine: Record "NPR Ecom Sales Line"; var TicketRequest: Record "NPR TM Ticket Reservation Req.")
+    var
+        LineRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        LineRequest.GetBySystemId(EcomSalesLine."Ticket Reservation Line Id");
+        TicketRequest.SetRange("Session Token ID", Token);
+        TicketRequest.SetRange("Ext. Line Reference No.", LineRequest."Ext. Line Reference No.");
+        TicketRequest.SetRange("Primary Request Line", true);
+        Assert.IsTrue(TicketRequest.FindFirst(), 'Precondition: the line must have a primary reservation request');
+    end;
+
+    // Same walk as the production check: the slot of the issued ticket, else the slot on the request row.
+    local procedure FindIssuedScheduleEntry(Token: Text[100]; AdmissionCode: Code[20]; var ScheduleEntry: Record "NPR TM Admis. Schedule Entry"): Boolean
+    var
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketResponse: Record "NPR TM Ticket Reserv. Resp.";
+        Ticket: Record "NPR TM Ticket";
+        AccessEntry: Record "NPR TM Ticket Access Entry";
+        DetailedEntry: Record "NPR TM Det. Ticket AccessEntry";
+        ExtScheduleEntryNo: Integer;
+    begin
+        GetRequestRow(Token, AdmissionCode, TicketRequest);
+        TicketResponse.SetRange("Session Token ID", Token);
+        TicketResponse.SetRange("Ext. Line Reference No.", TicketRequest."Ext. Line Reference No.");
+        if TicketResponse.FindFirst() then begin
+            Ticket.SetRange("Ticket Reservation Entry No.", TicketResponse."Request Entry No.");
+            if Ticket.FindFirst() then begin
+                AccessEntry.SetRange("Ticket No.", Ticket."No.");
+                AccessEntry.SetRange("Admission Code", AdmissionCode);
+                if AccessEntry.FindFirst() then begin
+                    DetailedEntry.SetRange("Ticket Access Entry No.", AccessEntry."Entry No.");
+                    DetailedEntry.SetFilter(Quantity, '>%1', 0);
+                    DetailedEntry.SetRange(Type, DetailedEntry.Type::RESERVATION);
+                    if not DetailedEntry.FindLast() then
+                        DetailedEntry.SetRange(Type, DetailedEntry.Type::INITIAL_ENTRY);
+                    if DetailedEntry.FindLast() then
+                        ExtScheduleEntryNo := DetailedEntry."External Adm. Sch. Entry No.";
+                end;
+            end;
+        end;
+        if ExtScheduleEntryNo <= 0 then
+            ExtScheduleEntryNo := TicketRequest."External Adm. Sch. Entry No.";
+        if ExtScheduleEntryNo <= 0 then
+            exit(false);
+
+        ScheduleEntry.Reset();
+        ScheduleEntry.SetRange("External Schedule Entry No.", ExtScheduleEntryNo);
+        ScheduleEntry.SetRange("Admission Code", AdmissionCode);
+        ScheduleEntry.SetRange(Cancelled, false);
+        exit(ScheduleEntry.FindFirst());
+    end;
+
+    local procedure MoveIssuedSlot(var ScheduleEntry: Record "NPR TM Admis. Schedule Entry"; StartDate: Date; EndDate: Date; EndTime: Time; ArrivalUntilTime: Time)
+    begin
+        ScheduleEntry."Admission Start Date" := StartDate;
+        ScheduleEntry."Admission End Date" := EndDate;
+        ScheduleEntry."Admission End Time" := EndTime;
+        ScheduleEntry."Event Arrival Until Time" := ArrivalUntilTime;
+        ScheduleEntry.Modify();
+    end;
+
+    local procedure SetPrebookRequired(AdmissionCode: Code[20]; PrebookRequired: Boolean)
+    var
+        Admission: Record "NPR TM Admission";
+    begin
+        Admission.Get(AdmissionCode);
+        Admission."Prebook Is Required" := PrebookRequired;
+        Admission.Modify();
+    end;
+
+    local procedure AdmissionLocalToday(AdmissionCode: Code[20]): Date
+    var
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+    begin
+        exit(DT2Date(TimeHelper.GetLocalTimeAtAdmission(AdmissionCode)));
+    end;
+
+    // Scans the Time Zone table like LibraryTicketModule.AlignServiceTimeZoneToSession. The zone must be 3 hours from both the session clock and UTC.
+    local procedure SetAdmissionTimeZoneFromSession(AdmissionCode: Code[20]; Ahead: Boolean)
+    var
+        Admission: Record "NPR TM Admission";
+        TimeZone: Record "Time Zone";
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        SessionNow: DateTime;
+        UtcNow: DateTime;
+        ZoneNow: DateTime;
+        TimeZoneCode: Code[20];
+        IsDaylightSavingsTime: Boolean;
+        Found: Boolean;
+    begin
+        SessionNow := CreateDateTime(Today(), Time());
+        UtcNow := TimeHelper.UtcNow();
+        TimeZone.SetFilter("No.", '<>0');
+        if TimeZone.FindSet() then
+            repeat
+                ZoneNow := TimeHelper.GetTimeZoneLocalTime(TimeZone."No.", TimeZoneCode, IsDaylightSavingsTime);
+                if Ahead then
+                    Found := (ZoneNow - SessionNow >= 3 * 3600000) and (ZoneNow - UtcNow >= 3 * 3600000)
+                else
+                    Found := (ZoneNow - SessionNow <= -3 * 3600000) and (ZoneNow - UtcNow <= -3 * 3600000);
+                if Found then begin
+                    Admission.Get(AdmissionCode);
+                    Admission.TimeZoneNo := TimeZone."No.";
+                    Admission.Modify();
+                    exit;
+                end;
+            until TimeZone.Next() = 0;
+        if Ahead then
+            Error('No time zone at least 3 hours ahead of this session''s time zone and UTC was found. This is a limit of the test environment, not a product defect.');
+        Error('No time zone at least 3 hours behind this session''s time zone and UTC was found. This is a limit of the test environment, not a product defect.');
+    end;
+
+    local procedure AssertTokenStillRegistered(Token: Text[100])
+    var
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        // Rollback sanity check only. Whether the check runs before the first write is a review property.
+        TicketRequest.SetRange("Session Token ID", Token);
+        TicketRequest.SetRange("Request Status", TicketRequest."Request Status"::CONFIRMED);
+        Assert.IsTrue(TicketRequest.IsEmpty(), 'No reservation request should be confirmed');
+        TicketRequest.SetFilter("Request Status", '<>%1', TicketRequest."Request Status"::REGISTERED);
+        Assert.IsTrue(TicketRequest.IsEmpty(), 'Every reservation request should still be registered');
+    end;
+
     local procedure SetupStoreTicketDoc(var EcomSalesHeader: Record "NPR Ecom Sales Header"; var EcomSalesLine: Record "NPR Ecom Sales Line")
     begin
         SetupProcessableTicketDoc(EcomSalesHeader, EcomSalesLine);
