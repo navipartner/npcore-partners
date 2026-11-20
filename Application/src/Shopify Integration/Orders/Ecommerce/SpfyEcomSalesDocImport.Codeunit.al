@@ -1522,9 +1522,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         NpRvSalesLine."Spfy Initiated in Shopify" := not CheckIsNpGiftCard(PropertyDict);
         NpRvSalesLine."Spfy Gift Card ID" := GiftCardId;
         NpRvSalesLine.Validate("Customer No.", EcomSalesHeader."Sell-to Customer No.");
-        if PropertyDict.Count <> 0 then
-            OrderMgt.UpdateVoucherRecipient(PropertyDict, not NpRvSalesLine."Spfy Initiated in Shopify", NpRvSalesLine);
-        NpRvSalesLine.UpdateIsSendViaEmail();
+        OrderMgt.UpdateVoucherRecipient(PropertyDict, not NpRvSalesLine."Spfy Initiated in Shopify", NpRvSalesLine);
         NpRvSalesLine.Insert();
 
         NpRvSalesDocMgt.InsertNpRVSalesLineReference(NpRvSalesLine, Voucher);

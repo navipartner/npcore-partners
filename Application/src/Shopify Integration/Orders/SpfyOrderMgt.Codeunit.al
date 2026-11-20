@@ -1748,10 +1748,12 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 
     internal procedure UpdateVoucherRecipient(PropertyDict: Dictionary of [Text, Text]; IsNpGiftCard: Boolean; var NpRvSalesLine: Record "NPR NpRv Sales Line")
     var
+        VoucherType: Record "NPR NpRv Voucher Type";
         PropertyKey: Text;
         PropertyValue: Text;
     begin
-        NpRvSalesLine."Spfy Send from Shopify" := IsNpGiftCard;
+        VoucherType.Get(NpRvSalesLine."Voucher Type");
+        NpRvSalesLine."Spfy Send from Shopify" := IsNpGiftCard and not VoucherType."Spfy Send Vouchers from BC";
         NpRvSalesLine."Spfy Liquid Template Suffix" := '';
         NpRvSalesLine."Spfy Send on" := 0DT;
 
@@ -1771,6 +1773,16 @@ codeunit 6184814 "NPR Spfy Order Mgt."
                         if Evaluate(NpRvSalesLine."Spfy Send on", PropertyValue, 9) then;
                 end;
         end;
+
+        if (IsNpGiftCard and VoucherType."Spfy Send Vouchers from BC") then begin
+            if (NpRvSalesLine."Spfy Recipient Name".Trim() <> '') then
+                NpRvSalesLine."Name" := CopyStr(NpRvSalesLine."Spfy Recipient Name".Trim(), 1, MaxStrLen(NpRvSalesLine."Name"));
+            if (NpRvSalesLine."Spfy Recipient E-mail".Trim() <> '') then
+                NpRvSalesLine."E-mail" := CopyStr(NpRvSalesLine."Spfy Recipient E-mail".Trim(), 1, MaxStrLen(NpRvSalesLine."E-mail"));
+        end;
+
+        if IsNpGiftCard then
+            NpRvSalesLine.UpdateIsSendViaEmail();
     end;
 
     local procedure InsertSalesLineShipmentFee(ShippingLine: JsonToken; SalesHeader: Record "Sales Header"; ForPosting: Boolean; var LastLineNo: Integer)

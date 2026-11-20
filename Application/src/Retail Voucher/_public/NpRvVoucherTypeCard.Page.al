@@ -387,6 +387,11 @@
                     ApplicationArea = NPRShopify;
                     ToolTip = 'Specifies whether retail vouchers of this type sold on POS should be sent to the intended recipient from Shopify.';
                 }
+                field("Spfy Send Vouchers from BC"; Rec."Spfy Send Vouchers from BC")
+                {
+                    ApplicationArea = NPRShopify;
+                    ToolTip = 'Specifies whether BC emails vouchers sold on Shopify. Requires a voucher email template. When enabled, Shopify creates the gift card without linking it to the buyer.';
+                }
             }
 #endif
         }

@@ -20,6 +20,255 @@ codeunit 85389 "NPR Spfy Order Import Tests"
         _LastMessageText: Text;
 
     [Test]
+    procedure EcomVoucher_BCDeliveryOff_KeepsShopifyDelivery()
+    var
+        VoucherType: Record "NPR NpRv Voucher Type";
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        Voucher: Record "NPR NpRv Voucher";
+        OrderResponse: JsonToken;
+    begin
+        // [SCENARIO] An imported NP voucher keeps Shopify delivery when BC delivery is off.
+        // [GIVEN] A buyer with an email and a voucher type with both delivery settings off
+        SetupEcomVoucherDeliveryOrder('941640000003', VoucherType, LogEntry, OrderResponse);
+
+        // [WHEN] The Shopify order is imported and its voucher is issued
+        ImportAndIssueEcomVoucher(LogEntry, OrderResponse, Voucher);
+
+        // [THEN] The issued voucher uses Shopify delivery without enabling BC email
+        _Assert.IsTrue(Voucher."Spfy Send from Shopify", 'BC delivery off must keep Shopify delivery independently of the POS setting.');
+        _Assert.IsFalse(Voucher."Send via E-mail", 'Shopify delivery must not also enable BC email.');
+        _Assert.AreEqual('buyer@example.com', Voucher."E-mail", 'The issued voucher must retain the buyer email.');
+    end;
+
+    [Test]
+    procedure EcomVoucher_BCDeliveryOn_EnablesBCEmail()
+    var
+        VoucherType: Record "NPR NpRv Voucher Type";
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        Voucher: Record "NPR NpRv Voucher";
+        OrderResponse: JsonToken;
+    begin
+        // [SCENARIO] An imported NP voucher uses BC email when BC delivery is on.
+        // [GIVEN] BC delivery for Shopify orders and Shopify delivery for POS sales are enabled
+        SetupEcomVoucherDeliveryOrder('941640000004', VoucherType, LogEntry, OrderResponse);
+        VoucherType."Spfy Send Vouchers from BC" := true;
+        VoucherType."Spfy Send from Shopify" := true;
+        VoucherType.Modify();
+
+        // [WHEN] The Shopify order is imported and its voucher is issued
+        ImportAndIssueEcomVoucher(LogEntry, OrderResponse, Voucher);
+
+        // [THEN] The issued voucher uses BC email despite the POS setting being on
+        _Assert.IsFalse(Voucher."Spfy Send from Shopify", 'BC delivery on must disable Shopify delivery independently of the POS setting.');
+        _Assert.IsTrue(Voucher."Send via E-mail", 'BC delivery on must enable email on the issued voucher.');
+        _Assert.AreEqual('buyer@example.com', Voucher."E-mail", 'The issued voucher must retain the buyer email.');
+    end;
+
+    [Test]
+    procedure EcomVoucher_BCDeliveryOn_UsesCheckoutRecipient()
+    var
+        VoucherType: Record "NPR NpRv Voucher Type";
+        LogEntry: Record "NPR Spfy Event Log Entry";
+        Voucher: Record "NPR NpRv Voucher";
+        OrderResponse: JsonToken;
+        BuyerNo: Code[20];
+        Attributes: JsonToken;
+        Recipient: JsonObject;
+    begin
+        // [SCENARIO] BC emails the checkout recipient while keeping the buyer as the voucher customer.
+        // [GIVEN] A buyer orders an NP voucher for Jane with BC delivery enabled
+        BuyerNo := SetupEcomVoucherDeliveryOrder('941640000005', VoucherType, LogEntry, OrderResponse);
+        VoucherType."Spfy Send Vouchers from BC" := true;
+        VoucherType.Modify();
+        OrderResponse.SelectToken('data.order.lineItems[0].node.customAttributes', Attributes);
+        Recipient.Add('key', 'recipient_email');
+        Recipient.Add('value', 'jane@example.com');
+        Attributes.AsArray().Add(Recipient);
+
+        // [WHEN] The Shopify order is imported and the voucher is issued
+        ImportAndIssueEcomVoucher(LogEntry, OrderResponse, Voucher);
+
+        // [THEN] BC email is enabled for Jane and the voucher belongs to the buyer
+        _Assert.AreEqual('jane@example.com', Voucher."E-mail", 'The voucher email must be the checkout recipient.');
+        _Assert.AreEqual(BuyerNo, Voucher."Customer No.", 'The voucher customer must remain the buyer.');
+        _Assert.IsTrue(Voucher."Send via E-mail", 'The issued voucher must be marked for BC email.');
+        _Assert.IsFalse(Voucher."Spfy Send from Shopify", 'Shopify must not also send the voucher.');
+    end;
+
+    local procedure SetupEcomVoucherDeliveryOrder(ShopifyOrderId: Text[30]; var VoucherType: Record "NPR NpRv Voucher Type"; var LogEntry: Record "NPR Spfy Event Log Entry"; var OrderResponse: JsonToken): Code[20]
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        NpEcStore: Record "NPR NpEc Store";
+        Customer: Record Customer;
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        ItemNo: Code[20];
+        LineJson: Text;
+    begin
+        LibrarySpfyImport.SetupSimpleItemOrder(StoreCode, Sku, ItemNo);
+        NpEcStore.SetRange("Shopify Store Code", StoreCode);
+        NpEcStore.SetRange("Shopify Source Name", 'web');
+        NpEcStore.FindFirst();
+        Customer.Get(NpEcStore."Spfy Customer No.");
+        Customer."E-Mail" := 'buyer@example.com';
+        Customer.Modify();
+
+        LibraryPOSMasterData.CreateDefaultVoucherType(VoucherType, false);
+        VoucherType."Integrate with Shopify" := false;
+        VoucherType."Spfy Send Vouchers from BC" := false;
+        VoucherType."Spfy Send from Shopify" := false;
+        VoucherType.Modify();
+        ShopifyStore.Get(StoreCode);
+        ShopifyStore."Voucher Type (Sold at Shopify)" := VoucherType.Code;
+        ShopifyStore.Modify();
+
+        LibrarySpfyImport.InitLogEntry(LogEntry, StoreCode, ShopifyOrderId);
+        LineJson := LibrarySpfyImport.ItemLineNodeText(ShopifyOrderId, Sku, 100, 1, '[]');
+        OrderResponse := LibrarySpfyImport.WrapOrderText(LogEntry."Shopify ID", '[' + LineJson + ']', '[]');
+        AddCustomAttributes(OrderResponse, 'data.order.lineItems[0].node', '[{"key":"is_giftcard","value":"true"}]');
+        exit(Customer."No.");
+    end;
+
+    local procedure ImportAndIssueEcomVoucher(var LogEntry: Record "NPR Spfy Event Log Entry"; OrderResponse: JsonToken; var Voucher: Record "NPR NpRv Voucher")
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        VoucherLink: Record "NPR Ecom Sales Voucher Link";
+        SpfyEcomSalesDocImport: Codeunit "NPR Spfy Ecom Sales Doc Import";
+        EcomCreateVchrImpl: Codeunit "NPR EcomCreateVchrImpl";
+    begin
+        _Assert.IsTrue(SpfyEcomSalesDocImport.CreateEcommerceDocumentFromJson(LogEntry, OrderResponse, EcomSalesHeader), 'The Shopify order must import successfully.');
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetRange(Type, EcomSalesLine.Type::Voucher);
+        _Assert.AreEqual(1, EcomSalesLine.Count(), 'The order must contain exactly one voucher line.');
+        EcomSalesLine.FindFirst();
+        EcomSalesLine.Captured := true;
+        EcomSalesLine.Modify();
+        _Assert.IsTrue(EcomCreateVchrImpl.Process(EcomSalesLine), 'The imported voucher line must be processed successfully.');
+        VoucherLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+        _Assert.AreEqual(1, VoucherLink.Count(), 'The imported line must issue exactly one voucher.');
+        VoucherLink.FindFirst();
+        Voucher.Get(VoucherLink."Voucher No.");
+        Voucher.CalcFields("Initial Amount");
+        _Assert.AreEqual(100, Voucher."Initial Amount", 'The voucher must have an issued balance.');
+    end;
+
+    [Test]
+    procedure LegacyVoucher_BCDeliveryOff_UsesShopify()
+    var
+        SalesHeader: Record "Sales Header";
+        VoucherType: Record "NPR NpRv Voucher Type";
+        Voucher: Record "NPR NpRv Voucher";
+        Order: JsonToken;
+    begin
+        // [SCENARIO] A Shopify NP voucher keeps Shopify delivery when BC delivery is disabled.
+        // [GIVEN] An NP voucher order with both voucher-type delivery flags disabled
+        SetupLegacyVoucherDelivery('941640000001', SalesHeader, VoucherType, Order);
+        VoucherType."Spfy Send Vouchers from BC" := false;
+        VoucherType."Spfy Send from Shopify" := false;
+        VoucherType.Modify();
+
+        // [WHEN] The legacy import creates the order line and the order is posted
+        ImportAndPostLegacyVoucher(SalesHeader, Order, Voucher);
+
+        // [THEN] The issued voucher uses Shopify delivery and retains the buyer email
+        _Assert.IsTrue(Voucher."Spfy Send from Shopify", 'Shopify must deliver when BC delivery is disabled.');
+        _Assert.IsFalse(Voucher."Send via E-mail", 'BC must not email a voucher delivered by Shopify.');
+        _Assert.AreEqual('buyer@npretail.test', Voucher."E-mail", 'The buyer email must survive import and posting.');
+    end;
+
+    [Test]
+    procedure LegacyVoucher_BCDeliveryOn_UsesBCEmail()
+    var
+        SalesHeader: Record "Sales Header";
+        VoucherType: Record "NPR NpRv Voucher Type";
+        Voucher: Record "NPR NpRv Voucher";
+        Order: JsonToken;
+    begin
+        // [SCENARIO] A Shopify NP voucher uses BC email when BC delivery is enabled.
+        // [GIVEN] An NP voucher order with both voucher-type delivery flags enabled
+        SetupLegacyVoucherDelivery('941640000002', SalesHeader, VoucherType, Order);
+        VoucherType."Spfy Send Vouchers from BC" := true;
+        VoucherType."Spfy Send from Shopify" := true;
+        VoucherType.Modify();
+
+        // [WHEN] The legacy import creates the order line and the order is posted
+        ImportAndPostLegacyVoucher(SalesHeader, Order, Voucher);
+
+        // [THEN] The issued voucher uses BC email independently of the POS delivery setting
+        _Assert.IsFalse(Voucher."Spfy Send from Shopify", 'Shopify must not deliver when BC delivery is enabled.');
+        _Assert.IsTrue(Voucher."Send via E-mail", 'BC email must be enabled on the issued voucher.');
+        _Assert.AreEqual('buyer@npretail.test', Voucher."E-mail", 'The buyer email must survive import and posting.');
+    end;
+
+    local procedure SetupLegacyVoucherDelivery(ShopifyOrderId: Text[30]; var SalesHeader: Record "Sales Header"; var VoucherType: Record "NPR NpRv Voucher Type"; var Order: JsonToken)
+    var
+        Customer: Record Customer;
+        ShopifyStore: Record "NPR Spfy Store";
+        LibrarySales: Codeunit "Library - Sales";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        OrderLine: JsonObject;
+        Properties: JsonArray;
+        Property: JsonObject;
+        OrderLineText: Text;
+    begin
+        LibrarySales.CreateCustomer(Customer);
+        Customer."E-Mail" := 'buyer@npretail.test';
+        Customer.Modify();
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, Customer."No.");
+        SalesHeader."NPR External Order No." := ShopifyOrderId;
+        SalesHeader.Modify();
+
+        LibraryPOSMasterData.CreateDefaultVoucherType(VoucherType, false);
+        VoucherType."Integrate with Shopify" := false;
+        VoucherType."Spfy Auto-Fulfill" := true;
+        VoucherType.Modify();
+        LibrarySpfyImport.CreateStore('SPFYBCDELIVERY');
+        ShopifyStore.Get('SPFYBCDELIVERY');
+        ShopifyStore."Voucher Type (Sold at Shopify)" := VoucherType.Code;
+        ShopifyStore.Modify();
+
+        OrderLine.ReadFrom(LibrarySpfyImport.LegacyOrderLineText(ShopifyOrderId, '', 100, 1, 1, '', false));
+        Property.Add('name', 'is_giftcard');
+        Property.Add('value', 'true');
+        Properties.Add(Property);
+        OrderLine.Replace('properties', Properties);
+        OrderLine.WriteTo(OrderLineText);
+        Order := LibrarySpfyImport.LegacyOrderJson(ShopifyOrderId, OrderLineText, '');
+    end;
+
+    local procedure ImportAndPostLegacyVoucher(var SalesHeader: Record "Sales Header"; Order: JsonToken; var Voucher: Record "NPR NpRv Voucher")
+    var
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+        OrderMgt: Codeunit "NPR Spfy Order Mgt.";
+        LibrarySales: Codeunit "Library - Sales";
+        DeliverySubscriber: Codeunit "NPR Spfy Order Import Tests";
+        InvoiceNo: Code[20];
+    begin
+        OrderMgt.UpsertSalesLines('SPFYBCDELIVERY', Order, SalesHeader, true);
+        BindSubscription(DeliverySubscriber);
+        InvoiceNo := LibrarySales.PostSalesDocument(SalesHeader, true, true);
+        UnbindSubscription(DeliverySubscriber);
+
+        VoucherEntry.SetRange("Document Type", VoucherEntry."Document Type"::Invoice);
+        VoucherEntry.SetRange("Document No.", InvoiceNo);
+        VoucherEntry.SetRange("Entry Type", VoucherEntry."Entry Type"::"Issue Voucher");
+        _Assert.AreEqual(1, VoucherEntry.Count(), 'The imported order must issue exactly one voucher.');
+        VoucherEntry.FindFirst();
+        Voucher.Get(VoucherEntry."Voucher No.");
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnAfterSendSalesDocVoucherSelection', '', false, false)]
+    local procedure SkipLegacyVoucherDeliveryDuringTest(var VoucherEntry: Record "NPR NpRv Voucher Entry"; var SalesHeader: Record "Sales Header"; SalesInvHdrNo: Code[20]; SalesCrMemoNo: Code[20])
+    begin
+        if SalesHeader."NPR External Order No." in ['941640000001', '941640000002'] then
+            VoucherEntry.SetRange("Entry No.", 0);
+    end;
+
+    [Test]
     procedure GiftCardSearchBoundUsesCreatedAtNotUpdatedAt()
     var
         TempSpfyFulfillmentBuffer: Record "NPR Spfy Fulfillment Buffer" temporary;

@@ -262,6 +262,22 @@
             Caption = 'Send from Shopify';
             DataClassification = CustomerContent;
         }
+        field(270; "Spfy Send Vouchers from BC"; Boolean)
+        {
+            Caption = 'Send Shopify Vouchers from BC';
+            DataClassification = CustomerContent;
+            InitValue = false;
+
+            trigger OnValidate()
+            var
+                EnableBCDeliveryQst: Label 'BC requires a voucher email template. At posting, BC emails the checkout recipient (or the buyer if no recipient was entered), regardless of the scheduled send date. Shopify creates the gift card without linking it to the buyer. If Digital Notification handles vouchers and this voucher type has a PDF Designer template, only the buyer receives the voucher in the order manifest. Continue?';
+            begin
+                CheckVoucherEmailTemplate();
+                if "Spfy Send Vouchers from BC" and not xRec."Spfy Send Vouchers from BC" and GuiAllowed then
+                    if not Confirm(EnableBCDeliveryQst, false) then
+                        Error('');
+            end;
+        }
 #endif
         field(300; "Voucher Message"; Text[250])
         {
@@ -417,6 +433,18 @@
         SpfyStore.SetLoadFields(Code);
         if SpfyStore.FindFirst() then
             Error(StoreCodeMissingErr, SpfyStore.Code);
+    end;
+
+    local procedure CheckVoucherEmailTemplate()
+    var
+        NewEmailExpFeature: Codeunit "NPR NewEmailExpFeature";
+    begin
+        if not "Spfy Send Vouchers from BC" then
+            exit;
+        if NewEmailExpFeature.IsFeatureEnabled() then
+            TestField("E-mail Template Id")
+        else
+            TestField("E-mail Template Code");
     end;
 #endif
 }

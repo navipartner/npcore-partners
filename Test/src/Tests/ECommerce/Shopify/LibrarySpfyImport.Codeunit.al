@@ -273,7 +273,7 @@ codeunit 85465 "NPR Library Spfy Import"
             '"isGiftCard":false,' +
             '"product":{"id":"gid://shopify/Product/1","productType":"snowboard"},' +
             '"variant":{"price":"' + Amount + '"},' +
-            '"originalUnitPriceSet":{"presentmentMoney":{"amount":"' + Amount + '"}},' +
+            '"originalUnitPriceSet":{"presentmentMoney":{"amount":"' + Amount + '"},"shopMoney":{"amount":"' + Amount + '"}},' +
             '"taxLines":[],"discountAllocations":' + DiscountAllocText +
             '}}');
     end;
