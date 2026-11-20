@@ -915,6 +915,144 @@ codeunit 85183 "NPR TM TicketDeferRevenueTest"
         Assert.AreEqual(RequestB.Status::PENDING_DEFERRAL, RequestB.Status, 'The request in the failing batch should still be PENDING_DEFERRAL.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ForcedDeferredRequest_InlineProfile_ProcessOneDoesNotPostAgain()
+    var
+        Assert: Codeunit Assert;
+        Item: Record Item;
+        DeferRevenueRequest: Record "NPR TM DeferRevenueRequest";
+        GLEntry: Record "G/L Entry";
+        DeferRevenue: Codeunit "NPR TM RevenueDeferral";
+        SalesReceiptNo: Code[20];
+        PostedDeferralDocumentNo: Code[20];
+        AchievedRevenueAccount: Code[20];
+        LastGLEntryNo: Integer;
+    begin
+        // [SCENARIO] Defer Revenue on a force-deferred request with an inline profile posts nothing and leaves the request unchanged
+        Initialize();
+        ParkForeignPendingRequests();
+        AllowAnyPostingDate();
+
+        // [GIVEN] One ticket sold on one receipt, its request WAITING
+        Item.Get(SelectSmokeTestScenario());
+        ConfigureItem(Item, true, 148.22);
+        SalesReceiptNo := SellAndPostTicket(Item, 1);
+        TriggerDeferral();
+        AssertRequestsWaitingForReceipt(SalesReceiptNo, 1);
+
+        // [GIVEN] The ticket expired yesterday without admission, and the batch force-deferred and posted the request
+        SetRequestDatesForReceipt(SalesReceiptNo, Today() - 1, 0D);
+        TriggerDeferral();
+        FilterRequestsForReceipt(SalesReceiptNo, DeferRevenueRequest);
+        DeferRevenueRequest.FindFirst();
+        Assert.AreEqual(DeferRevenueRequest.Status::DEFERRED_FORCED, DeferRevenueRequest.Status, 'Status should be DEFERRED_FORCED for an expired ticket.');
+        Assert.AreEqual(SalesReceiptNo, DeferRevenueRequest.DeferralDocumentNo, 'An inline profile should post under the sales receipt number.');
+        Assert.AreEqual(Today() - 1, DeferRevenueRequest.DeferralPostingDate, 'DeferralPostingDate should be the TicketValidUntil date.');
+        GLEntry.SetFilter("G/L Account No.", '=%1', DeferRevenueRequest.AchievedRevenueAccount);
+        GLEntry.SetFilter("Document No.", '=%1', DeferRevenueRequest.DeferralDocumentNo);
+        GLEntry.SetFilter("Posting Date", '=%1', Today() - 1);
+        Assert.AreEqual(1, GLEntry.Count(), 'The forced deferral should be posted once to the achieved revenue account.');
+        PostedDeferralDocumentNo := DeferRevenueRequest.DeferralDocumentNo;
+        AchievedRevenueAccount := DeferRevenueRequest.AchievedRevenueAccount;
+
+        // [GIVEN] The last G/L entry before Defer Revenue runs
+        GLEntry.Reset();
+        GLEntry.FindLast();
+        LastGLEntryNo := GLEntry."Entry No.";
+
+        // [WHEN] Defer Revenue runs on the request
+        DeferRevenue.ProcessOne(DeferRevenueRequest);
+
+        // [THEN] Nothing is posted to the request's achieved revenue account
+        GLEntry.Reset();
+        GLEntry.SetFilter("Entry No.", '>%1', LastGLEntryNo);
+        GLEntry.SetFilter("G/L Account No.", '=%1', AchievedRevenueAccount);
+        Assert.RecordIsEmpty(GLEntry);
+
+        // [THEN] The request keeps its Status, DeferralDocumentNo and DeferralPostingDate
+        DeferRevenueRequest.Get(DeferRevenueRequest.TicketAccessEntryNo);
+        Assert.AreEqual(DeferRevenueRequest.Status::DEFERRED_FORCED, DeferRevenueRequest.Status, 'Status should stay DEFERRED_FORCED.');
+        Assert.AreEqual(PostedDeferralDocumentNo, DeferRevenueRequest.DeferralDocumentNo, 'DeferralDocumentNo should not change.');
+        Assert.AreEqual(Today() - 1, DeferRevenueRequest.DeferralPostingDate, 'DeferralPostingDate should not change.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ForcedDeferredRequest_UncompressedProfile_ProcessOneDoesNotPostAgain()
+    var
+        Assert: Codeunit Assert;
+        Item: Record Item;
+        Profile: Record "NPR TM DeferRevenueProfile";
+        TicketType: Record "NPR TM Ticket Type";
+        DeferRevenueRequest: Record "NPR TM DeferRevenueRequest";
+        GLEntry: Record "G/L Entry";
+        DeferRevenue: Codeunit "NPR TM RevenueDeferral";
+        LibraryUtility: Codeunit "Library - Utility";
+        SalesReceiptNo: Code[20];
+        PostedDeferralDocumentNo: Code[20];
+        AchievedRevenueAccount: Code[20];
+        LastGLEntryNo: Integer;
+    begin
+        // [SCENARIO] Defer Revenue on a force-deferred request with a numbered uncompressed profile posts nothing and leaves the request unchanged
+        Initialize();
+        ParkForeignPendingRequests();
+        AllowAnyPostingDate();
+
+        // [GIVEN] An uncompressed deferral profile with a number series on the ticket type
+        CopyDeferralProfile('TMDEFERN', Profile);
+        Profile.PostingMode := Profile.PostingMode::UNCOMPRESSED;
+        Profile.NoSeries := LibraryUtility.GetGlobalNoSeriesCode();
+        Profile.Modify();
+
+        Item.Get(SelectSmokeTestScenario());
+        ConfigureItem(Item, true, 148.22);
+        TicketType.Get(Item."NPR Ticket Type");
+        TicketType.DeferRevenueProfileCode := Profile.DeferRevenueProfileCode;
+        TicketType.Modify();
+
+        // [GIVEN] One ticket sold on one receipt, its request WAITING
+        SalesReceiptNo := SellAndPostTicket(Item, 1);
+        TriggerDeferral();
+        AssertRequestsWaitingForReceipt(SalesReceiptNo, 1);
+
+        // [GIVEN] The ticket expired yesterday without admission, and the batch force-deferred and posted the request
+        SetRequestDatesForReceipt(SalesReceiptNo, Today() - 1, 0D);
+        TriggerDeferral();
+        FilterRequestsForReceipt(SalesReceiptNo, DeferRevenueRequest);
+        DeferRevenueRequest.FindFirst();
+        Assert.AreEqual(DeferRevenueRequest.Status::DEFERRED_FORCED, DeferRevenueRequest.Status, 'Status should be DEFERRED_FORCED for an expired ticket.');
+        Assert.AreEqual(Profile.DeferRevenueProfileCode, DeferRevenueRequest.DeferRevenueProfileCode, 'The request should use the uncompressed profile.');
+        Assert.AreNotEqual(SalesReceiptNo, DeferRevenueRequest.DeferralDocumentNo, 'A numbered profile should post under a number from its series.');
+        Assert.AreEqual(Today() - 1, DeferRevenueRequest.DeferralPostingDate, 'DeferralPostingDate should be the TicketValidUntil date.');
+        GLEntry.SetFilter("G/L Account No.", '=%1', DeferRevenueRequest.AchievedRevenueAccount);
+        GLEntry.SetFilter("Document No.", '=%1', DeferRevenueRequest.DeferralDocumentNo);
+        GLEntry.SetFilter("Posting Date", '=%1', Today() - 1);
+        Assert.AreEqual(1, GLEntry.Count(), 'The forced deferral should be posted once to the achieved revenue account.');
+        PostedDeferralDocumentNo := DeferRevenueRequest.DeferralDocumentNo;
+        AchievedRevenueAccount := DeferRevenueRequest.AchievedRevenueAccount;
+
+        // [GIVEN] The last G/L entry before Defer Revenue runs
+        GLEntry.Reset();
+        GLEntry.FindLast();
+        LastGLEntryNo := GLEntry."Entry No.";
+
+        // [WHEN] Defer Revenue runs on the request
+        DeferRevenue.ProcessOne(DeferRevenueRequest);
+
+        // [THEN] Nothing is posted to the request's achieved revenue account
+        GLEntry.Reset();
+        GLEntry.SetFilter("Entry No.", '>%1', LastGLEntryNo);
+        GLEntry.SetFilter("G/L Account No.", '=%1', AchievedRevenueAccount);
+        Assert.RecordIsEmpty(GLEntry);
+
+        // [THEN] The request keeps its Status, DeferralDocumentNo and DeferralPostingDate
+        DeferRevenueRequest.Get(DeferRevenueRequest.TicketAccessEntryNo);
+        Assert.AreEqual(DeferRevenueRequest.Status::DEFERRED_FORCED, DeferRevenueRequest.Status, 'Status should stay DEFERRED_FORCED.');
+        Assert.AreEqual(PostedDeferralDocumentNo, DeferRevenueRequest.DeferralDocumentNo, 'DeferralDocumentNo should not change.');
+        Assert.AreEqual(Today() - 1, DeferRevenueRequest.DeferralPostingDate, 'DeferralPostingDate should not change.');
+    end;
+
     local procedure Initialize()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";

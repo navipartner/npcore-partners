@@ -422,7 +422,7 @@ EventDate: Date) ValidRequest: Boolean
         DeferRevenueProfile: Record "NPR TM DeferRevenueProfile";
     begin
         Handled := False;
-        if (DeferRevenueRequest.Status in [DeferRevenueRequest.Status::UNRESOLVED, DeferRevenueRequest.Status::DEFERRED, DeferRevenueRequest.Status::IMMEDIATE, DeferRevenueRequest.Status::DEFERRAL_ABORTED]) then
+        if (DeferRevenueRequest.Status in [DeferRevenueRequest.Status::UNRESOLVED, DeferRevenueRequest.Status::DEFERRED, DeferRevenueRequest.Status::DEFERRED_FORCED, DeferRevenueRequest.Status::IMMEDIATE, DeferRevenueRequest.Status::DEFERRAL_ABORTED]) then
             exit;
 
         if (not TicketReservationRequest.Get(DeferRevenueRequest.ReservationRequestEntryNo)) then
