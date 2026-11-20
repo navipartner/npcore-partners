@@ -90,14 +90,18 @@ codeunit 85576 "NPR Spfy Ord Amt Billing Tests"
         SalesHeader: Record "Sales Header";
         OrderPaymentLine: Record "NPR Magento Payment Line";
         InvoicePaymentLine: Record "NPR Magento Payment Line";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt.";
         InvoiceNo: Code[20];
         StartEntryNo: BigInteger;
+        ShopifyOrderId: Text[30];
     begin
         // [SCENARIO] A Shopify payment line posted before any capture was confirmed is still billed at posting, once in each currency, each event with its own amount and currency.
         Initialize();
 
-        // [GIVEN] A sales order paid by a Shopify card line that has not been captured, worth 400 in the EUR shop currency
+        // [GIVEN] A sales order of a Shopify order, paid by a Shopify card line that has not been captured, worth 400 in the EUR shop currency
         CreateOrder(SalesHeader, 300, 0);
+        ShopifyOrderId := '171000000004';
+        SpfyAssignedIDMgt.AssignShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyOrderId, false);
         AddShopifyCardLine(SalesHeader, OrderPaymentLine);
         OrderPaymentLine."Amount (Store Currency)" := 400;
         OrderPaymentLine."Requested Amt. (Store Curr.)" := 400;
@@ -118,6 +122,8 @@ codeunit 85576 "NPR Spfy Ord Amt Billing Tests"
         // [THEN] Each event names its own currency: the document's for the presentment event, the shop's for the shop currency event
         _Assert.AreEqual(OrderPaymentLine.TransactionCurrencyCode(false), _LibBilling.AmountQueueEntryMetadata(InvoicePaymentLine."NPR Spfy Ord.Amt.PCY Event Id", 'currency'), 'The presentment currency event must carry the currency of the document.');
         _Assert.AreEqual('EUR', _LibBilling.AmountQueueEntryMetadata(InvoicePaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id", 'currency'), 'The shop currency event must carry the shop currency.');
+        // [THEN] Both events carry the order id that posting copied to the invoice, and are marked as billed on posting and not as a voucher
+        AssertAmountEventMetadata(InvoicePaymentLine, ShopifyOrderId, TransactionId(), 'posting', false);
     end;
 
     [Test]
@@ -166,6 +172,127 @@ codeunit 85576 "NPR Spfy Ord Amt Billing Tests"
         // [THEN] Both amount events carry the store code
         _Assert.AreEqual(StoreCode, _LibBilling.AmountQueueEntryMetadata(PaymentLine."NPR Spfy Ord.Amt.PCY Event Id", 'shopify_store_code'), 'The presentment currency event must name the Shopify store of the order.');
         _Assert.AreEqual(StoreCode, _LibBilling.AmountQueueEntryMetadata(PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id", 'shopify_store_code'), 'The shop currency event must name the Shopify store of the order.');
+    end;
+
+    [Test]
+    procedure LineCapturedOnSalesOrder_AmountEventsCarryOrderTransactionAndCapture()
+    var
+        SalesHeader: Record "Sales Header";
+        PaymentLine: Record "NPR Magento Payment Line";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt.";
+        ShopifyOrderId: Text[30];
+    begin
+        // [SCENARIO] A Shopify card payment captured on its sales order is billed with the Shopify order id and the payment transaction id, so a billed amount can be traced back to its order, and is marked as billed on capture.
+        Initialize();
+
+        // [GIVEN] A sales order imported from a Shopify order, paid by a Shopify card line
+        CreateOrder(SalesHeader, 300, 0);
+        ShopifyOrderId := '171000000001';
+        SpfyAssignedIDMgt.AssignShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyOrderId, false);
+        AddShopifyCardLine(SalesHeader, PaymentLine);
+
+        // [WHEN] Its capture is confirmed
+        ConfirmCapture(PaymentLine);
+
+        // [THEN] Both amount events carry the Shopify order id and the transaction id, are marked as billed on capture and not as a voucher
+        AssertAmountEventMetadata(PaymentLine, ShopifyOrderId, TransactionId(), 'capture', false);
+    end;
+
+    [Test]
+    procedure GiftCardLinePosted_AmountEventsCarryOrderTransactionPostingAndVoucher()
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
+        ShopifyOrderId: Text[30];
+    begin
+        // [SCENARIO] A Shopify gift card payment line billed at posting takes the Shopify order id from the posted invoice, which posting copies from the sales order, and is marked as a voucher billed on posting.
+        Initialize();
+
+        // [GIVEN] A posted Shopify gift card payment line whose invoice carries the Shopify order id
+        CreatePostedInvoicePaymentLine(PaymentLine, 500, 400);
+        PaymentLine."Payment Type" := PaymentLine."Payment Type"::Voucher;
+        PaymentLine.Modify();
+        ShopifyOrderId := '171000000002';
+        LibrarySpfyImport.InsertPostedSalesInvoiceWithShopifyId(PaymentLine."Document No.", ShopifyOrderId);
+
+        // [WHEN] Its billing events are registered, as posting the line does
+        SpfyPaymentGatewayHdlr.RegisterBillingEvents(PaymentLine);
+
+        // [THEN] Both amount events carry the Shopify order id and the transaction id, are marked as billed on posting and as a voucher
+        AssertAmountEventMetadata(PaymentLine, ShopifyOrderId, TransactionId(), 'posting', true);
+    end;
+
+    [Test]
+    procedure LineCapturedOnEcomDocument_AmountEventsCarryOrderTransactionAndCapture()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        PaymentLine: Record "NPR Magento Payment Line";
+    begin
+        // [SCENARIO] A Shopify card payment captured while its line still belongs to the ecommerce document is billed with the Shopify order id of the order's event log entry, and is marked as billed on capture.
+        Initialize();
+
+        // [GIVEN] A Shopify order on the ecommerce route with a Shopify card payment line of 200 still on the ecommerce document
+        CreateShopifyEcomOrder(EcomSalesHeader);
+        CreateEcomDocumentPaymentLine(EcomSalesHeader, PaymentLine, 200);
+
+        // [WHEN] Its capture is confirmed
+        ConfirmCapture(PaymentLine);
+
+        // [THEN] Both amount events carry the Shopify order id and the transaction id, are marked as billed on capture and not as a voucher
+        AssertAmountEventMetadata(PaymentLine, EcomSalesHeader."External No.", TransactionId(), 'capture', false);
+    end;
+
+    [Test]
+    procedure OrderCountEvent_CarriesTheShopifyOrder()
+    var
+        SpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        ShopifyOrderId: Text[30];
+    begin
+        // [SCENARIO] The order count event carries the Shopify order id under the same key as the amount events, so the count and the amounts of one order can be joined in the billing database.
+        Initialize();
+
+        // [GIVEN] An imported Shopify order
+        ShopifyOrderId := '171000000003';
+        LibrarySpfyImport.InsertOrderLogEntry(SpfyEventLogEntry, 'SPFYBILL', ShopifyOrderId, "NPR SpfyEventLogDocType"::Order, "NPR SpfyAPIDocumentStatus"::Open, CurrentDateTime());
+
+        // [WHEN] Its order count event is registered
+        SpfyEventLogEntry.RegisterEvent(SpfyEventLogEntry);
+
+        // [THEN] The event carries the Shopify order id and is marked as an order
+        _Assert.AreEqual(ShopifyOrderId, _LibBilling.AmountQueueEntryMetadata(SpfyEventLogEntry.SystemId, 'external_no'), 'The order count event must name the Shopify order.');
+        _Assert.AreEqual('order', _LibBilling.AmountQueueEntryMetadata(SpfyEventLogEntry.SystemId, 'document_type'), 'The order count event of an order must be marked as an order.');
+    end;
+
+    [Test]
+    procedure ReturnFinalizedOnEcomRoute_CountEventIsMarkedAsReturn()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        SalesHeader: Record "Sales Header";
+        SpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyEventLogDocProcessr: Codeunit "NPR Spfy Event Log DocProcessr";
+        ShopifyReturnId: Text[30];
+    begin
+        // [SCENARIO] A Shopify return processed on the ecommerce route also registers an order count event, with the Shopify return id. The event is marked as a return, so the billing side can tell it from an order that was never paid.
+        Initialize();
+
+        // [GIVEN] A Shopify return on the ecommerce route, with its event log entry
+        ShopifyReturnId := '172000000001';
+        EcomSalesHeader.Init();
+        EcomSalesHeader."External No." := ShopifyReturnId;
+        EcomSalesHeader."Document Type" := EcomSalesHeader."Document Type"::"Return Order";
+        EcomSalesHeader.Insert(false);
+        LibrarySpfyImport.InsertOrderLogEntry(SpfyEventLogEntry, 'SPFYBILL', ShopifyReturnId, "NPR SpfyEventLogDocType"::"Return Order", "NPR SpfyAPIDocumentStatus"::Closed, CurrentDateTime());
+
+        // [WHEN] The return order created from it is finalized
+        SalesHeader."Document Type" := SalesHeader."Document Type"::"Return Order";
+        SpfyEventLogDocProcessr.FinalizeSalesOrder(SalesHeader, EcomSalesHeader);
+
+        // [THEN] The count event carries the Shopify return id and is marked as a return
+        _Assert.AreEqual(ShopifyReturnId, _LibBilling.AmountQueueEntryMetadata(SpfyEventLogEntry.SystemId, 'external_no'), 'The count event of a return must name the Shopify return.');
+        _Assert.AreEqual('return', _LibBilling.AmountQueueEntryMetadata(SpfyEventLogEntry.SystemId, 'document_type'), 'The count event of a return must be marked as a return.');
     end;
 
     [Test]
@@ -649,5 +776,30 @@ codeunit 85576 "NPR Spfy Ord Amt Billing Tests"
     local procedure TransactionId(): Text[30]
     begin
         exit(Format(170000000 + _TransactionNo, 0, 9));
+    end;
+
+    local procedure AssertAmountEventMetadata(PaymentLine: Record "NPR Magento Payment Line"; ShopifyOrderId: Text; ShopifyTransactionId: Text; BilledOn: Text; Voucher: Boolean)
+    begin
+        _Assert.AreEqual(ShopifyOrderId, _LibBilling.AmountQueueEntryMetadata(PaymentLine."NPR Spfy Ord.Amt.PCY Event Id", 'external_no'), 'The presentment currency event must name the Shopify order.');
+        _Assert.AreEqual(ShopifyOrderId, _LibBilling.AmountQueueEntryMetadata(PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id", 'external_no'), 'The shop currency event must name the Shopify order.');
+        _Assert.AreEqual(ShopifyTransactionId, _LibBilling.AmountQueueEntryMetadata(PaymentLine."NPR Spfy Ord.Amt.PCY Event Id", 'shopify_transaction_id'), 'The presentment currency event must name the Shopify payment transaction.');
+        _Assert.AreEqual(ShopifyTransactionId, _LibBilling.AmountQueueEntryMetadata(PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id", 'shopify_transaction_id'), 'The shop currency event must name the Shopify payment transaction.');
+        _Assert.AreEqual(BilledOn, _LibBilling.AmountQueueEntryMetadata(PaymentLine."NPR Spfy Ord.Amt.PCY Event Id", 'billed_on'), 'The presentment currency event must name what billed it.');
+        _Assert.AreEqual(BilledOn, _LibBilling.AmountQueueEntryMetadata(PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id", 'billed_on'), 'The shop currency event must name what billed it.');
+        _Assert.AreEqual(Voucher, AmountQueueEntryMetadataBoolean(PaymentLine."NPR Spfy Ord.Amt.PCY Event Id", 'voucher'), 'The presentment currency event must tell whether a voucher paid it.');
+        _Assert.AreEqual(Voucher, AmountQueueEntryMetadataBoolean(PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id", 'voucher'), 'The shop currency event must tell whether a voucher paid it.');
+    end;
+
+    local procedure AmountQueueEntryMetadataBoolean(EventId: Guid; MetadataKey: Text): Boolean
+    var
+        BillingQueueEntry: Record "NPR Billing Queue Entry";
+        Metadata: JsonObject;
+        MetadataValue: JsonToken;
+    begin
+        BillingQueueEntry.SetRange("Event ID", EventId);
+        BillingQueueEntry.FindFirst();
+        Metadata.ReadFrom(BillingQueueEntry.GetMetadata());
+        Metadata.Get(MetadataKey, MetadataValue);
+        exit(MetadataValue.AsValue().AsBoolean());
     end;
 }

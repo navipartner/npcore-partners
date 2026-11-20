@@ -234,6 +234,12 @@ table 6150989 "NPR Spfy Event Log Entry"
         MetadataJson: JsonObject;
     begin
         MetadataJson.Add('shopify_store_code', Rec."Store Code");
+        MetadataJson.Add('external_no', Rec."Shopify ID");
+        // Return entries register this event too, and their Shopify ID is the return id, not the order id.
+        if Rec."Document Type" = Rec."Document Type"::"Return Order" then
+            MetadataJson.Add('document_type', 'return')
+        else
+            MetadataJson.Add('document_type', 'order');
         EventBillingClient.RegisterEvent(Rec.SystemId, Enum::"NPR Billing Event Type"::ECOM_SHOPIFY_ORDERS_COUNT, 1, MetadataJson.AsToken());
     end;
 #endif

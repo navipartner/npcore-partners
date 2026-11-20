@@ -192,6 +192,16 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
 
         MetadataJson.Add('shopify_store_code', GetShopifyStoreCode(PaymentLine));
         MetadataJson.Add('currency', PaymentLine.TransactionCurrencyCode(false));
+        // References that tie a billed amount to its Shopify order and payment.
+        MetadataJson.Add('external_no', GetDocumentShopifyID(PaymentLine, "NPR Spfy ID Type"::"Entry ID"));
+        MetadataJson.Add('shopify_transaction_id', TransactionID);
+        // Posting marks the line as posted before billing it, and the capture paths never bill a posted line.
+        if PaymentLine.Posted then
+            MetadataJson.Add('billed_on', 'posting')
+        else
+            MetadataJson.Add('billed_on', 'capture');
+        // Vouchers (Shopify gift cards) are also billed when sold, so amounts paid with one can be billed twice.
+        MetadataJson.Add('voucher', PaymentLine."Payment Type" = PaymentLine."Payment Type"::Voucher);
         // The event ids are stored on the line, so the copy made at posting carries them and registering it again adds nothing.
         // A line re-created for a transaction whose billed line was deleted takes over the ids kept from it.
         // The presentment id is seeded with SystemId, the key used before it was stored, so a line already registered that way is not billed twice.
@@ -324,6 +334,14 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
     end;
 
     local procedure GetShopifyStoreCode(PaymentLine: Record "NPR Magento Payment Line"): Code[20]
+    begin
+        exit(CopyStr(GetDocumentShopifyID(PaymentLine, "NPR Spfy ID Type"::"Store Code"), 1, 20));
+    end;
+
+    /// <summary>
+    /// Returns the Shopify store code ("Store Code") or the Shopify order id ("Entry ID") of the document the payment line belongs to, or '' when it has none.
+    /// </summary>
+    local procedure GetDocumentShopifyID(PaymentLine: Record "NPR Magento Payment Line"; ShopifyIDType: Enum "NPR Spfy ID Type"): Text
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         SalesHeader: Record "Sales Header";
@@ -332,32 +350,37 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
         SpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyEcomSalesDocPrcssr: Codeunit "NPR Spfy Event Log DocProcessr";
-        ShopifyStoreCode: Text;
+        ShopifyID: Text;
     begin
         case PaymentLine."Document Table No." of
             Database::"Sales Header":
                 begin
                     SalesHeader."Document Type" := PaymentLine."Document Type";
                     SalesHeader."No." := PaymentLine."Document No.";
-                    ShopifyStoreCode := SpfyAssignedIDMgt.GetAssignedShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Store Code");
+                    ShopifyID := SpfyAssignedIDMgt.GetAssignedShopifyID(SalesHeader.RecordId(), ShopifyIDType);
                 end;
             Database::"Sales Invoice Header":
                 begin
                     SalesInvHeader."No." := PaymentLine."Document No.";
-                    ShopifyStoreCode := SpfyAssignedIDMgt.GetAssignedShopifyID(SalesInvHeader.RecordId(), "NPR Spfy ID Type"::"Store Code");
+                    ShopifyID := SpfyAssignedIDMgt.GetAssignedShopifyID(SalesInvHeader.RecordId(), ShopifyIDType);
                 end;
             Database::"Sales Cr.Memo Header":
                 begin
                     SalesCrMemoHeader."No." := PaymentLine."Document No.";
-                    ShopifyStoreCode := SpfyAssignedIDMgt.GetAssignedShopifyID(SalesCrMemoHeader.RecordId(), "NPR Spfy ID Type"::"Store Code");
+                    ShopifyID := SpfyAssignedIDMgt.GetAssignedShopifyID(SalesCrMemoHeader.RecordId(), ShopifyIDType);
                 end;
             // A virtual item is captured while its payment line still belongs to the ecommerce document.
             Database::"NPR Ecom Sales Header":
                 if EcomSalesHeader.GetBySystemId(PaymentLine."NPR Inc Ecom Sale Id") then
                     if SpfyEcomSalesDocPrcssr.GetShopifyLogEntry(EcomSalesHeader, SpfyEventLogEntry) then
-                        ShopifyStoreCode := SpfyEventLogEntry."Store Code";
+                        case ShopifyIDType of
+                            "NPR Spfy ID Type"::"Store Code":
+                                ShopifyID := SpfyEventLogEntry."Store Code";
+                            "NPR Spfy ID Type"::"Entry ID":
+                                ShopifyID := SpfyEventLogEntry."Shopify ID";
+                        end;
         end;
-        exit(CopyStr(ShopifyStoreCode, 1, 20));
+        exit(ShopifyID);
     end;
 #endif
 
