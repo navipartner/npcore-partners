@@ -22,19 +22,19 @@ page 6059798 "NPR E-mail Templ. Reports"
                 {
 
                     ToolTip = 'Specifies the value of the Report ID field';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
                 field(Filename; Rec.Filename)
                 {
 
                     ToolTip = 'Specifies the value of the Filename field';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
                 field("Report Name"; Rec."Report Name")
                 {
 
                     ToolTip = 'Specifies the value of the Report Name field';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
             }
         }

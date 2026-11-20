@@ -5,6 +5,23 @@ codeunit 6059847 "NPR Click & Collect"
     ObsoleteReason = 'This module is no longer being maintained';
     Access = Public;
 
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+    procedure IsNPEmailFeatureEnabled(): Boolean
+    var
+        ClickCollectNPEmailFeature: Codeunit "NPR CnC NP Email Feature";
+    begin
+        exit(ClickCollectNPEmailFeature.IsFeatureEnabled());
+    end;
+
+    procedure IsNPEmailEnabled(): Boolean
+    var
+        NPEmailFeature: Codeunit "NPR NP Email Feature";
+        NewEmailExpFeature: Codeunit "NPR NewEmailExpFeature";
+    begin
+        exit(NPEmailFeature.IsFeatureEnabled() and IsNPEmailFeatureEnabled() and NewEmailExpFeature.IsFeatureEnabled());
+    end;
+#endif
+
     procedure ArchiveCollectDocument(var NpCsDocument: Record "NPR NpCs Document"; DeleteSalesDocument: Boolean): Boolean
     var
         NpCsArchCollectMgt: Codeunit "NPR NpCs Arch. Collect Mgt.";
@@ -166,6 +183,11 @@ codeunit 6059847 "NPR Click & Collect"
 
     [IntegrationEvent(false, false)]
     internal procedure OnNotifyCustomerViaNPEmailOnBeforeSendEmail(RecRef: RecordRef; CustomerEmail: Text[80]; NPEmailTemplate: Record "NPR NPEmailTemplate"; var CustomerNotified: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnNotifyStoreViaNPEmailOnBeforeSendEmail(RecRef: RecordRef; StoreEmail: Text[80]; NPEmailTemplate: Record "NPR NPEmailTemplate"; var StoreNotified: Boolean)
     begin
     end;
 }

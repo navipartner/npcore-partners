@@ -58,6 +58,18 @@ table 6151196 "NPR NpCs Workflow"
             Description = 'NPR5.54';
             TableRelation = "NPR E-mail Template Header".Code WHERE("Table No." = CONST(6151198));
         }
+        field(123; "Store NP Email Templ (Pending)"; Code[20])
+        {
+            Caption = 'Store NP Email Template (Pending)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId WHERE(DataProvider = CONST(CLICK_COLLECT_NOTIFICATION));
+        }
+        field(124; "Store NP Email Templ (Expired)"; Code[20])
+        {
+            Caption = 'Store NP Email Template (Expired)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId WHERE(DataProvider = CONST(CLICK_COLLECT_NOTIFICATION));
+        }
         field(125; "Notify Store via Sms"; Boolean)
         {
             Caption = 'Notify Store via Sms';
@@ -143,6 +155,9 @@ table 6151196 "NPR NpCs Workflow"
         }
         field(500; "Enable NP Email"; Boolean)
         {
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-11-06';
+            ObsoleteReason = 'Use the NP Email for Click & Collect feature in NaviPartner Feature Management.';
             Caption = 'Enable NP Email';
             DataClassification = CustomerContent;
         }

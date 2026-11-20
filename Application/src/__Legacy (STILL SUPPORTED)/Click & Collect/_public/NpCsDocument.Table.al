@@ -99,6 +99,8 @@ table 6151198 "NPR NpCs Document"
                 "NP E-mail Template (Confirmed)" := NpCsStoreWorkflowRelation."NP E-mail Template (Confirmed)";
                 "NP E-mail Template (Rejected)" := NpCsStoreWorkflowRelation."NP E-mail Template (Rejected)";
                 "NP E-mail Template (Expired)" := NpCsStoreWorkflowRelation."NP E-mail Template (Expired)";
+                "Store NP Email Templ (Pending)" := NpCsStoreWorkflowRelation."Store NP Email Templ (Pending)";
+                "Store NP Email Templ (Expired)" := NpCsStoreWorkflowRelation."Store NP Email Templ (Expired)";
                 "Notify Customer via Sms" := NpCsStoreWorkflowRelation."Notify Customer via Sms";
                 "Sms Template (Pending)" := NpCsStoreWorkflowRelation."Sms Template (Pending)";
                 "Sms Template (Confirmed)" := NpCsStoreWorkflowRelation."Sms Template (Confirmed)";
@@ -320,6 +322,9 @@ table 6151198 "NPR NpCs Document"
         }
         field(500; "Enable NP Email"; Boolean)
         {
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-11-06';
+            ObsoleteReason = 'Use the NP Email for Click & Collect feature in NaviPartner Feature Management.';
             Caption = 'Enable NP Email';
             DataClassification = CustomerContent;
         }
@@ -586,6 +591,18 @@ table 6151198 "NPR NpCs Document"
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             TableRelation = "NPR E-mail Template Header".Code WHERE("Table No." = CONST(6151198));
+        }
+        field(421; "Store NP Email Templ (Pending)"; Code[20])
+        {
+            Caption = 'Store NP Email Template (Pending)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId WHERE(DataProvider = CONST(CLICK_COLLECT_NOTIFICATION));
+        }
+        field(422; "Store NP Email Templ (Expired)"; Code[20])
+        {
+            Caption = 'Store NP Email Template (Expired)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId WHERE(DataProvider = CONST(CLICK_COLLECT_NOTIFICATION));
         }
         field(430; "Notify Store via Sms"; Boolean)
         {

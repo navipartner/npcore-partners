@@ -22,6 +22,9 @@ codeunit 6151082 "NPR NPEmailCnCDataProvider" implements "NPR IDynamicTemplateDa
             Error(WrongRecordReceivedErr);
 
         RecRef.SetTable(NpCsDocument);
+        NpCsDocument.CalcFields("To Store Contact Name", "To Store Contact Name 2", "To Store Contact Address 2",
+            "To Store Contact Post Code", "To Store Contact City", "To Store Contact Region Code",
+            "To Store Contact County", "To Store Contact Phone No.", "To Store Contact E-mail");
 
         if not Customer.Get(NpCsDocument.ResolveCustomerNo()) then
             Clear(Customer);
@@ -35,6 +38,18 @@ codeunit 6151082 "NPR NPEmailCnCDataProvider" implements "NPR IDynamicTemplateDa
         JObject.Add('delivery_status', SelectStr(NpCsDocument."Delivery Status" + 1, DeliveryStatusMembersTok));
         JObject.Add('from_store_code', NpCsDocument."From Store Code");
         JObject.Add('to_store_code', NpCsDocument."To Store Code");
+        JObject.Add('opening_hour_set', NpCsDocument."Opening Hour Set");
+        JObject.Add('location_code', NpCsDocument."Location Code");
+        JObject.Add('to_store_contact_name', NpCsDocument."To Store Contact Name");
+        JObject.Add('to_store_contact_name_2', NpCsDocument."To Store Contact Name 2");
+        JObject.Add('to_store_contact_address_2', NpCsDocument."To Store Contact Address 2");
+        JObject.Add('to_store_contact_post_code', NpCsDocument."To Store Contact Post Code");
+        JObject.Add('to_store_contact_city', NpCsDocument."To Store Contact City");
+        JObject.Add('to_store_contact_region_code', NpCsDocument."To Store Contact Region Code");
+        JObject.Add('to_store_contact_county', NpCsDocument."To Store Contact County");
+        JObject.Add('to_store_contact_phone_no', NpCsDocument."To Store Contact Phone No.");
+        JObject.Add('to_store_contact_email', NpCsDocument."To Store Contact E-mail");
+        JObject.Add('document_customer_no', NpCsDocument."Customer No.");
         JObject.Add('customer_no', Customer."No.");
         JObject.Add('sell_to_customer_name', NpCsDocument."Sell-to Customer Name");
         JObject.Add('customer_email', NpCsDocument."Customer E-mail");
@@ -69,6 +84,18 @@ codeunit 6151082 "NPR NPEmailCnCDataProvider" implements "NPR IDynamicTemplateDa
         JObject.Add('delivery_status', 'Ready');
         JObject.Add('from_store_code', 'STORE-DK-01');
         JObject.Add('to_store_code', 'STORE-DK-02');
+        JObject.Add('opening_hour_set', 'STANDARD');
+        JObject.Add('location_code', 'STORE-DK-02');
+        JObject.Add('to_store_contact_name', 'Copenhagen Store');
+        JObject.Add('to_store_contact_name_2', 'Customer Service');
+        JObject.Add('to_store_contact_address_2', 'Ground floor');
+        JObject.Add('to_store_contact_post_code', '1000');
+        JObject.Add('to_store_contact_city', 'Copenhagen');
+        JObject.Add('to_store_contact_region_code', 'DK');
+        JObject.Add('to_store_contact_county', 'Sample County');
+        JObject.Add('to_store_contact_phone_no', '+4587654321');
+        JObject.Add('to_store_contact_email', 'store@example.com');
+        JObject.Add('document_customer_no', 'C-00001');
         JObject.Add('customer_no', 'C-00001');
         JObject.Add('sell_to_customer_name', 'John Doe');
         JObject.Add('customer_email', 'customer@example.com');

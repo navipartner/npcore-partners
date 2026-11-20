@@ -66,6 +66,7 @@ codeunit 6151434 "NPR Feature Management Install"
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         AddFeature(Feature::"NP Email");
         AddFeature(Feature::"New Email Experience");
+        AddFeature(Feature::"NP Email for Click & Collect");
 #endif
         AddFeature(Feature::"POS Webservice Sessions");
         AddFeature(Feature::"New Sales Receipt Experience");

@@ -23,25 +23,25 @@ page 6059795 "NPR E-mail Templates"
                 {
 
                     ToolTip = 'Specifies the unique code assigned to this e-mail template';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
                 field(Description; Rec.Description)
                 {
 
                     ToolTip = 'Specifies the description or name of this e-mail template';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
                 field("Report ID"; Rec."Report ID")
                 {
 
                     ToolTip = 'Specifies the ID of the associated report for this e-mail template';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
                 field("Table No."; Rec."Table No.")
                 {
 
                     ToolTip = 'Specifies the table number associated with this e-mail template.';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
             }
         }
@@ -58,7 +58,7 @@ page 6059795 "NPR E-mail Templates"
                 Visible = (Rec."Transactional E-mail" = 0) or (Rec."Transactional E-mail Code" = '');
 
                 ToolTip = 'Open and view the HTML template associated with this e-mail template';
-                ApplicationArea = NPRLegacyEmail;
+                ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
 
                 trigger OnAction()
                 var
@@ -74,7 +74,7 @@ page 6059795 "NPR E-mail Templates"
                 Visible = (Rec."Transactional E-mail" = 0) or (Rec."Transactional E-mail Code" = '');
 
                 ToolTip = 'Import an external HTML template to use with this e-mail template';
-                ApplicationArea = NPRLegacyEmail;
+                ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
 
                 trigger OnAction()
                 var
@@ -91,7 +91,7 @@ page 6059795 "NPR E-mail Templates"
                 Visible = (Rec."Transactional E-mail" = 0) or (Rec."Transactional E-mail Code" = '');
 
                 ToolTip = 'Export the HTML template associated with this e-mail template as a file';
-                ApplicationArea = NPRLegacyEmail;
+                ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
 
                 trigger OnAction()
                 var
@@ -107,7 +107,7 @@ page 6059795 "NPR E-mail Templates"
                 Visible = (Rec."Transactional E-mail" = 0) or (Rec."Transactional E-mail Code" = '');
 
                 ToolTip = 'Copy the contents and settings from another e-mail template to create a new one';
-                ApplicationArea = NPRLegacyEmail;
+                ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
 
                 trigger OnAction()
                 var
@@ -123,7 +123,7 @@ page 6059795 "NPR E-mail Templates"
                 Visible = (Rec."Transactional E-mail" = 0) or (Rec."Transactional E-mail Code" = '');
 
                 ToolTip = 'Delete the HTML template associated with this e-mail template';
-                ApplicationArea = NPRLegacyEmail;
+                ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
 
                 trigger OnAction()
                 var
@@ -144,7 +144,7 @@ page 6059795 "NPR E-mail Templates"
                 RunPageView = sorting("Entry No.");
 
                 ToolTip = 'View the log of sent e-mails related to this e-mail template';
-                ApplicationArea = NPRLegacyEmail;
+                ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
             }
             action(EmailTemplateFilters)
             {
@@ -156,7 +156,7 @@ page 6059795 "NPR E-mail Templates"
                 RunPageView = sorting("E-mail Template Code", "Table No.", "Line No.");
 
                 ToolTip = 'Set up filters to define conditions for applying this e-mail template';
-                ApplicationArea = NPRLegacyEmail;
+                ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
             }
             action(AttachedFiles)
             {
@@ -164,7 +164,7 @@ page 6059795 "NPR E-mail Templates"
                 Image = MailAttachment;
 
                 ToolTip = 'View and manage the attached files associated with this e-mail template';
-                ApplicationArea = NPRLegacyEmail;
+                ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
 
                 trigger OnAction()
                 var
@@ -186,7 +186,7 @@ page 6059795 "NPR E-mail Templates"
                 RunPageLink = "E-mail Template Code" = field(Code);
 
                 ToolTip = 'Configure additional reports to be included when this e-mail template is generated';
-                ApplicationArea = NPRLegacyEmail;
+                ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
             }
         }
     }

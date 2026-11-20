@@ -285,19 +285,41 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                         ToolTip = 'Specifies the value of the Notify Store via E-mail field';
                         ApplicationArea = NPRRetail;
                     }
-                    field("Store E-mail Temp. (Pending)"; Rec."Store E-mail Temp. (Pending)")
+                    group(LegacyStoreEmailTemplates)
                     {
+                        ShowCaption = false;
+                        Visible = not _NPEmailFeatureEnabled;
 
-                        Importance = Additional;
-                        ToolTip = 'Specifies the value of the Store E-mail Template (Pending) field';
-                        ApplicationArea = NPRRetail;
+                        field("Store E-mail Temp. (Pending)"; Rec."Store E-mail Temp. (Pending)")
+                        {
+                            Importance = Additional;
+                            ToolTip = 'Specifies the value of the Store E-mail Template (Pending) field';
+                            ApplicationArea = NPRRetail;
+                        }
+                        field("Store E-mail Temp. (Expired)"; Rec."Store E-mail Temp. (Expired)")
+                        {
+                            Importance = Additional;
+                            ToolTip = 'Specifies the value of the Store E-mail Template (Expired) field';
+                            ApplicationArea = NPRRetail;
+                        }
                     }
-                    field("Store E-mail Temp. (Expired)"; Rec."Store E-mail Temp. (Expired)")
+                    group(NPStoreEmailTemplates)
                     {
+                        ShowCaption = false;
+                        Visible = _NPEmailFeatureEnabled;
 
-                        Importance = Additional;
-                        ToolTip = 'Specifies the value of the Store E-mail Template (Expired) field';
-                        ApplicationArea = NPRRetail;
+                        field("Store NP Email Templ (Pending)"; Rec."Store NP Email Templ (Pending)")
+                        {
+                            ApplicationArea = NPRRetail;
+                            Importance = Additional;
+                            ToolTip = 'Specifies the NP E-mail Template used to notify the store for the Pending state.';
+                        }
+                        field("Store NP Email Templ (Expired)"; Rec."Store NP Email Templ (Expired)")
+                        {
+                            ApplicationArea = NPRRetail;
+                            Importance = Additional;
+                            ToolTip = 'Specifies the NP E-mail Template used to notify the store for the Expired state.';
+                        }
                     }
                 }
                 group(Control6014475)
@@ -344,19 +366,19 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                     field("Enable NP Email"; Rec."Enable NP Email")
                     {
                         ApplicationArea = NPRRetail;
-                        Visible = _NPEmailFeatureEnabled;
-                        ToolTip = 'When enabled, customer notifications use the modern NP E-mail templates instead of the legacy e-mail templates.';
+                        Visible = false;
+                        ToolTip = 'Specifies the existing customer NP Email opt-in. New configurations use NP Email for Click & Collect in NaviPartner Feature Management.';
 
                         trigger OnValidate()
                         begin
-                            _NPEmailEnabled := Rec."Enable NP Email" and _NPEmailFeatureEnabled;
-                            CurrPage.Update(true);
+                            UpdateCustomerEmailVisibility();
+                            CurrPage.Update();
                         end;
                     }
                     group(LegacyCustomerEmailTemplates)
                     {
                         ShowCaption = false;
-                        Visible = not _NPEmailEnabled;
+                        Visible = not _CustomerNPEmailEnabled;
 
                         field("E-mail Template (Pending)"; Rec."E-mail Template (Pending)")
                         {
@@ -386,7 +408,7 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                     group(NPCustomerEmailTemplates)
                     {
                         ShowCaption = false;
-                        Visible = _NPEmailEnabled;
+                        Visible = _CustomerNPEmailEnabled;
 
                         field("NP E-mail Template (Pending)"; Rec."NP E-mail Template (Pending)")
                         {
@@ -693,23 +715,30 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
         Rec.Type := Rec.Type::"Collect in Store";
     end;
 
-    trigger OnOpenPage()
-    begin
-        _NPEmailFeatureEnabled := _NPEmailFeature.IsFeatureEnabled() and _NewEmailExpFeature.IsFeatureEnabled();
-    end;
-
     trigger OnAfterGetCurrRecord()
     begin
-        _NPEmailEnabled := Rec."Enable NP Email" and _NPEmailFeatureEnabled;
+        UpdateCustomerEmailVisibility();
+    end;
+
+    local procedure UpdateCustomerEmailVisibility()
+    begin
+        _CustomerNPEmailEnabled := _NPEmailFeature.IsFeatureEnabled() and _NewEmailExpFeature.IsFeatureEnabled() and
+            (Rec."Enable NP Email" or _ClickCollectNPEmailFeature.IsFeatureEnabled());
+    end;
+
+    trigger OnOpenPage()
+    begin
+        _NPEmailFeatureEnabled := _NPEmailFeature.IsFeatureEnabled() and _ClickCollectNPEmailFeature.IsFeatureEnabled() and _NewEmailExpFeature.IsFeatureEnabled();
     end;
 
     var
         ConfirmOrderQst: Label 'Confirm Order %1?', Comment = '%1 = Document no.';
         RejectOrderQst: Label 'Reject Order %1?', Comment = '%1 = Document no.';
         WarningLbl: Label 'Do not pick from Store Stock';
-        _NPEmailEnabled: Boolean;
         _NPEmailFeatureEnabled: Boolean;
+        _CustomerNPEmailEnabled: Boolean;
         _NPEmailFeature: Codeunit "NPR NP Email Feature";
         _NewEmailExpFeature: Codeunit "NPR NewEmailExpFeature";
+        _ClickCollectNPEmailFeature: Codeunit "NPR CnC NP Email Feature";
 }
 

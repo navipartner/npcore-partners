@@ -7,19 +7,20 @@ codeunit 85252 "NPR NpCs NPEmail Notif Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure ResolvesTemplateForCurrentStatus()
+    procedure ExistingCustomerNPEmailWorksWithoutClickCollectFeature()
     var
         NpCsDocument: Record "NPR NpCs Document";
         NotifMock: Codeunit "NPR NpCs NPEmail Notif Mock";
-        NewEmailExpFeature: Codeunit "NPR NewEmailExpFeature";
         CnCTemplateId: Code[20];
     begin
-        // [Given] the NP Email + New Email Experience features are enabled
-        NewEmailExpFeature.SetFeatureEnabled(true);
+        // [Given] NP Email and New Email Experience are enabled, but the new Click & Collect feature is disabled
+        SetNPEmailFeatures(false);
         // [Given] a Click & Collect template wired to the Confirmed status
         CnCTemplateId := 'CNC-CONFIRMED';
         CreateEmailTemplate(CnCTemplateId, "NPR DynTemplateDataProvider"::CLICK_COLLECT_NOTIFICATION);
         CreateCnCDocument(NpCsDocument, NpCsDocument."Processing Status"::Confirmed);
+        // [Given] the existing document opted into customer NP Email and has no legacy template
+        NpCsDocument."Enable NP Email" := true;
         NpCsDocument."NP E-mail Template (Confirmed)" := CnCTemplateId;
         NpCsDocument.Modify();
 
@@ -40,11 +41,10 @@ codeunit 85252 "NPR NpCs NPEmail Notif Tests"
     var
         NpCsDocument: Record "NPR NpCs Document";
         NotifMock: Codeunit "NPR NpCs NPEmail Notif Mock";
-        NewEmailExpFeature: Codeunit "NPR NewEmailExpFeature";
         WrongProviderTemplateId: Code[20];
     begin
         // [Given] the features are enabled
-        NewEmailExpFeature.SetFeatureEnabled(true);
+        SetNPEmailFeatures(true);
         // [Given] a template that belongs to another data provider (Ticket, not Click & Collect)
         WrongProviderTemplateId := 'WRONG-PROVIDER';
         CreateEmailTemplate(WrongProviderTemplateId, "NPR DynTemplateDataProvider"::TICKET_NOTIFICATION);
@@ -69,11 +69,10 @@ codeunit 85252 "NPR NpCs NPEmail Notif Tests"
     var
         NpCsDocument: Record "NPR NpCs Document";
         NotifMock: Codeunit "NPR NpCs NPEmail Notif Mock";
-        NewEmailExpFeature: Codeunit "NPR NewEmailExpFeature";
         CnCTemplateId: Code[20];
     begin
         // [Given] the features are enabled
-        NewEmailExpFeature.SetFeatureEnabled(true);
+        SetNPEmailFeatures(true);
         // [Given] only the Confirmed template is configured; the Rejected status template is left blank
         CnCTemplateId := 'CNC-CONFIRMED';
         CreateEmailTemplate(CnCTemplateId, "NPR DynTemplateDataProvider"::CLICK_COLLECT_NOTIFICATION);
@@ -101,41 +100,198 @@ codeunit 85252 "NPR NpCs NPEmail Notif Tests"
         ReExportedXml: Text;
         RequestBody: Text;
     begin
-        // [Given] a Send-to-Store collect order with NP Email enabled and its four templates set
+        // [Given] all three features are enabled, the obsolete checkbox is false, and customer and store templates are set
         CreateSendToStoreCollectDocument(NpCsDocument, true);
+        // [Given] store email notifications are enabled on the source document
+        NpCsDocument."Notify Store via E-mail" := true;
+        NpCsDocument.Modify();
 
         // [When] the request body is built by the sender and its sales_document payload imported through the receiver xmlport
         NpCsSendOrder.InitReqBody(NpCsDocument, RequestBody);
         ImportThroughReceiverXmlport(RequestBody, TempSalesHeader, ReExportedXml);
 
         // [Then] the NP Email block was emitted and the receiver schema accepted the payload
-        Assert.IsTrue(StrPos(RequestBody, '<enable_np_email>') > 0, 'The NP Email block should be emitted when Enable NP Email is true.');
+        Assert.IsTrue(StrPos(RequestBody, '<enable_np_email>') > 0, 'The NP Email block should be emitted when all three features are enabled.');
+        Assert.IsTrue(StrPos(ReExportedXml, 'STORE-PENDING') > 0, 'The receiver must preserve the store Pending template.');
+        Assert.IsTrue(StrPos(ReExportedXml, 'STORE-EXPIRED') > 0, 'The receiver must preserve the store Expired template.');
         Assert.IsTrue(TempSalesHeader.FindFirst(), 'The receiver xmlport should have imported the collect sales document.');
         Assert.AreEqual(NpCsDocument."Document No.", TempSalesHeader."No.", 'The imported sales document should match the collect document No.');
-        // [Then] the re-export the receiving import entry is fed from still carries the NP Email values
+        // The re-export consumed by the receiving import entry must retain the customer templates.
         Assert.IsTrue(StrPos(ReExportedXml, 'CNC-CONFIRMED') > 0, 'The re-exported document should carry the NP Email templates.');
     end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure GivenNpEmailDisabled_WhenBuildingAndImportingCollectOrder_ThenTagsOmittedAndAccepted()
+    procedure ExistingCustomerNPSettingsSurviveExportWithoutSenderFeatures()
     var
         NpCsDocument: Record "NPR NpCs Document";
         TempSalesHeader: Record "Sales Header" temporary;
         NpCsSendOrder: Codeunit "NPR NpCs Send Order";
+        NPEmailFeature: Codeunit "NPR NP Email Feature";
+        NewEmailExpFeature: Codeunit "NPR NewEmailExpFeature";
         ReExportedXml: Text;
         RequestBody: Text;
     begin
-        // [Given] the same Send-to-Store collect order but with NP Email disabled
+        // [Given] an existing document opted into customer NP Email with customer and store templates configured
         CreateSendToStoreCollectDocument(NpCsDocument, false);
+        // [Given] the receiving store owns notifications and all sender NP Email features are disabled
+        NpCsDocument."Send Notification from Store" := true;
+        NpCsDocument.Modify();
+        NewEmailExpFeature.SetFeatureEnabled(false);
+        NPEmailFeature.SetFeatureEnabled(false);
 
         // [When] the request body is built by the sender and its sales_document payload imported through the receiver xmlport
         NpCsSendOrder.InitReqBody(NpCsDocument, RequestBody);
         ImportThroughReceiverXmlport(RequestBody, TempSalesHeader, ReExportedXml);
 
-        // [Then] the NP Email block was omitted and the receiver schema still accepted the payload
-        Assert.AreEqual(0, StrPos(RequestBody, '<enable_np_email>'), 'The NP Email block must be omitted when Enable NP Email is false.');
+        // [Then] the customer NP configuration survives transfer while the new store NP elements are omitted
+        Assert.IsTrue(StrPos(RequestBody, '<enable_np_email>true</enable_np_email>') > 0, 'The existing customer NP Email opt-in must survive export.');
+        Assert.IsTrue(StrPos(ReExportedXml, '<enable_np_email>true</enable_np_email>') > 0, 'The receiver must preserve the customer NP Email opt-in.');
+        Assert.IsTrue(StrPos(ReExportedXml, 'CNC-PENDING') > 0, 'The receiver must preserve the customer Pending template.');
+        Assert.IsTrue(StrPos(ReExportedXml, 'CNC-CONFIRMED') > 0, 'The receiver must preserve the customer Confirmed template.');
+        Assert.IsTrue(StrPos(ReExportedXml, 'CNC-REJECTED') > 0, 'The receiver must preserve the customer Rejected template.');
+        Assert.IsTrue(StrPos(ReExportedXml, 'CNC-EXPIRED') > 0, 'The receiver must preserve the customer Expired template.');
+        Assert.AreEqual(0, StrPos(RequestBody, '<store_np_email_template_pending>'), 'The store NP Email block must also be omitted when the Click & Collect feature is disabled.');
+        Assert.AreEqual(0, StrPos(RequestBody, '<store_np_email_template_expired>'), 'The store Expired NP template must be omitted when the Click & Collect feature is disabled.');
         Assert.IsTrue(TempSalesHeader.FindFirst(), 'The receiver xmlport should have imported the collect sales document.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure StoreDeliveryExpiryOverridesPendingProcessing()
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        NpCsStore: Record "NPR NpCs Store";
+        NotifMock: Codeunit "NPR NpCs NPEmail Notif Mock";
+    begin
+        // [Given] all three NP Email features are enabled and the obsolete document checkbox is false, with Pending and Expired templates
+        // [Given] processing is Pending while delivery is Expired
+        CreateStoreNotificationDocument(NpCsDocument);
+        NpCsDocument."Delivery Status" := NpCsDocument."Delivery Status"::Expired;
+        NpCsDocument.Modify();
+        NpCsStore.Get(NpCsDocument."To Store Code");
+
+        // [When] the store notification runs with sending intercepted
+        BindSubscription(NotifMock);
+        RunStoreEmailNotification(NpCsDocument);
+        UnbindSubscription(NotifMock);
+
+        // [Then] the Expired template is selected for the destination store without logging an error
+        Assert.IsTrue(NotifMock.Fired(), 'The store NP Email send hook should be reached.');
+        Assert.AreEqual(NpCsDocument."Store NP Email Templ (Expired)", NotifMock.ResolvedTemplateId(), 'Delivery expiry must take precedence over pending processing.');
+        Assert.AreEqual(NpCsStore."E-mail", NotifMock.CapturedEmail(), 'The notification must be addressed to the destination store.');
+        Assert.AreEqual(0, ErrorLogEntryCount(NpCsDocument), 'A successful store notification must not log an error.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DisabledStoreNotificationsDoNotSend()
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        NpCsDocumentLogEntry: Record "NPR NpCs Document Log Entry";
+        NotifMock: Codeunit "NPR NpCs NPEmail Notif Mock";
+    begin
+        // [Given] NP Email is enabled but store email notifications are disabled
+        CreateStoreNotificationDocument(NpCsDocument);
+        NpCsDocument."Notify Store via E-mail" := false;
+        NpCsDocument.Modify();
+        BindSubscription(NotifMock);
+
+        // [When] the store email notification runs
+        RunStoreEmailNotification(NpCsDocument);
+        UnbindSubscription(NotifMock);
+
+        // [Then] no email is sent and no success or error log is created
+        Assert.IsFalse(NotifMock.Fired(), 'A disabled store notification must not send.');
+        NpCsDocumentLogEntry.SetRange("Document Entry No.", NpCsDocument."Entry No.");
+        Assert.IsTrue(NpCsDocumentLogEntry.IsEmpty(), 'A skipped store notification must not create success or error logs.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure StoreNPTemplateFromAnotherProviderLogsError()
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        NPEmailTemplate: Record "NPR NPEmailTemplate";
+        NotifMock: Codeunit "NPR NpCs NPEmail Notif Mock";
+    begin
+        // [Given] the configured store NP Email template belongs to another data provider
+        CreateStoreNotificationDocument(NpCsDocument);
+        NPEmailTemplate.Get(NpCsDocument."Store NP Email Templ (Pending)");
+        NPEmailTemplate.DataProvider := "NPR DynTemplateDataProvider"::TICKET_NOTIFICATION;
+        NPEmailTemplate.Modify();
+        BindSubscription(NotifMock);
+
+        // [When] the store email notification runs
+        RunStoreEmailNotification(NpCsDocument);
+        UnbindSubscription(NotifMock);
+
+        // [Then] no email is sent and one error is logged
+        Assert.IsFalse(NotifMock.Fired(), 'A template from another data provider must not reach the send hook.');
+        Assert.AreEqual(1, ErrorLogEntryCount(NpCsDocument), 'A template from another data provider must log one error.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DisabledClickCollectFeatureUsesLegacyStoreTemplate()
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        EmailTemplateHeader: Record "NPR E-mail Template Header";
+        LibraryUtility: Codeunit "Library - Utility";
+        ClickCollectNPEmailFeature: Codeunit "NPR CnC NP Email Feature";
+        NotifMock: Codeunit "NPR NpCs NPEmail Notif Mock";
+    begin
+        // [Given] NP Email and New Email Experience are enabled, but the Click & Collect feature is disabled
+        // [Given] the obsolete document checkbox is true and must not select NP Email
+        CreateStoreNotificationDocument(NpCsDocument);
+        NpCsDocument."Enable NP Email" := true;
+        ClickCollectNPEmailFeature.SetFeatureEnabled(false);
+        // [Given] a legacy template for another table, so validation stops before any real email is sent
+        EmailTemplateHeader.Code := LibraryUtility.GenerateRandomCode20(EmailTemplateHeader.FieldNo(Code), Database::"NPR E-mail Template Header");
+        EmailTemplateHeader."Table No." := Database::Customer;
+        EmailTemplateHeader.Insert();
+        NpCsDocument."Store E-mail Temp. (Pending)" := EmailTemplateHeader.Code;
+        NpCsDocument.Modify();
+        BindSubscription(NotifMock);
+
+        // [When] the store email notification runs
+        asserterror RunStoreEmailNotification(NpCsDocument);
+
+        // [Then] legacy template validation runs and the NP Email send hook is not reached
+        Assert.ExpectedError(EmailTemplateHeader.FieldCaption("Table No."));
+        Assert.ExpectedError(EmailTemplateHeader.Code);
+        UnbindSubscription(NotifMock);
+        Assert.IsFalse(NotifMock.Fired(), 'Disabling the Click & Collect feature must bypass NP Email even when the obsolete document checkbox is true.');
+    end;
+
+    local procedure CreateStoreNotificationDocument(var NpCsDocument: Record "NPR NpCs Document")
+    var
+        NpCsStore: Record "NPR NpCs Store";
+        LibraryClickCollect: Codeunit "NPR Library Click & Collect";
+    begin
+        SetNPEmailFeatures(true);
+        CreateEmailTemplate('STORE-PENDING', "NPR DynTemplateDataProvider"::CLICK_COLLECT_NOTIFICATION);
+        CreateEmailTemplate('STORE-EXPIRED', "NPR DynTemplateDataProvider"::CLICK_COLLECT_NOTIFICATION);
+        NpCsStore.Get(LibraryClickCollect.CreateLocalCollectStore());
+        NpCsStore."E-mail" := 'store@example.com';
+        NpCsStore.Modify();
+        CreateCnCDocument(NpCsDocument, NpCsDocument."Processing Status"::Pending);
+        NpCsDocument."To Store Code" := NpCsStore.Code;
+        NpCsDocument."Notify Store via E-mail" := true;
+        NpCsDocument."Enable NP Email" := false;
+        NpCsDocument."Send Notification from Store" := true;
+        NpCsDocument."Store NP Email Templ (Pending)" := 'STORE-PENDING';
+        NpCsDocument."Store NP Email Templ (Expired)" := 'STORE-EXPIRED';
+        NpCsDocument.Modify();
+    end;
+
+    local procedure RunStoreEmailNotification(NpCsDocument: Record "NPR NpCs Document")
+    var
+        RunWorkflowStep: Codeunit "NPR NpCs Run Workflow Step";
+    begin
+        RunWorkflowStep.SetWorkflowFunctionType(4); // "Send Notification to Store"
+        RunWorkflowStep.SetNotificationType(1); // Email
+        RunWorkflowStep.Run(NpCsDocument);
     end;
 
     local procedure CreateEmailTemplate(TemplateId: Code[20]; DataProvider: Enum "NPR DynTemplateDataProvider")
@@ -159,7 +315,7 @@ codeunit 85252 "NPR NpCs NPEmail Notif Tests"
         NpCsDocument.Type := NpCsDocument.Type::"Collect in Store";
         NpCsDocument."Customer E-mail" := 'customer@example.com';
         NpCsDocument."Notify Customer via E-mail" := true;
-        NpCsDocument."Enable NP Email" := true;
+        NpCsDocument."Enable NP Email" := false;
         NpCsDocument."Processing Status" := ProcessingStatus;
         NpCsDocument.Insert(true);
     end;
@@ -189,6 +345,7 @@ codeunit 85252 "NPR NpCs NPEmail Notif Tests"
         LibraryClickCollect: Codeunit "NPR Library Click & Collect";
         LibrarySales: Codeunit "Library - Sales";
     begin
+        SetNPEmailFeatures(EnableNpEmail);
         CreateWorkflow(NpCsWorkflow);
         LibrarySales.CreateSalesOrder(SalesHeader);
 
@@ -202,14 +359,25 @@ codeunit 85252 "NPR NpCs NPEmail Notif Tests"
         NpCsDocument."To Store Code" := LibraryClickCollect.CreateLocalCollectStore();
         NpCsDocument."Workflow Code" := NpCsWorkflow.Code;
         NpCsDocument."Customer E-mail" := 'customer@example.com';
-        if EnableNpEmail then begin
-            NpCsDocument."Enable NP Email" := true;
-            NpCsDocument."NP E-mail Template (Pending)" := 'CNC-PENDING';
-            NpCsDocument."NP E-mail Template (Confirmed)" := 'CNC-CONFIRMED';
-            NpCsDocument."NP E-mail Template (Rejected)" := 'CNC-REJECTED';
-            NpCsDocument."NP E-mail Template (Expired)" := 'CNC-EXPIRED';
-        end;
+        NpCsDocument."Enable NP Email" := not EnableNpEmail;
+        NpCsDocument."NP E-mail Template (Pending)" := 'CNC-PENDING';
+        NpCsDocument."NP E-mail Template (Confirmed)" := 'CNC-CONFIRMED';
+        NpCsDocument."NP E-mail Template (Rejected)" := 'CNC-REJECTED';
+        NpCsDocument."NP E-mail Template (Expired)" := 'CNC-EXPIRED';
+        NpCsDocument."Store NP Email Templ (Pending)" := 'STORE-PENDING';
+        NpCsDocument."Store NP Email Templ (Expired)" := 'STORE-EXPIRED';
         NpCsDocument.Insert(true);
+    end;
+
+    local procedure SetNPEmailFeatures(ClickCollectEnabled: Boolean)
+    var
+        NPEmailFeature: Codeunit "NPR NP Email Feature";
+        NewEmailExpFeature: Codeunit "NPR NewEmailExpFeature";
+        ClickCollectNPEmailFeature: Codeunit "NPR CnC NP Email Feature";
+    begin
+        NewEmailExpFeature.SetFeatureEnabled(true);
+        NPEmailFeature.SetFeatureEnabled(true);
+        ClickCollectNPEmailFeature.SetFeatureEnabled(ClickCollectEnabled);
     end;
 
     local procedure CreateWorkflow(var NpCsWorkflow: Record "NPR NpCs Workflow")

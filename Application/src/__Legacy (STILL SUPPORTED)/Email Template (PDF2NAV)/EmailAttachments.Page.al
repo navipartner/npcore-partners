@@ -27,13 +27,13 @@ page 6059797 "NPR E-mail Attachments"
 
                     Visible = false;
                     ToolTip = 'Specifies the value of the Line No. field';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
                 field(Description; Rec.Description)
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
             }
         }
@@ -45,7 +45,7 @@ page 6059797 "NPR E-mail Attachments"
         {
             action(UploadFile)
             {
-                ApplicationArea = NPRLegacyEmail;
+                ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 Caption = 'Upload File';
                 ToolTip = 'Uploads file to the email attachment';
                 Image = Insert;

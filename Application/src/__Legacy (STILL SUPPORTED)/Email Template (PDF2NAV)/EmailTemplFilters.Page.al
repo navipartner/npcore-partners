@@ -22,19 +22,19 @@ page 6059794 "NPR E-mail Templ. Filters"
                 {
 
                     ToolTip = 'Specifies the value of the Field No. field';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
                 field("Field Name"; Rec."Field Name")
                 {
 
                     ToolTip = 'Specifies the value of the Field Name field';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
                 field(Value; Rec.Value)
                 {
 
                     ToolTip = 'Specifies the value of the Value field';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
             }
         }

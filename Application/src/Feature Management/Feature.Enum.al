@@ -106,6 +106,11 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'New Email Experience', Locked = true, MaxLength = 50;
         Implementation = "NPR Feature Management" = "NPR NewEmailExpFeature";
     }
+    value(5; "NP Email for Click & Collect")
+    {
+        Caption = 'NP Email for Click & Collect', Locked = true, MaxLength = 50;
+        Implementation = "NPR Feature Management" = "NPR CnC NP Email Feature";
+    }
 #endif
     value(140; "POS Webservice Sessions")
     {

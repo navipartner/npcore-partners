@@ -219,6 +219,16 @@ xmlport 6151195 "NPR NpCs Sales Document"
                         MaxOccurs = Once;
                         MinOccurs = Zero;
                     }
+                    textelement(store_np_email_template_pending)
+                    {
+                        MaxOccurs = Once;
+                        MinOccurs = Zero;
+                    }
+                    textelement(store_np_email_template_expired)
+                    {
+                        MaxOccurs = Once;
+                        MinOccurs = Zero;
+                    }
                     textelement(notify_customer_via_sms)
                     {
                         MaxOccurs = Once;

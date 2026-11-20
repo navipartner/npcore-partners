@@ -22,44 +22,44 @@ page 6059796 "NPR E-mail Log"
                 {
 
                     ToolTip = 'Specifies the value of the Recipient E-mail field';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
                 field("From E-mail"; Rec."From E-mail")
                 {
 
                     ToolTip = 'Specifies the value of the From E-mail field';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
                 field("E-mail subject"; Rec."E-mail subject")
                 {
 
                     ToolTip = 'Specifies the value of the E-mail subject field';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
                 field(Filename; Rec.Filename)
                 {
 
                     Visible = false;
                     ToolTip = 'Specifies the value of the Filename field';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
                 field("Sent Date"; Rec."Sent Date")
                 {
 
                     ToolTip = 'Specifies the value of the Sent Date field';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
                 field("Sent Time"; Rec."Sent Time")
                 {
 
                     ToolTip = 'Specifies the value of the Sent time field';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
                 field("Sent Username"; Rec."Sent Username")
                 {
 
                     ToolTip = 'Specifies the value of the Sent by Username field';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
             }
         }

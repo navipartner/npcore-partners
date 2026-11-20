@@ -20,7 +20,7 @@ page 6059793 "NPR E-mail Templ. Subform"
                 {
 
                     ToolTip = 'Specifies the value of the Mail Body Line field';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
             }
         }

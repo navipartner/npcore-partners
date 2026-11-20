@@ -27,14 +27,14 @@ page 6059792 "NPR E-mail Field List"
 
                     Caption = 'No.';
                     ToolTip = 'Specifies the value of the No. field';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
                 field("Field Caption"; Rec."Field Caption")
                 {
 
                     Caption = 'Field Name';
                     ToolTip = 'Specifies the value of the Field Name field';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
             }
         }

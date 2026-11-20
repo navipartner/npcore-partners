@@ -41,6 +41,8 @@ table 6151200 "NPR NpCs Store Workflow Rel."
                 "NP E-mail Template (Confirmed)" := NpCsWorkflow."NP E-mail Template (Confirmed)";
                 "NP E-mail Template (Rejected)" := NpCsWorkflow."NP E-mail Template (Rejected)";
                 "NP E-mail Template (Expired)" := NpCsWorkflow."NP E-mail Template (Expired)";
+                "Store NP Email Templ (Pending)" := NpCsWorkflow."Store NP Email Templ (Pending)";
+                "Store NP Email Templ (Expired)" := NpCsWorkflow."Store NP Email Templ (Expired)";
                 "Notify Customer via Sms" := NpCsWorkflow."Notify Customer via Sms";
                 "Sms Template (Pending)" := NpCsWorkflow."Sms Template (Pending)";
                 "Sms Template (Confirmed)" := NpCsWorkflow."Sms Template (Confirmed)";
@@ -161,6 +163,9 @@ table 6151200 "NPR NpCs Store Workflow Rel."
         }
         field(500; "Enable NP Email"; Boolean)
         {
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-11-06';
+            ObsoleteReason = 'Use the NP Email for Click & Collect feature in NaviPartner Feature Management.';
             Caption = 'Enable NP Email';
             DataClassification = CustomerContent;
         }
@@ -462,6 +467,49 @@ table 6151200 "NPR NpCs Store Workflow Rel."
                 EmailTemplateHeader.SetRange("Table No.", DATABASE::"NPR NpCs Document");
                 if PAGE.RunModal(0, EmailTemplateHeader) = ACTION::LookupOK then
                     Validate("Store E-mail Temp. (Expired)", EmailTemplateHeader.Code);
+            end;
+        }
+        field(421; "Store NP Email Templ (Pending)"; Code[20])
+        {
+            Caption = 'Store NP Email Template (Pending)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId WHERE(DataProvider = CONST(CLICK_COLLECT_NOTIFICATION));
+
+            ValidateTableRelation = false;
+
+            trigger OnLookup()
+            var
+                NPEmailTemplate: Record "NPR NPEmailTemplate";
+                NpCsStore: Record "NPR NpCs Store";
+            begin
+                NpCsStore.Get("Store Code");
+                if NPEmailTemplate.ChangeCompany(NpCsStore."Company Name") then;
+
+                if NPEmailTemplate.Get("Store NP Email Templ (Pending)") then;
+                NPEmailTemplate.SetRange(DataProvider, NPEmailTemplate.DataProvider::CLICK_COLLECT_NOTIFICATION);
+                if PAGE.RunModal(0, NPEmailTemplate) = ACTION::LookupOK then
+                    Validate("Store NP Email Templ (Pending)", NPEmailTemplate.TemplateId);
+            end;
+        }
+        field(422; "Store NP Email Templ (Expired)"; Code[20])
+        {
+            Caption = 'Store NP Email Template (Expired)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId WHERE(DataProvider = CONST(CLICK_COLLECT_NOTIFICATION));
+            ValidateTableRelation = false;
+
+            trigger OnLookup()
+            var
+                NPEmailTemplate: Record "NPR NPEmailTemplate";
+                NpCsStore: Record "NPR NpCs Store";
+            begin
+                NpCsStore.Get("Store Code");
+                if NPEmailTemplate.ChangeCompany(NpCsStore."Company Name") then;
+
+                if NPEmailTemplate.Get("Store NP Email Templ (Expired)") then;
+                NPEmailTemplate.SetRange(DataProvider, NPEmailTemplate.DataProvider::CLICK_COLLECT_NOTIFICATION);
+                if PAGE.RunModal(0, NPEmailTemplate) = ACTION::LookupOK then
+                    Validate("Store NP Email Templ (Expired)", NPEmailTemplate.TemplateId);
             end;
         }
         field(430; "Notify Store via Sms"; Boolean)

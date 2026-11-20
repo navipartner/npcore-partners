@@ -5,15 +5,24 @@ codeunit 85203 "NPR NpCs NPEmail Notif Mock"
     var
         _Fired: Boolean;
         _ResolvedTemplateId: Code[20];
-        _CustomerEmail: Text[80];
+        _RecipientEmail: Text[80];
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Click & Collect", 'OnNotifyCustomerViaNPEmailOnBeforeSendEmail', '', false, false)]
     local procedure CaptureOnBeforeSendNPEmail(RecRef: RecordRef; CustomerEmail: Text[80]; NPEmailTemplate: Record "NPR NPEmailTemplate"; var CustomerNotified: Boolean)
     begin
         _Fired := true;
         _ResolvedTemplateId := NPEmailTemplate.TemplateId;
-        _CustomerEmail := CustomerEmail;
+        _RecipientEmail := CustomerEmail;
         CustomerNotified := true;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Click & Collect", 'OnNotifyStoreViaNPEmailOnBeforeSendEmail', '', false, false)]
+    local procedure CaptureStoreOnBeforeSendNPEmail(RecRef: RecordRef; StoreEmail: Text[80]; NPEmailTemplate: Record "NPR NPEmailTemplate"; var StoreNotified: Boolean)
+    begin
+        _Fired := true;
+        _ResolvedTemplateId := NPEmailTemplate.TemplateId;
+        _RecipientEmail := StoreEmail;
+        StoreNotified := true;
     end;
 
     procedure Fired(): Boolean
@@ -28,6 +37,6 @@ codeunit 85203 "NPR NpCs NPEmail Notif Mock"
 
     procedure CapturedEmail(): Text[80]
     begin
-        exit(_CustomerEmail);
+        exit(_RecipientEmail);
     end;
 }

@@ -33,13 +33,13 @@ page 6151198 "NPR NpCs Workflow Card"
                     field("Enable NP Email"; Rec."Enable NP Email")
                     {
                         ApplicationArea = NPRRetail;
-                        Visible = _NPEmailFeatureEnabled;
-                        ToolTip = 'When enabled, customer notifications use the modern NP E-mail templates instead of the legacy e-mail templates.';
+                        Visible = false;
+                        ToolTip = 'Specifies the existing customer NP Email opt-in. New configurations use NP Email for Click & Collect in NaviPartner Feature Management.';
 
                         trigger OnValidate()
                         begin
-                            _NPEmailEnabled := Rec."Enable NP Email" and _NPEmailFeatureEnabled;
-                            CurrPage.Update(true);
+                            UpdateCustomerEmailVisibility();
+                            CurrPage.Update();
                         end;
                     }
                 }
@@ -74,17 +74,37 @@ page 6151198 "NPR NpCs Workflow Card"
                         ToolTip = 'Specifies the value of the Notify Store via E-mail field';
                         ApplicationArea = NPRRetail;
                     }
-                    field("Store E-mail Temp. (Pending)"; Rec."Store E-mail Temp. (Pending)")
+                    group(LegacyStoreEmailTemplates)
                     {
+                        ShowCaption = false;
+                        Visible = not _NPEmailFeatureEnabled;
 
-                        ToolTip = 'Specifies the value of the Store E-mail Template (Pending) field';
-                        ApplicationArea = NPRRetail;
+                        field("Store E-mail Temp. (Pending)"; Rec."Store E-mail Temp. (Pending)")
+                        {
+                            ToolTip = 'Specifies the value of the Store E-mail Template (Pending) field';
+                            ApplicationArea = NPRRetail;
+                        }
+                        field("Store E-mail Temp. (Expired)"; Rec."Store E-mail Temp. (Expired)")
+                        {
+                            ToolTip = 'Specifies the value of the Store E-mail Template (Expired) field';
+                            ApplicationArea = NPRRetail;
+                        }
                     }
-                    field("Store E-mail Temp. (Expired)"; Rec."Store E-mail Temp. (Expired)")
+                    group(NPStoreEmailTemplates)
                     {
+                        ShowCaption = false;
+                        Visible = _NPEmailFeatureEnabled;
 
-                        ToolTip = 'Specifies the value of the Store E-mail Template (Expired) field';
-                        ApplicationArea = NPRRetail;
+                        field("Store NP Email Templ (Pending)"; Rec."Store NP Email Templ (Pending)")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the NP E-mail Template used to notify the store for the Pending state.';
+                        }
+                        field("Store NP Email Templ (Expired)"; Rec."Store NP Email Templ (Expired)")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the NP E-mail Template used to notify the store for the Expired state.';
+                        }
                     }
                 }
                 group(Control6014430)
@@ -191,7 +211,7 @@ page 6151198 "NPR NpCs Workflow Card"
                     group(LegacyCustomerEmailTemplates)
                     {
                         ShowCaption = false;
-                        Visible = not _NPEmailEnabled;
+                        Visible = not _CustomerNPEmailEnabled;
 
                         field("E-mail Template (Pending)"; Rec."E-mail Template (Pending)")
                         {
@@ -217,7 +237,7 @@ page 6151198 "NPR NpCs Workflow Card"
                     group(NPCustomerEmailTemplates)
                     {
                         ShowCaption = false;
-                        Visible = _NPEmailEnabled;
+                        Visible = _CustomerNPEmailEnabled;
 
                         field("NP E-mail Template (Pending)"; Rec."NP E-mail Template (Pending)")
                         {
@@ -301,20 +321,68 @@ page 6151198 "NPR NpCs Workflow Card"
         }
     }
 
-    trigger OnOpenPage()
-    begin
-        _NPEmailFeatureEnabled := _NPEmailFeature.IsFeatureEnabled() and _NewEmailExpFeature.IsFeatureEnabled();
-    end;
+    actions
+    {
+        area(processing)
+        {
+            action(CopyStoreNPEmailTemplates)
+            {
+                Caption = 'Copy Store NP Email Templates to Stores';
+                ApplicationArea = NPRRetail;
+                Image = Copy;
+                Visible = _ClickCollectNPEmailFeatureEnabled;
+                Enabled = _ClickCollectNPEmailFeatureEnabled;
+                ToolTip = 'Copies the pending and expired store NP Email template codes to all store workflow lines with this workflow code. Existing codes are overwritten, including with blank values.';
+
+                trigger OnAction()
+                var
+                    NpCsStoreWorkflowRel: Record "NPR NpCs Store Workflow Rel.";
+                    UpdatedCount: Integer;
+                    TemplatesCopiedMsg: Label 'Store NP Email templates were copied to %1 store workflow lines.', Comment = '%1 = Number of updated store workflow lines';
+                begin
+                    if not _ClickCollectNPEmailFeature.IsFeatureEnabled() then
+                        exit;
+
+                    CurrPage.SaveRecord();
+                    Rec.TestField(Code);
+                    NpCsStoreWorkflowRel.SetRange("Workflow Code", Rec.Code);
+                    if NpCsStoreWorkflowRel.FindSet(true) then
+                        repeat
+                            NpCsStoreWorkflowRel.Validate("Store NP Email Templ (Pending)", Rec."Store NP Email Templ (Pending)");
+                            NpCsStoreWorkflowRel.Validate("Store NP Email Templ (Expired)", Rec."Store NP Email Templ (Expired)");
+                            NpCsStoreWorkflowRel.Modify(true);
+                            UpdatedCount += 1;
+                        until NpCsStoreWorkflowRel.Next() = 0;
+
+                    Message(TemplatesCopiedMsg, UpdatedCount);
+                end;
+            }
+        }
+    }
 
     trigger OnAfterGetCurrRecord()
     begin
-        _NPEmailEnabled := Rec."Enable NP Email" and _NPEmailFeatureEnabled;
+        UpdateCustomerEmailVisibility();
+    end;
+
+    local procedure UpdateCustomerEmailVisibility()
+    begin
+        _CustomerNPEmailEnabled := _NPEmailFeature.IsFeatureEnabled() and _NewEmailExpFeature.IsFeatureEnabled() and
+            (Rec."Enable NP Email" or _ClickCollectNPEmailFeature.IsFeatureEnabled());
+    end;
+
+    trigger OnOpenPage()
+    begin
+        _ClickCollectNPEmailFeatureEnabled := _ClickCollectNPEmailFeature.IsFeatureEnabled();
+        _NPEmailFeatureEnabled := _NPEmailFeature.IsFeatureEnabled() and _ClickCollectNPEmailFeatureEnabled and _NewEmailExpFeature.IsFeatureEnabled();
     end;
 
     var
-        _NPEmailEnabled: Boolean;
         _NPEmailFeatureEnabled: Boolean;
+        _CustomerNPEmailEnabled: Boolean;
+        _ClickCollectNPEmailFeatureEnabled: Boolean;
         _NPEmailFeature: Codeunit "NPR NP Email Feature";
         _NewEmailExpFeature: Codeunit "NPR NewEmailExpFeature";
+        _ClickCollectNPEmailFeature: Codeunit "NPR CnC NP Email Feature";
 }
 

@@ -191,6 +191,9 @@ table 6151202 "NPR NpCs Arch. Document"
         }
         field(500; "Enable NP Email"; Boolean)
         {
+            ObsoleteState = Pending;
+            ObsoleteTag = '2026-11-06';
+            ObsoleteReason = 'Use the NP Email for Click & Collect feature in NaviPartner Feature Management.';
             Caption = 'Enable NP Email';
             DataClassification = CustomerContent;
         }
@@ -373,6 +376,18 @@ table 6151202 "NPR NpCs Arch. Document"
             DataClassification = CustomerContent;
             Description = 'NPR5.51';
             TableRelation = "Salesperson/Purchaser";
+        }
+        field(421; "Store NP Email Templ (Pending)"; Code[20])
+        {
+            Caption = 'Store NP Email Template (Pending)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId where(DataProvider = const(CLICK_COLLECT_NOTIFICATION));
+        }
+        field(422; "Store NP Email Templ (Expired)"; Code[20])
+        {
+            Caption = 'Store NP Email Template (Expired)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId where(DataProvider = const(CLICK_COLLECT_NOTIFICATION));
         }
         field(2000; "Sell-to Customer Name"; Text[100])
         {

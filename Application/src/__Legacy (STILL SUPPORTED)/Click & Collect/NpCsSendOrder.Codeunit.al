@@ -72,6 +72,9 @@ codeunit 6151197 "NPR NpCs Send Order"
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         ClickCollect: Codeunit "NPR Click & Collect";
+        NPEmailFeature: Codeunit "NPR NP Email Feature";
+        ClickCollectNPEmailFeature: Codeunit "NPR CnC NP Email Feature";
+        NewEmailExpFeature: Codeunit "NPR NewEmailExpFeature";
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         ServiceName: Text;
         CustNo: Text;
@@ -133,13 +136,21 @@ codeunit 6151197 "NPR NpCs Send Order"
                       '<email_template_confirmed>' + Escape(NpCsDocument."E-mail Template (Confirmed)") + '</email_template_confirmed>' +
                       '<email_template_rejected>' + Escape(NpCsDocument."E-mail Template (Rejected)") + '</email_template_rejected>' +
                       '<email_template_expired>' + Escape(NpCsDocument."E-mail Template (Expired)") + '</email_template_expired>';
-                      if NpCsDocument."Enable NP Email" then
+                      // Preserve existing customer NP Email settings independently of the sending company's features.
+                      if NpCsDocument."Enable NP Email" or
+                         (NPEmailFeature.IsFeatureEnabled() and ClickCollectNPEmailFeature.IsFeatureEnabled() and NewEmailExpFeature.IsFeatureEnabled())
+                      then
                           Content +=
-                          '<enable_np_email>' + Format(NpCsDocument."Enable NP Email", 0, 9) + '</enable_np_email>' +
+                          '<enable_np_email>true</enable_np_email>' +
                           '<np_email_template_pending>' + Escape(NpCsDocument."NP E-mail Template (Pending)") + '</np_email_template_pending>' +
                           '<np_email_template_confirmed>' + Escape(NpCsDocument."NP E-mail Template (Confirmed)") + '</np_email_template_confirmed>' +
                           '<np_email_template_rejected>' + Escape(NpCsDocument."NP E-mail Template (Rejected)") + '</np_email_template_rejected>' +
                           '<np_email_template_expired>' + Escape(NpCsDocument."NP E-mail Template (Expired)") + '</np_email_template_expired>';
+                      // Store NP Email remains an explicit company feature opt-in.
+                      if NPEmailFeature.IsFeatureEnabled() and ClickCollectNPEmailFeature.IsFeatureEnabled() and NewEmailExpFeature.IsFeatureEnabled() then
+                          Content +=
+                          '<store_np_email_template_pending>' + Escape(NpCsDocument."Store NP Email Templ (Pending)") + '</store_np_email_template_pending>' +
+                          '<store_np_email_template_expired>' + Escape(NpCsDocument."Store NP Email Templ (Expired)") + '</store_np_email_template_expired>';
                       Content +=
                       '<notify_customer_via_sms>' + Format(NpCsDocument."Notify Customer via Sms", 0, 9) + '</notify_customer_via_sms>' +
                       '<sms_template_pending>' + Escape(NpCsDocument."Sms Template (Pending)") + '</sms_template_pending>' +

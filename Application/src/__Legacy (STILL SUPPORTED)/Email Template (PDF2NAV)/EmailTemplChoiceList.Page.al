@@ -21,7 +21,7 @@ page 6059799 "NPR E-mail Templ. Choice List"
 
                     Caption = 'Selected';
                     ToolTip = 'Specifies the value of the Selected field';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
                 field("Field Caption"; Rec."Field Caption")
                 {
@@ -29,7 +29,7 @@ page 6059799 "NPR E-mail Templ. Choice List"
                     Caption = 'E-mail Template';
                     Editable = false;
                     ToolTip = 'Specifies the value of the E-mail Template field';
-                    ApplicationArea = NPRLegacyEmail;
+                    ApplicationArea = NPRLegacyEmail, NPRNPEmailTempl;
                 }
             }
         }
