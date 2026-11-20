@@ -355,6 +355,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Ecom Sales Docs", 'FixMonitoredJQEcomSalesRetDoc'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Ecom Sales Docs", 'SetEntriaOrderImpFailureStatus'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Ecom Sales Docs", 'LowercaseEcomEmails'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Ecom Sales Docs", 'BackfillEcomMembershipUnitPrice'));
 #endif
 #IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG No Series Experience", 'UpgradeImplementationFieldOnNoSeries'));
@@ -1318,6 +1319,8 @@
                         exit('NPR-SetEntriaOrderImpFailureStatus-20260819');
                     'LowercaseEcomEmails':
                         exit('NPR-Ecom-LowercaseEcomEmails-20260907');
+                    'BackfillEcomMembershipUnitPrice':
+                        exit('NPR-Ecom-BackfillEcomMembershipUnitPrice-20261118');
                 end;
 #endif
             Codeunit::"NPR UPGUserAccounts":

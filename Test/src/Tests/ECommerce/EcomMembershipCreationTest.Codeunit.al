@@ -3049,5 +3049,397 @@ codeunit 85166 "NPR EcomMembershipCreationTest"
         Community.Modify();
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateMembership_NewEntryUnitPriceIsItemPrice()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        MembershipEntry: Record "NPR MM Membership Entry";
+    begin
+        // [SCENARIO] The NEW entry of an ecom-created membership carries the item price, the amounts carry the line price.
+        Initialize();
+
+        // [GIVEN] A create-membership order line, qty 1 at 80, for an item priced 100
+        // [WHEN] The line is processed
+        ProcessCreateMembershipOrder(EcomSalesHeader, EcomSalesLine, 1, 80);
+
+        // [THEN] The NEW entry has Unit Price 100 and amounts 80
+        FindNewMembershipEntry(EcomSalesLine."Membership Id", MembershipEntry);
+        _Assert.AreEqual(100, MembershipEntry."Unit Price", 'NEW entry Unit Price must be the item Unit Price (100).');
+        _Assert.AreEqual(80, MembershipEntry.Amount, 'NEW entry Amount must be the line amount (80).');
+        _Assert.AreEqual(80, MembershipEntry."Amount Incl VAT", 'NEW entry Amount Incl VAT must be the line amount (80) with VAT 0.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateMembership_Qty3_EveryNewEntryHasItemPrice()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link";
+        MembershipEntry: Record "NPR MM Membership Entry";
+    begin
+        // [SCENARIO] Every membership issued by a multi-quantity line gets the item price on its NEW entry.
+        Initialize();
+
+        // [GIVEN] A create-membership order line, qty 3 at 80, for an item priced 100
+        // [WHEN] The line is processed
+        ProcessCreateMembershipOrder(EcomSalesHeader, EcomSalesLine, 3, 80);
+
+        // [THEN] Three memberships are linked and each NEW entry has Unit Price 100
+        EcomSalesMembershipLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+        _Assert.AreEqual(3, EcomSalesMembershipLink.Count(), 'Expected 3 link rows for qty=3.');
+        EcomSalesMembershipLink.FindSet();
+        repeat
+            FindNewMembershipEntry(EcomSalesMembershipLink."Membership System Id", MembershipEntry);
+            _Assert.AreEqual(100, MembershipEntry."Unit Price", 'Every NEW entry Unit Price must be the item Unit Price (100).');
+        until EcomSalesMembershipLink.Next() = 0;
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CreateMembership_FullDiscountLine_EntryStillHasItemPrice()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+    begin
+        // [SCENARIO] A fully discounted line still stores the item price on the NEW entry, with amount 0.
+        Initialize();
+
+        // [GIVEN] A create-membership order line at 80 with Line Amount 0
+        _LibEcommerce.CreateEcomSalesHeader(EcomSalesHeader);
+        CreateCapturedCreateMembershipLine(EcomSalesLine, EcomSalesHeader, 'T-ECOM-ITEM', 1, 80);
+        EcomSalesLine."Line Amount" := 0;
+        EcomSalesLine.Modify();
+        Commit();
+
+        // [WHEN] The line is processed
+        EcomCreateMMShipImpl.Process(EcomSalesLine);
+        EcomSalesLine.Get(EcomSalesLine.RecordId);
+
+        // [THEN] The NEW entry has Unit Price 100 and Amount 0
+        FindNewMembershipEntry(EcomSalesLine."Membership Id", MembershipEntry);
+        _Assert.AreEqual(100, MembershipEntry."Unit Price", 'NEW entry Unit Price must be the item Unit Price (100) on a fully discounted line.');
+        _Assert.AreEqual(0, MembershipEntry.Amount, 'NEW entry Amount must be 0 on a fully discounted line.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RegretMembership_EcomCreatedMembership_SuggestsNegativeItemPrice()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        Membership: Record "NPR MM Membership";
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        StartDate: Date;
+        UntilDate: Date;
+        SuggestedUnitPrice: Decimal;
+        Success: Boolean;
+    begin
+        // [SCENARIO] Regretting an ecom-created membership suggests the negative item price.
+        Initialize();
+
+        // [GIVEN] An ecom-created membership from a line at 80 for an item priced 100
+        ProcessCreateMembershipOrder(EcomSalesHeader, EcomSalesLine, 1, 80);
+        Membership.GetBySystemId(EcomSalesLine."Membership Id");
+        MemberInfoCapture."Membership Entry No." := Membership."Entry No.";
+
+        // [WHEN] Regret is evaluated without confirm and without update
+        Success := MembershipMgtInternal.RegretMembership(MemberInfoCapture, false, false, StartDate, UntilDate, SuggestedUnitPrice);
+
+        // [THEN] The suggested unit price is -100
+        _Assert.IsTrue(Success, 'Regret must be possible: T-ECOM has no REGRET alteration setup with a blank item.');
+        _Assert.AreEqual(-100, SuggestedUnitPrice, 'Regret must suggest the negative item Unit Price (-100).');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure UpgradeBackfill_EcomNewEntryWithZeroUnitPrice_GetsUnitPriceBase()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        UPGEcomSalesDocs: Codeunit "NPR UPG Ecom Sales Docs";
+        ModifiedCount: Integer;
+    begin
+        // [SCENARIO] The backfill copies Unit Price (Base) into a zero Unit Price on an ecom NEW entry, and a second run changes nothing.
+        Initialize();
+
+        // [GIVEN] An ecom-created NEW entry with Unit Price 0 and Unit Price (Base) 123
+        ProcessCreateMembershipOrder(EcomSalesHeader, EcomSalesLine, 1, 80);
+        FindNewMembershipEntry(EcomSalesLine."Membership Id", MembershipEntry);
+        SetEntryUnitPrices(MembershipEntry, 0, 123);
+
+        // [WHEN] The backfill runs
+        UPGEcomSalesDocs.BackfillEcomMembershipEntryUnitPrice();
+
+        // [THEN] The entry has Unit Price 123
+        AssertEntryUnitPrice(MembershipEntry."Entry No.", 123, 'The backfill must set Unit Price to Unit Price (Base) (123).');
+
+        // [WHEN] The backfill runs again
+        ModifiedCount := UPGEcomSalesDocs.BackfillEcomMembershipEntryUnitPrice();
+
+        // [THEN] Nothing is modified and the entry keeps Unit Price 123
+        _Assert.AreEqual(0, ModifiedCount, 'A second backfill run must not modify any entry.');
+        AssertEntryUnitPrice(MembershipEntry."Entry No.", 123, 'A second backfill run must keep Unit Price 123.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure UpgradeBackfill_DocumentWithoutMembershipLinks_IsBackfilled()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        UPGEcomSalesDocs: Codeunit "NPR UPG Ecom Sales Docs";
+    begin
+        // [SCENARIO] The backfill finds the membership through the line Membership Id when the document has no link rows.
+        Initialize();
+
+        // [GIVEN] An ecom-created membership whose line has no link rows
+        ProcessCreateMembershipOrder(EcomSalesHeader, EcomSalesLine, 1, 80);
+        EcomSalesMembershipLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+        EcomSalesMembershipLink.DeleteAll();
+        _Assert.IsFalse(IsNullGuid(EcomSalesLine."Membership Id"), 'Precondition: the line must carry the Membership Id.');
+
+        // [GIVEN] Its NEW entry has Unit Price 0 and Unit Price (Base) 123
+        FindNewMembershipEntry(EcomSalesLine."Membership Id", MembershipEntry);
+        SetEntryUnitPrices(MembershipEntry, 0, 123);
+
+        // [WHEN] The backfill runs
+        UPGEcomSalesDocs.BackfillEcomMembershipEntryUnitPrice();
+
+        // [THEN] The entry has Unit Price 123
+        AssertEntryUnitPrice(MembershipEntry."Entry No.", 123, 'The backfill must reach the membership through the line Membership Id and set Unit Price 123.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure UpgradeBackfill_Qty3Order_EveryNewEntryBackfilledThroughLinks()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        UPGEcomSalesDocs: Codeunit "NPR UPG Ecom Sales Docs";
+    begin
+        // [SCENARIO] The backfill reaches every membership of a multi-quantity line through its link rows.
+        Initialize();
+
+        // [GIVEN] A create-membership order line, qty 3 at 80, with 3 link rows and no line Membership Id
+        ProcessCreateMembershipOrder(EcomSalesHeader, EcomSalesLine, 3, 80);
+        _Assert.IsTrue(IsNullGuid(EcomSalesLine."Membership Id"), 'Precondition: a qty 3 line must not carry a Membership Id.');
+        EcomSalesMembershipLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+        _Assert.AreEqual(3, EcomSalesMembershipLink.Count(), 'Precondition: expected 3 link rows for qty 3.');
+
+        // [GIVEN] Every linked NEW entry has Unit Price 0 and Unit Price (Base) 123
+        EcomSalesMembershipLink.FindSet();
+        repeat
+            FindNewMembershipEntry(EcomSalesMembershipLink."Membership System Id", MembershipEntry);
+            SetEntryUnitPrices(MembershipEntry, 0, 123);
+        until EcomSalesMembershipLink.Next() = 0;
+
+        // [WHEN] The backfill runs
+        UPGEcomSalesDocs.BackfillEcomMembershipEntryUnitPrice();
+
+        // [THEN] Every linked NEW entry has Unit Price 123
+        EcomSalesMembershipLink.FindSet();
+        repeat
+            FindNewMembershipEntry(EcomSalesMembershipLink."Membership System Id", MembershipEntry);
+            _Assert.AreEqual(123, MembershipEntry."Unit Price", 'The backfill must set Unit Price 123 on the NEW entry of every linked membership.');
+        until EcomSalesMembershipLink.Next() = 0;
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmYesHandler')]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure UpgradeBackfill_ExcludedEntriesAreUnchanged()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        Membership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        AlterationSetup: Record "NPR MM Members. Alter. Setup";
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+        UPGEcomSalesDocs: Codeunit "NPR UPG Ecom Sales Docs";
+        PricedEntryNo: Integer;
+        BlockedEntryNo: Integer;
+        ConfirmedEntryNo: Integer;
+        RenewedNewEntryNo: Integer;
+        RenewEntryNo: Integer;
+        MembershipEntryNo: Integer;
+        ResponseMessage: Text;
+    begin
+        // [SCENARIO] The backfill leaves priced, blocked and confirmed memberships unchanged. An ecom-created membership later renewed by an ecom order gets its NEW entry backfilled, its RENEW entry does not.
+        Initialize();
+
+        // [GIVEN] An ecom-created NEW entry that already has Unit Price 77
+        ProcessCreateMembershipOrder(EcomSalesHeader, EcomSalesLine, 1, 80);
+        FindNewMembershipEntry(EcomSalesLine."Membership Id", MembershipEntry);
+        SetEntryUnitPrices(MembershipEntry, 77, 123);
+        PricedEntryNo := MembershipEntry."Entry No.";
+
+        // [GIVEN] A blocked ecom-created NEW entry with Unit Price 0
+        ProcessCreateMembershipOrder(EcomSalesHeader, EcomSalesLine, 1, 80);
+        FindNewMembershipEntry(EcomSalesLine."Membership Id", MembershipEntry);
+        MembershipEntry.Blocked := true;
+        SetEntryUnitPrices(MembershipEntry, 0, 123);
+        BlockedEntryNo := MembershipEntry."Entry No.";
+
+        // [GIVEN] A REST-created membership confirmed by an ecom order, its NEW entry with Unit Price 0
+        _Assert.IsTrue(_MemberApiLib.CreateMembership('T-ECOM-ITEM', MembershipEntryNo, ResponseMessage), ResponseMessage);
+        Membership.Get(MembershipEntryNo);
+        _LibEcommerce.CreateEcomSalesHeader(EcomSalesHeader);
+        _LibEcommerce.CreateCapturedMembershipLine(EcomSalesLine, EcomSalesHeader, 'T-ECOM-ITEM', Membership);
+        Commit();
+        EcomCreateMMShipImpl.Process(EcomSalesLine);
+        FindNewMembershipEntry(Membership.SystemId, MembershipEntry);
+        MembershipEntry."Source Type" := MembershipEntry."Source Type"::SALESHEADER;
+        MembershipEntry."Document No." := EcomSalesHeader."External No.";
+        SetEntryUnitPrices(MembershipEntry, 0, 123);
+        ConfirmedEntryNo := MembershipEntry."Entry No.";
+
+        // [GIVEN] An ecom-created membership later renewed by an ecom order, its NEW entry with Unit Price 0
+        ProcessCreateMembershipOrder(EcomSalesHeader, EcomSalesLine, 1, 80);
+        Membership.GetBySystemId(EcomSalesLine."Membership Id");
+        AlterationSetup.SetRange("From Membership Code", 'T-ECOM');
+        AlterationSetup.SetRange("Alteration Type", AlterationSetup."Alteration Type"::RENEW);
+        if not AlterationSetup.FindFirst() then
+            Error('Renew alteration setup for T-ECOM not found — check Initialize().');
+        _LibEcommerce.CreateEcomSalesHeader(EcomSalesHeader);
+        EcomSalesHeader."Received Date" := Today();
+        EcomSalesHeader.Modify();
+        CreateCapturedAlterationMembershipLine(EcomSalesLine, EcomSalesHeader, AlterationSetup."Sales Item No.", Membership, AlterationSetup.SystemId, EcomSalesLine."Membership Operation"::RenewMembership, 1, 100);
+        Commit();
+        EcomCreateMMShipImpl.Process(EcomSalesLine);
+        FindNewMembershipEntry(Membership.SystemId, MembershipEntry);
+        SetEntryUnitPrices(MembershipEntry, 0, 123);
+        RenewedNewEntryNo := MembershipEntry."Entry No.";
+        MembershipEntry.Reset();
+        MembershipEntry.SetRange("Membership Entry No.", Membership."Entry No.");
+        MembershipEntry.SetRange(Context, MembershipEntry.Context::RENEW);
+        _Assert.IsTrue(MembershipEntry.FindFirst(), 'Precondition: the ecom renew must create a RENEW entry.');
+        RenewEntryNo := MembershipEntry."Entry No.";
+        AssertEntryUnitPrice(RenewEntryNo, 0, 'Precondition: the RENEW entry must have Unit Price 0.');
+
+        AssertEntryHasUnitPriceBase(PricedEntryNo);
+        AssertEntryHasUnitPriceBase(BlockedEntryNo);
+        AssertEntryHasUnitPriceBase(ConfirmedEntryNo);
+        AssertEntryHasUnitPriceBase(RenewedNewEntryNo);
+        AssertEntryHasUnitPriceBase(RenewEntryNo);
+
+        // [WHEN] The backfill runs
+        UPGEcomSalesDocs.BackfillEcomMembershipEntryUnitPrice();
+
+        // [THEN] The priced, blocked and confirmed entries and the RENEW entry are unchanged
+        AssertEntryUnitPrice(PricedEntryNo, 77, 'The backfill must not change an entry that already has a Unit Price.');
+        AssertEntryUnitPrice(BlockedEntryNo, 0, 'The backfill must not change a blocked entry.');
+        AssertEntryUnitPrice(ConfirmedEntryNo, 0, 'The backfill must not change the entry of a membership confirmed by an ecom order.');
+        AssertEntryUnitPrice(RenewEntryNo, 0, 'The backfill must not change the RENEW entry of a membership renewed by an ecom order.');
+
+        // [THEN] The NEW entry of the renewed ecom-created membership is backfilled
+        AssertEntryUnitPrice(RenewedNewEntryNo, 123, 'The backfill must set Unit Price 123 on the NEW entry of an ecom-created membership renewed by an ecom order.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure UpgradeBackfill_EntryWithOneFieldOutsideFilter_IsUnchanged()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        UPGEcomSalesDocs: Codeunit "NPR UPG Ecom Sales Docs";
+        RenewContextEntryNo: Integer;
+        OtherDocumentEntryNo: Integer;
+        NoSourceTypeEntryNo: Integer;
+    begin
+        // [SCENARIO] An ecom NEW entry with a single field outside the backfill filter is not changed.
+        Initialize();
+
+        // [GIVEN] An ecom-created entry at Unit Price 0 with Context RENEW
+        ProcessCreateMembershipOrder(EcomSalesHeader, EcomSalesLine, 1, 80);
+        FindNewMembershipEntry(EcomSalesLine."Membership Id", MembershipEntry);
+        MembershipEntry.Context := MembershipEntry.Context::RENEW;
+        SetEntryUnitPrices(MembershipEntry, 0, 123);
+        RenewContextEntryNo := MembershipEntry."Entry No.";
+
+        // [GIVEN] An ecom-created NEW entry at Unit Price 0 with another Document No.
+        ProcessCreateMembershipOrder(EcomSalesHeader, EcomSalesLine, 1, 80);
+        FindNewMembershipEntry(EcomSalesLine."Membership Id", MembershipEntry);
+        MembershipEntry."Document No." := 'OTHER';
+        SetEntryUnitPrices(MembershipEntry, 0, 123);
+        OtherDocumentEntryNo := MembershipEntry."Entry No.";
+
+        // [GIVEN] An ecom-created NEW entry at Unit Price 0 with no Source Type
+        ProcessCreateMembershipOrder(EcomSalesHeader, EcomSalesLine, 1, 80);
+        FindNewMembershipEntry(EcomSalesLine."Membership Id", MembershipEntry);
+        MembershipEntry."Source Type" := MembershipEntry."Source Type"::NA;
+        SetEntryUnitPrices(MembershipEntry, 0, 123);
+        NoSourceTypeEntryNo := MembershipEntry."Entry No.";
+
+        AssertEntryHasUnitPriceBase(RenewContextEntryNo);
+        AssertEntryHasUnitPriceBase(OtherDocumentEntryNo);
+        AssertEntryHasUnitPriceBase(NoSourceTypeEntryNo);
+
+        // [WHEN] The backfill runs
+        UPGEcomSalesDocs.BackfillEcomMembershipEntryUnitPrice();
+
+        // [THEN] None of the entries is changed
+        AssertEntryUnitPrice(RenewContextEntryNo, 0, 'The backfill must not change an entry whose Context is not NEW.');
+        AssertEntryUnitPrice(OtherDocumentEntryNo, 0, 'The backfill must not change an entry whose Document No. is not the order External No.');
+        AssertEntryUnitPrice(NoSourceTypeEntryNo, 0, 'The backfill must not change an entry whose Source Type is not Sales Header.');
+    end;
+
+    local procedure ProcessCreateMembershipOrder(var EcomSalesHeader: Record "NPR Ecom Sales Header"; var EcomSalesLine: Record "NPR Ecom Sales Line"; Qty: Decimal; UnitPrice: Decimal)
+    var
+        EcomCreateMMShipImpl: Codeunit "NPR EcomCreateMMShipImpl";
+    begin
+        _LibEcommerce.CreateEcomSalesHeader(EcomSalesHeader);
+        CreateCapturedCreateMembershipLine(EcomSalesLine, EcomSalesHeader, 'T-ECOM-ITEM', Qty, UnitPrice);
+        Commit();
+        EcomCreateMMShipImpl.Process(EcomSalesLine);
+        EcomSalesLine.Get(EcomSalesLine.RecordId);
+    end;
+
+    local procedure FindNewMembershipEntry(MembershipSystemId: Guid; var MembershipEntry: Record "NPR MM Membership Entry")
+    var
+        Membership: Record "NPR MM Membership";
+    begin
+        Membership.GetBySystemId(MembershipSystemId);
+        MembershipEntry.Reset();
+        MembershipEntry.SetRange("Membership Entry No.", Membership."Entry No.");
+        MembershipEntry.SetRange(Context, MembershipEntry.Context::NEW);
+        MembershipEntry.SetRange(Blocked, false);
+        MembershipEntry.FindFirst();
+    end;
+
+    local procedure SetEntryUnitPrices(var MembershipEntry: Record "NPR MM Membership Entry"; UnitPrice: Decimal; UnitPriceBase: Decimal)
+    begin
+        MembershipEntry."Unit Price" := UnitPrice;
+        MembershipEntry."Unit Price (Base)" := UnitPriceBase;
+        MembershipEntry.Modify();
+    end;
+
+    local procedure AssertEntryHasUnitPriceBase(EntryNo: Integer)
+    var
+        MembershipEntry: Record "NPR MM Membership Entry";
+    begin
+        MembershipEntry.Get(EntryNo);
+        _Assert.AreNotEqual(0, MembershipEntry."Unit Price (Base)", 'Precondition: Unit Price (Base) must be non-zero, so a backfill that ignored its filter would change the entry.');
+    end;
+
+    local procedure AssertEntryUnitPrice(EntryNo: Integer; ExpectedUnitPrice: Decimal; Message: Text)
+    var
+        MembershipEntry: Record "NPR MM Membership Entry";
+    begin
+        MembershipEntry.Get(EntryNo);
+        _Assert.AreEqual(ExpectedUnitPrice, MembershipEntry."Unit Price", Message);
+    end;
+
 }
 #endif

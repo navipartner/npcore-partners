@@ -4,6 +4,7 @@ codeunit 85161 "NPR Library Ecommerce"
     procedure CreateEcomSalesHeader(var EcomSalesHeader: Record "NPR Ecom Sales Header")
     begin
         EcomSalesHeader.Init();
+        EcomSalesHeader."Entry No." := 0; // Init() keeps the primary key; a reused variable would insert the previous Entry No. again
         EcomSalesHeader."External No." := 'TEST-' + Format(Random(9999));
         EcomSalesHeader."Document Type" := EcomSalesHeader."Document Type"::Order;
         EcomSalesHeader."Creation Status" := EcomSalesHeader."Creation Status"::Pending;

@@ -20,6 +20,7 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
         FixMonitoredJQEcomSalesRetDoc();
         SetEntriaOrderImpFailureStatus();
         LowercaseEcomEmails();
+        BackfillEcomMembershipUnitPrice();
     end;
 
     local procedure UpgradeEcomJQs()
@@ -377,6 +378,70 @@ codeunit 6248652 "NPR UPG Ecom Sales Docs"
                     ModifiedCount += 1;
                 end;
             until EcomSalesLine.Next() = 0;
+    end;
+
+    internal procedure BackfillEcomMembershipUnitPrice()
+    begin
+        UpgradeStep := 'BackfillEcomMembershipUnitPrice';
+        if HasUpgradeTag() then
+            exit;
+
+        BackfillEcomMembershipEntryUnitPrice();
+
+        SetUpgradeTag();
+    end;
+
+    internal procedure BackfillEcomMembershipEntryUnitPrice() ModifiedCount: Integer
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomSalesMembershipLink: Record "NPR Ecom Sales Membership Link";
+    begin
+        EcomSalesLine.SetRange("Membership Operation", EcomSalesLine."Membership Operation"::CreateMembership);
+        EcomSalesLine.SetLoadFields("Document Entry No.", "Membership Id");
+        if not EcomSalesLine.FindSet() then
+            exit;
+
+        EcomSalesHeader.SetLoadFields("External No.");
+        EcomSalesMembershipLink.SetCurrentKey("Source Line System Id", "Entry No.");
+        EcomSalesMembershipLink.SetLoadFields("Membership System Id");
+        repeat
+            if EcomSalesHeader.Get(EcomSalesLine."Document Entry No.") then begin
+                EcomSalesMembershipLink.SetRange("Source Line System Id", EcomSalesLine.SystemId);
+                if EcomSalesMembershipLink.FindSet() then
+                    repeat
+                        BackfillMembershipEntryUnitPrice(EcomSalesMembershipLink."Membership System Id", EcomSalesHeader."External No.", ModifiedCount);
+                    until EcomSalesMembershipLink.Next() = 0
+                else
+                    if not IsNullGuid(EcomSalesLine."Membership Id") then
+                        BackfillMembershipEntryUnitPrice(EcomSalesLine."Membership Id", EcomSalesHeader."External No.", ModifiedCount);
+            end;
+        until EcomSalesLine.Next() = 0;
+    end;
+
+    local procedure BackfillMembershipEntryUnitPrice(MembershipSystemId: Guid; DocumentNo: Code[20]; var ModifiedCount: Integer)
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
+    begin
+        Membership.SetLoadFields("Entry No.");
+        if not Membership.GetBySystemId(MembershipSystemId) then
+            exit;
+
+        MembershipEntry.SetCurrentKey("Membership Entry No.");
+        MembershipEntry.SetRange("Membership Entry No.", Membership."Entry No.");
+        MembershipEntry.SetRange(Context, MembershipEntry.Context::NEW);
+        MembershipEntry.SetRange(Blocked, false);
+        MembershipEntry.SetRange("Unit Price", 0);
+        MembershipEntry.SetFilter("Unit Price (Base)", '<>0');
+        MembershipEntry.SetRange("Source Type", MembershipEntry."Source Type"::SALESHEADER);
+        MembershipEntry.SetRange("Document No.", DocumentNo);
+        if MembershipEntry.FindSet(true) then
+            repeat
+                MembershipEntry."Unit Price" := MembershipEntry."Unit Price (Base)";
+                MembershipEntry.Modify();
+                ModifiedCount += 1;
+            until MembershipEntry.Next() = 0;
     end;
 }
 #endif

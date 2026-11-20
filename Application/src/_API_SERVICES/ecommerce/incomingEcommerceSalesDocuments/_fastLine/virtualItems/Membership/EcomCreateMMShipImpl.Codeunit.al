@@ -296,6 +296,7 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         Membership: Record "NPR MM Membership";
+        Item: Record Item;
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
     begin
         MemberInfoCapture.Init();
@@ -311,6 +312,9 @@ codeunit 6248527 "NPR EcomCreateMMShipImpl"
         GetMembershipSaleSetup(MembershipSalesSetup, GetItemNoAsCode20(EcomSalesLine));
         if MemberInfoCapture.PreferredLanguageCode = '' then
             MemberInfoCapture.PreferredLanguageCode := GetFallbackMemberLanguageCode(MembershipSalesSetup, MemberInfoCapture);
+        Item.SetLoadFields("Unit Price");
+        if Item.Get(MembershipSalesSetup."No.") then
+            MemberInfoCapture."Unit Price" := Item."Unit Price";
         MemberInfoCapture.Modify();
 
         MembershipManagement.CreateMembershipAll(MembershipSalesSetup, MemberInfoCapture, true);
