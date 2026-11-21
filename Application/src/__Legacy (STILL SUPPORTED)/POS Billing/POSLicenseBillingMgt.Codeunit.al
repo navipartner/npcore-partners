@@ -237,6 +237,12 @@ codeunit 6248524 "NPR POS License Billing Mgt."
 
         RequestBody.Add('name', EnvironmentName);
         RequestBody.Add('status', 'active');
+        // The portal reads `type`, and stores a push without it as production. Builds with the integration-dev
+        // symbols push from sandboxes too (prelive testing), so say which one this is (CORE-2485).
+        if EnvInfo.IsSandbox() then
+            RequestBody.Add('type', 'sandbox')
+        else
+            RequestBody.Add('type', 'production');
 
         if (not ApiPost(Endpoint, RequestBody, JsonResponse)) then
             Error(FailedToSyncEnvironmentToRemoteErr, GetLastErrorText());
