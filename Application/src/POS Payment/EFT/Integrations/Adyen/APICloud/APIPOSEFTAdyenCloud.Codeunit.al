@@ -8,12 +8,14 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
 
     internal procedure PrepareEFTPayment(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
+        APIPOSSaleLine: Codeunit "NPR API POS Sale Line";
         POSSale: Record "NPR POS Sale";
         EFTSetup: Record "NPR EFT Setup";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
         APIPOSSale: Codeunit "NPR API POS Sale";
+        POSAgeCheck: Codeunit "NPR POS Age Check";
         Body: JsonToken;
         IntegrationRequest: JsonObject;
         Mechanism: Enum "NPR EFT Request Mechanism";
@@ -25,6 +27,8 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
         EntryNo: Integer;
         JsonResponse: JsonObject;
     begin
+        Request.SkipCacheIfNonStickyRequest(APIPOSSaleLine.POSSaleTableIds());
+
         if not TryResolveSelfServiceEFTContext(Request, POSSale, EFTSetup, POSUnitNo, SaleId, Response) then
             exit(Response);
 
@@ -40,6 +44,9 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
             Amount := GetRemainingBalance(POSSale);
         if Amount <= 0 then
             exit(Response.RespondBadRequest('Payment amount must be greater than zero'));
+
+        if POSAgeCheck.NeedsApproval(POSSale) then
+            exit(Response.RespondBadRequest("NPR API Error Code"::age_check_required, POSAgeCheck.RequiredErrorMessage()));
 
         // Reconstruct POS session - required by EFT framework (e.g. CalculateCashback needs active session)
         APIPOSSale.ReconstructSession(SaleId);
@@ -69,6 +76,7 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
 
     internal procedure BuildEFTRequest(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
+        APIPOSSaleLine: Codeunit "NPR API POS Sale Line";
         POSSale: Record "NPR POS Sale";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTSetup: Record "NPR EFT Setup";
@@ -76,6 +84,7 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
         EFTAdyenTrxRequest: Codeunit "NPR EFT Adyen Trx Request";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
         APIPOSSale: Codeunit "NPR API POS Sale";
+        POSAgeCheck: Codeunit "NPR POS Age Check";
         SaleId: Guid;
         TransactionId: Guid;
         TerminalApiSaletoPoiRequestJson: Text;
@@ -84,6 +93,8 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
         BridgeRequest: JsonObject;
         JsonResponse: JsonObject;
     begin
+        Request.SkipCacheIfNonStickyRequest(APIPOSSaleLine.POSSaleTableIds());
+
         if not TryLoadExistingTransaction(Request, POSSale, EFTTransactionRequest, SaleId, TransactionId, Response) then
             exit(Response);
 
@@ -92,6 +103,9 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
 
         if not APIPOSSale.AssertPOSUnitOpenForSale(POSSale."Register No.") then
             exit(Response.RespondBadRequest(StrSubstNo('POS Unit ''%1'' is not open for sales.', POSSale."Register No.")));
+
+        if POSAgeCheck.NeedsApproval(POSSale) then
+            exit(Response.RespondBadRequest("NPR API Error Code"::age_check_required, POSAgeCheck.RequiredErrorMessage()));
 
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
         if EFTSetup."EFT Integration Type" <> EFTAdyenIntegration.MposTapToPayIntegrationType() then
@@ -250,6 +264,7 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
 
     internal procedure StartEFTPayment(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
+        APIPOSSaleLine: Codeunit "NPR API POS Sale Line";
         POSSale: Record "NPR POS Sale";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTSetup: Record "NPR EFT Setup";
@@ -258,6 +273,7 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
         EFTAdyenResponseHandler: Codeunit "NPR EFT Adyen Response Handler";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
         APIPOSSale: Codeunit "NPR API POS Sale";
+        POSAgeCheck: Codeunit "NPR POS Age Check";
         SaleId: Guid;
         TransactionId: Guid;
         RequestJson: Text;
@@ -268,6 +284,8 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
         ErrorText: Text;
         JsonResponse: JsonObject;
     begin
+        Request.SkipCacheIfNonStickyRequest(APIPOSSaleLine.POSSaleTableIds());
+
         if not TryLoadExistingTransaction(Request, POSSale, EFTTransactionRequest, SaleId, TransactionId, Response) then
             exit(Response);
 
@@ -276,6 +294,9 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
 
         if not APIPOSSale.AssertPOSUnitOpenForSale(POSSale."Register No.") then
             exit(Response.RespondBadRequest(StrSubstNo('POS Unit ''%1'' is not open for sales.', POSSale."Register No.")));
+
+        if POSAgeCheck.NeedsApproval(POSSale) then
+            exit(Response.RespondBadRequest("NPR API Error Code"::age_check_required, POSAgeCheck.RequiredErrorMessage()));
 
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
         if EFTSetup."EFT Integration Type" <> EFTAdyenIntegration.CloudIntegrationType() then

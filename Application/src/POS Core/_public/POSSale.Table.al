@@ -811,6 +811,28 @@
             DataClassification = CustomerContent;
             Description = 'Temporary field to store payer email for membership subscription payments';
         }
+        field(6030; "Age Check Method"; Enum "NPR POS Age Check Method")
+        {
+            Caption = 'Age Check Method';
+            DataClassification = CustomerContent;
+        }
+        field(6031; "Age Check Approved Limit"; Integer)
+        {
+            Caption = 'Age Check Approved Limit';
+            DataClassification = CustomerContent;
+            BlankZero = true;
+        }
+        field(6032; "Age Check Salesperson Code"; Code[20])
+        {
+            Caption = 'Age Check Salesperson Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Salesperson/Purchaser";
+        }
+        field(6033; "Age Check Approved At"; DateTime)
+        {
+            Caption = 'Age Check Approved At';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

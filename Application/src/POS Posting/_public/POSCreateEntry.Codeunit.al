@@ -247,6 +247,10 @@
         POSEntry."Responsibility Center" := POSSale."Responsibility Center";
         POSEntry."Sales Channel" := POSSale."Sales Channel";
         POSEntry."Customer Posting Group" := POSSale."Customer Posting Group";
+        POSEntry."Age Check Method" := POSSale."Age Check Method";
+        POSEntry."Age Check Approved Limit" := POSSale."Age Check Approved Limit";
+        POSEntry."Age Check Salesperson Code" := POSSale."Age Check Salesperson Code";
+        POSEntry."Age Check Approved At" := POSSale."Age Check Approved At";
 
         OnBeforeInsertPOSEntry(POSSale, POSEntry);
 

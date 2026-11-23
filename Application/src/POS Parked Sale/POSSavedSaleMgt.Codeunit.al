@@ -429,6 +429,7 @@
     procedure Xml2POSSale(var XmlDoc: XmlDocument; var SalePOS: Record "NPR POS Sale")
     var
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        POSAgeCheck: Codeunit "NPR POS Age Check";
         NpDcSaleLinePOSNewCoupon: Record "NPR NpDc SaleLinePOS NewCoupon";
         NpIaSaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
@@ -546,6 +547,7 @@
         SalePOS."Salesperson Code" := xSalePOS."Salesperson Code";
         SalePOS.Date := xSalePOS.Date;
         SalePOS."Start Time" := xSalePOS."Start Time";
+        POSAgeCheck.ClearApproval(SalePOS);
         if UpdateDim then
             SalePOS.CreateDimFromDefaultDim(SalePOS.FieldNo("Register No."));
         SalePOS.Insert(false, true);

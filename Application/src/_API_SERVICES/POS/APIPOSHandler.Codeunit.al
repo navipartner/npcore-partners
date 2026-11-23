@@ -34,6 +34,8 @@ codeunit 6185056 "NPR API POS Handler" implements "NPR API Request Handler"
                 exit(APIPOSSale.ParkSale(Request));
             Request.Match('POST', '/pos/sale/:saleId/resume'):
                 exit(APIPOSSale.ResumeSale(Request));
+            Request.Match('POST', '/pos/sale/:saleId/age-check'):
+                exit(APIPOSSale.ApproveAgeCheck(Request));
             Request.Match('POST', '/pos/unit/:unitId/open'):
                 exit(APIPOSUnit.OpenPOSUnit(Request));
 

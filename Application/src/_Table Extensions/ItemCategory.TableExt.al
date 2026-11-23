@@ -68,6 +68,20 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
                 ItemCategoryMgt.SetBlockedOnChildren(Code, "NPR Blocked", false);
             end;
         }
+        field(6014424; "NPR Age Limit"; Integer)
+        {
+            Caption = 'Age Limit';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+            BlankZero = true;
+
+            trigger OnValidate()
+            var
+                ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
+            begin
+                ItemCategoryMgt.SetAgeLimitOnChildren(Code, "NPR Age Limit", false);
+            end;
+        }
         field(6014409; "NPR Global Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,1,1';

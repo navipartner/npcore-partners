@@ -78,6 +78,8 @@
 
         ToItemCategory.Validate("NPR Global Dimension 1 Code", FromItemCategory."NPR Global Dimension 1 Code");
         ToItemCategory.Validate("NPR Global Dimension 2 Code", FromItemCategory."NPR Global Dimension 2 Code");
+        if FromItemCategory."NPR Age Limit" > ToItemCategory."NPR Age Limit" then
+            ToItemCategory."NPR Age Limit" := FromItemCategory."NPR Age Limit";
 
         TemplateCode := CopyItemTemplate(FromItemCategory, ToItemCategory);
         if ToItemCategory."NPR Item Template Code" = '' then
@@ -105,6 +107,47 @@
                 ItemCategory.Modify(true);
                 SetBlockedOnChildren(ItemCategory.Code, IsBlocked, true);
             until ItemCategory.Next() = 0;
+    end;
+
+    internal procedure SetAgeLimitOnChildren(ParentCode: Code[20]; AgeLimit: Integer; Silent: Boolean)
+    var
+        ItemCategory: Record "Item Category";
+        ConfirmQst: Label 'Do you wish to raise %1 to %2 on Item Categories below this level? Categories with a higher limit keep it.', Comment = '%1 = Age Limit field caption, %2 = the new age limit';
+    begin
+        if not HasChildWithLowerAgeLimit(ParentCode, AgeLimit) then
+            exit;
+
+        if not Silent then
+            if not ConfirmationManagement.GetResponseOrDefault(StrSubstNo(ConfirmQst, ItemCategory.FieldCaption("NPR Age Limit"), AgeLimit), false) then
+                exit;
+
+        ItemCategory.SetRange("Parent Category", ParentCode);
+        if ItemCategory.FindSet(true) then
+            repeat
+                if AgeLimit > ItemCategory."NPR Age Limit" then begin
+                    ItemCategory."NPR Age Limit" := AgeLimit;
+                    ItemCategory.Modify(true);
+                end;
+                SetAgeLimitOnChildren(ItemCategory.Code, AgeLimit, true);
+            until ItemCategory.Next() = 0;
+    end;
+
+    local procedure HasChildWithLowerAgeLimit(ParentCode: Code[20]; AgeLimit: Integer): Boolean
+    var
+        ItemCategory: Record "Item Category";
+    begin
+        ItemCategory.SetRange("Parent Category", ParentCode);
+        ItemCategory.SetFilter("NPR Age Limit", '<%1', AgeLimit);
+        if not ItemCategory.IsEmpty() then
+            exit(true);
+
+        ItemCategory.SetRange("NPR Age Limit");
+        if ItemCategory.FindSet() then
+            repeat
+                if HasChildWithLowerAgeLimit(ItemCategory.Code, AgeLimit) then
+                    exit(true);
+            until ItemCategory.Next() = 0;
+        exit(false);
     end;
 
     #endregion

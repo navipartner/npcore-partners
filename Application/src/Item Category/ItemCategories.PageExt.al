@@ -29,6 +29,17 @@ pageextension 6014446 "NPR Item Categories" extends "Item Categories"
                     CurrPage.Update(false);
                 end;
             }
+            field("NPR Age Limit"; Rec."NPR Age Limit")
+            {
+                ToolTip = 'Specifies the minimum customer age for items in this category. 0 means no restriction. Self-service checkouts require an approved age check before payment when it is set.';
+                ApplicationArea = NPRRetail;
+
+                trigger OnValidate()
+                begin
+                    UpdateDisplayOrder();
+                    CurrPage.Update(false);
+                end;
+            }
         }
     }
 

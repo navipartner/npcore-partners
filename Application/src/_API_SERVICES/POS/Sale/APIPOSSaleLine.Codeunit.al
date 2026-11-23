@@ -174,6 +174,7 @@ codeunit 6248630 "NPR API POS Sale Line"
     internal procedure AddSaleLineToJson(POSSaleLine: Record "NPR POS Sale Line"; var Json: Codeunit "NPR Json Builder")
     var
         NpIaItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+        POSAgeCheck: Codeunit "NPR POS Age Check";
         ParentPOSSaleLine: Record "NPR POS Sale Line";
         NpIaSaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
     begin
@@ -192,7 +193,8 @@ codeunit 6248630 "NPR API POS Sale Line"
             .AddProperty('vatPercent', POSSaleLine."VAT %")
             .AddProperty('amountInclVat', POSSaleLine."Amount Including VAT")
             .AddProperty('amount', POSSaleLine.Amount)
-            .AddProperty('unitOfMeasure', POSSaleLine."Unit of Measure Code");
+            .AddProperty('unitOfMeasure', POSSaleLine."Unit of Measure Code")
+            .AddProperty('ageLimit', POSAgeCheck.LineAgeLimit(POSSaleLine));
 
         NpIaItemAddOnMgt.FilterSaleLinePOS2ItemAddOnPOSLine(POSSaleLine, NpIaSaleLinePOSAddOn);
         if NpIaSaleLinePOSAddOn.FindFirst() then begin

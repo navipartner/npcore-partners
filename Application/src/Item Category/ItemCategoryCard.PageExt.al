@@ -24,6 +24,11 @@ pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
                 ToolTip = 'Specifies the value of the NPR Blocked field';
                 ApplicationArea = NPRRetail;
             }
+            field("NPR Age Limit"; Rec."NPR Age Limit")
+            {
+                ToolTip = 'Specifies the minimum customer age for items in this category. 0 means no restriction. Self-service checkouts require an approved age check before payment when it is set.';
+                ApplicationArea = NPRRetail;
+            }
             field("NPR Main Category"; Rec."NPR Main Category")
             {
                 ToolTip = 'Specifies the value of the NPR Main Category field';

@@ -640,6 +640,32 @@
             Editable = false;
             FieldClass = FlowField;
         }
+        field(6030; "Age Check Method"; Enum "NPR POS Age Check Method")
+        {
+            Caption = 'Age Check Method';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
+        field(6031; "Age Check Approved Limit"; Integer)
+        {
+            Caption = 'Age Check Approved Limit';
+            DataClassification = CustomerContent;
+            Editable = false;
+            BlankZero = true;
+        }
+        field(6032; "Age Check Salesperson Code"; Code[20])
+        {
+            Caption = 'Age Check Salesperson Code';
+            DataClassification = CustomerContent;
+            Editable = false;
+            TableRelation = "Salesperson/Purchaser";
+        }
+        field(6033; "Age Check Approved At"; DateTime)
+        {
+            Caption = 'Age Check Approved At';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
     }
 
     keys

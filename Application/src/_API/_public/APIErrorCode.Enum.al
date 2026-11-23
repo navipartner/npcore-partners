@@ -310,4 +310,12 @@ enum 6059810 "NPR API Error Code"
     {
         Caption = 'A concurrent operation is modifying the same member. Retry shortly.', Locked = true;
     }
+    value(6060160; age_check_required)
+    {
+        Caption = 'The sale contains age-restricted items and the age check has not been approved.', Locked = true;
+    }
+    value(6060161; age_check_rejected)
+    {
+        Caption = 'The age check approval was rejected.', Locked = true;
+    }
 }

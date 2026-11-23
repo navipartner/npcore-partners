@@ -73,7 +73,7 @@ codeunit 6248632 "NPR API POS Sale"
             Evaluate(WithLines, Request.QueryParams().Get('withLines'));
 
         POSSale.ReadIsolation := IsolationLevel::ReadCommitted;
-        POSSale.SetLoadFields(SystemId, "Sales Ticket No.", "Register No.", "Customer No.", "SystemCreatedAt", Date, "POS Store Code", "Salesperson Code", "VAT Bus. Posting Group", "Gen. Bus. Posting Group");
+        POSSale.SetLoadFields(SystemId, "Sales Ticket No.", "Register No.", "Customer No.", "SystemCreatedAt", Date, "POS Store Code", "Salesperson Code", "VAT Bus. Posting Group", "Gen. Bus. Posting Group", "Age Check Approved Limit");
         POSSale.SetFilter("Register No.", '=%1', POSUnitFilter);
         if Request.QueryParams().ContainsKey('userId') then
             POSSale.SetRange("User ID", CopyStr(UserIdFilter, 1, MaxStrLen(POSSale."User ID")))
@@ -258,6 +258,7 @@ codeunit 6248632 "NPR API POS Sale"
         POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
+        POSAgeCheck: Codeunit "NPR POS Age Check";
         KitchenOrder: JsonToken;
         HasKitchenRequest: Boolean;
         ProductType: Text;
@@ -277,6 +278,9 @@ codeunit 6248632 "NPR API POS Sale"
 
         if not AssertPOSUnitOpenForSale(POSSaleRec."Register No.") then
             exit(Response.RespondBadRequest(StrSubstNo('POS Unit ''%1'' is not open for sales.', POSSaleRec."Register No.")));
+
+        if POSAgeCheck.NeedsApproval(POSSaleRec) then
+            exit(Response.RespondBadRequest("NPR API Error Code"::age_check_required, POSAgeCheck.RequiredErrorMessage()));
 
         ReconstructSession(SaleSystemId);
         POSSession.GetSale(POSSale);
@@ -298,6 +302,47 @@ codeunit 6248632 "NPR API POS Sale"
         POSSale.GetLastSalePOSEntry(POSEntry);
         RegisterSelfServiceBillingEvents(POSEntry, ProductType, HasKitchenRequest);
         exit(Response.RespondCreated(POSEntryAsJson(POSEntry)));
+    end;
+
+    procedure ApproveAgeCheck(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        SaleId: Text;
+        SaleSystemId: Guid;
+        POSSaleRec: Record "NPR POS Sale";
+        POSAgeCheck: Codeunit "NPR POS Age Check";
+        Body: JsonToken;
+        Method: Text;
+        Credential: Text;
+    begin
+        Request.SkipCacheIfNonStickyRequest(POSSaleTableIds());
+
+        SaleId := Request.Paths().Get(3);
+        if SaleId = '' then
+            exit(Response.RespondBadRequest('Missing required path parameter: saleId'));
+
+        if not Evaluate(SaleSystemId, SaleId) then
+            exit(Response.RespondBadRequest('Invalid saleId format'));
+
+        if not POSSaleRec.GetBySystemId(SaleSystemId) then
+            exit(Response.RespondResourceNotFound());
+
+        if not AssertPOSUnitOpenForSale(POSSaleRec."Register No.") then
+            exit(Response.RespondBadRequest(StrSubstNo('POS Unit ''%1'' is not open for sales.', POSSaleRec."Register No.")));
+
+        Body := Request.BodyJson();
+        if not Body.IsObject() then
+            exit(Response.RespondBadRequest('Request body must be a JSON object'));
+        if not GetJsonText(Body, 'method', Method) then
+            exit(Response.RespondBadRequest('Missing required field: method'));
+        if Method.ToLower() <> 'staff' then
+            exit(Response.RespondBadRequest(StrSubstNo('Unsupported age check method ''%1''. Supported methods: staff', Method)));
+        if not GetJsonText(Body, 'credential', Credential) then
+            exit(Response.RespondBadRequest('Missing required field: credential'));
+
+        if not POSAgeCheck.ApproveByStaff(POSSaleRec, Credential) then
+            exit(Response.CreateErrorResponse("NPR API Error Code"::age_check_rejected, 'The salesperson PIN or badge was not accepted.', "NPR API HTTP Status Code"::Forbidden));
+
+        exit(Response.RespondOK(POSSaleAsJson(POSSaleRec, true)));
     end;
 
     [CommitBehavior(CommitBehavior::Ignore)]
@@ -405,6 +450,7 @@ codeunit 6248632 "NPR API POS Sale"
         LineId: Text;
         APIPOSSaleLine: Codeunit "NPR API POS Sale Line";
         APIPOSPaymentLine: Codeunit "NPR API POS Payment Line";
+        POSAgeCheck: Codeunit "NPR POS Age Check";
     begin
         Json.StartObject('')
             .AddProperty('saleId', Format(POSSale.SystemId, 0, 4).ToLower())
@@ -417,6 +463,7 @@ codeunit 6248632 "NPR API POS Sale"
             .AddProperty('salespersonCode', POSSale."Salesperson Code")
             .AddProperty('vatBusinessPostingGroup', POSSale."VAT Bus. Posting Group")
             .AddProperty('genBusinessPostingGroup', POSSale."Gen. Bus. Posting Group");
+        POSAgeCheck.AddToJson(POSSale, Json);
 
         if not WithLines then begin
             Json.EndObject();

@@ -92,6 +92,7 @@ codeunit 6248629 "NPR API POS Payment Line"
         POSSaleLine: Record "NPR POS Sale Line";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         APIPOSSale: Codeunit "NPR API POS Sale";
+        POSAgeCheck: Codeunit "NPR POS Age Check";
         DeltaBuilder: Codeunit "NPR API POS Delta Builder";
         PaymentMethodCode: Code[10];
         PaymentAmount: Decimal;
@@ -154,6 +155,9 @@ codeunit 6248629 "NPR API POS Payment Line"
             if POSSaleLine.GetBySystemId(LineId) then
                 exit(Response.RespondBadRequest(StrSubstNo(DuplicatePaymentLineLbl, POSSaleLine.TableCaption, POSSaleLine.FieldCaption(SystemId), LineId)));
         end;
+
+        if (PaymentType = 'Cash') and POSAgeCheck.NeedsApproval(POSSale) then
+            exit(Response.RespondBadRequest("NPR API Error Code"::age_check_required, POSAgeCheck.RequiredErrorMessage()));
 
         if GetJsonText(Body, 'description', TempText) then
             Description := CopyStr(TempText, 1, MaxStrLen(Description));

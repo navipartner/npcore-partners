@@ -120,6 +120,31 @@
                     Visible = false;
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                group(AgeCheck)
+                {
+                    Caption = 'Age Check';
+                    Visible = _HasAgeCheck;
+                    field("Age Check Method"; Rec."Age Check Method")
+                    {
+                        ToolTip = 'Specifies how the age check for the age-restricted items in the sale was approved.';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Age Check Approved Limit"; Rec."Age Check Approved Limit")
+                    {
+                        ToolTip = 'Specifies the age limit that the approval covered.';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Age Check Salesperson Code"; Rec."Age Check Salesperson Code")
+                    {
+                        ToolTip = 'Specifies the salesperson who approved the age check.';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Age Check Approved At"; Rec."Age Check Approved At")
+                    {
+                        ToolTip = 'Specifies when the age check was approved.';
+                        ApplicationArea = NPRRetail;
+                    }
+                }
                 field(LastOpenSalesDocumentNo; LastOpenSalesDocumentNo)
                 {
                     Caption = 'Last Open Sales Doc.';
@@ -795,10 +820,12 @@
         HasSaleLines := Rec."Sale Lines" > 0;
         HasPaymentLines := Rec."Payment Lines" > 0;
         HasTaxLines := Rec."Tax Lines" > 0;
+        _HasAgeCheck := Rec."Age Check Method" <> Rec."Age Check Method"::None;
     end;
 
     var
         TextSalesDocNotFound: Label 'Sales Document %1 %2 not found.';
+        _HasAgeCheck: Boolean;
         HasSaleLines: Boolean;
         HasPaymentLines: Boolean;
         HasTaxLines: Boolean;
