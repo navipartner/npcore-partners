@@ -3,6 +3,9 @@ codeunit 6248644 "NPR API Restaurant Menu"
 {
     Access = Internal;
 
+    var
+        _FallbackLanguageCode: Code[10];
+
     procedure GetMenus(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         Restaurant: Record "NPR NPRE Restaurant";
@@ -268,6 +271,7 @@ codeunit 6248644 "NPR API Restaurant Menu"
         ItemAddOn: Record "NPR NpIa Item AddOn";
         ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
         ItemAddOnLineOpt: Record "NPR NpIa ItemAddOn Line Opt.";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
     begin
         if not ItemAddOn.Get(ItemAddOnNo) then
             exit;
@@ -290,6 +294,7 @@ codeunit 6248644 "NPR API Restaurant Menu"
                 if ItemAddOnLine.Type = ItemAddOnLine.Type::Quantity then begin
                     BuildAddonItemFromLine(ItemAddOnLine, PosUnitCode, VATBusPostingGroup, Json);
                 end else begin
+                    AddAddonDescription(ItemAddOnLine.SystemId, ItemAddOnMgt.GetLineName(ItemAddOnLine), Json);
                     Json.StartArray('selectOptions');
                     ItemAddOnLineOpt.ReadIsolation := IsolationLevel::ReadCommitted;
                     ItemAddOnLineOpt.SetRange("AddOn No.", ItemAddOnLine."AddOn No.");
@@ -313,10 +318,9 @@ codeunit 6248644 "NPR API Restaurant Menu"
 
     local procedure BuildAddonItemFromLine(var ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; PosUnitCode: Code[10]; VATBusPostingGroup: Code[20]; var Json: Codeunit "NPR JSON Builder")
     var
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
         CalculatedPrice: Decimal;
         BasePrice: Decimal;
-        ItemAddonTranslation: Record "NPR Item Addon Translation";
-        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
     begin
         Json.AddProperty('addonNo', ItemAddOnLine."AddOn No.")
             .AddProperty('addonLineNo', ItemAddOnLine."Line No.")
@@ -332,21 +336,14 @@ codeunit 6248644 "NPR API Restaurant Menu"
 
         Json.AddProperty('unitPrice', CalculatedPrice);
 
-        Json.StartObject('description');
-        ItemAddonTranslation.SetRange("External Table SystemId", ItemAddOnLine.SystemId);
-        if ItemAddonTranslation.FindSet() then
-            repeat
-                Json.AddProperty(ItemAddonTranslation."Language Code", ItemAddonTranslation.Description);
-            until ItemAddonTranslation.Next() = 0;
-        Json.EndObject();
+        AddAddonDescription(ItemAddOnLine.SystemId, ItemAddOnMgt.GetLineName(ItemAddOnLine), Json);
     end;
 
     local procedure BuildAddonItemFromOption(var ItemAddOnLineOpt: Record "NPR NpIa ItemAddOn Line Opt."; PosUnitCode: Code[10]; VATBusPostingGroup: Code[20]; var Json: Codeunit "NPR JSON Builder")
     var
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
         CalculatedPrice: Decimal;
         BasePrice: Decimal;
-        ItemAddonTranslation: Record "NPR Item Addon Translation";
-        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
     begin
         Json.AddProperty('addonNo', ItemAddOnLineOpt."AddOn No.")
             .AddProperty('addonLineNo', ItemAddOnLineOpt."AddOn Line No.")
@@ -362,13 +359,34 @@ codeunit 6248644 "NPR API Restaurant Menu"
 
         Json.AddProperty('unitPrice', CalculatedPrice);
 
+        AddAddonDescription(ItemAddOnLineOpt.SystemId, ItemAddOnMgt.GetOptionName(ItemAddOnLineOpt), Json);
+    end;
+
+    local procedure AddAddonDescription(TranslatedRecordSystemId: Guid; FallbackName: Text; var Json: Codeunit "NPR JSON Builder")
+    var
+        ItemAddonTranslation: Record "NPR Item Addon Translation";
+    begin
         Json.StartObject('description');
-        ItemAddonTranslation.SetRange("External Table SystemId", ItemAddOnLineOpt.SystemId);
+        ItemAddonTranslation.SetRange("External Table SystemId", TranslatedRecordSystemId);
         if ItemAddonTranslation.FindSet() then
             repeat
                 Json.AddProperty(ItemAddonTranslation."Language Code", ItemAddonTranslation.Description);
-            until ItemAddonTranslation.Next() = 0;
+            until ItemAddonTranslation.Next() = 0
+        else
+            Json.AddProperty(FallbackLanguageCode(), FallbackName);
         Json.EndObject();
+    end;
+
+    local procedure FallbackLanguageCode(): Code[10]
+    var
+        Language: Codeunit Language;
+    begin
+        if _FallbackLanguageCode = '' then begin
+            _FallbackLanguageCode := Language.GetUserLanguageCode();
+            if _FallbackLanguageCode = '' then
+                _FallbackLanguageCode := 'ENU';
+        end;
+        exit(_FallbackLanguageCode);
     end;
 
     local procedure BuildItemUpsells(MenuItemSystemId: Guid; PosUnitCode: Code[10]; VATBusPostingGroup: Code[20]; var Json: Codeunit "NPR JSON Builder")

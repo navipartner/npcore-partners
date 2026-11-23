@@ -274,7 +274,6 @@
     var
         PerUnitLbl: Label 'per unit';
         QuantityLbl: Label 'quantity';
-        SelectOptionsLbl: Label 'Select one';
         PlaceHolder2Lbl: Label '; %1 = %2', Locked = true;
     begin
         case UseField of
@@ -293,18 +292,38 @@
                         LineCaption := LineCaption + ' ' + ItemAddOnLine."Description 2";
                 end;
         end;
-        if LineCaption = '' then begin
-            case ItemAddOnLine.Type of
-                ItemAddOnLine.Type::Quantity:
-                    LineCaption := ItemNoAndVariantCodeAsDescription(ItemAddOnLine."Item No.", ItemAddOnLine."Variant Code");
-                ItemAddOnLine.Type::Select:
-                    LineCaption := SelectOptionsLbl;
-            end;
-        end;
+        if LineCaption = '' then
+            LineCaption := LineNameFallback(ItemAddOnLine);
         if ItemAddOnLine."Fixed Quantity" then
             LineCaption := LineCaption + StrSubstNo(PlaceHolder2Lbl, QuantityLbl, ItemAddOnLine.Quantity);
         if ItemAddOnLine."Per Unit" then
             LineCaption := LineCaption + '/' + PerUnitLbl;
+    end;
+
+    internal procedure GetLineName(ItemAddOnLine: Record "NPR NpIa Item AddOn Line"): Text
+    begin
+        if ItemAddOnLine.Description <> '' then
+            exit(ItemAddOnLine.Description);
+        exit(LineNameFallback(ItemAddOnLine));
+    end;
+
+    internal procedure GetOptionName(ItemAddOnLineOpt: Record "NPR NpIa ItemAddOn Line Opt."): Text
+    begin
+        if ItemAddOnLineOpt.Description <> '' then
+            exit(ItemAddOnLineOpt.Description);
+        exit(ItemNoAndVariantCodeAsDescription(ItemAddOnLineOpt."Item No.", ItemAddOnLineOpt."Variant Code"));
+    end;
+
+    local procedure LineNameFallback(ItemAddOnLine: Record "NPR NpIa Item AddOn Line"): Text
+    var
+        SelectOptionsLbl: Label 'Select one';
+    begin
+        case ItemAddOnLine.Type of
+            ItemAddOnLine.Type::Quantity:
+                exit(ItemNoAndVariantCodeAsDescription(ItemAddOnLine."Item No.", ItemAddOnLine."Variant Code"));
+            ItemAddOnLine.Type::Select:
+                exit(SelectOptionsLbl);
+        end;
     end;
 
     local procedure OptionValue(ItemAddOnLineOption: Record "NPR NpIa ItemAddOn Line Opt.") ValueJObject: JsonObject
@@ -595,6 +614,94 @@
         end;
 
         exit(true);
+    end;
+
+    internal procedure InsertMissingMandatoryPOSAddOnLines(ItemAddOn: Record "NPR NpIa Item AddOn"; POSSession: Codeunit "NPR POS Session"; MasterSaleLinePOS: Record "NPR POS Sale Line")
+    var
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        TempItemAddOnLine: Record "NPR NpIa Item AddOn Line" temporary;
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        AttachedSaleLinePOS: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        ItemAddOnUnit: Codeunit "NPR NpIa Item AddOn";
+        DiscountManagement: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
+    begin
+        ItemAddOnLine.SetRange("AddOn No.", ItemAddOn."No.");
+        ItemAddOnLine.SetRange(Mandatory, true);
+        ItemAddOnLine.SetRange(Type, ItemAddOnLine.Type::Quantity);
+        ItemAddOnLine.SetFilter(IncludeFromDate, '<=%1', Today());
+        ItemAddOnLine.SetFilter(IncludeUntilDate, '=%1|>=%2', 0D, Today());
+        ItemAddOnUnit.FilterItemAddOnLine(ItemAddOnLine, ItemAddOn, POSSession, MasterSaleLinePOS."Line No.", false);
+        if ItemAddOnLine.IsEmpty() then
+            exit;
+
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+
+        ItemAddOnLine.FindSet();
+        repeat
+            if not FindAddOnSaleLinePOS(SalePOS, MasterSaleLinePOS."Line No.", ItemAddOnLine, AttachedSaleLinePOS) then
+                if not NeedsUserInputToInsert(ItemAddOnLine) then
+                    ItemAddOnLine.Mark(true);
+        until ItemAddOnLine.Next() = 0;
+        ItemAddOnLine.MarkedOnly(true);
+        if ItemAddOnLine.IsEmpty() then
+            exit;
+
+        CopyItemAddOnLinesToTemp(ItemAddOnLine, TempItemAddOnLine, true);
+
+        POSSession.GetSaleLine(POSSaleLine);
+        TempItemAddOnLine.FindSet();
+        repeat
+            ScaleFixedPerUnitQuantity(TempItemAddOnLine, MasterSaleLinePOS);
+            TempItemAddOnLine.Modify();
+            InsertPOSAddOnLine(TempItemAddOnLine, SalePOS, POSSaleLine, MasterSaleLinePOS."Line No.", SaleLinePOS);
+        until TempItemAddOnLine.Next() = 0;
+
+        DiscountManagement.RecalculateAllSaleLinePOS(SalePOS);
+    end;
+
+    internal procedure ScaleFixedPerUnitQuantity(var ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; MasterSaleLinePOS: Record "NPR POS Sale Line")
+    begin
+        if not (ItemAddOnLine."Per Unit" and ItemAddOnLine."Fixed Quantity") then
+            exit;
+        if MasterSaleLinePOS."Quantity (Base)" = 0 then
+            exit;
+        ItemAddOnLine.Quantity := Round(ItemAddOnLine.Quantity * MasterSaleLinePOS."Quantity (Base)", 0.00001);
+    end;
+
+    internal procedure RemoveAttachedPOSAddOnLine(SalePOS: Record "NPR POS Sale"; POSSaleLine: Codeunit "NPR POS Sale Line"; AppliesToLineNo: Integer; ItemAddOnLine: Record "NPR NpIa Item AddOn Line")
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+    begin
+        if not FindAddOnSaleLinePOS(SalePOS, AppliesToLineNo, ItemAddOnLine, SaleLinePOS) then
+            exit;
+        FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
+        SaleLinePOSAddOn.DeleteAll();
+        POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
+        POSSaleLine.DeleteLine();
+    end;
+
+    local procedure NeedsUserInputToInsert(ItemAddOnLine: Record "NPR NpIa Item AddOn Line"): Boolean
+    var
+        Item: Record Item;
+        POSTrackingUtils: Codeunit "NPR POS Tracking Utils";
+        UseSpecificTracking: Boolean;
+    begin
+        if ItemAddOnLine."Item No." = '' then
+            exit(false);
+        if (ItemAddOnLine."Variant Code" = '') and ItemVariantIsRequired(ItemAddOnLine."Item No.") then
+            exit(true);
+        if not Item.Get(ItemAddOnLine."Item No.") then
+            exit(false);
+        if (ItemAddOnLine."Serial No." = '') and POSTrackingUtils.ItemRequiresSerialNumber(Item, UseSpecificTracking) then
+            exit(true);
+        if (ItemAddOnLine."Lot No." = '') and POSTrackingUtils.ItemRequiresLotNo(Item, UseSpecificTracking) then
+            exit(true);
+        exit(false);
     end;
 
     internal procedure InsertPOSAddOnLine(ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; SalePOS: Record "NPR POS Sale"; POSSaleLine: Codeunit "NPR POS Sale Line"; AppliesToLineNo: Integer; var SaleLinePOS: Record "NPR POS Sale Line"): Boolean

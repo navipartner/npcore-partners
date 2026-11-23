@@ -5698,6 +5698,737 @@ codeunit 85157 "NPR POS API Tests"
         JobQueueEntry.Insert(true);
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleLine_MandatoryAddon_AutoInsertedWhenNotSent()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Item: Record Item;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        SaleLines: JsonArray;
+        AddonLine: JsonObject;
+        JToken: JsonToken;
+        SaleId: Guid;
+        SaleLineId: Guid;
+    begin
+        // [SCENARIO] Creating a sale line without addons adds the mandatory Quantity addon like the POS does
+        InitializeAddon();
+        CreateItemWithMandatoryAddon(Item, ItemAddOn, ItemAddOnLine, false, false);
+
+        SaleId := CreateGuid();
+        SaleLineId := CreateGuid();
+        Headers.Add('x-api-version', '2026-11-23');
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        // [WHEN] The sale line is created without an addons array
+        Clear(Body);
+        Body.Add('type', 'Item');
+        Body.Add('code', Item."No.");
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale line should succeed');
+
+        // [THEN] The mandatory addon is on the sale
+        SaleLines := GetSaleLines(SaleId);
+        Assert.AreEqual(2, SaleLines.Count(), 'Should have the item line and the mandatory addon line');
+        Assert.AreEqual(1, CountAddonLines(SaleLines), 'Should have exactly one addon line');
+        Assert.IsTrue(FindFirstAddonLine(SaleLines, AddonLine), 'Addon line should exist');
+        AddonLine.Get('code', JToken);
+        Assert.AreEqual(_AddonItem."No.", JToken.AsValue().AsCode(), 'Addon line should be the mandatory addon item');
+        AddonLine.Get('quantity', JToken);
+        Assert.AreEqual(1, JToken.AsValue().AsDecimal(), 'Addon quantity should be the setup quantity');
+        AddonLine.Get('unitPrice', JToken);
+        Assert.AreEqual(5, JToken.AsValue().AsDecimal(), 'Addon should use the addon line price');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleLine_MandatoryAddon_SentExplicitly_NotDuplicated()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Item: Record Item;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        Response: JsonObject;
+        Body: JsonObject;
+        AddonObj: JsonObject;
+        AddonsArray: JsonArray;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        SaleLines: JsonArray;
+        AddonLine: JsonObject;
+        JToken: JsonToken;
+        SaleId: Guid;
+        SaleLineId: Guid;
+        AddonLineId: Guid;
+    begin
+        // [SCENARIO] A mandatory addon the client sends keeps the client's line id and is not added twice
+        InitializeAddon();
+        CreateItemWithMandatoryAddon(Item, ItemAddOn, ItemAddOnLine, false, false);
+
+        SaleId := CreateGuid();
+        SaleLineId := CreateGuid();
+        AddonLineId := CreateGuid();
+        Headers.Add('x-api-version', '2026-11-23');
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        // [WHEN] The sale line is created with the mandatory addon in the addons array
+        Clear(Body);
+        Body.Add('type', 'Item');
+        Body.Add('code', Item."No.");
+        Body.Add('quantity', 1);
+        AddonObj.Add('lineId', FormatGuid(AddonLineId));
+        AddonObj.Add('addonNo', ItemAddOn."No.");
+        AddonObj.Add('addonLineNo', Format(ItemAddOnLine."Line No."));
+        AddonObj.Add('quantity', 1);
+        AddonsArray.Add(AddonObj);
+        Body.Add('addons', AddonsArray);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale line with addon should succeed');
+
+        // [THEN] Only the client's addon line exists
+        SaleLines := GetSaleLines(SaleId);
+        Assert.AreEqual(2, SaleLines.Count(), 'Should have the item line and one addon line');
+        Assert.AreEqual(1, CountAddonLines(SaleLines), 'Mandatory addon must not be duplicated');
+        Assert.IsTrue(FindFirstAddonLine(SaleLines, AddonLine), 'Addon line should exist');
+        AddonLine.Get('id', JToken);
+        Assert.AreEqual(FormatGuid(AddonLineId), JToken.AsValue().AsText(), 'Addon line should keep the id the client sent');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleLine_MandatoryAddon_FixedPerUnit_FollowsItemQuantity()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Item: Record Item;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        SaleLines: JsonArray;
+        AddonLine: JsonObject;
+        JToken: JsonToken;
+        SaleId: Guid;
+        SaleLineId: Guid;
+    begin
+        // [SCENARIO] A mandatory, fixed quantity, per unit addon is added with the item quantity
+        InitializeAddon();
+        CreateItemWithMandatoryAddon(Item, ItemAddOn, ItemAddOnLine, true, true);
+
+        SaleId := CreateGuid();
+        SaleLineId := CreateGuid();
+        Headers.Add('x-api-version', '2026-11-23');
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        // [WHEN] The sale line is created with quantity 3
+        Clear(Body);
+        Body.Add('type', 'Item');
+        Body.Add('code', Item."No.");
+        Body.Add('quantity', 3);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale line should succeed');
+
+        // [THEN] The addon quantity follows the item quantity
+        SaleLines := GetSaleLines(SaleId);
+        Assert.AreEqual(1, CountAddonLines(SaleLines), 'Should have exactly one addon line');
+        Assert.IsTrue(FindFirstAddonLine(SaleLines, AddonLine), 'Addon line should exist');
+        AddonLine.Get('quantity', JToken);
+        Assert.AreEqual(3, JToken.AsValue().AsDecimal(), 'Per unit addon quantity should follow the item quantity');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleLine_OptionalAddon_NotAutoInserted()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        Item: Record Item;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        SaleLines: JsonArray;
+        SaleId: Guid;
+        SaleLineId: Guid;
+    begin
+        // [SCENARIO] An optional addon line is not added when the client does not send it
+        InitializeAddon();
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryRestaurant.CreateItemAddon(ItemAddOn);
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, ItemAddOn."No.", _AddonItem."No.", ItemAddOnLine."Use Unit Price"::Always, 5);
+        ItemAddOnLine."Fixed Quantity" := true;
+        ItemAddOnLine.Modify();
+        LibraryRestaurant.LinkItemToAddon(Item, ItemAddOn."No.");
+        Commit();
+
+        SaleId := CreateGuid();
+        SaleLineId := CreateGuid();
+        Headers.Add('x-api-version', '2026-11-23');
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        // [WHEN] The sale line is created without addons
+        Clear(Body);
+        Body.Add('type', 'Item');
+        Body.Add('code', Item."No.");
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale line should succeed');
+
+        // [THEN] No addon line is added
+        SaleLines := GetSaleLines(SaleId);
+        Assert.AreEqual(1, SaleLines.Count(), 'Only the item line should exist');
+        Assert.AreEqual(0, CountAddonLines(SaleLines), 'Optional addon must not be auto inserted');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_AddonLine_DescriptionFallsBackToLineDescription()
+    var
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        Assert: Codeunit Assert;
+        Language: Codeunit Language;
+        Item: Record Item;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        AddonItems: JsonArray;
+        AddonObj: JsonObject;
+        Description: JsonObject;
+        JToken: JsonToken;
+    begin
+        // [SCENARIO] Without translations the menu sends the addon line Description under the user language key
+        InitializeMenu();
+        CreateMenuItemWithAddon(Item, ItemAddOn);
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, ItemAddOn."No.", _AddonItem."No.", ItemAddOnLine."Use Unit Price"::Always, 5);
+        ItemAddOnLine.Description := 'Pant';
+        ItemAddOnLine.Modify();
+        Commit();
+
+        // [WHEN] Get menu
+        AddonItems := GetMenuItemAddons(Item."No.");
+
+        // [THEN] The addon line description is the line Description
+        Assert.AreEqual(1, AddonItems.Count(), 'Should have one addon line');
+        AddonItems.Get(0, JToken);
+        AddonObj := JToken.AsObject();
+        Assert.IsTrue(AddonObj.Get('description', JToken), 'Addon line should have description');
+        Description := JToken.AsObject();
+        Assert.AreEqual(1, Description.Keys().Count(), 'Fallback description should have one language key');
+        Assert.IsTrue(Description.Get(Language.GetUserLanguageCode(), JToken), 'Fallback should be under the user language code');
+        Assert.AreEqual('Pant', JToken.AsValue().AsText(), 'Fallback should be the line Description');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_AddonLine_DescriptionFallsBackToItemNo()
+    var
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        Assert: Codeunit Assert;
+        Language: Codeunit Language;
+        Item: Record Item;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        AddonItems: JsonArray;
+        AddonObj: JsonObject;
+        Description: JsonObject;
+        JToken: JsonToken;
+    begin
+        // [SCENARIO] With a blank Description and no translations the menu sends the POS fallback name
+        InitializeMenu();
+        CreateMenuItemWithAddon(Item, ItemAddOn);
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, ItemAddOn."No.", _AddonItem."No.", ItemAddOnLine."Use Unit Price"::Always, 5);
+        ItemAddOnLine.Description := '';
+        ItemAddOnLine.Modify();
+        Commit();
+
+        // [WHEN] Get menu
+        AddonItems := GetMenuItemAddons(Item."No.");
+
+        // [THEN] The addon line description is the item number fallback the POS uses
+        AddonItems.Get(0, JToken);
+        AddonObj := JToken.AsObject();
+        AddonObj.Get('description', JToken);
+        Description := JToken.AsObject();
+        Assert.IsTrue(Description.Get(Language.GetUserLanguageCode(), JToken), 'Fallback should be under the user language code');
+        Assert.AreEqual(StrSubstNo('Item: %1', _AddonItem."No."), JToken.AsValue().AsText(), 'Fallback should name the addon item like the POS');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_AddonLine_TranslationsWinOverFallback()
+    var
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        Assert: Codeunit Assert;
+        Item: Record Item;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        ItemAddonTranslation: Record "NPR Item Addon Translation";
+        AddonItems: JsonArray;
+        AddonObj: JsonObject;
+        Description: JsonObject;
+        JToken: JsonToken;
+    begin
+        // [SCENARIO] When translations exist the menu sends only them, as before
+        InitializeMenu();
+        CreateMenuItemWithAddon(Item, ItemAddOn);
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, ItemAddOn."No.", _AddonItem."No.", ItemAddOnLine."Use Unit Price"::Always, 5);
+        ItemAddonTranslation.Init();
+        ItemAddonTranslation."External Table SystemId" := ItemAddOnLine.SystemId;
+        ItemAddonTranslation."Language Code" := 'DAN';
+        ItemAddonTranslation.Description := 'Pant (dansk)';
+        ItemAddonTranslation.Insert();
+        ItemAddonTranslation."Language Code" := 'ENU';
+        ItemAddonTranslation.Description := 'Deposit';
+        ItemAddonTranslation.Insert();
+        Commit();
+
+        // [WHEN] Get menu
+        AddonItems := GetMenuItemAddons(Item."No.");
+
+        // [THEN] Only the translations are returned
+        AddonItems.Get(0, JToken);
+        AddonObj := JToken.AsObject();
+        AddonObj.Get('description', JToken);
+        Description := JToken.AsObject();
+        Assert.AreEqual(2, Description.Keys().Count(), 'Only the two translations should be returned');
+        Assert.IsTrue(Description.Get('DAN', JToken), 'Danish translation should be returned');
+        Assert.AreEqual('Pant (dansk)', JToken.AsValue().AsText(), 'Danish translation text');
+        Assert.IsTrue(Description.Get('ENU', JToken), 'English translation should be returned');
+        Assert.AreEqual('Deposit', JToken.AsValue().AsText(), 'English translation text');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantMenu_SelectLine_HasOwnDescriptionAndOptionFallback()
+    var
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        Assert: Codeunit Assert;
+        Language: Codeunit Language;
+        Item: Record Item;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        ItemAddOnLineOpt: Record "NPR NpIa ItemAddOn Line Opt.";
+        AddonItems: JsonArray;
+        AddonObj: JsonObject;
+        OptionObj: JsonObject;
+        Description: JsonObject;
+        SelectOptions: JsonArray;
+        JToken: JsonToken;
+    begin
+        // [SCENARIO] A Select line carries its own name and its options fall back like the POS
+        InitializeMenu();
+        CreateMenuItemWithAddon(Item, ItemAddOn);
+        ItemAddOnLine.Init();
+        ItemAddOnLine."AddOn No." := ItemAddOn."No.";
+        ItemAddOnLine."Line No." := 10000;
+        ItemAddOnLine.Type := ItemAddOnLine.Type::Select;
+        ItemAddOnLine.Description := 'Choose protein';
+        ItemAddOnLine.Insert(true);
+        LibraryRestaurant.CreateItemAddonLineOption(ItemAddOnLineOpt, ItemAddOnLine, _AddonItem."No.", ItemAddOnLineOpt."Use Unit Price"::Always, 5);
+        ItemAddOnLineOpt.Description := '';
+        ItemAddOnLineOpt.Modify();
+        Commit();
+
+        // [WHEN] Get menu
+        AddonItems := GetMenuItemAddons(Item."No.");
+
+        // [THEN] The Select line has its Description and the option has the item number fallback
+        AddonItems.Get(0, JToken);
+        AddonObj := JToken.AsObject();
+        Assert.IsTrue(AddonObj.Get('description', JToken), 'Select line should have description');
+        Description := JToken.AsObject();
+        Assert.IsTrue(Description.Get(Language.GetUserLanguageCode(), JToken), 'Select line description should be under the user language code');
+        Assert.AreEqual('Choose protein', JToken.AsValue().AsText(), 'Select line description should be the line Description');
+
+        Assert.IsTrue(AddonObj.Get('selectOptions', JToken), 'Select line should have selectOptions');
+        SelectOptions := JToken.AsArray();
+        Assert.AreEqual(1, SelectOptions.Count(), 'Should have one option');
+        SelectOptions.Get(0, JToken);
+        OptionObj := JToken.AsObject();
+        Assert.IsTrue(OptionObj.Get('description', JToken), 'Option should have description');
+        Description := JToken.AsObject();
+        Assert.IsTrue(Description.Get(Language.GetUserLanguageCode(), JToken), 'Option description should be under the user language code');
+        Assert.AreEqual(StrSubstNo('Item: %1', _AddonItem."No."), JToken.AsValue().AsText(), 'Option fallback should name the option item like the POS');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleLine_MandatoryAddons_SentOneOfTwo_KeepsClientLineAndAddsOther()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        Assert: Codeunit Assert;
+        Item: Record Item;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLineA: Record "NPR NpIa Item AddOn Line";
+        ItemAddOnLineB: Record "NPR NpIa Item AddOn Line";
+        Response: JsonObject;
+        Body: JsonObject;
+        AddonObj: JsonObject;
+        AddonsArray: JsonArray;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        SaleLines: JsonArray;
+        LineObj: JsonObject;
+        JToken: JsonToken;
+        SaleId: Guid;
+        SaleLineId: Guid;
+        AddonLineId: Guid;
+    begin
+        // [SCENARIO] With two mandatory lines, the one the client sends keeps its id and quantity and the other is added
+        InitializeAddon();
+        CreateItemWithMandatoryAddon(Item, ItemAddOn, ItemAddOnLineA, false, false);
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLineB, ItemAddOn."No.", _AddonItem."No.", ItemAddOnLineB."Use Unit Price"::Always, 7);
+        ItemAddOnLineB.Mandatory := true;
+        ItemAddOnLineB.Modify();
+        Commit();
+
+        SaleId := CreateGuid();
+        SaleLineId := CreateGuid();
+        AddonLineId := CreateGuid();
+        Headers.Add('x-api-version', '2026-11-23');
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        // [WHEN] Only line A is sent, with quantity 2
+        Clear(Body);
+        Body.Add('type', 'Item');
+        Body.Add('code', Item."No.");
+        Body.Add('quantity', 1);
+        AddonObj.Add('lineId', FormatGuid(AddonLineId));
+        AddonObj.Add('addonNo', ItemAddOn."No.");
+        AddonObj.Add('addonLineNo', Format(ItemAddOnLineA."Line No."));
+        AddonObj.Add('quantity', 2);
+        AddonsArray.Add(AddonObj);
+        Body.Add('addons', AddonsArray);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale line with addon should succeed');
+
+        // [THEN] Line A keeps the client's id and quantity, line B is added, nothing is duplicated
+        SaleLines := GetSaleLines(SaleId);
+        Assert.AreEqual(2, CountAddonLines(SaleLines), 'Should have exactly two addon lines');
+        Assert.IsTrue(FindSaleLineById(SaleLines, AddonLineId, LineObj), 'Client addon line id should exist');
+        LineObj.Get('quantity', JToken);
+        Assert.AreEqual(2, JToken.AsValue().AsDecimal(), 'Client addon line should keep the client quantity');
+        Assert.IsTrue(FindAddonLineByUnitPrice(SaleLines, 7, LineObj), 'Mandatory line B should be auto inserted');
+        LineObj.Get('quantity', JToken);
+        Assert.AreEqual(1, JToken.AsValue().AsDecimal(), 'Auto inserted line should use the setup quantity');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleLine_MandatoryAddon_TwoStep_AddonEndpointReplacesAutoInserted()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Item: Record Item;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        SaleLines: JsonArray;
+        AddonLine: JsonObject;
+        JToken: JsonToken;
+        SaleId: Guid;
+        SaleLineId: Guid;
+        AddonLineId: Guid;
+    begin
+        // [SCENARIO] Posting the mandatory addon through the addon endpoint after the sale line keeps the client's id and quantity
+        InitializeAddon();
+        CreateItemWithMandatoryAddon(Item, ItemAddOn, ItemAddOnLine, false, false);
+
+        SaleId := CreateGuid();
+        SaleLineId := CreateGuid();
+        AddonLineId := CreateGuid();
+        Headers.Add('x-api-version', '2026-11-23');
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        Clear(Body);
+        Body.Add('type', 'Item');
+        Body.Add('code', Item."No.");
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale line should succeed');
+        Assert.AreEqual(1, CountAddonLines(GetSaleLines(SaleId)), 'Mandatory addon should be auto inserted first');
+
+        // [WHEN] The client posts the same mandatory addon with its own id and quantity 2
+        Clear(Body);
+        Body.Add('lineId', FormatGuid(AddonLineId));
+        Body.Add('parentLineId', FormatGuid(SaleLineId));
+        Body.Add('addonNo', ItemAddOn."No.");
+        Body.Add('addonLineNo', Format(ItemAddOnLine."Line No."));
+        Body.Add('quantity', 2);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId) + '/addon', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create addon line should succeed');
+
+        // [THEN] One addon line exists, with the client's id and quantity
+        SaleLines := GetSaleLines(SaleId);
+        Assert.AreEqual(1, CountAddonLines(SaleLines), 'The auto inserted line should be replaced, not duplicated');
+        Assert.IsTrue(FindFirstAddonLine(SaleLines, AddonLine), 'Addon line should exist');
+        AddonLine.Get('id', JToken);
+        Assert.AreEqual(FormatGuid(AddonLineId), JToken.AsValue().AsText(), 'Addon line should have the id the client sent');
+        AddonLine.Get('quantity', JToken);
+        Assert.AreEqual(2, JToken.AsValue().AsDecimal(), 'Addon line should have the client quantity');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleLine_MandatoryAddon_FixedPerUnit_SentExplicitly_FollowsItemQuantity()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Item: Record Item;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        Response: JsonObject;
+        Body: JsonObject;
+        AddonObj: JsonObject;
+        AddonsArray: JsonArray;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        SaleLines: JsonArray;
+        AddonLine: JsonObject;
+        JToken: JsonToken;
+        SaleId: Guid;
+        SaleLineId: Guid;
+        AddonLineId: Guid;
+    begin
+        // [SCENARIO] A fixed per unit addon the client sends with the setup quantity ends up scaled like the auto inserted one
+        InitializeAddon();
+        CreateItemWithMandatoryAddon(Item, ItemAddOn, ItemAddOnLine, true, true);
+
+        SaleId := CreateGuid();
+        SaleLineId := CreateGuid();
+        AddonLineId := CreateGuid();
+        Headers.Add('x-api-version', '2026-11-23');
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        // [WHEN] Item quantity 3 is created with the addon sent at its setup quantity 1
+        Clear(Body);
+        Body.Add('type', 'Item');
+        Body.Add('code', Item."No.");
+        Body.Add('quantity', 3);
+        AddonObj.Add('lineId', FormatGuid(AddonLineId));
+        AddonObj.Add('addonNo', ItemAddOn."No.");
+        AddonObj.Add('addonLineNo', Format(ItemAddOnLine."Line No."));
+        AddonObj.Add('quantity', 1);
+        AddonsArray.Add(AddonObj);
+        Body.Add('addons', AddonsArray);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale line with addon should succeed');
+
+        // [THEN] The addon quantity follows the item quantity
+        SaleLines := GetSaleLines(SaleId);
+        Assert.AreEqual(1, CountAddonLines(SaleLines), 'Should have exactly one addon line');
+        Assert.IsTrue(FindSaleLineById(SaleLines, AddonLineId, AddonLine), 'Addon line should keep the client id');
+        AddonLine.Get('quantity', JToken);
+        Assert.AreEqual(3, JToken.AsValue().AsDecimal(), 'Fixed per unit addon should follow the item quantity');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SaleLine_MandatoryAddon_ItemWithVariants_SkippedWithoutError()
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        Item: Record Item;
+        AddonItemWithVariants: Record Item;
+        ItemVariant: Record "Item Variant";
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        SaleLines: JsonArray;
+        SaleId: Guid;
+        SaleLineId: Guid;
+    begin
+        // [SCENARIO] A mandatory addon whose item needs a variant choice is left out instead of failing the request
+        InitializeAddon();
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(AddonItemWithVariants, _POSUnit, _POSStore);
+        ItemVariant.Init();
+        ItemVariant."Item No." := AddonItemWithVariants."No.";
+        ItemVariant.Code := 'RED';
+        ItemVariant.Insert();
+        LibraryRestaurant.CreateItemAddon(ItemAddOn);
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, ItemAddOn."No.", AddonItemWithVariants."No.", ItemAddOnLine."Use Unit Price"::Always, 5);
+        ItemAddOnLine.Mandatory := true;
+        ItemAddOnLine.Modify();
+        LibraryRestaurant.LinkItemToAddon(Item, ItemAddOn."No.");
+        Commit();
+
+        SaleId := CreateGuid();
+        SaleLineId := CreateGuid();
+        Headers.Add('x-api-version', '2026-11-23');
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale should succeed');
+
+        // [WHEN] The sale line is created without addons
+        Clear(Body);
+        Body.Add('type', 'Item');
+        Body.Add('code', Item."No.");
+        Body.Add('quantity', 1);
+        Response := LibraryNPRetailAPI.CallApi('POST', '/pos/sale/' + FormatGuid(SaleId) + '/saleline/' + FormatGuid(SaleLineId), Body, QueryParams, Headers);
+
+        // [THEN] The request succeeds and the addon needing a variant is not inserted
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Create sale line should succeed');
+        SaleLines := GetSaleLines(SaleId);
+        Assert.AreEqual(1, SaleLines.Count(), 'Only the item line should exist');
+        Assert.AreEqual(0, CountAddonLines(SaleLines), 'Addon needing a variant must not be auto inserted');
+    end;
+
+    local procedure FindSaleLineById(SaleLines: JsonArray; LineId: Guid; var LineObj: JsonObject): Boolean
+    var
+        SaleLineToken: JsonToken;
+        JToken: JsonToken;
+    begin
+        foreach SaleLineToken in SaleLines do
+            if SaleLineToken.AsObject().Get('id', JToken) and (JToken.AsValue().AsText() = FormatGuid(LineId)) then begin
+                LineObj := SaleLineToken.AsObject();
+                exit(true);
+            end;
+        exit(false);
+    end;
+
+    local procedure FindAddonLineByUnitPrice(SaleLines: JsonArray; UnitPrice: Decimal; var LineObj: JsonObject): Boolean
+    var
+        SaleLineToken: JsonToken;
+        JToken: JsonToken;
+    begin
+        foreach SaleLineToken in SaleLines do
+            if SaleLineToken.AsObject().Get('isAddon', JToken) and JToken.AsValue().AsBoolean() then
+                if SaleLineToken.AsObject().Get('unitPrice', JToken) and (JToken.AsValue().AsDecimal() = UnitPrice) then begin
+                    LineObj := SaleLineToken.AsObject();
+                    exit(true);
+                end;
+        exit(false);
+    end;
+
+    local procedure CreateItemWithMandatoryAddon(var Item: Record Item; var ItemAddOn: Record "NPR NpIa Item AddOn"; var ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; FixedQuantity: Boolean; PerUnit: Boolean)
+    var
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+    begin
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryRestaurant.CreateItemAddon(ItemAddOn);
+        LibraryRestaurant.CreateItemAddonLine(ItemAddOnLine, ItemAddOn."No.", _AddonItem."No.", ItemAddOnLine."Use Unit Price"::Always, 5);
+        ItemAddOnLine.Mandatory := true;
+        ItemAddOnLine."Fixed Quantity" := FixedQuantity;
+        ItemAddOnLine."Per Unit" := PerUnit;
+        ItemAddOnLine.Modify();
+        LibraryRestaurant.LinkItemToAddon(Item, ItemAddOn."No.");
+        Commit();
+    end;
+
+    local procedure CreateMenuItemWithAddon(var Item: Record Item; var ItemAddOn: Record "NPR NpIa Item AddOn")
+    var
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        MenuCategory: Record "NPR NPRE Menu Category";
+        MenuItem: Record "NPR NPRE Menu Item";
+    begin
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryRestaurant.SetupItemForKitchenOrders(Item);
+        LibraryRestaurant.CreateItemAddon(ItemAddOn);
+        LibraryRestaurant.LinkItemToAddon(Item, ItemAddOn."No.");
+
+        MenuCategory.SetRange("Restaurant Code", _Menu."Restaurant Code");
+        MenuCategory.SetRange("Menu Code", _Menu.Code);
+        MenuCategory.SetRange("Category Code", 'ADDONNAMES');
+        if MenuCategory.IsEmpty() then
+            LibraryRestaurant.CreateMenuCategory(MenuCategory, _Menu."Restaurant Code", _Menu.Code, 'ADDONNAMES');
+        LibraryRestaurant.CreateMenuItem(MenuItem, _Menu."Restaurant Code", _Menu.Code, 'ADDONNAMES', Item."No.");
+    end;
+
+    local procedure GetMenuItemAddons(ItemNo: Code[20]) AddonItems: JsonArray
+    var
+        Assert: Codeunit Assert;
+        MenuContent: JsonObject;
+        ItemObj: JsonObject;
+        Categories: JsonArray;
+        CategoryToken: JsonToken;
+        ItemsToken: JsonToken;
+        JToken: JsonToken;
+    begin
+        MenuContent := GetMenuContent(_Menu);
+        Assert.IsTrue(MenuContent.Get('categories', JToken), 'menuContent should have categories');
+        Categories := JToken.AsArray();
+        foreach CategoryToken in Categories do
+            if CategoryToken.AsObject().Get('items', ItemsToken) then
+                if FindMenuItemByItemCode(ItemsToken.AsArray(), ItemNo, ItemObj) then begin
+                    Assert.IsTrue(ItemObj.Get('addonItems', JToken), 'Menu item should have addonItems');
+                    exit(JToken.AsArray());
+                end;
+        Assert.Fail(StrSubstNo('Menu item %1 not found in menu response', ItemNo));
+    end;
+
+    local procedure GetSaleLines(SaleId: Guid) SaleLines: JsonArray
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        Body: JsonObject;
+        ResponseBody: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        JToken: JsonToken;
+    begin
+        QueryParams.Add('withLines', 'true');
+        Response := LibraryNPRetailAPI.CallApi('GET', '/pos/sale/' + FormatGuid(SaleId), Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'Get sale should succeed');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        Assert.IsTrue(ResponseBody.Get('saleLines', JToken), 'Sale should have saleLines');
+        SaleLines := JToken.AsArray();
+    end;
+
+    local procedure CountAddonLines(SaleLines: JsonArray) AddonCount: Integer
+    var
+        SaleLineToken: JsonToken;
+        JToken: JsonToken;
+    begin
+        foreach SaleLineToken in SaleLines do
+            if SaleLineToken.AsObject().Get('isAddon', JToken) and JToken.AsValue().AsBoolean() then
+                AddonCount += 1;
+    end;
+
+    local procedure FindFirstAddonLine(SaleLines: JsonArray; var AddonLine: JsonObject): Boolean
+    var
+        SaleLineToken: JsonToken;
+        JToken: JsonToken;
+    begin
+        foreach SaleLineToken in SaleLines do
+            if SaleLineToken.AsObject().Get('isAddon', JToken) and JToken.AsValue().AsBoolean() then begin
+                AddonLine := SaleLineToken.AsObject();
+                exit(true);
+            end;
+        exit(false);
+    end;
+
     local procedure Initialize()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";

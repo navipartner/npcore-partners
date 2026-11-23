@@ -56,11 +56,12 @@ codeunit 6184624 "NPR API POS Sale Line V2"
         if not POSSaleLine.InsertLine(TempPOSSaleLine, true) then
             exit(Response.RespondBadRequest('Failed to insert sale line'));
 
+        POSSaleLine.GetCurrentSaleLine(CreatedLine);
         if Body.AsObject().Get('addons', AddonsArray) and AddonsArray.IsArray() then begin
-            POSSaleLine.GetCurrentSaleLine(CreatedLine);
             ProcessAddonsArray(AddonsArray, CreatedLine);
             DiscountManagement.RecalculateAllSaleLinePOS(POSSaleRec);
         end;
+        InsertMissingMandatoryAddons(CreatedLine, POSSession);
 
         exit(Response.RespondCreated(DeltaBuilder.BuildDeltaResponse()));
     end;
@@ -213,10 +214,32 @@ codeunit 6184624 "NPR API POS Sale Line V2"
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(POSSaleRec);
         POSSession.GetSaleLine(POSSaleLine);
+        if ItemAddOnLine.Mandatory and (ItemAddOnLine.Type = ItemAddOnLine.Type::Quantity) then
+            ItemAddOnMgt.RemoveAttachedPOSAddOnLine(POSSaleRec, POSSaleLine, ParentLine."Line No.", TempItemAddOnLine);
         POSSaleLine.SetPosition(ParentLine.GetPosition());
 
         if not ItemAddOnMgt.InsertPOSAddOnLine(TempItemAddOnLine, POSSaleRec, POSSaleLine, ParentLine."Line No.", CreatedLine, AddonSaleLineId, SelectedOptionLineNo) then
             Error('Inserting POS addon line failed');
+    end;
+
+    local procedure InsertMissingMandatoryAddons(ParentLine: Record "NPR POS Sale Line"; POSSession: Codeunit "NPR POS Session")
+    var
+        Item: Record Item;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+    begin
+        if ParentLine."Line Type" <> ParentLine."Line Type"::Item then
+            exit;
+        if not Item.Get(ParentLine."No.") then
+            exit;
+        if Item."NPR Item AddOn No." = '' then
+            exit;
+        if not ItemAddOn.Get(Item."NPR Item AddOn No.") then
+            exit;
+        if not ItemAddOn.Enabled then
+            exit;
+
+        ItemAddOnMgt.InsertMissingMandatoryPOSAddOnLines(ItemAddOn, POSSession, ParentLine);
     end;
 
     local procedure ProcessAddonsArray(AddonsArray: JsonToken; ParentLine: Record "NPR POS Sale Line")
