@@ -11,6 +11,11 @@ table 6151230 "NPR Job Queue Refresh Log"
             Caption = 'JQ Runner User Name';
             DataClassification = CustomerContent;
         }
+        field(2; "Monitored Jobs Renewed At"; DateTime)
+        {
+            Caption = 'Monitored Jobs Renewed At';
+            DataClassification = SystemMetadata;
+        }
         field(10; "Last Refreshed"; DateTime)
         {
             Caption = 'Last Refreshed';

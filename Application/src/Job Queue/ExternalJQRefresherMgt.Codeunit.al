@@ -108,6 +108,7 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
 
     internal procedure SendRefreshRequest(var HttpResponseMessage: HttpResponseMessage): Text
     var
+        JobQueueRefreshLog: Record "NPR Job Queue Refresh Log";
         TypeHelper: Codeunit "Type Helper";
         CompanyNameUrlEncoded: Text;
         AzureADTenant: Codeunit "Azure AD Tenant";
@@ -117,6 +118,8 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         SandboxEndpoint: Label '-prelive.navipartner-prelive.workers.dev', Locked = true;
         LiveEndpoint: Label '.npretail.app', Locked = true;
     begin
+        JobQueueRefreshLog.ModifyAll("Monitored Jobs Renewed At", 0DT);
+        Commit();
         CompanyNameUrlEncoded := CompanyName();
         TypeHelper.UrlEncode(CompanyNameUrlEncoded);
 

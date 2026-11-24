@@ -20,6 +20,8 @@
         AutoRescheduleOnError: Boolean;
         IsNPProtected: Boolean;
         JQRefreshSetupRetrieved: Boolean;
+        _DefinitionUpdatePostponed: Boolean;
+        _RestoringFromMonitored: Boolean;
         ShowAutoCreatedClause: Boolean;
         ParamNameAndValueLbl: Label '%1=%2', Locked = true;
 
@@ -295,6 +297,7 @@
         JobQueueEntry."Record ID to Process" := Parameters."Record ID to Process";
         JobQueueEntry."Earliest Start Date/Time" := Parameters."Earliest Start Date/Time";
         SetJobQueueEntryParams(Parameters, JobQueueEntry);
+        JobQueueEntry."Notify On Success" := Parameters."Notify On Success";
         if MonitoredJobRefreshActive and ((JobQueueEntry."Starting Time" <> 0T) or (JobQueueEntry."Ending Time" <> 0T)) then begin
             GetJQRefresherSetup();
             JobQueueEntry."NPR Time Zone" := _JQRefresherSetup."Default Job Time Zone";
@@ -311,14 +314,39 @@
 
     local procedure UpdateJobQueueEntry(Parameters: Record "Job Queue Entry"; var JobQueueEntry: Record "Job Queue Entry"): Boolean
     begin
+        _DefinitionUpdatePostponed := false;
         if not UpdateIsRequired(Parameters, JobQueueEntry) then
             exit(false);
+        if PostponeUpdateOfRunningJob(JobQueueEntry) then
+            exit(false);
 
-        JobQueueEntry.RefreshLocked();
+        LockJobQueueEntry(JobQueueEntry);
+        if PostponeUpdateOfRunningJob(JobQueueEntry) then
+            exit(false);
         DoUpdateJobQueueEntry(Parameters, JobQueueEntry);
         JobQueueEntry.Status := JobQueueEntry.Status::"On Hold";
         JobQueueEntry.Modify(true);
         exit(true);
+    end;
+
+    local procedure PostponeUpdateOfRunningJob(JobQueueEntry: Record "Job Queue Entry"): Boolean
+    begin
+        // The refresher leaves a running job alone. Writing the monitored definition puts the entry On Hold and restarts
+        // it, but a restart does not stop the run in progress, so the job would run twice at the same time.
+        // The first refresh that finds the job not running writes it.
+        if not _RestoringFromMonitored then
+            exit(false);
+        if JobQueueEntry.Status <> JobQueueEntry.Status::"In Process" then
+            exit(false);
+        if IsStale(JobQueueEntry) then
+            exit(false);
+        _DefinitionUpdatePostponed := true;
+        exit(true);
+    end;
+
+    internal procedure DefinitionUpdatePostponed(): Boolean
+    begin
+        exit(_DefinitionUpdatePostponed);
     end;
 
     local procedure DoUpdateJobQueueEntry(Parameters: Record "Job Queue Entry"; var JobQueueEntry: Record "Job Queue Entry")
@@ -327,7 +355,7 @@
         OnBeforeModifyUpdatedJobQueueEntry(JobQueueEntry);
     end;
 
-    local procedure UpdateIsRequired(Parameters: Record "Job Queue Entry"; JobQueueEntry: Record "Job Queue Entry"): Boolean
+    internal procedure UpdateIsRequired(Parameters: Record "Job Queue Entry"; JobQueueEntry: Record "Job Queue Entry"): Boolean
     var
         TempJobQueueEntry: Record "Job Queue Entry" temporary;
     begin
@@ -384,7 +412,6 @@
         JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := Parameters."NPR Auto-Resched. Delay (sec.)";
         JobQueueEntry."NPR Heartbeat URL" := Parameters."NPR Heartbeat URL";
         JobQueueEntry."NPR NP Protected Job" := Parameters."NPR NP Protected Job";
-        JobQueueEntry."Notify On Success" := Parameters."Notify On Success";
     end;
 
     [Obsolete('Replaced by the JQEntryExists procedure.', '2025-11-07')]
@@ -448,7 +475,6 @@
     var
         EnvironmentInformation: Codeunit "Environment Information";
         MonitoredJobQueueMgt: Codeunit "NPR Monitored Job Queue Mgt.";
-        ValidStartDT: Boolean;
     begin
         if IsMonitoredJobRefreshRoutineActive() then begin
             MonitoredJobQueueMgt.AddMonitoredJobQueueEntry(JobQueueEntry);
@@ -458,25 +484,16 @@
         Activated := false;
         if not TaskScheduler.CanCreateTask() then
             exit;
-        case JobQueueEntry.Status of
-            JobQueueEntry.Status::"In Process":
-                if not IsStale(JobQueueEntry) then
-                    exit;
-            JobQueueEntry.Status::"On Hold":
-                if JobQueueEntry."NPR Manually Set On Hold" then
-                    exit;
-        end;
+        if not RestartWanted(JobQueueEntry, NotBeforeDateTime) then
+            exit;
         if EnvironmentInformation.IsSaaS() then
             if GetCurrentModuleExecutionContext() <> ExecutionContext::Normal then
                 exit;
 
-        ValidStartDT := HasValidStartDT(JobQueueEntry, NotBeforeDateTime);
-        if ValidStartDT and (JobQueueEntry.Status = JobQueueEntry.Status::Ready) then
-            if not IsStale(JobQueueEntry) then
-                exit;
-
-        JobQueueEntry.RefreshLocked();
-        if not ValidStartDT then begin
+        LockJobQueueEntry(JobQueueEntry);
+        if not RestartWanted(JobQueueEntry, NotBeforeDateTime) then
+            exit;
+        if not HasValidStartDT(JobQueueEntry, NotBeforeDateTime) then begin
             JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
             JobQueueEntry."Earliest Start Date/Time" := NotBeforeDateTime;
             JobQueueEntry.Modify();
@@ -525,6 +542,74 @@
     local procedure HasValidStartDT(JobQueueEntry: Record "Job Queue Entry"; NotBeforeDateTime: DateTime): Boolean
     begin
         exit(JobQueueEntry."Earliest Start Date/Time" in [RoundDateTime(NotBeforeDateTime, MinutesToDuration(3), '<') .. RoundDateTime(NotBeforeDateTime, MinutesToDuration(3), '>')]);
+    end;
+
+    internal procedure RestartWanted(JobQueueEntry: Record "Job Queue Entry"; NotBeforeDateTime: DateTime): Boolean
+    begin
+        if _RestoringFromMonitored then
+            exit(NeedsRestart(JobQueueEntry));
+        case JobQueueEntry.Status of
+            JobQueueEntry.Status::"In Process":
+                exit(IsStale(JobQueueEntry));
+            JobQueueEntry.Status::"On Hold":
+                exit(not JobQueueEntry."NPR Manually Set On Hold");
+            JobQueueEntry.Status::Ready:
+                if not IsStale(JobQueueEntry) then
+                    exit(not HasValidStartDT(JobQueueEntry, NotBeforeDateTime));
+        end;
+        exit(true);
+    end;
+
+    internal procedure NeedsRestart(JobQueueEntry: Record "Job Queue Entry"): Boolean
+    begin
+        case JobQueueEntry.Status of
+            JobQueueEntry.Status::"On Hold":
+                exit(not JobQueueEntry."NPR Manually Set On Hold");
+            JobQueueEntry.Status::Ready,
+            JobQueueEntry.Status::Waiting,
+            JobQueueEntry.Status::"In Process",
+            JobQueueEntry.Status::"On Hold with Inactivity Timeout":
+                exit(IsStale(JobQueueEntry));
+        end;
+        exit(true);
+    end;
+
+    local procedure LockJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry")
+    var
+        PrevLockTimeout: Integer;
+        Locked: Boolean;
+    begin
+        if not _RestoringFromMonitored then begin
+            JobQueueEntry.RefreshLocked();
+            exit;
+        end;
+        // Base RefreshLocked waits minutes for a lock (up to 10 from BC28), but the external refresher is cut off after 125
+        // seconds and BC then rolls its work back. A locked entry fails here instead and is refreshed again on the next run.
+        // The lock timeout is session wide, so it is restored before the failure is raised.
+        PrevLockTimeout := LockTimeoutDuration();
+        LockTimeoutDuration(ShortLockWaitSec());
+        Locked := TryLockJobQueueEntry(JobQueueEntry);
+        LockTimeoutDuration(PrevLockTimeout);
+        if not Locked then
+            Error(GetLastErrorText());
+    end;
+
+    [TryFunction]
+    local procedure TryLockJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry")
+    begin
+        JobQueueEntry.SetLoadFields();
+        JobQueueEntry.ReadIsolation := IsolationLevel::UpdLock;
+        JobQueueEntry.Find();
+    end;
+
+    local procedure ShortLockWaitSec(): Integer
+    begin
+        exit(5);
+    end;
+
+    internal procedure SetRestoringFromMonitored(RestoringFromMonitored: Boolean)
+    begin
+        _RestoringFromMonitored := RestoringFromMonitored;
     end;
 
     local procedure GetJQRefresherSetup()
@@ -754,20 +839,73 @@
     end;
 
     internal procedure RefreshNPRJobQueueList(CallRefreshProcedure: Boolean)
+    begin
+        RefreshNPRJobQueueList(CallRefreshProcedure, false);
+    end;
+
+    internal procedure RefreshNPRJobQueueList(CallRefreshProcedure: Boolean; ExternalRefresherCall: Boolean)
     var
         MonitoredJobQueueMgt: Codeunit "NPR Monitored Job Queue Mgt.";
+        Sentry: Codeunit "NPR Sentry";
+        RenewSpan: Codeunit "NPR Sentry Span";
+        CallStartedAt: DateTime;
+        RenewMonitoredJobs: Boolean;
     begin
+        CallStartedAt := CurrentDateTime();
         if not SkipUpdateNPManagedMonitoredJobs() then begin
             GetJQRefresherSetup();
             if _JQRefresherSetup."Use External JQ Refresher" then
                 _JQRefresherSetup.TestField("Default Job Time Zone");
-            BindSubscription(MonitoredJobQueueMgt);
-            OnRefreshNPRJobQueueList();  //renew NaviPartner protected monitored jobs
-            if UnBindSubscription(MonitoredJobQueueMgt) then;
-            Commit();
+            RenewMonitoredJobs := true;
+            if ExternalRefresherCall then
+                RenewMonitoredJobs := MonitoredJobsRenewalIsDue();
+            if RenewMonitoredJobs then begin
+                Sentry.StartSpan(RenewSpan, 'bc.jobqueue.refresher.renew-monitored-jobs');
+                BindSubscription(MonitoredJobQueueMgt);
+                OnRefreshNPRJobQueueList();  //renew NaviPartner protected monitored jobs
+                if UnBindSubscription(MonitoredJobQueueMgt) then;
+                // Stamped only after the renewal ran, so a call that dies during it leaves the renewal to the next call.
+                if ExternalRefresherCall then
+                    StampMonitoredJobsRenewal();
+                Commit();
+                RenewSpan.Finish();
+            end;
         end;
         if CallRefreshProcedure then
-            RefreshJobQueues();  //loop through monitored jobs and create job queue entries if needed
+            RefreshJobQueues(RefreshDeadline(ExternalRefresherCall, CallStartedAt));  //loop through monitored jobs and create job queue entries if needed
+    end;
+
+    local procedure RefreshDeadline(ExternalRefresherCall: Boolean; CallStartedAt: DateTime) Deadline: DateTime
+    begin
+        // The external refresher is cut off after 125 seconds and BC then rolls back the work in progress, so it starts no
+        // new entry after the deadline: 60 seconds for the entries, but no later than 85 seconds into the call. The
+        // remaining entries are refreshed on a later run.
+        if not ExternalRefresherCall then
+            exit(0DT);
+        Deadline := CurrentDateTime() + 60 * 1000;
+        if Deadline > CallStartedAt + 85 * 1000 then
+            Deadline := CallStartedAt + 85 * 1000;
+    end;
+
+    internal procedure MonitoredJobsRenewalIsDue(): Boolean
+    var
+        JobQueueRefreshLog: Record "NPR Job Queue Refresh Log";
+    begin
+        // Every runner user calls the external refresher each hour, but the monitored job list only needs renewing once.
+        // 40 minutes rather than 60, so the first call of the next hour renews it again.
+        JobQueueRefreshLog.SetFilter("Monitored Jobs Renewed At", '>%1', CurrentDateTime() - MinutesToDuration(40));
+        exit(JobQueueRefreshLog.IsEmpty());
+    end;
+
+    local procedure StampMonitoredJobsRenewal()
+    var
+        JobQueueRefreshLog: Record "NPR Job Queue Refresh Log";
+    begin
+        JobQueueRefreshLog."JQ Runner User Name" := CopyStr(UserId(), 1, MaxStrLen(JobQueueRefreshLog."JQ Runner User Name"));
+        if not JobQueueRefreshLog.Find() then
+            JobQueueRefreshLog.Insert();
+        JobQueueRefreshLog."Monitored Jobs Renewed At" := CurrentDateTime();
+        JobQueueRefreshLog.Modify();
     end;
 
     internal procedure SkipUpdateNPManagedMonitoredJobs() Skip: Boolean
@@ -985,6 +1123,36 @@
             JobQueueEntry."Earliest Start Date/Time" := CreateDateTime(Today() + 1, JobQueueEntry."Starting Time");
     end;
 
+    internal procedure AlignToRunWindow(JobQueueEntry: Record "Job Queue Entry"; RunDateTime: DateTime): DateTime
+    var
+        TimeOfDay: Time;
+    begin
+        if RunDateTime = 0DT then
+            exit(RunDateTime);
+        TimeOfDay := DT2Time(RunDateTime);
+        if IsWithinRunWindow(JobQueueEntry, TimeOfDay) then
+            exit(RunDateTime);
+        if (JobQueueEntry."Starting Time" <> 0T) and (TimeOfDay < JobQueueEntry."Starting Time") then
+            exit(CreateDateTime(DT2Date(RunDateTime), JobQueueEntry."Starting Time"));
+        if JobQueueEntry."Starting Time" = 0T then
+            exit(CreateDateTime(DT2Date(RunDateTime) + 1, 000000T));
+        exit(CreateDateTime(DT2Date(RunDateTime) + 1, JobQueueEntry."Starting Time"));
+    end;
+
+    local procedure IsWithinRunWindow(JobQueueEntry: Record "Job Queue Entry"; TimeOfDay: Time): Boolean
+    begin
+        // Same rules as "Job Queue Dispatcher".IsWithinStartEndTime, which decides whether a job may run now.
+        if (JobQueueEntry."Starting Time" = 0T) and (JobQueueEntry."Ending Time" = 0T) then
+            exit(true);
+        if (JobQueueEntry."Ending Time" <> 0T) and (JobQueueEntry."Starting Time" > JobQueueEntry."Ending Time") then
+            exit((TimeOfDay >= JobQueueEntry."Starting Time") or (TimeOfDay <= JobQueueEntry."Ending Time"));
+        if (JobQueueEntry."Starting Time" <> 0T) and (JobQueueEntry."Ending Time" <> 0T) and (JobQueueEntry."Starting Time" <> JobQueueEntry."Ending Time") then
+            exit((JobQueueEntry."Starting Time" <= TimeOfDay) and (TimeOfDay <= JobQueueEntry."Ending Time"));
+        if JobQueueEntry."Starting Time" <> 0T then
+            exit(JobQueueEntry."Starting Time" <= TimeOfDay);
+        exit(TimeOfDay <= JobQueueEntry."Ending Time");
+    end;
+
     local procedure GetLastSuccessfulRunDateTime(JobQueueEntry: Record "Job Queue Entry"): DateTime
     var
         JobQueueLogEntry: Record "Job Queue Log Entry";
@@ -1157,11 +1325,11 @@
         IsInMonitoredJobUpdate(Result, Handled);
     end;
 
-    local procedure RefreshJobQueues()
+    local procedure RefreshJobQueues(Deadline: DateTime)
     var
         MonitoredJobQueueMgt: Codeunit "NPR Monitored Job Queue Mgt.";
     begin
-        MonitoredJobQueueMgt.RefreshJobQueueEntries();
+        MonitoredJobQueueMgt.RefreshJobQueueEntries(Deadline);
     end;
 
     local procedure SetTimeZone(var JobQueueEntry: Record "Job Queue Entry")
@@ -1257,6 +1425,24 @@
             JobQueueEntry.Modify();
             JobQueueEntry.Restart();
         end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue Dispatcher", OnCalcInitialRunTimeOnAfterCalcEarliestPossibleRunTime, '', false, false)]
+    local procedure KeepMonitoredFormulaJobInRunWindow(var JobQueueEntry: Record "Job Queue Entry"; var EarliestPossibleRunTime: DateTime; var IsHandled: Boolean)
+    begin
+        // The dispatcher keeps only minute-based recurring jobs inside their run window. A job with a Next Run Date Formula
+        // that is started outside its window would be rescheduled to "now" every few seconds until the window opens.
+        if IsHandled then
+            exit;
+        if not JobQueueEntry."Recurring Job" then
+            exit;
+        if Format(JobQueueEntry."Next Run Date Formula") = '' then
+            exit;
+        if (JobQueueEntry."Starting Time" = 0T) and (JobQueueEntry."Ending Time" = 0T) then
+            exit;
+        if not JobQueueIsMonitored(JobQueueEntry) then
+            exit;
+        EarliestPossibleRunTime := AlignToRunWindow(JobQueueEntry, EarliestPossibleRunTime);
     end;
 
 #if BC17 or BC18 or BC19 or BC20 or BC21

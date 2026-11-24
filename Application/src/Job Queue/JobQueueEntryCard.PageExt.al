@@ -250,6 +250,26 @@ pageextension 6014424 "NPR Job Queue Entry Card" extends "Job Queue Entry Card"
         _MonitoredJob := JobQueueManagement.JobQueueIsMonitored(Rec);
         _MonitoredJobCanBeToggled := not JobQueueManagement.JobQueueIsNPProtected(Rec);
         SetShowTimeZone();
+        ShowOrRecallRefreshOverwriteNotification();
+    end;
+
+    trigger OnModifyRecord(): Boolean
+    begin
+        ShowOrRecallRefreshOverwriteNotification();
+        exit(true);
+    end;
+
+    local procedure ShowOrRecallRefreshOverwriteNotification()
+    var
+        MonitoredJQMgt: Codeunit "NPR Monitored Job Queue Mgt.";
+    begin
+        if MonitoredJQMgt.ShowRefreshOverwriteNotification(Rec) then
+            _RefreshOverwriteNotificationShown := true
+        else
+            if _RefreshOverwriteNotificationShown then begin
+                MonitoredJQMgt.RecallRefreshOverwriteNotification();
+                _RefreshOverwriteNotificationShown := false;
+            end;
     end;
 
     local procedure SetShowTimeZone()
@@ -278,5 +298,6 @@ pageextension 6014424 "NPR Job Queue Entry Card" extends "Job Queue Entry Card"
         _NPRRetailAppAreaEnabled: Boolean;
         _MonitoredJob: Boolean;
         _MonitoredJobCanBeToggled: Boolean;
+        _RefreshOverwriteNotificationShown: Boolean;
         _ShowTimeZone: Boolean;
 }

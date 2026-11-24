@@ -15,10 +15,21 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
         Result := true;
     end;
 
-    internal procedure RefreshJobQueueEntries()
+    internal procedure RefreshJobQueueEntries(Deadline: DateTime)
     var
         JQMonitorEntry: Record "NPR Monitored Job Queue Entry";
         JQRefreshSetup: Record "NPR Job Queue Refresh Setup";
+        Sentry: Codeunit "NPR Sentry";
+        EntriesSpan: Codeunit "NPR Sentry Span";
+        EntryNos: List of [BigInteger];
+        FailedEntryNos: List of [BigInteger];
+        FailedModifiedAt: List of [DateTime];
+        EntryNo: BigInteger;
+        Refreshed: Integer;
+        Failed: Integer;
+        NotReached: Integer;
+        EntrySpans: Integer;
+        NotReachedTxt: Label 'The job queue refresher ran out of time before it reached all monitored jobs.', Locked = true;
     begin
         JQRefreshSetup.GetSetup();
         if JQRefreshSetup."Use External JQ Refresher" then begin
@@ -28,22 +39,120 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
                 JQMonitorEntry.SetRange("JQ Runner User Name", UserID);
         end;
 
+        // Entries that failed last time (e.g. locked by another session) go last, so they cannot use up the time of the others.
+        // Among them the one written longest ago goes first: every failed attempt rewrites its entry, so entries the deadline
+        // did not reach come before the ones that just failed again.
+        JQMonitorEntry.SetLoadFields("Entry No.", "Last Refresh Status", SystemModifiedAt);
         if JQMonitorEntry.FindSet() then
             repeat
-                RefreshOneJobQueueEntry(JQMonitorEntry);
+                if JQMonitorEntry."Last Refresh Status" = JQMonitorEntry."Last Refresh Status"::Error then
+                    AddOldestFirst(FailedEntryNos, FailedModifiedAt, JQMonitorEntry."Entry No.", JQMonitorEntry.SystemModifiedAt)
+                else
+                    EntryNos.Add(JQMonitorEntry."Entry No.");
             until JQMonitorEntry.Next() = 0;
+        EntryNos.AddRange(FailedEntryNos);
+
+        Sentry.StartSpan(EntriesSpan, 'bc.jobqueue.refresher.refresh-entries');
+        JQMonitorEntry.SetLoadFields();
+        foreach EntryNo in EntryNos do
+            if DeadlinePassed(Deadline) then
+                NotReached += 1
+            else
+                if JQMonitorEntry.Get(EntryNo) then
+                    if RefreshOneJobQueueEntry(JQMonitorEntry, EntrySpans) then
+                        Refreshed += 1
+                    else
+                        Failed += 1;
+        if NotReached > 0 then
+            EntriesSpan.Finish(Enum::"NPR Sentry Span Status"::DeadlineExceeded)
+        else
+            EntriesSpan.Finish(Enum::"NPR Sentry Span Status"::Ok);
+
+        if Sentry.HasActiveTransaction() then begin
+            Sentry.AddTransactionTag('jq_refresher.monitored_entries', Format(EntryNos.Count(), 0, 9));
+            Sentry.AddTransactionTag('jq_refresher.refreshed_entries', Format(Refreshed, 0, 9));
+            Sentry.AddTransactionTag('jq_refresher.failed_entries', Format(Failed, 0, 9));
+            Sentry.AddTransactionTag('jq_refresher.not_reached_entries', Format(NotReached, 0, 9));
+            if NotReached > 0 then
+                Sentry.AddError(NotReachedTxt);
+        end;
     end;
 
-    local procedure RefreshOneJobQueueEntry(JQMonitorEntry: Record "NPR Monitored Job Queue Entry")
+    local procedure AddOldestFirst(var EntryNos: List of [BigInteger]; var ModifiedAt: List of [DateTime]; EntryNo: BigInteger; EntryModifiedAt: DateTime)
+    var
+        Position: Integer;
+        i: Integer;
     begin
-        if Codeunit.Run(Codeunit::"NPR Refresh Job Queue Entry", JQMonitorEntry) then
-            exit;
+        Position := ModifiedAt.Count() + 1;
+        for i := ModifiedAt.Count() downto 1 do
+            if ModifiedAt.Get(i) > EntryModifiedAt then
+                Position := i;
+        if Position > ModifiedAt.Count() then begin
+            EntryNos.Add(EntryNo);
+            ModifiedAt.Add(EntryModifiedAt);
+        end else begin
+            EntryNos.Insert(Position, EntryNo);
+            ModifiedAt.Insert(Position, EntryModifiedAt);
+        end;
+    end;
+
+    local procedure DeadlinePassed(Deadline: DateTime): Boolean
+    begin
+        if Deadline = 0DT then
+            exit(false);
+        exit(CurrentDateTime() > Deadline);
+    end;
+
+    local procedure RefreshOneJobQueueEntry(JQMonitorEntry: Record "NPR Monitored Job Queue Entry"; var EntrySpans: Integer): Boolean
+    var
+        Sentry: Codeunit "NPR Sentry";
+        EntrySpan: Codeunit "NPR Sentry Span";
+        StartedAt: DateTime;
+        Refreshed: Boolean;
+        ErrorText: Text;
+        EntrySpanLbl: Label 'bc.jobqueue.refresher.refresh-entry:%1', Locked = true;
+    begin
+        StartedAt := CurrentDateTime();
+        Refreshed := Codeunit.Run(Codeunit::"NPR Refresh Job Queue Entry", JQMonitorEntry);
+        // Only failed and slow entries get a span, and only up to a limit: a transaction that reaches 200 spans is dropped.
+        if (not Refreshed or (CurrentDateTime() - StartedAt >= 1000)) and (EntrySpans < 50) then begin
+            EntrySpans += 1;
+            Sentry.StartSpan(EntrySpan, StrSubstNo(EntrySpanLbl, Format(JQMonitorEntry."Object ID to Run", 0, 9)));
+            EntrySpan.SetStartTime(StartedAt);
+        end;
+        if Refreshed then begin
+            EntrySpan.Finish(Enum::"NPR Sentry Span Status"::Ok);
+            exit(true);
+        end;
+        ErrorText := GetLastErrorText();
+        AddLastErrorToSentry(JQMonitorEntry."Last Refresh Status" <> JQMonitorEntry."Last Refresh Status"::Error);
+        EntrySpan.Finish(Enum::"NPR Sentry Span Status"::InternalError);
         if JQMonitorEntry.Find() then begin
-            JQMonitorEntry.SetErrorMessage(GetLastErrorText());
+            JQMonitorEntry.SetErrorMessage(ErrorText);
             JQMonitorEntry."Last Refresh Status" := JQMonitorEntry."Last Refresh Status"::Error;
             JQMonitorEntry.Modify();
             Commit();
         end;
+    end;
+
+    local procedure AddLastErrorToSentry(FirstFailure: Boolean)
+    var
+        Sentry: Codeunit "NPR Sentry";
+        OwnsTransaction: Boolean;
+    begin
+        // The legacy refresher and the "Refresh" action on the job queue entries start no transaction, and an error added
+        // without one is never sent. This transaction is not sampled, so it is only sent when it carries an error.
+        OwnsTransaction := not Sentry.HasActiveTransaction();
+        if OwnsTransaction then
+            Sentry.InitScopeAndTransaction('Job Queue refresher entry', 'bc.jobqueue.refresher.refresh-entry', 0);
+        // A job that could not be refreshed is reported when that starts. One that fails again on every later call is
+        // only sent again when it is a programming bug.
+        if FirstFailure then
+            Sentry.AddLastErrorInEnglish()
+        else
+            Sentry.AddLastErrorIfProgrammingBug();
+        if OwnsTransaction then
+            Sentry.FinalizeScope();
     end;
 
     internal procedure AddMonitoredJobQueueEntry(JobQueueEntry: Record "Job Queue Entry")
@@ -276,6 +385,51 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
                 MonitoredJQEntry.Modify();
             end;
         end;
+    end;
+
+    internal procedure ShowRefreshOverwriteNotification(JobQueueEntry: Record "Job Queue Entry"): Boolean
+    var
+        RefreshJobQueueEntry: Codeunit "NPR Refresh Job Queue Entry";
+        RefreshOverwriteNotification: Notification;
+        RefreshOverwritesMsg: Label 'This job is monitored by the Job Queue Refresher. The changes made to this job queue entry will be overwritten when the refresher runs. To keep a change, make it on the monitored job.';
+        ShowMonitoredJobLbl: Label 'Show monitored job';
+    begin
+        if not RefreshJobQueueEntry.WillOverwrite(JobQueueEntry) then
+            exit(false);
+        RefreshOverwriteNotification.Id := RefreshOverwriteNotificationId();
+        RefreshOverwriteNotification.Message := RefreshOverwritesMsg;
+        RefreshOverwriteNotification.SetData('JobQueueEntryID', Format(JobQueueEntry.ID));
+        RefreshOverwriteNotification.AddAction(ShowMonitoredJobLbl, Codeunit::"NPR Monitored Job Queue Mgt.", 'ShowMonitoredJobFromNotification');
+        RefreshOverwriteNotification.Send();
+        exit(true);
+    end;
+
+    internal procedure RecallRefreshOverwriteNotification()
+    var
+        RefreshOverwriteNotification: Notification;
+    begin
+        RefreshOverwriteNotification.Id := RefreshOverwriteNotificationId();
+        RefreshOverwriteNotification.Recall();
+    end;
+
+    internal procedure ShowMonitoredJobFromNotification(RefreshOverwriteNotification: Notification)
+    var
+        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
+        JobQueueEntryID: Guid;
+    begin
+        if not Evaluate(JobQueueEntryID, RefreshOverwriteNotification.GetData('JobQueueEntryID')) then
+            exit;
+        MonitoredJQEntry.SetRange("Job Queue Entry ID", JobQueueEntryID);
+        Page.Run(Page::"NPR Monitored JQ Entries", MonitoredJQEntry);
+    end;
+
+    local procedure RefreshOverwriteNotificationId(): Guid
+    var
+        NotificationId: Guid;
+        NotificationIdTok: Label '5a9c7e21-6f0b-4b6e-9d0a-3c2e8f4b7d15', Locked = true;
+    begin
+        Evaluate(NotificationId, NotificationIdTok);
+        exit(NotificationId);
     end;
 
     internal procedure CheckJobBeforeAddingToMonitored(JobQueueEntry: Record "Job Queue Entry")
