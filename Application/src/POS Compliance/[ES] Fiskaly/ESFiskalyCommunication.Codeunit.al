@@ -1260,7 +1260,7 @@ codeunit 6184937 "NPR ES Fiskaly Communication"
             repeat
                 JsonTextWriter.WriteStartObject('');
                 JsonTextWriter.WriteStringProperty('text', POSEntrySalesLine.Description);
-                JsonTextWriter.WriteStringProperty('quantity', Format(Abs(Round(POSEntrySalesLine.Quantity, 0.01)), 0, '<Precision,0:8><Standard Format,2>'));
+                JsonTextWriter.WriteStringProperty('quantity', Format(Abs(POSEntrySalesLine.Quantity), 0, '<Precision,0:8><Standard Format,2>'));
                 UnitPriceExclVAT := Abs(Round((POSEntrySalesLine."Amount Excl. VAT" + POSEntrySalesLine."Line Discount Amount Excl. VAT") / POSEntrySalesLine.Quantity, 0.01));
                 if ESPOSAuditLogAuxInfo."Invoice Type" <> Enum::"NPR ES Invoice Type"::CORRECTING then
                     JsonTextWriter.WriteStringProperty('unit_amount', Format(UnitPriceExclVAT, 0, '<Precision,2:8><Standard Format,2>'))

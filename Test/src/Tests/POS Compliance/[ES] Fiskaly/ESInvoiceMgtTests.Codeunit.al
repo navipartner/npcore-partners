@@ -285,6 +285,55 @@ codeunit 85212 "NPR ES Invoice Mgt. Tests"
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('GeneralConfirmHandler')]
+    procedure SellFractionalQuantities()
+    var
+        POSEntry: Record "NPR POS Entry";
+        ESFiscalLibrary: Codeunit "NPR Library ES Fiscal";
+        InvoiceBody: JsonObject;
+    begin
+        // [SCENARIO] Fractional quantities of a sale, such as items sold by weight, are sent to Fiskaly as sold instead of rounded to two decimals
+        // [GIVEN] POS and ES audit setup
+        InitializeData();
+
+        // [WHEN] Selling an item in quantities 0.004 and 0.123
+        POSEntry.Get(DoItemSaleOfFractionalQuantities(ESFiscalLibrary));
+
+        // [THEN] The invoice items at Fiskaly carry the quantities sold and the amounts of the posted lines
+        InvoiceBody.ReadFrom(ESFiscalLibrary.GetLastCreateInvoiceBody());
+        AssertFractionalQuantityInvoiceItems(InvoiceBody, '$.content.items', POSEntry."Entry No.");
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('GeneralConfirmHandler')]
+    procedure ReturnFractionalQuantities()
+    var
+        ESPOSAuditLogAuxInfo: Record "NPR ES POS Audit Log Aux. Info";
+        OriginalPOSEntry: Record "NPR POS Entry";
+        POSEntry: Record "NPR POS Entry";
+        ESFiscalLibrary: Codeunit "NPR Library ES Fiscal";
+        InvoiceBody: JsonObject;
+    begin
+        // [SCENARIO] Fractional quantities of a return are sent to Fiskaly in the correcting invoice as returned instead of rounded to two decimals
+        // [GIVEN] POS and ES audit setup
+        InitializeData();
+
+        // [GIVEN] Sale of an item in quantities 0.004 and 0.123
+        OriginalPOSEntry.Get(DoItemSaleOfFractionalQuantities(ESFiscalLibrary));
+
+        // [WHEN] Returning the sale
+        POSEntry.Get(DoReturnSale(OriginalPOSEntry."Document No.", ESFiscalLibrary));
+
+        // [THEN] The correcting invoice items at Fiskaly carry the quantities returned and the amounts of the posted lines
+        ESPOSAuditLogAuxInfo.FindAuditLog(POSEntry."Entry No.");
+        Assert.AreEqual(ESPOSAuditLogAuxInfo."Invoice Type"::CORRECTING, ESPOSAuditLogAuxInfo."Invoice Type", ESPOSAuditLogAuxInfo.FieldCaption("Invoice Type"));
+        InvoiceBody.ReadFrom(ESFiscalLibrary.GetLastCreateInvoiceBody());
+        AssertFractionalQuantityInvoiceItems(InvoiceBody, '$.content.invoice.items', POSEntry."Entry No.");
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('GeneralConfirmHandler')]
     procedure SellItemWithGLAccountDiscountLine()
     var
         ESPOSAuditLogAuxInfo: Record "NPR ES POS Audit Log Aux. Info";
@@ -886,6 +935,97 @@ codeunit 85212 "NPR ES Invoice Mgt. Tests"
         POSSession.ClearAll();
         Clear(POSSession);
         exit(POSEntry."Entry No.");
+    end;
+
+    local procedure DoItemSaleOfFractionalQuantities(var ESFiscalLibrary: Codeunit "NPR Library ES Fiscal"): Integer
+    var
+        POSEntry: Record "NPR POS Entry";
+        SalePOS: Record "NPR POS Sale";
+        POSMockLibrary: Codeunit "NPR Library - POS Mock";
+        POSSaleWrapper: Codeunit "NPR POS Sale";
+        ChangeAmount: Decimal;
+        PaidAmount: Decimal;
+        RoundingAmount: Decimal;
+        SalesAmount: Decimal;
+        SaleShouldEndErr: Label 'Sale of fractional quantities should end.', Locked = true;
+    begin
+        POSMockLibrary.InitializePOSSessionAndStartSale(POSSession, POSUnit, Salesperson, POSSaleWrapper);
+        POSSaleWrapper.GetCurrentSale(SalePOS);
+        POSMockLibrary.CreateItemLine(POSSession, Item."No.", 0.004);
+        POSMockLibrary.CreateItemLine(POSSession, Item."No.", 0.123);
+        POSSaleWrapper.GetTotals(SalesAmount, PaidAmount, ChangeAmount, RoundingAmount);
+        ESFiscalLibrary.SetInvoiceRegistrationState(Enum::"NPR ES Inv. Registration State"::REGISTERED);
+        BindSubscription(ESFiscalLibrary);
+        if not POSMockLibrary.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, SalesAmount, '') then
+            Error(SaleShouldEndErr);
+        UnbindSubscription(ESFiscalLibrary);
+
+        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+        POSEntry.FindFirst();
+        POSSession.ClearAll();
+        Clear(POSSession);
+        exit(POSEntry."Entry No.");
+    end;
+
+    local procedure DoReturnSale(DocumentNoToReturn: Code[20]; var ESFiscalLibrary: Codeunit "NPR Library ES Fiscal"): Integer
+    var
+        POSEntry: Record "NPR POS Entry";
+        ReturnReason: Record "Return Reason";
+        SalePOS: Record "NPR POS Sale";
+        POSMockLibrary: Codeunit "NPR Library - POS Mock";
+        POSActionRevDirSale: Codeunit "NPR POS Action: Rev.Dir.Sale B";
+        POSSaleWrapper: Codeunit "NPR POS Sale";
+        ChangeAmount: Decimal;
+        PaidAmount: Decimal;
+        RoundingAmount: Decimal;
+        SalesAmount: Decimal;
+        SaleShouldEndErr: Label 'Return sale should end.', Locked = true;
+    begin
+        POSMockLibrary.InitializePOSSessionAndStartSale(POSSession, POSUnit, Salesperson, POSSaleWrapper);
+        POSSaleWrapper.GetCurrentSale(SalePOS);
+        ReturnReason.FindFirst();
+        POSActionRevDirSale.ReverseSalesTicket(SalePOS, DocumentNoToReturn, ReturnReason.Code, true);
+        POSSaleWrapper.GetTotals(SalesAmount, PaidAmount, ChangeAmount, RoundingAmount);
+        ESFiscalLibrary.SetInvoiceRegistrationState(Enum::"NPR ES Inv. Registration State"::REGISTERED);
+        BindSubscription(ESFiscalLibrary);
+        if not POSMockLibrary.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, SalesAmount, '') then
+            Error(SaleShouldEndErr);
+        UnbindSubscription(ESFiscalLibrary);
+
+        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+        POSEntry.FindFirst();
+        POSSession.ClearAll();
+        Clear(POSSession);
+        exit(POSEntry."Entry No.");
+    end;
+
+    local procedure AssertFractionalQuantityInvoiceItems(InvoiceBody: JsonObject; ItemsPath: Text; POSEntryNo: Integer)
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        ItemToken: JsonToken;
+        ItemsToken: JsonToken;
+        ValueToken: JsonToken;
+        ExpectedQuantities: List of [Text];
+        Index: Integer;
+    begin
+        ExpectedQuantities.Add('0.004');
+        ExpectedQuantities.Add('0.123');
+
+        Assert.IsTrue(InvoiceBody.SelectToken(ItemsPath, ItemsToken), ItemsPath);
+        Assert.AreEqual(ExpectedQuantities.Count(), ItemsToken.AsArray().Count(), ItemsPath);
+
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntryNo);
+        POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Item);
+        POSEntrySalesLine.FindSet();
+        for Index := 1 to ExpectedQuantities.Count() do begin
+            Assert.AreNotEqual(0, POSEntrySalesLine."Amount Incl. VAT", POSEntrySalesLine.FieldCaption("Amount Incl. VAT"));
+            ItemsToken.AsArray().Get(Index - 1, ItemToken);
+            ItemToken.SelectToken('quantity', ValueToken);
+            Assert.AreEqual(ExpectedQuantities.Get(Index), ValueToken.AsValue().AsText(), 'quantity');
+            ItemToken.SelectToken('full_amount', ValueToken);
+            Assert.AreEqual(Format(POSEntrySalesLine."Amount Incl. VAT", 0, '<Precision,2:8><Standard Format,2>'), ValueToken.AsValue().AsText(), 'full_amount');
+            POSEntrySalesLine.Next();
+        end;
     end;
 
     [ConfirmHandler]
