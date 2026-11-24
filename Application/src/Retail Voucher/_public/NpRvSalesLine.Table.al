@@ -327,6 +327,34 @@
             DataClassification = CustomerContent;
         }
 #endif
+        field(2; "Spfy Amount (Store Currency)"; Decimal)
+        {
+            Caption = 'Amount (Store Currency)';
+            DataClassification = CustomerContent;
+            AutoFormatExpression = "Spfy Store Currency Code";
+            AutoFormatType = 1;
+        }
+        field(3; "Spfy Store Currency Code"; Code[10])
+        {
+            Caption = 'Store Currency Code';
+            DataClassification = CustomerContent;
+        }
+        field(4; "Spfy Captured Unit Price"; Decimal)
+        {
+            Caption = 'Captured Unit Price';
+            DataClassification = CustomerContent;
+        }
+        field(6; "Issued Unit Amount (LCY)"; Decimal)
+        {
+            Caption = 'Issued Unit Amount (LCY)';
+            DataClassification = CustomerContent;
+            AutoFormatType = 1;
+        }
+        field(7; "Issued Unit Price"; Decimal)
+        {
+            Caption = 'Issued Unit Price';
+            DataClassification = CustomerContent;
+        }
         field(1000; Id; Guid)
         {
             Caption = 'Id';

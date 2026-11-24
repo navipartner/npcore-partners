@@ -362,6 +362,50 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
         SalesHeader.Validate("Order Date", DT2Date(SpfyEventLogEntry."Event Date-Time"));
     end;
 
+    /// <summary>
+    /// Marks an order's factor as Shopify's when it came from the order's own totals, so BC does not silently replace it later.
+    /// A return takes the factor the order's invoices posted at, so it reverses exactly what they posted.
+    /// </summary>
+    internal procedure KeepShopifySalesHeaderCurrencyFactor(var SalesHeader: Record "Sales Header"; EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        SpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
+        SpfyAPIEventLogMgt: Codeunit "NPR Spfy Event Log Mgt.";
+        SpfyDocumentRate: Codeunit "NPR Spfy Document Rate";
+        SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
+    begin
+        if SalesHeader."Currency Code" = '' then
+            exit;
+        if not GetShopifyLogEntry(EcomSalesHeader, SpfyEventLogEntry) then
+            exit;
+        case SalesHeader."Document Type" of
+            SalesHeader."Document Type"::Order:
+                begin
+                    if (EcomSalesHeader."Currency Exchange Rate" <= 0) or (SalesHeader."Currency Factor" <> EcomSalesHeader."Currency Exchange Rate") then
+                        exit;
+                    if SpfyPaymentGatewayHdlr.IsLCY(SpfyEventLogEntry."Presentment Currency Code") then
+                        exit;
+                    if not SpfyAPIEventLogMgt.CurrencyFactorFromShopify(SpfyEventLogEntry) then
+                        exit;
+                    SpfyDocumentRate.SetShopifyCurrencyFactor(SalesHeader);
+                end;
+            SalesHeader."Document Type"::"Return Order":
+                SpfyDocumentRate.KeepOrderInvoiceCurrencyFactor(SpfyEventLogEntry."Store Code", ReturnedOrderId(EcomSalesHeader), SalesHeader);
+        end;
+    end;
+
+    /// <summary>
+    /// The returned order's id, from the Shopify order GID the ecommerce header keeps; the log entry's stored order data may be discarded before the return order is created.
+    /// </summary>
+    local procedure ReturnedOrderId(EcomSalesHeader: Record "NPR Ecom Sales Header"): Text[30]
+    var
+        OrderGID: Text;
+    begin
+        OrderGID := EcomSalesHeader."External Document Id";
+        if OrderGID = '' then
+            exit('');
+        exit(CopyStr(OrderGID.Substring(OrderGID.LastIndexOf('/') + 1), 1, 30));
+    end;
+
     internal procedure AssignShopifyIDAndRefreshShopifySalesHeaderDimensions(var SalesHeader: Record "Sales Header"; EcomSalesHeader: Record "NPR Ecom Sales Header")
     var
         NpEcStore: Record "NPR NpEc Store";

@@ -627,7 +627,7 @@ codeunit 6151149 "NPR Spfy Legacy Return Mgt."
 
     internal procedure IsGiftCardRefundTxn(var TempRefundTxnBuffer: Record "NPR Spfy Legacy Refund Txn Buf" temporary): Boolean
     begin
-        exit((TempRefundTxnBuffer."Gift Card Id" <> '') or (StrPos(UpperCase(TempRefundTxnBuffer.Gateway), 'GIFT') > 0));
+        exit((TempRefundTxnBuffer."Gift Card Id" <> '') or IsGiftCardGateway(TempRefundTxnBuffer.Gateway));
     end;
 
     /// <summary>
@@ -635,7 +635,25 @@ codeunit 6151149 "NPR Spfy Legacy Return Mgt."
     /// </summary>
     internal procedure IsStoreCreditRefundTxn(var TempRefundTxnBuffer: Record "NPR Spfy Legacy Refund Txn Buf" temporary): Boolean
     begin
-        exit(StrPos(UpperCase(TempRefundTxnBuffer.Gateway), 'STORE_CREDIT') > 0);
+        exit(IsStoreCreditGateway(TempRefundTxnBuffer.Gateway));
+    end;
+
+    /// <summary>
+    /// A refund to a gift card or to store credit stays with Shopify as a customer liability; told apart by the gateway, which the refund payment lines carry too.
+    /// </summary>
+    internal procedure IsLiabilityGateway(Gateway: Text): Boolean
+    begin
+        exit(IsGiftCardGateway(Gateway) or IsStoreCreditGateway(Gateway));
+    end;
+
+    local procedure IsGiftCardGateway(Gateway: Text): Boolean
+    begin
+        exit(StrPos(UpperCase(Gateway), 'GIFT') > 0);
+    end;
+
+    local procedure IsStoreCreditGateway(Gateway: Text): Boolean
+    begin
+        exit(StrPos(UpperCase(Gateway), 'STORE_CREDIT') > 0);
     end;
 
     /// <summary>

@@ -81,6 +81,12 @@ codeunit 85465 "NPR Library Spfy Import"
         LogEntry.Insert(true);
     end;
 
+    /// <summary>The ecommerce store SetupSimpleItemOrder links to the Shopify store.</summary>
+    procedure EcStoreCode(): Code[20]
+    begin
+        exit(CopyStr(EcStoreCodeTok, 1, 20));
+    end;
+
     /// <summary>Creates a bare Shopify store (no connection setup), for tests that only need the store to exist.</summary>
     procedure CreateStore(StoreCode: Code[20])
     var

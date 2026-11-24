@@ -12,6 +12,19 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             Caption = 'Buy-from Vendor No.';
             DataClassification = CustomerContent;
         }
+        field(6014402; "NPR Spfy Currency Factor"; Decimal)
+        {
+            Caption = 'Shopify Currency Factor';
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 15;
+            Editable = false;
+        }
+        field(6014403; "NPR Spfy Currency Code"; Code[10])
+        {
+            Caption = 'Shopify Currency Code';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
         field(6014406; "NPR Document Time"; Time)
         {
             Caption = 'Document Time';

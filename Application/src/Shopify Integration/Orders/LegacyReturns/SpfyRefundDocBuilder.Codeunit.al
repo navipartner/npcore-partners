@@ -751,6 +751,7 @@ codeunit 6151263 "NPR Spfy Refund Doc. Builder"
 
     local procedure CreateSalesHeader(ShopifyStore: Record "NPR Spfy Store"; NpEcStore: Record "NPR NpEc Store"; Customer: Record Customer; LocationCode: Code[10]; var TempReturnBuffer: Record "NPR Spfy Legacy Return Buffer" temporary; var SalesHeader: Record "Sales Header")
     var
+        SpfyDocumentRate: Codeunit "NPR Spfy Document Rate";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
         CurrencyCode: Code[10];
@@ -767,6 +768,7 @@ codeunit 6151263 "NPR Spfy Refund Doc. Builder"
         CurrencyCode := SpfyPaymentGatewayHdlr.TranslateCurrencyCode(TempReturnBuffer."Presentment Currency Code", SpfyIntegrationMgt.CurrencyBlankForLCY(ShopifyStore.Code), CurrencyIsLCY);
         if CurrencyCode <> SalesHeader."Currency Code" then
             SalesHeader.Validate("Currency Code", CurrencyCode);
+        SpfyDocumentRate.KeepOrderInvoiceCurrencyFactor(ShopifyStore.Code, TempReturnBuffer."Order Id", SalesHeader);
         SalesHeader."External Document No." := CopyStr(SpfyIntegrationMgt.BuildExternalDocumentNo(ShopifyStore.Code, TempReturnBuffer."Order No.", TempReturnBuffer."Order Name", MaxStrLen(SalesHeader."External Document No.")), 1, MaxStrLen(SalesHeader."External Document No."));
         if NpEcStore."Salesperson/Purchaser Code" <> '' then
             SalesHeader.Validate("Salesperson Code", NpEcStore."Salesperson/Purchaser Code");
@@ -871,7 +873,7 @@ codeunit 6151263 "NPR Spfy Refund Doc. Builder"
             SalesLine.Validate("VAT Prod. Posting Group", TempSalesInvoiceLine."VAT Prod. Posting Group");
         SalesLine.Description := TempSalesInvoiceLine.Description;
         SetQuantityAndAmounts(TempLineBuffer, SalesLine);
-        AttachVouchersToRevoke(SalesHeader, SalesLine, TempVoucher);
+        AttachVouchersToRevoke(SalesHeader, SalesLine, TempSalesInvoiceLine, TempVoucher);
     end;
 
     /// <summary>
@@ -1106,7 +1108,7 @@ codeunit 6151263 "NPR Spfy Refund Doc. Builder"
     /// <summary>
     /// Attaches the voucher module's reversal shape: a voucher sales line with one reference per card, posted as a corrective entry on each voucher.
     /// </summary>
-    local procedure AttachVouchersToRevoke(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; var TempVoucher: Record "NPR NpRv Voucher" temporary)
+    local procedure AttachVouchersToRevoke(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; var TempSalesInvoiceLine: Record "Sales Invoice Line" temporary; var TempVoucher: Record "NPR NpRv Voucher" temporary)
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Voucher: Record "NPR NpRv Voucher";
@@ -1128,11 +1130,39 @@ codeunit 6151263 "NPR Spfy Refund Doc. Builder"
             NpRvSalesLine."Voucher No." := TempVoucher."No.";
             NpRvSalesLine."Reference No." := TempVoucher."Reference No.";
         end;
+        SetIssuedAmountToRevoke(TempSalesInvoiceLine, SalesHeader."Currency Code", SalesHeader."Currency Factor", NpRvSalesLine);
         NpRvSalesLine.Insert(true);
         repeat
             Voucher := TempVoucher;
             NpRvSalesDocMgt.InsertNpRVSalesLineReference(NpRvSalesLine, Voucher);
         until TempVoucher.Next() = 0;
+    end;
+
+    /// <summary>
+    /// The returned cards are written off at what they were issued at, which only holds when every sale line of the gift card issued them at the same amount and price.
+    /// </summary>
+    local procedure SetIssuedAmountToRevoke(var TempSalesInvoiceLine: Record "Sales Invoice Line" temporary; CreditCurrencyCode: Code[10]; CreditCurrencyFactor: Decimal; var NpRvSalesLine: Record "NPR NpRv Sales Line")
+    var
+        TempNpRvSalesLine: Record "NPR NpRv Sales Line" temporary;
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+        First: Boolean;
+    begin
+        First := true;
+        TempSalesInvoiceLine.Reset();
+        TempSalesInvoiceLine.FindSet();
+        repeat
+            NpRvSalesDocMgt.SetIssuedAmountToReverse(TempSalesInvoiceLine, CreditCurrencyCode, CreditCurrencyFactor, TempNpRvSalesLine);
+            if First then begin
+                NpRvSalesLine."Issued Unit Amount (LCY)" := TempNpRvSalesLine."Issued Unit Amount (LCY)";
+                NpRvSalesLine."Issued Unit Price" := TempNpRvSalesLine."Issued Unit Price";
+                First := false;
+            end else
+                if (TempNpRvSalesLine."Issued Unit Amount (LCY)" <> NpRvSalesLine."Issued Unit Amount (LCY)") or (TempNpRvSalesLine."Issued Unit Price" <> NpRvSalesLine."Issued Unit Price") then begin
+                    NpRvSalesLine."Issued Unit Amount (LCY)" := 0;
+                    NpRvSalesLine."Issued Unit Price" := 0;
+                    exit;
+                end;
+        until TempSalesInvoiceLine.Next() = 0;
     end;
 
     local procedure UsesGenericItem(ShopifyStore: Record "NPR Spfy Store"; Sku: Text[100]): Boolean

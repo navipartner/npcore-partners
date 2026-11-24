@@ -271,6 +271,7 @@
         SignFactor: Integer;
         VoucherAmount: Decimal;
         VoucherQty: Decimal;
+        VoucherUnitPrice: Decimal;
         UnsupportedDocSourceErr: Label 'Unsupported document source %1 for voucher issuance in %2.', Comment = '%1 - Document Source, %2 - NPR NpRv Sales Line record ID';
     begin
         SignFactor := 1;
@@ -278,12 +279,8 @@
         case NpRvSalesLine."Document Source" of
             NpRvSalesLine."Document Source"::"Sales Document":
                 begin
-                    if not GetVoucherQtyAndUnitPriceFromSalesLine(NpRvSalesLine, VoucherQty, VoucherAmount) then
+                    if not GetVoucherQtyAndUnitAmounts(NpRvSalesLine, DocumentCurrencyCode, DocumentCurrencyFactor, DocumentPostingDate, VoucherQty, VoucherUnitPrice, VoucherAmount) then
                         exit;
-                    MagentoPaymentLine.Init();
-                    MagentoPaymentLine.Amount := VoucherAmount;
-                    MagentoPaymentLine."Posting Date" := DocumentPostingDate;
-                    VoucherAmount := MagentoPaymentLine.AmountLCY(DocumentCurrencyCode, DocumentCurrencyFactor);
 
                     if NpRvSalesLine.IsCreditDocType() then
                         SignFactor := -1;
@@ -519,21 +516,51 @@
         NpRvSalesLine.Modify();
     end;
 
-    internal procedure GetVoucherQtyAndUnitPriceFromSalesLine(NpRvSalesLine: Record "NPR NpRv Sales Line"; var VoucherQty: Decimal; var VoucherUnitPrice: Decimal): Boolean
+    /// <summary>
+    /// The quantity, the gross unit price in the document currency and what one voucher is worth in LCY.
+    /// A credit line that reverses a known issue takes its share of the issued amount; a line carrying Shopify's own amount uses it while the unit price is unchanged; anything else is converted at the document's factor.
+    /// Both captured amounts belong to the rate the document was given, so they only apply while it keeps that rate and its other lines are valued at it too.
+    /// </summary>
+    internal procedure GetVoucherQtyAndUnitAmounts(NpRvSalesLine: Record "NPR NpRv Sales Line"; DocumentCurrencyCode: Code[10]; DocumentCurrencyFactor: Decimal; DocumentPostingDate: Date; var VoucherQty: Decimal; var VoucherUnitPrice: Decimal; var VoucherUnitAmountLCY: Decimal): Boolean
     var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
+        SpfyDocumentRate: Codeunit "NPR Spfy Document Rate";
+        KeepsCapturedRate: Boolean;
+        PricesExclVAT: Boolean;
     begin
         VoucherQty := 0;
         VoucherUnitPrice := 0;
+        VoucherUnitAmountLCY := 0;
         if not SalesLine.Get(NpRvSalesLine."Document Type", NpRvSalesLine."Document No.", NpRvSalesLine."Document Line No.") then
             exit(false);
 
         VoucherQty := SalesLine."Qty. to Invoice";
         VoucherUnitPrice := SalesLine."Unit Price";
-        if SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.") and not SalesHeader."Prices Including VAT" then
+        PricesExclVAT := SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.") and not SalesHeader."Prices Including VAT";
+        if PricesExclVAT then
             VoucherUnitPrice := VoucherUnitPrice * (1 + SalesLine."VAT %" / 100);
+        KeepsCapturedRate := SpfyDocumentRate.IsLocked(SalesHeader);
 
+        if (NpRvSalesLine."Issued Unit Amount (LCY)" <> 0) and (NpRvSalesLine."Issued Unit Price" <> 0) and KeepsCapturedRate then begin
+            GeneralLedgerSetup.Get();
+            // Rounded down, so partial credits of one card never add up to more than it was issued at; a full credit is exact.
+            VoucherUnitAmountLCY := Round(NpRvSalesLine."Issued Unit Amount (LCY)" * VoucherUnitPrice / NpRvSalesLine."Issued Unit Price", GeneralLedgerSetup."Amount Rounding Precision", '<');
+            exit(true);
+        end;
+
+        MagentoPaymentLine.Init();
+        MagentoPaymentLine.Amount := VoucherUnitPrice;
+        MagentoPaymentLine."Posting Date" := DocumentPostingDate;
+        if (NpRvSalesLine."Spfy Amount (Store Currency)" <> 0) and (SalesLine."Unit Price" = NpRvSalesLine."Spfy Captured Unit Price") and KeepsCapturedRate then begin
+            MagentoPaymentLine."Store Currency Code" := NpRvSalesLine."Spfy Store Currency Code";
+            MagentoPaymentLine."Amount (Store Currency)" := NpRvSalesLine."Spfy Amount (Store Currency)";
+            if PricesExclVAT then
+                MagentoPaymentLine."Amount (Store Currency)" := MagentoPaymentLine.RoundStoreCurrencyAmount(MagentoPaymentLine."Amount (Store Currency)" * (1 + SalesLine."VAT %" / 100));
+        end;
+        VoucherUnitAmountLCY := MagentoPaymentLine.AmountLCY(DocumentCurrencyCode, DocumentCurrencyFactor);
         exit(true);
     end;
 

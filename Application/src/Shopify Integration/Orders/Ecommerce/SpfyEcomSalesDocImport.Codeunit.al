@@ -1300,32 +1300,44 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
 #pragma warning restore AA0139
     end;
 
-    local procedure PopulateVoucherAmounts(SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line")
+    internal procedure PopulateVoucherAmounts(SalesLineJsonToken: JsonToken; LogEntry: Record "NPR Spfy Event Log Entry"; var EcomSalesLine: Record "NPR Ecom Sales Line")
     var
+        SpfyAPIEventLogMgt: Codeunit "NPR Spfy Event Log Mgt.";
         ActualUnitPrice: Decimal;
         VoucherUnitPrice: Decimal;
+        VoucherUnitPriceSCY: Decimal;
         LineDiscountAmount: Decimal;
         TotalQty: Decimal;
     begin
         TotalQty := _SpfyAPIOrderHelper.LineDiscountBaseQuantity(SalesLineJsonToken);
         ActualUnitPrice := JsonHelper.GetJDecimal(SalesLineJsonToken, 'originalUnitPriceSet.presentmentMoney.amount', true);
-        VoucherUnitPrice := GetVoucherPriceInPresentmentCurrency(SalesLineJsonToken);
+        GetVoucherPrice(SalesLineJsonToken, VoucherUnitPrice, VoucherUnitPriceSCY);
 
         LineDiscountAmount := CalcLineDiscountAmount(SalesLineJsonToken, EcomSalesLine, TotalQty);
 
-        if VoucherUnitPrice < ActualUnitPrice then
+        if VoucherUnitPrice < ActualUnitPrice then begin
             VoucherUnitPrice := ActualUnitPrice;
+            VoucherUnitPriceSCY := JsonHelper.GetJDecimal(SalesLineJsonToken, 'originalUnitPriceSet.shopMoney.amount', true);
+        end;
 
         if VoucherUnitPrice > ActualUnitPrice then
             LineDiscountAmount += Round((VoucherUnitPrice - ActualUnitPrice) * EcomSalesLine.Quantity, GLSetup."Amount Rounding Precision");
 
         EcomSalesLine."Unit Price" := VoucherUnitPrice;
+        // The card's value in the shop currency belongs to Shopify's rate, so it is only kept when the document carries that rate.
+        if (VoucherUnitPriceSCY <> 0) and SpfyAPIEventLogMgt.CurrencyFactorFromShopify(LogEntry) then begin
+            EcomSalesLine."Unit Price (Store Currency)" := VoucherUnitPriceSCY;
+            EcomSalesLine."Store Currency Code" := LogEntry."Store Currency Code";
+        end;
         EcomSalesLine."Line Discount Amount" := LineDiscountAmount;
         EcomSalesLine."Line Amount" := EcomSalesLine."Unit Price" * EcomSalesLine.Quantity - EcomSalesLine."Line Discount Amount";
         EcomSalesLine."VAT %" := CalculateVAT(SalesLineJsonToken);
     end;
 
-    local procedure GetVoucherPriceInPresentmentCurrency(SalesLineJsonToken: JsonToken): Decimal
+    /// <summary>
+    /// The card's denomination in the presentment currency and, when Shopify gives the line in its shop currency, as Shopify values it there.
+    /// </summary>
+    local procedure GetVoucherPrice(SalesLineJsonToken: JsonToken; var PricePCY: Decimal; var PriceSCY: Decimal)
     var
         VariantPriceInShopCurrency: Decimal;
         LinePriceInShopCurrency: Decimal;
@@ -1335,9 +1347,13 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         VariantPriceInShopCurrency := JsonHelper.GetJDecimal(SalesLineJsonToken, 'variant.price', true);
         LinePriceInShopCurrency := JsonHelper.GetJDecimal(SalesLineJsonToken, 'originalUnitPriceSet.shopMoney.amount', true);
         LinePriceInPresentmentCurrency := JsonHelper.GetJDecimal(SalesLineJsonToken, 'originalUnitPriceSet.presentmentMoney.amount', true);
-        if LinePriceInShopCurrency = 0 then
-            exit(LinePriceInPresentmentCurrency);
-        exit(Round(VariantPriceInShopCurrency * LinePriceInPresentmentCurrency / LinePriceInShopCurrency, GLSetup."Unit-Amount Rounding Precision"));
+        if LinePriceInShopCurrency = 0 then begin
+            PricePCY := LinePriceInPresentmentCurrency;
+            PriceSCY := 0;
+            exit;
+        end;
+        PricePCY := Round(VariantPriceInShopCurrency * LinePriceInPresentmentCurrency / LinePriceInShopCurrency, GLSetup."Unit-Amount Rounding Precision");
+        PriceSCY := VariantPriceInShopCurrency;
     end;
 
     local procedure DeserializeMembershipLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesLineJsonToken: JsonToken; var IncEcomSalesLine: Record "NPR Ecom Sales Line"; LogEntry: Record "NPR Spfy Event Log Entry")
@@ -1459,7 +1475,7 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         IncEcomSalesLine."Voucher Type" := VoucherType.Code;
         IncEcomSalesLine.Description := CopyStr(JsonHelper.GetJText(SalesLineJsonToken, 'name', MaxStrLen(IncEcomSalesLine.Description), false), 1, MaxStrLen(IncEcomSalesLine.Description));
         IncEcomSalesLine.Quantity := _SpfyAPIOrderHelper.LineOrderedQuantity(SalesLineJsonToken);
-        PopulateVoucherAmounts(SalesLineJsonToken, IncEcomSalesLine);
+        PopulateVoucherAmounts(SalesLineJsonToken, LogEntry, IncEcomSalesLine);
     end;
 
     local procedure ReserveVouchers(EcomSalesHeader: Record "NPR Ecom Sales Header"; IncEcomSalesLine: Record "NPR Ecom Sales Line"; PropertyDict: Dictionary of [Text, Text]; var FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache")

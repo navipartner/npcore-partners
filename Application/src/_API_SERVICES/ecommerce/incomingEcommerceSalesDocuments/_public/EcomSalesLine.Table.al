@@ -63,6 +63,19 @@ table 6151259 "NPR Ecom Sales Line"
             Caption = 'Unit Price';
             BlankZero = true;
         }
+        field(9; "Unit Price (Store Currency)"; Decimal)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Unit Price (Store Currency)';
+            BlankZero = true;
+            AutoFormatExpression = "Store Currency Code";
+            AutoFormatType = 2;
+        }
+        field(12; "Store Currency Code"; Code[10])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Store Currency Code';
+        }
         field(10; Quantity; Decimal)
         {
             DataClassification = CustomerContent;

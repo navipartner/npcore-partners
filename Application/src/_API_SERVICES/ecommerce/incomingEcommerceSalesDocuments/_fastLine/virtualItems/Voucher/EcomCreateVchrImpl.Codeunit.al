@@ -365,15 +365,29 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
 
     internal procedure CalculateVoucherFaceValueLCY(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: record "NPR Ecom Sales Line"): Decimal
     var
+        Currency: Record Currency;
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
         FaceValueTCY: Decimal;
     begin
-        if EcomSalesHeader."Price Excl. VAT" and (EcomSalesLine."VAT %" > 0) then
-            FaceValueTCY := EcomSalesLine."Unit Price" * (1 + EcomSalesLine."VAT %" / 100)
-        else
-            FaceValueTCY := EcomSalesLine."Unit Price";
+        // The value the store booked in its own currency is the card's value when that currency is the LCY; converting the presentment price back can be a cent off.
+        if (EcomSalesLine."Unit Price (Store Currency)" <> 0) and (EcomSalesLine."Store Currency Code" <> '') and
+           EcomSalesDocUtils.IsLCY(EcomSalesLine."Store Currency Code") and
+           not EcomSalesDocUtils.IsLCY(EcomSalesHeader."Currency Code")
+        then begin
+            Currency.InitRoundingPrecision();
+            exit(Round(GrossFaceValue(EcomSalesHeader, EcomSalesLine, EcomSalesLine."Unit Price (Store Currency)"), Currency."Amount Rounding Precision"));
+        end;
 
+        FaceValueTCY := GrossFaceValue(EcomSalesHeader, EcomSalesLine, EcomSalesLine."Unit Price");
         exit(EcomVirtualItemMgt.ConvertLineAmountToLCY(EcomSalesHeader, FaceValueTCY));
+    end;
+
+    local procedure GrossFaceValue(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesLine: record "NPR Ecom Sales Line"; UnitPrice: Decimal): Decimal
+    begin
+        if EcomSalesHeader."Price Excl. VAT" and (EcomSalesLine."VAT %" > 0) then
+            exit(UnitPrice * (1 + EcomSalesLine."VAT %" / 100));
+        exit(UnitPrice);
     end;
 
     local procedure VoucherAlreadyExist(VoucherNo: Code[20]): Boolean

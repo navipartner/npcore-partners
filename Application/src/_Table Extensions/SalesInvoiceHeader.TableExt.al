@@ -11,6 +11,19 @@ tableextension 6014405 "NPR Sales Invoice Header" extends "Sales Invoice Header"
             ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
+        field(6014402; "NPR Spfy Currency Factor"; Decimal)
+        {
+            Caption = 'Shopify Currency Factor';
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 15;
+            Editable = false;
+        }
+        field(6014403; "NPR Spfy Currency Code"; Code[10])
+        {
+            Caption = 'Shopify Currency Code';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
         field(6014414; "NPR Bill-to E-mail"; Text[80])
         {
             Caption = 'Bill-to E-mail';

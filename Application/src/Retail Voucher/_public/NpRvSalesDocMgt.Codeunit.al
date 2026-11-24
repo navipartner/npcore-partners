@@ -413,6 +413,7 @@
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         VoucherQty: Decimal;
+        VoucherUnitAmountLCY: Decimal;
         VoucherUnitPrice: Decimal;
         SalesHeaderMagentoPaymentAmount: Decimal;
     begin
@@ -447,7 +448,7 @@
             if NpRvSalesLine.FindSet() then
                 repeat
                     if NpRvSalesLine.Type in [NpRvSalesLine.Type::"New Voucher", NpRvSalesLine.Type::"Top-up", NpRvSalesLine.Type::"Partner Issue Voucher"] then begin
-                        NpRvVoucherMgt.GetVoucherQtyAndUnitPriceFromSalesLine(NpRvSalesLine, VoucherQty, VoucherUnitPrice);
+                        NpRvVoucherMgt.GetVoucherQtyAndUnitAmounts(NpRvSalesLine, SalesHeader."Currency Code", SalesHeader."Currency Factor", SalesHeader."Posting Date", VoucherQty, VoucherUnitPrice, VoucherUnitAmountLCY);
                         NpRvSalesLineReference.SetRange("Sales Line Id", NpRvSalesLine.Id);
                         NpRvSalesLineReference.SetRange(Posted, false);
                         if not NpRvSalesLineReference.FindSet() then begin
@@ -457,15 +458,10 @@
                             NpRvSalesLineReference.Posted := false;
                         end;
                         repeat
-                            if NpRvSalesLineReference."Voucher No." <> '' then begin
-                                MagentoPaymentLine.Init();
-                                MagentoPaymentLine.Amount := VoucherUnitPrice;
-                                MagentoPaymentLine."Posting Date" := SalesHeader."Posting Date";
+                            if NpRvSalesLineReference."Voucher No." <> '' then
                                 CheckVoucherActiveAndAvailableAmountIsSufficient(
                                     NpRvSalesLineReference."Voucher No.", NpRvSalesLineReference."Reference No.",
-                                    VoucherUnitPrice, SalesHeader."Currency Code",
-                                    MagentoPaymentLine.AmountLCY(SalesHeader."Currency Code", SalesHeader."Currency Factor"));
-                            end;
+                                    VoucherUnitPrice, SalesHeader."Currency Code", VoucherUnitAmountLCY);
                         until NpRvSalesLineReference.Next() = 0;
                     end;
                 until NpRvSalesLine.Next() = 0;
@@ -812,7 +808,85 @@
                     NpRvSalesLine.Description := Voucher.Description;
                 end;
         end;
+        if InvoiceCarriedShopifyRate(FromSalesInvLine."Document No.") then
+            SetIssuedAmountToReverse(FromSalesInvLine, ToSalesHeader."Currency Code", ToSalesHeader."Currency Factor", NpRvSalesLine);
         NpRvSalesLine.Insert(true);
+    end;
+
+    local procedure InvoiceCarriedShopifyRate(SalesInvoiceNo: Code[20]): Boolean
+    var
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+    begin
+        SalesInvoiceHeader.SetLoadFields("NPR Spfy Currency Factor");
+        if not SalesInvoiceHeader.Get(SalesInvoiceNo) then
+            exit(false);
+        exit(SalesInvoiceHeader."NPR Spfy Currency Factor" <> 0);
+    end;
+
+    /// <summary>
+    /// Lets a credit line write its vouchers off at the amount they were issued at, scaled to the share of the original price it credits, instead of converting it again at the credit document's rate.
+    /// Left blank, and conversion applies, when the invoice is in LCY, the credit is in another currency or at another rate than the invoice, or the invoice's vouchers were not all issued at the same amount.
+    /// </summary>
+    internal procedure SetIssuedAmountToReverse(SalesInvoiceLine: Record "Sales Invoice Line"; CreditCurrencyCode: Code[10]; CreditCurrencyFactor: Decimal; var NpRvSalesLine: Record "NPR NpRv Sales Line")
+    var
+        ArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+        IssuedUnitAmountLCY: Decimal;
+        IssuedUnitPrice: Decimal;
+    begin
+        NpRvSalesLine."Issued Unit Amount (LCY)" := 0;
+        NpRvSalesLine."Issued Unit Price" := 0;
+        if not SalesInvoiceHeader.Get(SalesInvoiceLine."Document No.") then
+            exit;
+        // The credited share compares the two prices, so both must be in the same currency, and the credit's lines must reverse at the rate the vouchers were issued at.
+        if (SalesInvoiceHeader."Currency Code" = '') or (SalesInvoiceHeader."Currency Code" <> CreditCurrencyCode) then
+            exit;
+        if SalesInvoiceHeader."Currency Factor" <> CreditCurrencyFactor then
+            exit;
+
+        VoucherEntry.SetCurrentKey("Entry Type", "Document Type", "Document No.", "Document Line No.");
+        VoucherEntry.SetFilter("Entry Type", '%1|%2|%3', VoucherEntry."Entry Type"::"Issue Voucher", VoucherEntry."Entry Type"::"Partner Issue Voucher", VoucherEntry."Entry Type"::"Top-up");
+        VoucherEntry.SetRange("Document Type", VoucherEntry."Document Type"::Invoice);
+        VoucherEntry.SetRange("Document No.", SalesInvoiceLine."Document No.");
+        VoucherEntry.SetRange("Document Line No.", SalesInvoiceLine."Line No.");
+        if VoucherEntry.FindSet() then
+            repeat
+                if not AddIssuedUnitAmount(VoucherEntry, IssuedUnitAmountLCY) then
+                    exit;
+            until VoucherEntry.Next() = 0;
+
+        ArchVoucherEntry.SetCurrentKey("Entry Type", "Document Type", "Document No.", "Document Line No.");
+        ArchVoucherEntry.SetFilter("Entry Type", '%1|%2|%3', ArchVoucherEntry."Entry Type"::"Issue Voucher", ArchVoucherEntry."Entry Type"::"Partner Issue Voucher", ArchVoucherEntry."Entry Type"::"Top-up");
+        ArchVoucherEntry.SetRange("Document Type", ArchVoucherEntry."Document Type"::Invoice);
+        ArchVoucherEntry.SetRange("Document No.", SalesInvoiceLine."Document No.");
+        ArchVoucherEntry.SetRange("Document Line No.", SalesInvoiceLine."Line No.");
+        if ArchVoucherEntry.FindSet() then
+            repeat
+                VoucherEntry.TransferFields(ArchVoucherEntry);
+                if not AddIssuedUnitAmount(VoucherEntry, IssuedUnitAmountLCY) then
+                    exit;
+            until ArchVoucherEntry.Next() = 0;
+
+        IssuedUnitPrice := SalesInvoiceLine."Unit Price";
+        if not SalesInvoiceHeader."Prices Including VAT" then
+            IssuedUnitPrice := IssuedUnitPrice * (1 + SalesInvoiceLine."VAT %" / 100);
+        if (IssuedUnitAmountLCY = 0) or (IssuedUnitPrice = 0) then
+            exit;
+        NpRvSalesLine."Issued Unit Amount (LCY)" := IssuedUnitAmountLCY;
+        NpRvSalesLine."Issued Unit Price" := IssuedUnitPrice;
+    end;
+
+    /// <summary>
+    /// False when the entry issued a different amount than the ones before it; an entry that redeems a voucher as a payment is skipped.
+    /// </summary>
+    local procedure AddIssuedUnitAmount(VoucherEntry: Record "NPR NpRv Voucher Entry"; var IssuedUnitAmountLCY: Decimal): Boolean
+    begin
+        if IsVoucherRedeemRealatedEntry(VoucherEntry) then
+            exit(true);
+        if IssuedUnitAmountLCY = 0 then
+            IssuedUnitAmountLCY := Abs(VoucherEntry.Amount);
+        exit(IssuedUnitAmountLCY = Abs(VoucherEntry.Amount));
     end;
 
     local procedure IsVoucherRedeemRealatedEntry(VoucherEntry: Record "NPR NpRv Voucher Entry"): Boolean

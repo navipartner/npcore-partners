@@ -134,6 +134,7 @@ codeunit 6151171 "NPR Spfy Legacy Return Posting"
         CustLedgerEntry: Record "Cust. Ledger Entry";
         TotalToSettle: Decimal;
         CardShare: Decimal;
+        AmountLCYPerAmount: Decimal;
         GiftCardAccountNo: Code[20];
         RefundAccountMissingErr: Label '%1 must be set on %2 %3 before Shopify %4 can be settled.', Comment = '%1 = Return Refund G/L Account No. caption, %2 = Shopify Store table caption, %3 = store code, %4 = Shopify document caption';
         RefundAppliedLbl: Label 'Refund for Shopify %1', Comment = '%1 = Shopify document caption';
@@ -159,14 +160,65 @@ codeunit 6151171 "NPR Spfy Legacy Return Posting"
         GiftCardAccountNo := ShopifyStore."Ret. Gift Card Refund G/L Acc.";
         if GiftCardAccountNo = '' then
             GiftCardAccountNo := ShopifyStore."Return Refund G/L Account No.";
-        PostRefundJournalLine(SalesCrMemoHeader, CustLedgerEntry."Journal Templ. Name", ShopifyStore."Return Refund G/L Account No.", CardShare, StrSubstNo(RefundAppliedLbl, Settlement."Display Name"), GenJnlPostLine);
-        PostRefundJournalLine(SalesCrMemoHeader, CustLedgerEntry."Journal Templ. Name", GiftCardAccountNo, PostedGiftCardShare, StrSubstNo(GiftCardRefundAppliedLbl, Settlement."Display Name"), GenJnlPostLine);
+        AmountLCYPerAmount := RefundAmountLCYPerAmount(SalesCrMemoHeader);
+        PostRefundJournalLine(SalesCrMemoHeader, CustLedgerEntry."Journal Templ. Name", ShopifyStore."Return Refund G/L Account No.", CardShare, AmountLCYPerAmount, StrSubstNo(RefundAppliedLbl, Settlement."Display Name"), GenJnlPostLine);
+        PostRefundJournalLine(SalesCrMemoHeader, CustLedgerEntry."Journal Templ. Name", GiftCardAccountNo, PostedGiftCardShare, GiftCardJournalAmountLCYPerAmount(Settlement, SalesCrMemoHeader), StrSubstNo(GiftCardRefundAppliedLbl, Settlement."Display Name"), GenJnlPostLine);
     end;
 
-    local procedure PostRefundJournalLine(SalesCrMemoHeader: Record "Sales Cr.Memo Header"; JournalTemplateName: Code[10]; BalAccountNo: Code[20]; Amount: Decimal; Description: Text; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
+    /// <summary>
+    /// The LCY per unit the card gets back, on the voucher and on the gift card account alike, so the two move together: Shopify's LCY for the card when the refund carries it, as the order import booked the card's payment; 0 keeps the credit memo's own rate.
+    /// </summary>
+    local procedure GiftCardAmountLCYPerAmount(Settlement: Record "NPR Spfy Refund Settlement"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"): Decimal
+    begin
+        if SalesCrMemoHeader."Currency Code" = '' then
+            exit(0);
+        if (Settlement."Voucher Refund Amount" <= 0) or (Settlement."Voucher Refund Amount (LCY)" <= 0) then
+            exit(0);
+        exit(Settlement."Voucher Refund Amount (LCY)" / Settlement."Voucher Refund Amount");
+    end;
+
+    /// <summary>
+    /// The gift card journal line follows the voucher, except where the currency has no realized FX accounts to book the difference to the credit memo's rate on; there it keeps the credit memo's rate, as before.
+    /// </summary>
+    local procedure GiftCardJournalAmountLCYPerAmount(Settlement: Record "NPR Spfy Refund Settlement"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"): Decimal
+    var
+        SpfyDocumentRate: Codeunit "NPR Spfy Document Rate";
+    begin
+        if not SpfyDocumentRate.HasRealizedFXAccounts(SalesCrMemoHeader."Currency Code") then
+            exit(0);
+        exit(GiftCardAmountLCYPerAmount(Settlement, SalesCrMemoHeader));
+    end;
+
+    /// <summary>
+    /// The LCY the card refund pays out per unit: Shopify's from the credit memo's card payment lines, or the table rate on its posting date for a credit memo held at the invoice's rate; 0 keeps the credit memo's own rate.
+    /// Gift card and store credit lines stay out: their share follows the voucher, not the refund's rate.
+    /// </summary>
+    local procedure RefundAmountLCYPerAmount(SalesCrMemoHeader: Record "Sales Cr.Memo Header"): Decimal
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        TempCardPaymentLine: Record "NPR Magento Payment Line" temporary;
+        SpfyDocumentRate: Codeunit "NPR Spfy Document Rate";
+        SpfyLegacyReturnMgt: Codeunit "NPR Spfy Legacy Return Mgt.";
+    begin
+        if SalesCrMemoHeader."Currency Code" = '' then
+            exit(0);
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Cr.Memo Header");
+        PaymentLine.SetRange("Document No.", SalesCrMemoHeader."No.");
+        if PaymentLine.FindSet() then
+            repeat
+                if not SpfyLegacyReturnMgt.IsLiabilityGateway(PaymentLine."External Payment Method Code") then begin
+                    TempCardPaymentLine := PaymentLine;
+                    TempCardPaymentLine.Insert();
+                end;
+            until PaymentLine.Next() = 0;
+        exit(SpfyDocumentRate.RefundAmountLCYPerAmount(SalesCrMemoHeader."Currency Code", SalesCrMemoHeader."Posting Date", SpfyDocumentRate.IsLocked(SalesCrMemoHeader), TempCardPaymentLine));
+    end;
+
+    local procedure PostRefundJournalLine(SalesCrMemoHeader: Record "Sales Cr.Memo Header"; JournalTemplateName: Code[10]; BalAccountNo: Code[20]; Amount: Decimal; AmountLCYPerAmount: Decimal; Description: Text; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
     var
         GenJnlLine: Record "Gen. Journal Line";
         GLSetup: Record "General Ledger Setup";
+        SpfyDocumentRate: Codeunit "NPR Spfy Document Rate";
     begin
         if (BalAccountNo = '') or (Amount = 0) then
             exit;
@@ -195,6 +247,8 @@ codeunit 6151171 "NPR Spfy Legacy Return Posting"
         GenJnlLine."Source Currency Code" := SalesCrMemoHeader."Currency Code";
         GenJnlLine."Source Currency Amount" := Amount;
         GenJnlLine.Validate(Amount);
+        // The refund's own LCY, not the credit memo's rate; BC books the difference as realized FX when it applies the refund.
+        SpfyDocumentRate.SetRefundAmountLCY(AmountLCYPerAmount, GenJnlLine);
         GenJnlLine."Applies-to Doc. Type" := GenJnlLine."Applies-to Doc. Type"::"Credit Memo";
         GenJnlLine."Applies-to Doc. No." := SalesCrMemoHeader."No.";
         GenJnlLine."Source Type" := GenJnlLine."Source Type"::Customer;
@@ -255,27 +309,24 @@ codeunit 6151171 "NPR Spfy Legacy Return Posting"
     end;
 
     /// <summary>
-    /// What the card gets back in LCY: the share at the rate Shopify booked it in the shop currency when that is the LCY, as the order import booked the card's payment; else at the credit memo's rate.
+    /// What the card gets back in LCY, at the same rate as the gift card share's journal line (GiftCardAmountLCYPerAmount).
     /// </summary>
     local procedure VoucherReversalAmountLCY(Settlement: Record "NPR Spfy Refund Settlement"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; VoucherShare: Decimal): Decimal
     var
         GLSetup: Record "General Ledger Setup";
         CurrencyExchangeRate: Record "Currency Exchange Rate";
+        AmountLCYPerAmount: Decimal;
         AmountLCY: Decimal;
     begin
         if SalesCrMemoHeader."Currency Code" = '' then
             exit(VoucherShare);
         GLSetup.Get();
-        if ShopifyRateKnown(Settlement) then
-            AmountLCY := VoucherShare * Settlement."Voucher Refund Amount (LCY)" / Settlement."Voucher Refund Amount"
+        AmountLCYPerAmount := GiftCardAmountLCYPerAmount(Settlement, SalesCrMemoHeader);
+        if AmountLCYPerAmount <> 0 then
+            AmountLCY := VoucherShare * AmountLCYPerAmount
         else
             AmountLCY := CurrencyExchangeRate.ExchangeAmtFCYToLCY(SalesCrMemoHeader."Posting Date", SalesCrMemoHeader."Currency Code", VoucherShare, SalesCrMemoHeader."Currency Factor");
         exit(Round(AmountLCY, GLSetup."Amount Rounding Precision"));
-    end;
-
-    local procedure ShopifyRateKnown(Settlement: Record "NPR Spfy Refund Settlement"): Boolean
-    begin
-        exit((Settlement."Voucher Refund Amount" > 0) and (Settlement."Voucher Refund Amount (LCY)" > 0));
     end;
 
     /// <summary>
@@ -349,15 +400,19 @@ codeunit 6151171 "NPR Spfy Legacy Return Posting"
     end;
 
     /// <summary>
-    /// Reads a reversal back at the rate it was posted at: Shopify's when VoucherReversalAmountLCY used it, else the credit memo's. Another rate would be off by the rate difference, not by a rounding unit.
+    /// Reads a reversal back at the rate it was posted at (GiftCardAmountLCYPerAmount, else the credit memo's). Another rate would be off by the rate difference, not by a rounding unit.
     /// </summary>
     local procedure ReversalInDocumentCurrency(AmountLCY: Decimal; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; OtherSettlement: Record "NPR Spfy Refund Settlement"; HasSettlement: Boolean): Decimal
+    var
+        AmountLCYPerAmount: Decimal;
     begin
         if SalesCrMemoHeader."Currency Code" = '' then
             exit(AmountLCY);
-        if HasSettlement then
-            if ShopifyRateKnown(OtherSettlement) then
-                exit(AmountLCY * OtherSettlement."Voucher Refund Amount" / OtherSettlement."Voucher Refund Amount (LCY)");
+        if HasSettlement then begin
+            AmountLCYPerAmount := GiftCardAmountLCYPerAmount(OtherSettlement, SalesCrMemoHeader);
+            if AmountLCYPerAmount <> 0 then
+                exit(AmountLCY / AmountLCYPerAmount);
+        end;
         if SalesCrMemoHeader."Currency Factor" <> 0 then
             exit(AmountLCY * SalesCrMemoHeader."Currency Factor");
         exit(AmountLCY);

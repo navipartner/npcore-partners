@@ -794,6 +794,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         Currency: Record Currency;
         CurrExchRate: Record "Currency Exchange Rate";
         PaymentLine: Record "NPR Magento Payment Line";
+        SpfyDocumentRate: Codeunit "NPR Spfy Document Rate";
         SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
         PaymentMgt: Codeunit "NPR Magento Pmt. Mgt.";
         CurrencyFactor: Decimal;
@@ -837,7 +838,9 @@ codeunit 6184814 "NPR Spfy Order Mgt."
                 CurrencyFactor := SpfyEventLogEntry."Amount (PCY)" / SpfyEventLogEntry."Amount (SCY)";
             if CurrencyFactor <> SalesHeader."Currency Factor" then
                 SalesHeader.Validate("Currency Factor", CurrencyFactor);
-        end;
+            SpfyDocumentRate.SetShopifyCurrencyFactor(SalesHeader);
+        end else
+            SpfyDocumentRate.ReleaseShopifyCurrencyFactor(SalesHeader);
 
         Currency.InitRoundingPrecision();
         case true of
@@ -1364,7 +1367,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
             end;
             SetOrderLineUnitPriceAndDiscount(SalesHeader, ShopifyStoreCode, UnitPrice, CalcLineDiscountAmount(OrderLine, SalesLine), SalesLine);
             if IsGiftCard and (not ExistingLineFound or (SalesLine."Outstanding Quantity" <> 0)) then begin
-                SetRetailVoucher(SalesHeader, SalesLine, IsNPGiftCard, VoucherType, PropertyDict, FulfillmentLineBuffer, FulfillmEntryDetailBuffer);
+                SetRetailVoucher(SalesHeader, OrderLine, SalesLine, IsNPGiftCard, VoucherType, PropertyDict, FulfillmentLineBuffer, FulfillmEntryDetailBuffer);
                 FulfillmEntryDetailBuffer.Reset();
             end;
             // Refunded before it shipped: no voucher is left to issue from this line.
@@ -1596,13 +1599,14 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         GLSetupRetrived := true;
     end;
 
-    local procedure SetRetailVoucher(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; IsNpGiftCard: Boolean; VoucherType: Record "NPR NpRv Voucher Type"; PropertyDict: Dictionary of [Text, Text]; FulfillmentLineBuffer: Record "NPR Spfy Fulfillment Buffer"; var FulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm. Buf. Detail")
+    local procedure SetRetailVoucher(SalesHeader: Record "Sales Header"; OrderLine: JsonToken; var SalesLine: Record "Sales Line"; IsNpGiftCard: Boolean; VoucherType: Record "NPR NpRv Voucher Type"; PropertyDict: Dictionary of [Text, Text]; FulfillmentLineBuffer: Record "NPR Spfy Fulfillment Buffer"; var FulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm. Buf. Detail")
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Voucher: Record "NPR NpRv Voucher";
         ShopifyAssignedID: Record "NPR Spfy Assigned ID";
         NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
         SpfySuspendVouchRefVal: Codeunit "NPR Spfy Suspend Vouch.Ref.Val";
         VoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
     begin
@@ -1622,6 +1626,12 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         NpRvSalesLine.Type := NpRvSalesLine.Type::"Top-up";
         NpRvSalesLine.Description := CopyStr(SalesLine.Description, 1, MaxStrLen(NpRvSalesLine.Description));
         NpRvSalesLine."Spfy Initiated in Shopify" := not IsNpGiftCard;
+        // What Shopify booked the card at in the shop currency, tied to the unit price it belongs to so an edited line falls back to conversion.
+        NpRvSalesLine."Spfy Amount (Store Currency)" := JsonHelper.GetJDecimal(OrderLine, 'price_set.shop_money.amount', false);
+        if NpRvSalesLine."Spfy Amount (Store Currency)" <> 0 then begin
+            NpRvSalesLine."Spfy Store Currency Code" := SpfyPaymentGatewayHdlr.TranslateCurrencyCode(JsonHelper.GetJText(OrderLine, 'price_set.shop_money.currency_code', false));
+            NpRvSalesLine."Spfy Captured Unit Price" := SalesLine."Unit Price";
+        end;
         NpRvSalesLine.Validate("Customer No.", SalesHeader."Sell-to Customer No.");
         UpdateVoucherRecipient(PropertyDict, IsNpGiftCard, NpRvSalesLine);
         NpRvSalesLine.Insert(true);

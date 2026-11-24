@@ -861,6 +861,16 @@ codeunit 85484 "NPR Library Spfy Legacy Return"
     end;
 
     /// <summary>
+    /// A refund transaction to gift card GiftCardId whose shop money is ShopAmount in ShopCurrency.
+    /// </summary>
+    procedure GiftCardRefundTxnJsonWithShopMoney(TxnId: Text; Amount: Decimal; Currency: Text; ShopAmount: Decimal; ShopCurrency: Text; GiftCardId: Text): Text
+    var
+        ShopMoneyTok: Label '"shopMoney":{"amount":"%1","currencyCode":"%2"}', Locked = true;
+    begin
+        exit(RefundTxnJson(TxnId, 'gift_card', Amount, Currency, GiftCardId).Replace(StrSubstNo(ShopMoneyTok, Format(Amount, 0, 9), Currency), StrSubstNo(ShopMoneyTok, Format(ShopAmount, 0, 9), ShopCurrency)));
+    end;
+
+    /// <summary>
     /// A card refund transaction whose paymentDetails name the card company, as Shopify reports a card refund.
     /// </summary>
     procedure RefundTxnJsonWithCompany(TxnId: Text; Gateway: Text; Amount: Decimal; Currency: Text; Company: Text): Text

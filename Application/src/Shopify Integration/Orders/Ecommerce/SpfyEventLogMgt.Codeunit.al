@@ -143,17 +143,25 @@ codeunit 6248621 "NPR Spfy Event Log Mgt."
     end;
 
     internal procedure GetCurrencyFactor(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry") CurrencyFactor: Decimal
-    var
-        SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
     begin
-        if SpfyPaymentGatewayHdlr.IsLCY(SpfyEventLogEntry."Store Currency Code") and
-           (SpfyEventLogEntry."Amount (PCY)" <> 0) and (SpfyEventLogEntry."Amount (SCY)" <> 0)
-        then begin
+        if CurrencyFactorFromShopify(SpfyEventLogEntry) then begin
             if SpfyEventLogEntry."Amount (SCY)" = SpfyEventLogEntry."Amount (PCY)" then
                 exit(1);
             exit(SpfyEventLogEntry."Amount (PCY)" / SpfyEventLogEntry."Amount (SCY)");
         end;
         exit(CalculateCurrencyFactor(SpfyEventLogEntry));
+    end;
+
+    /// <summary>
+    /// Whether GetCurrencyFactor returns the rate Shopify used rather than one from the BC exchange rate table.
+    /// </summary>
+    internal procedure CurrencyFactorFromShopify(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"): Boolean
+    var
+        SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
+    begin
+        exit(
+            SpfyPaymentGatewayHdlr.IsLCY(SpfyEventLogEntry."Store Currency Code") and
+            (SpfyEventLogEntry."Amount (PCY)" <> 0) and (SpfyEventLogEntry."Amount (SCY)" <> 0));
     end;
 
     internal procedure CalculateCurrencyFactor(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry") CurrencyFactor: Decimal
