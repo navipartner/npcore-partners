@@ -330,7 +330,7 @@ codeunit 85393 "NPR EcomAppSetWatchTest"
 
         // [SCENARIO] An extension changed while the session was part way through a page. The orders left
         // in that page must not be charged, and the session max must not claim them - it is what
-        // TryFlushMarker would promote into the store marker.
+        // TryFlushCursorState would promote into the store marker.
 
         // [GIVEN] An enabled Entria store and a page holding one order that cannot import
         InitializeEntria();
@@ -357,7 +357,7 @@ codeunit 85393 "NPR EcomAppSetWatchTest"
         _Assert.IsFalse(RowExists, 'An order the guard skipped must not be charged a failure - the platform error belongs to the stale session, not to the order.');
 
         // [THEN] The session max still describes only what the pass really consumed
-        _Assert.AreEqual(WindowStart, SessionMaxAfter, 'The session max must not advance past an order that was never walked - TryFlushMarker promotes it into the store marker, so an inflated max loses the skipped orders.');
+        _Assert.AreEqual(WindowStart, SessionMaxAfter, 'The session max must not advance past an order that was never walked - TryFlushCursorState promotes it into the store marker, so an inflated max loses the skipped orders.');
     end;
 
     [Test]
@@ -404,9 +404,9 @@ codeunit 85393 "NPR EcomAppSetWatchTest"
     begin
         Initialize();
 
-        // [SCENARIO] The store loop leaves before it touches the store's marker at all. GetSyncStateMarker
-        // is the first thing DownloadOrders does and it inserts the sync-state row when none exists, so
-        // the absence of that row is the observable proof that the store was never entered.
+        // [SCENARIO] The store loop leaves before it touches the store's marker at all. DownloadOrders
+        // first reads the sync-state row and inserts it when none exists, so the absence of that row is
+        // the observable proof that the store was never entered.
 
         // [GIVEN] An enabled Entria store with no sync-state row
         InitializeEntria();
@@ -437,7 +437,7 @@ codeunit 85393 "NPR EcomAppSetWatchTest"
     begin
         Initialize();
         // [SCENARIO] The control for the case above. With a clear latch the store IS entered, and the row
-        // appears - GetSyncStateMarker creates it before the first Medusa call, so this holds in a sandbox
+        // appears - DownloadOrders creates it before the first Medusa call, so this holds in a sandbox
         // where that call cannot succeed. Without this pair the case above would pass on a tenant where
         // the store is not enabled at all.
 
@@ -505,7 +505,7 @@ codeunit 85393 "NPR EcomAppSetWatchTest"
         _Assert.IsTrue(GuardHeld, 'A guarded store loop must return cleanly.');
 
         // [THEN] The store was never entered. This is the assertion that pins the guard: without it
-        //        DownloadOrders reseeds the session max to PassWindowStart(marker) as its third statement,
+        //        DownloadOrders reseeds the session max to PassWindowStart(marker) before its first fetch,
         //        long before anything can fail, so a regression is visible here and nowhere else.
         _Assert.AreEqual(OrderUpdatedAt, SessionMaxAfter, 'A guarded store loop must not reach DownloadOrders, which reseeds the session max from the stored marker before it fetches anything.');
 
@@ -516,8 +516,10 @@ codeunit 85393 "NPR EcomAppSetWatchTest"
 
         // [THEN] And the flush itself, called directly, still works - the guard is the loop''s business,
         //        not a change to the marker primitive every other caller relies on
-        _Assert.IsTrue(EntriaJQ.TryFlushMarker(_StoreCodeLbl, ExpectedMarkerDT), 'TryFlushMarker must keep its single meaning: the guard sits at its call site, not inside it, because the Entria suite calls it directly.');
+        //        The stored cursor is blank: InitializeEntria deleted the row and SetLastOrdersImportedAt blanks it.
+        _Assert.IsTrue(EntriaJQ.TryFlushCursorState(_StoreCodeLbl, ExpectedMarkerDT, '', 'tok-ctrl'), 'TryFlushCursorState must keep its single meaning: the guard sits at its call site, not inside it, because the Entria suite calls it directly.');
         _Assert.AreEqual(OrderUpdatedAt, EntriaJQ.GetSyncStateMarker(_StoreCodeLbl), 'Called directly with a clear latch, the flush must still promote the session max - otherwise the test above passed because flushing is broken, not because the guard works.');
+        _Assert.AreEqual('tok-ctrl', _LibraryEntria.GetOrderCursor(_StoreCodeLbl), 'Called directly with a clear latch, the flush must store the next cursor.');
     end;
     #endregion
 

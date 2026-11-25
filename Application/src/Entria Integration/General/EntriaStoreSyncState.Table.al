@@ -17,6 +17,11 @@ table 6059942 "NPR Entria Store Sync State"
             Caption = 'Last Orders Imported At';
             DataClassification = CustomerContent;
         }
+        field(11; "Order Cursor"; Text[2048])
+        {
+            Caption = 'Order Cursor';
+            DataClassification = CustomerContent;
+        }
 
     }
 

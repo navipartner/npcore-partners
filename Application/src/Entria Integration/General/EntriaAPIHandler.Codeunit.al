@@ -5,14 +5,21 @@ codeunit 6150988 "NPR Entria API Handler"
 
     internal procedure SendEntriaRequest(EntriaStoreCode: Code[20]; APIEndpoint: Text; HttpMethod: Enum "Http Request Type"; var EntriaResponse: JsonToken): Boolean
     var
-        EntriaStore: Record "NPR Entria Store";
+        HttpStatusCode: Integer;
         ResponseText: Text;
+    begin
+        exit(SendEntriaRequest(EntriaStoreCode, APIEndpoint, HttpMethod, 0, EntriaResponse, HttpStatusCode, ResponseText));
+    end;
+
+    internal procedure SendEntriaRequest(EntriaStoreCode: Code[20]; APIEndpoint: Text; HttpMethod: Enum "Http Request Type"; RequestTimeout: Duration; var EntriaResponse: JsonToken; var HttpStatusCode: Integer; var ResponseText: Text): Boolean
+    var
+        EntriaStore: Record "NPR Entria Store";
         Url: Text;
     begin
         EntriaStore.SetLoadFields("Entria Url", "Entria API Key Token");
         EntriaStore.Get(EntriaStoreCode);
         Url := GetEntriaUrl(EntriaStore) + APIEndpoint;
-        exit(TrySendEntriaRequest(EntriaStore, HttpMethod, Url, ResponseText, EntriaResponse));
+        exit(TrySendEntriaRequest(EntriaStore, HttpMethod, Url, RequestTimeout, HttpStatusCode, ResponseText, EntriaResponse));
     end;
 
     internal procedure GetEntriaStoreList(EntriaStoreCode: Code[20]; var EntriaResponse: JsonToken): Boolean
@@ -22,7 +29,7 @@ codeunit 6150988 "NPR Entria API Handler"
 
 
     [TryFunction]
-    local procedure TrySendEntriaRequest(EntriaStore: Record "NPR Entria Store"; RestMethod: Enum "Http Request Type"; Url: Text; var ResponseText: Text; var EntriaResponse: JsonToken)
+    local procedure TrySendEntriaRequest(EntriaStore: Record "NPR Entria Store"; RestMethod: Enum "Http Request Type"; Url: Text; RequestTimeout: Duration; var HttpStatusCode: Integer; var ResponseText: Text; var EntriaResponse: JsonToken)
     var
         Client: HttpClient;
         RequestMsg: HttpRequestMessage;
@@ -40,12 +47,17 @@ codeunit 6150988 "NPR Entria API Handler"
         repeat
             RetryCounter += 1;
             Clear(Client);
+            // The platform rejects a timeout of zero or less; zero keeps the default.
+            if RequestTimeout > 0 then
+                Client.Timeout(RequestTimeout);
             Clear(RequestMsg);
             Clear(ResponseMsg);
+            HttpStatusCode := 0;
 
             CreateRequestMsg(EntriaStore, RestMethod, Url, RequestMsg);
             if not Client.Send(RequestMsg, ResponseMsg) then
                 Error(GetLastErrorText());
+            HttpStatusCode := ResponseMsg.HttpStatusCode();
 
             Success := ResponseMsg.IsSuccessStatusCode();
             if not Success then

@@ -69,104 +69,147 @@ codeunit 6248580 "NPR Entria Order Import JQ"
     var
         ExpectedMarkerDT: DateTime;
         WindowStartDT: DateTime;
-        ConsumedMaxDT: DateTime;
-        Limit: Integer;
-        Offset: Integer;
+        Cursor: Text;
+        NextCursor: Text;
         PageCount: Integer;
+        InvalidCursor: Boolean;
     begin
-        ExpectedMarkerDT := GetSyncStateMarker(EntriaStore.Code);
-        WindowStartDT := PassWindowStart(ExpectedMarkerDT);
-        _SessionMaxBcStatusUpdatedAt.Set(EntriaStore.Code, WindowStartDT);
+        InitializeDownloadState(EntriaStore.Code, ExpectedMarkerDT, Cursor, WindowStartDT);
 
-        Offset := 0;
-        Limit := 40;
         repeat
-            // Ends the paging: nothing is fetched, no order is processed, TryFlushMarker is not reached,
-            // so the marker stays where the last complete page left it and the next pass re-reads from
-            // there.
             if _EcomJobManagement.ApplicationChanged() then
                 exit(false);
 
-            if not DownloadOrdersPage(EntriaStore, WindowStartDT, Offset, Limit, PageCount) then begin
-                EmitError(EntriaStore.Code, '');
-                exit(false);
-            end;
-
-            if PageCount = 0 then
-                exit(true);
+            if not DownloadOrdersPage(EntriaStore, Cursor, WindowStartDT, NextCursor, PageCount, InvalidCursor) then
+                exit(HandleDownloadFailure(EntriaStore.Code, Cursor, InvalidCursor));
 
             if _EcomJobManagement.ApplicationChanged() then
                 exit(false);
 
-            // False means the marker was rewound (moved backwards) in the database while we were
-            // paging. A forward move is a parallel session's flush - it is adopted and paging continues.
-            if not TryFlushMarker(EntriaStore.Code, ExpectedMarkerDT) then
+            if not TryFlushCursorState(EntriaStore.Code, ExpectedMarkerDT, Cursor, NextCursor) then
                 exit(true);
 
-            // ConsumedMaxDT is the pass's running maximum, not this page's - it is seeded to
-            // WindowStartDT and only ever raised.
-            ConsumedMaxDT := GetSessionMaxBcStatusUpdatedAt(EntriaStore.Code);
-            AdvancePagingCursor(ConsumedMaxDT, PageCount, WindowStartDT, Offset);
-        until PageCount < Limit;
+            Cursor := NextCursor;
+        until PageCount < OrderPageSize();
+
         exit(true);
     end;
 
-    /// <summary>
-    /// Keyset continuation: The window only ever moves FORWARD, to the highest bc_status_updated_at consumed so far, 
-    /// and the offset resets to zero whenever it does. That reset is what makes the offset meaningful at all - 
-    /// the offset may only be carried between requests whose filter is identical. It therefore survives for exactly one purpose: walking
-    /// through a block of rows that share one timestamp, where the window cannot move.
-    /// </summary>
-    internal procedure AdvancePagingCursor(ConsumedMaxDT: DateTime; PageCount: Integer; var WindowStartDT: DateTime; var Offset: Integer)
+    local procedure InitializeDownloadState(StoreCode: Code[20]; var ExpectedMarkerDT: DateTime; var Cursor: Text; var WindowStartDT: DateTime)
+    var
+        EntriaStoreSyncState: Record "NPR Entria Store Sync State";
     begin
-        if ConsumedMaxDT > WindowStartDT then begin
-            WindowStartDT := ConsumedMaxDT;
-            Offset := 0;
-        end else
-            Offset += PageCount;
+        GetSyncState(StoreCode, false, EntriaStoreSyncState);
+
+        ExpectedMarkerDT := EntriaStoreSyncState."Last Orders Imported At";
+        Cursor := EntriaStoreSyncState."Order Cursor";
+
+        // GetSyncState may have inserted the row. Do not keep that transaction open
+        // while Medusa is holding the long-poll request.
+        Commit();
+
+        WindowStartDT := PassWindowStart(ExpectedMarkerDT);
+        _SessionMaxBcStatusUpdatedAt.Set(StoreCode, WindowStartDT);
     end;
 
-    local procedure DownloadOrdersPage(EntriaStore: Record "NPR Entria Store"; FromDT: DateTime; Offset: Integer; Limit: Integer; var PageCount: Integer): Boolean
+    local procedure DownloadOrdersPage(EntriaStore: Record "NPR Entria Store"; Cursor: Text; FromDT: DateTime; var NextCursor: Text; var PageCount: Integer; var InvalidCursor: Boolean): Boolean
     var
         OrdersArr: JsonArray;
     begin
         PageCount := 0;
-        if not GetOrderList(EntriaStore, OrdersArr, Offset, Limit, FromDT) then
+
+        if not GetOrderList(EntriaStore, OrdersArr, Cursor, OrderPageSize(), FromDT, NextCursor, InvalidCursor) then
             exit(false);
 
         PageCount := OrdersArr.Count();
-        if PageCount > 0 then
-            exit(ProcessList(OrdersArr, EntriaStore));
-        exit(true);
+        if PageCount = 0 then
+            exit(true);
+
+        exit(ProcessList(OrdersArr, EntriaStore));
     end;
 
-    internal procedure TryFlushMarker(StoreCode: Code[20]; var ExpectedMarkerDT: DateTime): Boolean
+    local procedure HandleDownloadFailure(StoreCode: Code[20]; Cursor: Text; InvalidCursor: Boolean): Boolean
+    begin
+        if InvalidCursor then begin
+            ResetCursor(StoreCode, Cursor);
+            exit(true);
+        end;
+
+        EmitError(StoreCode, '');
+        exit(false);
+    end;
+
+    local procedure OrderPageSize(): Integer
+    begin
+        exit(40);
+    end;
+
+    internal procedure TryFlushCursorState(StoreCode: Code[20]; var ExpectedMarkerDT: DateTime; RequestCursor: Text; NextCursor: Text): Boolean
     var
         EntriaStoreSyncState: Record "NPR Entria Store Sync State";
         SessionMax: DateTime;
-        MarkerMovedBack: Boolean;
+        Changed: Boolean;
     begin
         GetSyncState(StoreCode, true, EntriaStoreSyncState);
 
-        // SQL Server datetime stores values on a 1/300s grid (.000/.003/.007) while the record
-        // variable keeps the unrounded value after Modify(), so a read-back can be ~1-2ms lower
-        // than what we wrote. A manual rewind is never sub-second, so only a move of 1s or more
-        // counts as one; anything smaller is a rounding artifact.
-        if ExpectedMarkerDT <> 0DT then
-            MarkerMovedBack := EntriaStoreSyncState."Last Orders Imported At" < (ExpectedMarkerDT - 1000);
+        if CursorStateChanged(EntriaStoreSyncState, ExpectedMarkerDT, RequestCursor) then begin
+            Commit();
+            exit(false);
+        end;
+
         SessionMax := _SessionMaxBcStatusUpdatedAt.Get(StoreCode);
 
-        if not MarkerMovedBack then begin
-            if SessionMax > EntriaStoreSyncState."Last Orders Imported At" then begin
-                EntriaStoreSyncState."Last Orders Imported At" := SessionMax;
-                EntriaStoreSyncState.Modify();
-            end;
-            // Track the value now in the database - our own write, or a parallel session's higher one 
-            ExpectedMarkerDT := EntriaStoreSyncState."Last Orders Imported At";
+        if SessionMax > EntriaStoreSyncState."Last Orders Imported At" then begin
+            EntriaStoreSyncState."Last Orders Imported At" := SessionMax;
+            Changed := true;
+        end;
+
+        if EntriaStoreSyncState."Order Cursor" <> NextCursor then begin
+            EntriaStoreSyncState."Order Cursor" := CopyStr(NextCursor, 1, MaxStrLen(EntriaStoreSyncState."Order Cursor"));
+            Changed := true;
+        end;
+
+        if Changed then
+            EntriaStoreSyncState.Modify();
+
+        ExpectedMarkerDT := EntriaStoreSyncState."Last Orders Imported At";
+
+        Commit();
+        exit(true);
+    end;
+
+    local procedure CursorStateChanged(EntriaStoreSyncState: Record "NPR Entria Store Sync State"; ExpectedMarkerDT: DateTime; RequestCursor: Text): Boolean
+    begin
+        if EntriaStoreSyncState."Order Cursor" <> RequestCursor then
+            exit(true);
+
+        exit(MarkerMoved(EntriaStoreSyncState."Last Orders Imported At", ExpectedMarkerDT));
+    end;
+
+    local procedure MarkerMoved(StoredMarkerDT: DateTime; ExpectedMarkerDT: DateTime): Boolean
+    begin
+        if (StoredMarkerDT = 0DT) or (ExpectedMarkerDT = 0DT) then
+            exit(StoredMarkerDT <> ExpectedMarkerDT);
+
+        // SQL Server datetime may differ by ~1-2 ms after read-back.
+        // Only a difference of at least one second is considered an external change.
+        exit((StoredMarkerDT <= ExpectedMarkerDT - 1000) or (StoredMarkerDT >= ExpectedMarkerDT + 1000));
+    end;
+
+    local procedure ResetCursor(StoreCode: Code[20]; RequestCursor: Text)
+    var
+        EntriaStoreSyncState: Record "NPR Entria Store Sync State";
+    begin
+        GetSyncState(StoreCode, true, EntriaStoreSyncState);
+
+        // Do not overwrite a newer cursor written by another session.
+        if EntriaStoreSyncState."Order Cursor" = RequestCursor then begin
+            EntriaStoreSyncState."Order Cursor" := '';
+            EntriaStoreSyncState.Modify();
         end;
 
         Commit();
-        exit(not MarkerMovedBack);
+        EmitCursorResetEvent(StoreCode);
     end;
 
     internal procedure GetSyncStateMarker(StoreCode: Code[20]): DateTime
@@ -184,24 +227,56 @@ codeunit 6248580 "NPR Entria Order Import JQ"
         if EntriaStoreSyncState.Get(StoreCode) then
             exit;
 
-        // A store that has never synced has no row yet.
         EntriaStoreSyncState.Init();
         EntriaStoreSyncState."Store Code" := StoreCode;
         if not EntriaStoreSyncState.Insert() then
             EntriaStoreSyncState.Get(StoreCode);
     end;
 
-    internal procedure GetOrderList(EntriaStore: Record "NPR Entria Store"; var OrdersArr: JsonArray; Offset: Integer; Limit: Integer; BcStatusUpdatedAtFrom: DateTime): Boolean
+    internal procedure GetOrderList(EntriaStore: Record "NPR Entria Store"; var OrdersArr: JsonArray; Cursor: Text; Limit: Integer; BcStatusUpdatedAtFrom: DateTime; var NextCursor: Text; var InvalidCursor: Boolean): Boolean
     var
         EntriaResponse: JsonToken;
-        Request: Text;
+        ResponseText: Text;
+        HttpStatusCode: Integer;
     begin
         Clear(OrdersArr);
-        Request := GenerateGetOrderListRequest(Offset, Limit, BcStatusUpdatedAtFrom);
-        if not _EntriaAPIHandler.SendEntriaRequest(EntriaStore.Code, Request, Enum::"Http Request Type"::GET, EntriaResponse) then
+        Clear(NextCursor);
+        InvalidCursor := false;
+
+        if not SendOrderListRequest(EntriaStore, Cursor, Limit, BcStatusUpdatedAtFrom, EntriaResponse, HttpStatusCode, ResponseText) then begin
+            InvalidCursor := IsInvalidCursorResponse(Cursor, HttpStatusCode, ResponseText);
+            exit(false);
+        end;
+
+        if not TryGetOrdersArray(EntriaResponse, OrdersArr) then
             exit(false);
 
-        exit(TryGetOrdersArray(EntriaResponse, OrdersArr));
+        if not TryGetNextCursor(EntriaResponse, NextCursor) then
+            exit(false);
+
+        exit(TryCheckCursorAdvanced(Cursor, NextCursor, OrdersArr.Count(), Limit));
+    end;
+
+    local procedure SendOrderListRequest(EntriaStore: Record "NPR Entria Store"; Cursor: Text; Limit: Integer; BcStatusUpdatedAtFrom: DateTime; var EntriaResponse: JsonToken; var HttpStatusCode: Integer; var ResponseText: Text): Boolean
+    var
+        Request: Text;
+    begin
+        Request := GenerateGetOrderListRequest(Cursor, Limit, BcStatusUpdatedAtFrom);
+        exit(_EntriaAPIHandler.SendEntriaRequest(EntriaStore.Code, Request, Enum::"Http Request Type"::GET, ListRequestTimeout(), EntriaResponse, HttpStatusCode, ResponseText));
+    end;
+
+    local procedure IsInvalidCursorResponse(Cursor: Text; HttpStatusCode: Integer; ResponseText: Text): Boolean
+    var
+        InvalidCursorMsgTxt: Label 'Invalid ''after'' cursor', Locked = true;
+    begin
+        exit((Cursor <> '') and (HttpStatusCode = 400) and ResponseText.Contains(InvalidCursorMsgTxt));
+    end;
+
+    internal procedure ListRequestTimeout(): Duration
+    begin
+        // Medusa may keep an idle request open for up to 115 seconds.
+        // Keep a 15-second margin for transport and response processing.
+        exit(130 * 1000);
     end;
 
     [TryFunction]
@@ -212,20 +287,55 @@ codeunit 6248580 "NPR Entria Order Import JQ"
     begin
         if not EntriaResponse.SelectToken('orders', OrdersToken) then
             Error(NoOrdersArrayErr);
+
         if not OrdersToken.IsArray() then
             Error(NoOrdersArrayErr);
 
         OrdersArr := OrdersToken.AsArray();
     end;
 
-    internal procedure GenerateGetOrderListRequest(Offset: Integer; Limit: Integer; BcStatusUpdatedAtFrom: DateTime): Text
+    [TryFunction]
+    local procedure TryGetNextCursor(EntriaResponse: JsonToken; var NextCursor: Text)
+    var
+        EntriaStoreSyncState: Record "NPR Entria Store Sync State";
+        NextToken: JsonToken;
+        RawNext: Text;
+        NoNextCursorErr: Label 'The Entria order list request succeeded but its response contains no usable "next" cursor (missing, null, not a non-empty string, or longer than %1 characters), so the importer cannot continue from this page.', Comment = '%1 - maximum cursor length', Locked = true;
+    begin
+        if EntriaResponse.SelectToken('next', NextToken) then
+            if NextToken.IsValue() then
+                if not NextToken.AsValue().IsNull() then begin
+                    NextToken.WriteTo(RawNext);
+                    if RawNext.StartsWith('"') then
+                        RawNext := NextToken.AsValue().AsText()
+                    else
+                        RawNext := '';
+                end;
+
+        if (RawNext = '') or (StrLen(RawNext) > MaxStrLen(EntriaStoreSyncState."Order Cursor")) then
+            Error(NoNextCursorErr, MaxStrLen(EntriaStoreSyncState."Order Cursor"));
+
+        NextCursor := RawNext;
+    end;
+
+    [TryFunction]
+    local procedure TryCheckCursorAdvanced(Cursor: Text; NextCursor: Text; PageCount: Integer; Limit: Integer)
+    var
+        CursorNotAdvancedErr: Label 'The Entria order list returned a full page but the same "next" cursor it was called with, so fetching again would serve the same page forever.', Locked = true;
+    begin
+        // An empty or short page with the same cursor is the normal idle answer.
+        if (PageCount >= Limit) and (NextCursor = Cursor) then
+            Error(CursorNotAdvancedErr);
+    end;
+
+    internal procedure GenerateGetOrderListRequest(Cursor: Text; Limit: Integer; BcStatusUpdatedAtFrom: DateTime): Text
     var
         WindowText: Text;
     begin
-        if BcStatusUpdatedAtFrom <> 0DT then
+        if (Cursor = '') and (BcStatusUpdatedAtFrom <> 0DT) then
             WindowText := StrSubstNo('&bc_status_updated_at[$gte]=%1', Format(BcStatusUpdatedAtFrom, 0, 9));
 
-        exit(StrSubstNo('admin/orders/bc-sync?bc_status=pending&limit=%1&offset=%2&order=bc_status_updated_at&%3%4', Limit, Offset, GetOrderFieldsProjection(), WindowText));
+        exit(StrSubstNo('admin/orders/bc-sync?after=%1&bc_status=pending%2&limit=%3&%4', Cursor, WindowText, Limit, GetOrderFieldsProjection()));
     end;
 
     local procedure GetOrderFieldsProjection(): Text
@@ -234,9 +344,8 @@ codeunit 6248580 "NPR Entria Order Import JQ"
     end;
 
     /// <summary>
-    /// The overlap is folded in exactly ONCE, here, against the fixed stored marker - never re-applied
-    /// per page against the moving window. Subtracting it from a moving base lets the window rewind
-    /// faster than it advances, and against densely stamped orders the same page is served forever.
+    /// Start of the time filter, which is only sent on a first call or after a cursor reset. Later
+    /// pages follow the cursor, so the overlap is applied once per reset, never per page.
     /// </summary>
     internal procedure PassWindowStart(MarkerDT: DateTime): DateTime
     begin
@@ -522,9 +631,8 @@ codeunit 6248580 "NPR Entria Order Import JQ"
 
     internal procedure SeedSessionMax(StoreCode: Code[20])
     begin
-        // Seeds to the window the pass would actually open with, overlap included - the same value
-        // DownloadOrders seeds. Seeding to the bare marker would put the running maximum ahead of the
-        // window, so the very first comparison would advance the window regardless of what was consumed.
+        // Same seed as DownloadOrders: the pass start, overlap included. It sits below the stored
+        // marker, so only a consumed order can move the marker forward on flush.
         _SessionMaxBcStatusUpdatedAt.Set(StoreCode, PassWindowStart(GetSyncStateMarker(StoreCode)));
     end;
     #endregion
@@ -538,25 +646,8 @@ codeunit 6248580 "NPR Entria Order Import JQ"
     /// One-hour dedup for the store-wide list-fetch failure
     /// </summary>
     internal procedure ShouldEmitSentryError(StoreCode: Code[20]; NowDT: DateTime): Boolean
-    var
-        DKey: Text;
-        LastEmitAt: DateTime;
-        OneHour: Duration;
     begin
-        OneHour := 60 * 60 * 1000;
-        DKey := StrSubstNo('%1|<list-fetch>', StoreCode);
-
-        if not _LastErrorEmitAt.ContainsKey(DKey) then begin
-            _LastErrorEmitAt.Add(DKey, NowDT);
-            exit(true);
-        end;
-
-        LastEmitAt := _LastErrorEmitAt.Get(DKey);
-        if NowDT - LastEmitAt < OneHour then
-            exit(false);
-
-        _LastErrorEmitAt.Set(DKey, NowDT);
-        exit(true);
+        exit(ShouldEmitForKey(StrSubstNo('%1|<list-fetch>', StoreCode), NowDT));
     end;
 
     local procedure EmitSentryError(StoreCode: Code[20]; OrderRef: Text)
@@ -579,6 +670,53 @@ codeunit 6248580 "NPR Entria Order Import JQ"
     begin
         if ShouldEmitSentryError(StoreCode) then
             EmitSentryError(StoreCode, DocumentNo);
+    end;
+
+    local procedure ShouldEmitCursorResetEvent(StoreCode: Code[20]): Boolean
+    begin
+        exit(ShouldEmitCursorResetEvent(StoreCode, CurrentDateTime()));
+    end;
+
+    /// <summary>
+    /// One-hour dedup for the cursor reset, kept apart from the list-fetch key so neither hides the other.
+    /// </summary>
+    internal procedure ShouldEmitCursorResetEvent(StoreCode: Code[20]; NowDT: DateTime): Boolean
+    begin
+        exit(ShouldEmitForKey(StrSubstNo('%1|<cursor-reset>', StoreCode), NowDT));
+    end;
+
+    local procedure ShouldEmitForKey(DKey: Text; NowDT: DateTime): Boolean
+    var
+        LastEmitAt: DateTime;
+        OneHour: Duration;
+    begin
+        OneHour := 60 * 60 * 1000;
+
+        if not _LastErrorEmitAt.ContainsKey(DKey) then begin
+            _LastErrorEmitAt.Add(DKey, NowDT);
+            exit(true);
+        end;
+
+        LastEmitAt := _LastErrorEmitAt.Get(DKey);
+        if NowDT - LastEmitAt < OneHour then
+            exit(false);
+
+        _LastErrorEmitAt.Set(DKey, NowDT);
+        exit(true);
+    end;
+
+    local procedure EmitCursorResetEvent(StoreCode: Code[20])
+    var
+        Sentry: Codeunit "NPR Sentry";
+        CursorResetTxt: Label 'Entria order cursor reset: %1', Comment = '%1 - store code', Locked = true;
+    begin
+        if not ShouldEmitCursorResetEvent(StoreCode) then
+            exit;
+
+        Sentry.InitScopeAndTransaction(StrSubstNo(CursorResetTxt, StoreCode), 'bc.entria.order.import.error');
+        Sentry.AddTransactionTag('entria.store_code', StoreCode);
+        Sentry.AddLastErrorInEnglish();
+        Sentry.FinalizeScope();
     end;
 
     local procedure InitGlobals()

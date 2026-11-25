@@ -1250,13 +1250,63 @@ codeunit 85379 "NPR Library - Entria"
     end;
 
     /// <summary>
-    /// Prime the JQ's per-store Sentry throttle so the sandbox DownloadOrdersPage
-    /// failure in the caller doesn't emit "Entria Order list fetch failed: ...".
+    /// Prime the JQ's per-store Sentry throttle so the sandbox list fetch failure in the caller
+    /// doesn't emit "Entria Order list fetch failed: ...".
     /// Walk and sync-state observable are unchanged; only the emission is suppressed.
     /// </summary>
     internal procedure SuppressListFetchSentryEmit(var EntriaJQ: Codeunit "NPR Entria Order Import JQ"; StoreCode: Code[20])
     begin
         EntriaJQ.ShouldEmitSentryError(StoreCode, CurrentDateTime());
+    end;
+
+    /// <summary>
+    /// Prime the JQ's per-store cursor reset throttle so a cursor reset in the caller doesn't emit
+    /// "Entria order cursor reset: ...".
+    /// </summary>
+    internal procedure SuppressCursorResetSentryEmit(var EntriaJQ: Codeunit "NPR Entria Order Import JQ"; StoreCode: Code[20])
+    begin
+        EntriaJQ.ShouldEmitCursorResetEvent(StoreCode, CurrentDateTime());
+    end;
+    #endregion
+
+    #region Sync state
+    procedure SetOrderCursor(StoreCode: Code[20]; Cursor: Text)
+    var
+        EntriaStoreSyncState: Record "NPR Entria Store Sync State";
+    begin
+        GetOrInsertSyncState(StoreCode, EntriaStoreSyncState);
+        EntriaStoreSyncState."Order Cursor" := CopyStr(Cursor, 1, MaxStrLen(EntriaStoreSyncState."Order Cursor"));
+        EntriaStoreSyncState.Modify();
+    end;
+
+    procedure GetOrderCursor(StoreCode: Code[20]): Text
+    var
+        EntriaStoreSyncState: Record "NPR Entria Store Sync State";
+    begin
+        if EntriaStoreSyncState.Get(StoreCode) then
+            exit(EntriaStoreSyncState."Order Cursor");
+    end;
+
+    /// <summary>
+    /// Writes the marker and leaves the cursor alone, the way an external edit lands under a running
+    /// pass. "NPR Entria Store".SetLastOrdersImportedAt blanks the cursor too, so it cannot stand in here.
+    /// </summary>
+    procedure SetSyncStateMarkerRaw(StoreCode: Code[20]; NewMarker: DateTime)
+    var
+        EntriaStoreSyncState: Record "NPR Entria Store Sync State";
+    begin
+        GetOrInsertSyncState(StoreCode, EntriaStoreSyncState);
+        EntriaStoreSyncState."Last Orders Imported At" := NewMarker;
+        EntriaStoreSyncState.Modify();
+    end;
+
+    local procedure GetOrInsertSyncState(StoreCode: Code[20]; var EntriaStoreSyncState: Record "NPR Entria Store Sync State")
+    begin
+        if EntriaStoreSyncState.Get(StoreCode) then
+            exit;
+        EntriaStoreSyncState.Init();
+        EntriaStoreSyncState."Store Code" := StoreCode;
+        EntriaStoreSyncState.Insert();
     end;
 
     #endregion

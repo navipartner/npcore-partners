@@ -199,6 +199,34 @@ table 6059910 "NPR Entria Store"
     begin
         FindSyncState(StoreCode, EntriaStoreSyncState);
         EntriaStoreSyncState."Last Orders Imported At" := NewDateTime;
+        // The cursor encodes the old position; blanking it restarts the poll from the new marker.
+        EntriaStoreSyncState."Order Cursor" := '';
+        EntriaStoreSyncState.Modify();
+    end;
+
+    internal procedure SetEntriaUrl(NewUrl: Text)
+    var
+        OldUrl: Text;
+    begin
+        OldUrl := "Entria Url";
+#pragma warning disable AA0139
+        Validate("Entria Url", NewUrl);
+#pragma warning restore AA0139
+        if "Entria Url" <> OldUrl then
+            ClearOrderCursor(Code);
+    end;
+
+    local procedure ClearOrderCursor(StoreCode: Code[20])
+    var
+        EntriaStoreSyncState: Record "NPR Entria Store Sync State";
+    begin
+        EntriaStoreSyncState.ReadIsolation := ReadIsolation::UpdLock;
+        if not EntriaStoreSyncState.Get(StoreCode) then
+            exit;
+        if EntriaStoreSyncState."Order Cursor" = '' then
+            exit;
+
+        EntriaStoreSyncState."Order Cursor" := '';
         EntriaStoreSyncState.Modify();
     end;
 

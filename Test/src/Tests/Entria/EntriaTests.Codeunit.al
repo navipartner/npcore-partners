@@ -33,6 +33,19 @@ codeunit 85260 "NPR Entria Tests"
         _MockOrderId: Text[100];
         _MockOrderUpdatedAt: DateTime;
         _MockRequestCount: Integer;
+        _BcSyncStatuses: List of [Integer];
+        _BcSyncBodies: List of [Text];
+        _BcSyncCallCount: Integer;
+        _BcSyncHasAfter: List of [Boolean];
+        _BcSyncAfter: List of [Text];
+        _BcSyncHasWindow: List of [Boolean];
+        _BcSyncWindow: List of [Text];
+        _BcSyncHasOffsetOrOrder: List of [Boolean];
+        _SingleOrderCallCount: Integer;
+        _UnexpectedCallCount: Integer;
+        _RetryOrderId: Text[100];
+        _RetryOrderUpdatedAt: DateTime;
+        _FlipAppChangeOnBcSync: Boolean;
 
     [Test]
     procedure WebhookGuards_PriceChangeOnEntriaItemWithEnabledStore_AllGuardsPass()
@@ -452,49 +465,291 @@ codeunit 85260 "NPR Entria Tests"
     end;
 
     [Test]
-    procedure ManualMarkerEditMidPaginationIsNotOverwritten()
+    procedure CursorFlushRefusesWhenStoredCursorChanged()
     var
         EntriaStore: Record "NPR Entria Store";
         EntriaJQ: Codeunit "NPR Entria Order Import JQ";
         OrdersArr: JsonArray;
-        OrderUpdatedAt: DateTime;
-        AdminResyncPoint: DateTime;
+        MarkerDT: DateTime;
+        OrderDT: DateTime;
         ExpectedMarkerDT: DateTime;
-        FirstFlushProceeded: Boolean;
-        FlushAfterRewindProceeded: Boolean;
+        FlushProceeded: Boolean;
     begin
-        // [SCENARIO] Editing "Last Orders Imported At" is allowed while the import job runs. An
-        // administrator moving it BACKWARDS to force a re-sync must survive even when the edit
-        // lands in the middle of a store's pagination
+        // [SCENARIO] A parallel session's flush and an admin reset both change the stored cursor. A pass
+        // that finds a cursor other than the one it requested with must write nothing, or it overwrites
+        // the other writer's position.
 
-        // [GIVEN] An enabled Entria store, an order timestamped 25 June 2024 and an admin re-sync point back in March
+        // [GIVEN] An enabled Entria store whose marker stands at 10:00:00 on 5 July 2024
         Initialize();
         _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
         EntriaStore.Get(_StoreCode);
-        OrderUpdatedAt := CreateDateTime(DMY2Date(25, 6, 2024), 100000T);
-        AdminResyncPoint := CreateDateTime(DMY2Date(1, 3, 2024), 0T);
+        MarkerDT := CreateDateTime(DMY2Date(5, 7, 2024), 100000T);
+        OrderDT := MarkerDT + 10000;
+        EntriaStore.SetLastOrdersImportedAt(_StoreCode, MarkerDT);
 
-        // [GIVEN] The pass has snapshotted the marker, seeded its session max and processed its first page
+        // [GIVEN] A pass that consumed an order 10 s past the marker and snapshotted the marker
+        EntriaJQ.SeedSessionMax(_StoreCode);
+        _LibraryEntria.BuildOrderArrayWithNoPaymentLines(OrdersArr, 'ZZ-DOC-CURCHG', 'medusa-curchg', OrderDT, OrderDT, 100);
+        EntriaJQ.ProcessList(OrdersArr, EntriaStore);
+        _Assert.AreEqual(OrderDT, EntriaJQ.GetSessionMaxBcStatusUpdatedAt(_StoreCode),
+            'Setup: the session max must stand above the marker, or a refused flush and a flush with nothing to write look the same.');
+        ExpectedMarkerDT := EntriaJQ.GetSyncStateMarker(_StoreCode);
+
+        // [GIVEN] A stored cursor other than the one the pass requested with
+        _LibraryEntria.SetOrderCursor(_StoreCode, 'tok-other');
+
+        // [WHEN] The pass flushes the page it requested with 'tok-a'
+        FlushProceeded := EntriaJQ.TryFlushCursorState(_StoreCode, ExpectedMarkerDT, 'tok-a', 'tok-x');
+
+        // [THEN] The flush is refused and neither the cursor nor the marker moves
+        _Assert.IsFalse(FlushProceeded, 'A flush under a cursor the pass did not request with must be refused.');
+        _Assert.AreEqual('tok-other', _LibraryEntria.GetOrderCursor(_StoreCode), 'A refused flush must leave the other writer''s cursor standing.');
+        _Assert.AreEqual(MarkerDT, EntriaJQ.GetSyncStateMarker(_StoreCode), 'A refused flush must not promote the session max into the marker.');
+    end;
+
+    [Test]
+    procedure CursorFlushProceedsWhenStoredCursorMatchesRequest()
+    var
+        EntriaStore: Record "NPR Entria Store";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+        MarkerDT: DateTime;
+        OrderDT: DateTime;
+        ExpectedMarkerDT: DateTime;
+        FlushProceeded: Boolean;
+    begin
+        // [SCENARIO] A pass that finds the cursor it requested with must flush: store the session max and
+        // the next cursor, and move its snapshot to the stored marker.
+
+        // [GIVEN] An enabled Entria store whose marker stands at 10:00:00 on 5 July 2024
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        EntriaStore.Get(_StoreCode);
+        MarkerDT := CreateDateTime(DMY2Date(5, 7, 2024), 100000T);
+        OrderDT := MarkerDT + 10000;
+        EntriaStore.SetLastOrdersImportedAt(_StoreCode, MarkerDT);
+
+        // [GIVEN] A pass that consumed an order 10 s past the marker and snapshotted the marker
+        EntriaJQ.SeedSessionMax(_StoreCode);
+        _LibraryEntria.BuildOrderArrayWithNoPaymentLines(OrdersArr, 'ZZ-DOC-CURMATCH', 'medusa-curmatch', OrderDT, OrderDT, 100);
+        EntriaJQ.ProcessList(OrdersArr, EntriaStore);
+        _Assert.AreEqual(OrderDT, EntriaJQ.GetSessionMaxBcStatusUpdatedAt(_StoreCode),
+            'Setup: the session max must stand above the marker, or a refused flush and a flush with nothing to write look the same.');
+        ExpectedMarkerDT := EntriaJQ.GetSyncStateMarker(_StoreCode);
+
+        // [GIVEN] The stored cursor is the one the pass requested with
+        _LibraryEntria.SetOrderCursor(_StoreCode, 'tok-a');
+
+        // [WHEN] The pass flushes the page it requested with 'tok-a'
+        FlushProceeded := EntriaJQ.TryFlushCursorState(_StoreCode, ExpectedMarkerDT, 'tok-a', 'tok-x');
+
+        // [THEN] The flush proceeds, stores the session max and the next cursor, and the snapshot follows the stored marker
+        _Assert.IsTrue(FlushProceeded, 'A flush under the cursor the pass requested with must proceed.');
+        _Assert.AreEqual(OrderDT, EntriaJQ.GetSyncStateMarker(_StoreCode), 'The flush must promote the session max into the marker.');
+        _Assert.AreEqual('tok-x', _LibraryEntria.GetOrderCursor(_StoreCode), 'The flush must store the next cursor.');
+        _Assert.AreEqual(EntriaJQ.GetSyncStateMarker(_StoreCode), ExpectedMarkerDT, 'The pass''s snapshot must follow what it just wrote.');
+    end;
+
+    [Test]
+    procedure CursorFlushRefusesExternalMarkerMoveInEitherDirection()
+    begin
+        // [SCENARIO] Under an unchanged cursor, a marker that moved a second or more since the pass read
+        // it was set by someone else, forward or back. The pass must write nothing, or that edit is lost.
+
+        // [GIVEN] [WHEN] [THEN] The marker moved forward 2 s
+        AssertFlushRefusedAfterMarkerMove(2000);
+
+        // [GIVEN] [WHEN] [THEN] The marker moved back 2 s
+        AssertFlushRefusedAfterMarkerMove(-2000);
+    end;
+
+    local procedure AssertFlushRefusedAfterMarkerMove(MoveMs: Integer)
+    var
+        EntriaStore: Record "NPR Entria Store";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+        MarkerDT: DateTime;
+        MovedMarkerDT: DateTime;
+        OrderDT: DateTime;
+        ExpectedMarkerDT: DateTime;
+        FlushProceeded: Boolean;
+    begin
+        // [GIVEN] An enabled Entria store whose marker stands at 10:00:00 on 6 July 2024, and a pass that
+        //         snapshotted it and consumed an order a day later
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        EntriaStore.Get(_StoreCode);
+        MarkerDT := CreateDateTime(DMY2Date(6, 7, 2024), 100000T);
+        OrderDT := CreateDateTime(DMY2Date(7, 7, 2024), 100000T);
+        EntriaStore.SetLastOrdersImportedAt(_StoreCode, MarkerDT);
         ExpectedMarkerDT := EntriaJQ.GetSyncStateMarker(_StoreCode);
         EntriaJQ.SeedSessionMax(_StoreCode);
-        _LibraryEntria.BuildOrderArrayWithNoPaymentLines(OrdersArr, 'ZZ-DOC-MIDEDIT', 'medusa-midedit', OrderUpdatedAt, OrderUpdatedAt, 100);
+        _LibraryEntria.BuildOrderArrayWithNoPaymentLines(OrdersArr, 'ZZ-DOC-MRKMOVE', 'medusa-mrkmove', OrderDT, OrderDT, 100);
+        EntriaJQ.ProcessList(OrdersArr, EntriaStore);
+        _Assert.AreEqual(OrderDT, EntriaJQ.GetSessionMaxBcStatusUpdatedAt(_StoreCode),
+            'Setup: the session max must stand above the moved marker, or a refused flush and a flush with nothing to write look the same.');
+
+        // [GIVEN] The marker is moved under the pass and the blank cursor is left alone
+        MovedMarkerDT := MarkerDT + MoveMs;
+        _LibraryEntria.SetSyncStateMarkerRaw(_StoreCode, MovedMarkerDT);
+
+        // [WHEN] The pass flushes its first page
+        FlushProceeded := EntriaJQ.TryFlushCursorState(_StoreCode, ExpectedMarkerDT, '', 'tok-x');
+
+        // [THEN] The flush is refused and the moved marker and the blank cursor stand
+        _Assert.IsFalse(FlushProceeded, StrSubstNo('A marker moved by %1 ms under an unchanged cursor must refuse the flush.', MoveMs));
+        _Assert.AreEqual('', _LibraryEntria.GetOrderCursor(_StoreCode), StrSubstNo('A refused flush must not store the next cursor (move %1 ms).', MoveMs));
+        _Assert.AreEqual(MovedMarkerDT, EntriaJQ.GetSyncStateMarker(_StoreCode), StrSubstNo('The moved marker must survive the refused flush (move %1 ms).', MoveMs));
+    end;
+
+    [Test]
+    procedure CursorFlushRefusesMarkerSetOnNeverSyncedStore()
+    var
+        EntriaStore: Record "NPR Entria Store";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+        AdminMarkerDT: DateTime;
+        OrderDT: DateTime;
+        ExpectedMarkerDT: DateTime;
+        FlushProceeded: Boolean;
+    begin
+        // [SCENARIO] A pass on a never-synced store snapshots the 0DT sentinel. A marker set under it is
+        // an external edit like any other move, so the flush must not overwrite it.
+
+        // [GIVEN] An enabled Entria store with no marker, and a pass that snapshotted 0DT
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        EntriaStore.Get(_StoreCode);
+        ExpectedMarkerDT := EntriaJQ.GetSyncStateMarker(_StoreCode);
+        _Assert.AreEqual(0DT, ExpectedMarkerDT, 'Setup: the store must never have synced.');
+        EntriaJQ.SeedSessionMax(_StoreCode);
+        _Assert.AreEqual(0DT, EntriaJQ.GetSessionMaxBcStatusUpdatedAt(_StoreCode), 'Setup: a never-synced store must seed the session max at 0DT.');
+
+        // [GIVEN] The pass consumed an order at 10:00:00 on 8 July 2024
+        OrderDT := CreateDateTime(DMY2Date(8, 7, 2024), 100000T);
+        _LibraryEntria.BuildOrderArrayWithNoPaymentLines(OrdersArr, 'ZZ-DOC-NEVERSYNC', 'medusa-neversync', OrderDT, OrderDT, 100);
+        EntriaJQ.ProcessList(OrdersArr, EntriaStore);
+        _Assert.AreEqual(OrderDT, EntriaJQ.GetSessionMaxBcStatusUpdatedAt(_StoreCode),
+            'Setup: the session max must stand above the admin marker, or a refused flush and a flush with nothing to write look the same.');
+
+        // [GIVEN] A marker of 1 July 2024 set under the pass, with the blank cursor left alone
+        AdminMarkerDT := CreateDateTime(DMY2Date(1, 7, 2024), 100000T);
+        _LibraryEntria.SetSyncStateMarkerRaw(_StoreCode, AdminMarkerDT);
+
+        // [WHEN] The pass flushes its first page
+        FlushProceeded := EntriaJQ.TryFlushCursorState(_StoreCode, ExpectedMarkerDT, '', 'tok-x');
+
+        // [THEN] The flush is refused and the admin marker and the blank cursor stand
+        _Assert.IsFalse(FlushProceeded, 'A marker set on a store the pass read as never synced must refuse the flush.');
+        _Assert.AreEqual('', _LibraryEntria.GetOrderCursor(_StoreCode), 'A refused flush must not store the next cursor.');
+        _Assert.AreEqual(AdminMarkerDT, EntriaJQ.GetSyncStateMarker(_StoreCode), 'The admin marker must survive the refused flush.');
+    end;
+
+    [Test]
+    procedure CursorFlushProceedsOnNeverSyncedStore()
+    var
+        EntriaStore: Record "NPR Entria Store";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+        OrderDT: DateTime;
+        ExpectedMarkerDT: DateTime;
+    begin
+        // [SCENARIO] A never-synced store has no marker. Its first flush must store the cursor and move the marker.
+
+        // [GIVEN] An enabled Entria store with no marker, and a pass that consumed an order at 10:00:00 on 8 July 2024
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        EntriaStore.Get(_StoreCode);
+        ExpectedMarkerDT := EntriaJQ.GetSyncStateMarker(_StoreCode);
+        _Assert.AreEqual(0DT, ExpectedMarkerDT, 'Setup: the store must never have synced.');
+        EntriaJQ.SeedSessionMax(_StoreCode);
+        OrderDT := CreateDateTime(DMY2Date(8, 7, 2024), 100000T);
+        _LibraryEntria.BuildOrderArrayWithNoPaymentLines(OrdersArr, 'ZZ-DOC-FIRSTFLUSH', 'medusa-firstflush', OrderDT, OrderDT, 100);
         EntriaJQ.ProcessList(OrdersArr, EntriaStore);
 
-        // [WHEN] The pass flushes that first page's marker
-        FirstFlushProceeded := EntriaJQ.TryFlushMarker(_StoreCode, ExpectedMarkerDT);
+        // [WHEN] The pass flushes its first page
+        // [THEN] The flush proceeds, stores the cursor and moves the marker and the snapshot to the order
+        _Assert.IsTrue(EntriaJQ.TryFlushCursorState(_StoreCode, ExpectedMarkerDT, '', 'tok-x'), 'The first flush of a never-synced store must proceed.');
+        _Assert.AreEqual(OrderDT, EntriaJQ.GetSyncStateMarker(_StoreCode), 'The first flush must move the marker to the order.');
+        _Assert.AreEqual('tok-x', _LibraryEntria.GetOrderCursor(_StoreCode), 'The first flush must store the next cursor.');
+        _Assert.AreEqual(OrderDT, ExpectedMarkerDT, 'The pass''s snapshot must follow what it just wrote.');
+    end;
 
-        // [THEN] The flush proceeds, advances the stored marker to the order and the pass's snapshot follows its own write
-        _Assert.IsTrue(FirstFlushProceeded, 'The first flush of the pass must proceed normally.');
-        _Assert.AreEqual(OrderUpdatedAt, EntriaJQ.GetSyncStateMarker(_StoreCode), 'The first flush must have advanced the marker.');
-        _Assert.AreEqual(OrderUpdatedAt, ExpectedMarkerDT, 'The pass''s snapshot must track what it just wrote itself.');
+    [Test]
+    procedure CursorFlushCommitSurvivesLaterError()
+    var
+        EntriaStore: Record "NPR Entria Store";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+        MarkerDT: DateTime;
+        OrderDT: DateTime;
+        ExpectedMarkerDT: DateTime;
+        ForcedRollbackErr: Label 'Forced rollback after the flush.', Locked = true;
+    begin
+        // [SCENARIO] The flush commits the cursor and the marker. An error later in the same session must not
+        // roll them back, or the next pass re-reads pages it already imported.
 
-        // [WHEN] The administrator rewinds the marker backwards between two flushes of the same pass, and the pass flushes again
-        EntriaStore.SetLastOrdersImportedAt(_StoreCode, AdminResyncPoint);
-        FlushAfterRewindProceeded := EntriaJQ.TryFlushMarker(_StoreCode, ExpectedMarkerDT);
+        // [GIVEN] An enabled Entria store whose marker stands at 10:00:00 on 12 August 2024, and a pass that
+        //         snapshotted it and consumed an order 10 s later
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        EntriaStore.Get(_StoreCode);
+        MarkerDT := CreateDateTime(DMY2Date(12, 8, 2024), 100000T);
+        OrderDT := MarkerDT + 10000;
+        EntriaStore.SetLastOrdersImportedAt(_StoreCode, MarkerDT);
+        Commit();
+        EntriaJQ.SeedSessionMax(_StoreCode);
+        _LibraryEntria.BuildOrderArrayWithNoPaymentLines(OrdersArr, 'ZZ-DOC-C5COMMIT', 'medusa-c5commit', OrderDT, OrderDT, 100);
+        EntriaJQ.ProcessList(OrdersArr, EntriaStore);
+        ExpectedMarkerDT := EntriaJQ.GetSyncStateMarker(_StoreCode);
 
-        // [THEN] That flush reports the external change and leaves the manual re-sync point standing as the next pass's window start
-        _Assert.IsFalse(FlushAfterRewindProceeded, 'TryFlushMarker must report the external change so pagination stops.');
-        _Assert.AreEqual(AdminResyncPoint, EntriaJQ.GetSyncStateMarker(_StoreCode), 'The manual re-sync point must survive in the database and become the next pass''s window start.');
+        // [WHEN] The pass flushes the page and the session then fails
+        _Assert.IsTrue(EntriaJQ.TryFlushCursorState(_StoreCode, ExpectedMarkerDT, '', 'tok-c5-commit'), 'Setup: the flush must proceed.');
+        asserterror Error(ForcedRollbackErr);
+        _Assert.ExpectedError(ForcedRollbackErr);
+
+        // [THEN] The cursor and the marker the flush wrote stand
+        _Assert.AreEqual('tok-c5-commit', _LibraryEntria.GetOrderCursor(_StoreCode), 'The flush''s own Commit must keep the cursor through a later error.');
+        _Assert.AreEqual(OrderDT, EntriaJQ.GetSyncStateMarker(_StoreCode), 'The flush''s own Commit must keep the marker through a later error.');
+    end;
+
+    [Test]
+    procedure CursorFlushRefusesMarkerClearedToSentinel()
+    var
+        EntriaStore: Record "NPR Entria Store";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+        MarkerDT: DateTime;
+        OrderDT: DateTime;
+        ExpectedMarkerDT: DateTime;
+        FlushProceeded: Boolean;
+    begin
+        // [SCENARIO] An admin clears the marker on the store card while a blank-cursor page is being
+        // processed. The clear must win.
+
+        // [GIVEN] An enabled Entria store whose marker stands at 10:00:00 on 6 July 2024, and a pass that
+        //         snapshotted it and consumed an order a day later
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        EntriaStore.Get(_StoreCode);
+        MarkerDT := CreateDateTime(DMY2Date(6, 7, 2024), 100000T);
+        OrderDT := CreateDateTime(DMY2Date(7, 7, 2024), 100000T);
+        EntriaStore.SetLastOrdersImportedAt(_StoreCode, MarkerDT);
+        ExpectedMarkerDT := EntriaJQ.GetSyncStateMarker(_StoreCode);
+        EntriaJQ.SeedSessionMax(_StoreCode);
+        _LibraryEntria.BuildOrderArrayWithNoPaymentLines(OrdersArr, 'ZZ-DOC-MRKCLEAR', 'medusa-mrkclear', OrderDT, OrderDT, 100);
+        EntriaJQ.ProcessList(OrdersArr, EntriaStore);
+        _Assert.IsTrue(EntriaJQ.GetSessionMaxBcStatusUpdatedAt(_StoreCode) > ExpectedMarkerDT,
+            'Setup: the session max must stand above the marker, or a refused flush and a flush with nothing to write look the same.');
+
+        // [WHEN] The marker is cleared through the store card, then the pass flushes its first page
+        EntriaStore.SetLastOrdersImportedAt(_StoreCode, 0DT);
+        FlushProceeded := EntriaJQ.TryFlushCursorState(_StoreCode, ExpectedMarkerDT, '', 'tok-x');
+
+        // [THEN] The flush is refused and the cleared marker and the blank cursor stand
+        _Assert.IsFalse(FlushProceeded, 'A marker cleared under the pass must refuse the flush.');
+        _Assert.AreEqual(0DT, EntriaJQ.GetSyncStateMarker(_StoreCode), 'The cleared marker must survive the refused flush.');
+        _Assert.AreEqual('', _LibraryEntria.GetOrderCursor(_StoreCode), 'A refused flush must not store the next cursor.');
     end;
 
     [Test]
@@ -556,22 +811,16 @@ codeunit 85260 "NPR Entria Tests"
     end;
 
     [Test]
-    procedure ContinuationPageAdvancesWindowWithoutReapplyingOverlap()
+    procedure PassWindowStartOpensOneOverlapBeforeMarkerAndKeepsSentinel()
     var
         EntriaStore: Record "NPR Entria Store";
         EntriaJQ: Codeunit "NPR Entria Order Import JQ";
-        OrdersArr: JsonArray;
         ExpectedMarkerDT: DateTime;
         InitialMarker: DateTime;
-        PageOrderDT: DateTime;
-        SessionMax: DateTime;
-        Page1RequestText: Text;
-        ContinuationRequestText: Text;
+        ExpectedOverlap: Duration;
     begin
         // [SCENARIO] The window a pass opens with is the stored marker moved back by the propagation
-        // overlap, computed ONCE, and every page after that moves the window strictly forward to the
-        // highest bc_status_updated_at consumed so far. The offset is only meaningful against a fixed
-        // filter, so the overlap must never be re-applied per page.
+        // overlap. The never-synced 0DT sentinel stays 0DT, and the session max starts at that window.
 
         // [GIVEN] An enabled Entria store whose marker already stands at 14 June 2024, so the pass has
         //         a real window start rather than the never-synced 0DT sentinel (which carries no filter)
@@ -581,6 +830,10 @@ codeunit 85260 "NPR Entria Tests"
         InitialMarker := CreateDateTime(DMY2Date(14, 6, 2024), 100000T);
         EntriaStore.SetLastOrdersImportedAt(_StoreCode, InitialMarker);
         ExpectedMarkerDT := EntriaJQ.GetSyncStateMarker(_StoreCode);
+
+        // [THEN] The overlap is 30 seconds
+        ExpectedOverlap := 30 * 1000;
+        _Assert.AreEqual(ExpectedOverlap, EntriaJQ.PropagationOverlap(), 'The store-card tooltip promises a 30-second overlap.');
 
         // [THEN] The pass opens one overlap before the stored marker, and the never-synced sentinel is
         //        left alone so it still means "no window at all"
@@ -595,31 +848,6 @@ codeunit 85260 "NPR Entria Tests"
         EntriaJQ.SeedSessionMax(_StoreCode);
         _Assert.AreEqual(EntriaJQ.PassWindowStart(ExpectedMarkerDT), EntriaJQ.GetSessionMaxBcStatusUpdatedAt(_StoreCode),
             'The running maximum must start at the window the pass opens with, not at the stored marker.');
-
-        // [GIVEN] The request that opening window produces
-        Page1RequestText := EntriaJQ.GenerateGetOrderListRequest(0, 40, EntriaJQ.PassWindowStart(ExpectedMarkerDT));
-        _Assert.IsTrue(Page1RequestText.Contains('bc_status_updated_at[$gte]=' + Format(ExpectedMarkerDT - EntriaJQ.PropagationOverlap(), 0, 9)),
-            'The opening request must carry the overlapped window verbatim.');
-
-        // [WHEN] A page carrying an order two days later is processed and flushed
-        PageOrderDT := CreateDateTime(DMY2Date(16, 6, 2024), 100000T);
-        _LibraryEntria.BuildOrderArrayWithNoPaymentLines(OrdersArr, 'ZZ-DOC-KEYSET', 'medusa-keyset', PageOrderDT, PageOrderDT, 100);
-        EntriaJQ.ProcessList(OrdersArr, EntriaStore);
-        EntriaJQ.TryFlushMarker(_StoreCode, ExpectedMarkerDT);
-        SessionMax := EntriaJQ.GetSessionMaxBcStatusUpdatedAt(_StoreCode);
-        _Assert.AreEqual(PageOrderDT, SessionMax, 'Setup: the running maximum must stand at the consumed order''s bc_status_updated_at.');
-
-        // [THEN] The continuation opens exactly AT the consumed maximum - moved forward, and with no
-        //        second overlap subtracted from it
-        ContinuationRequestText := EntriaJQ.GenerateGetOrderListRequest(0, 40, SessionMax);
-        _Assert.IsTrue(ContinuationRequestText.Contains('bc_status_updated_at[$gte]=' + Format(SessionMax, 0, 9)),
-            'A continuation must open exactly at the consumed maximum - that forward step is what replaces ordinal offset paging, leaving the offset only for a page whose rows all share one timestamp.');
-        _Assert.IsFalse(ContinuationRequestText.Contains(Format(SessionMax - EntriaJQ.PropagationOverlap(), 0, 9)),
-            'The continuation window must not have the overlap subtracted again: re-applying it against the moving window rewinds it faster than it advances.');
-
-        // [THEN] The continuation has left the opening window behind, so the cursor makes forward progress
-        _Assert.IsFalse(ContinuationRequestText.Contains(Format(ExpectedMarkerDT - EntriaJQ.PropagationOverlap(), 0, 9)),
-            'The continuation must not still be querying the window the pass opened with.');
     end;
 
     [Test]
@@ -996,70 +1224,96 @@ codeunit 85260 "NPR Entria Tests"
     end;
 
     [Test]
-    procedure OrderListRequestContract()
+    procedure CursorRequestFirstCallCarriesEmptyAfterAndWindowStart()
     var
         EntriaJQ: Codeunit "NPR Entria Order Import JQ";
         RequestText: Text;
         FromDT: DateTime;
     begin
-        // [SCENARIO] The literal wire contract of the bc-sync work-list endpoint, and the one place in
-        // the suite that exercises the actual request text. Three things have to hold together or the
-        // marker design breaks: the work list is narrowed to bc_status=pending, the window filter and
-        // the sort key are the SAME field the marker is flushed from (bc_status_updated_at), and the
-        // sort is ascending so flushing between pages only ever advances past rows already consumed.
+        // [SCENARIO] The literal wire contract of the bc-sync work list on a first call or after a cursor
+        // reset: an empty 'after' asks Medusa for a new cursor, the work list is narrowed to
+        // bc_status=pending, and the window start goes out verbatim as bc_status_updated_at[$gte].
 
         // [GIVEN] A window start of 12:00 on 15 June 2024
         FromDT := CreateDateTime(DMY2Date(15, 6, 2024), 120000T);
 
-        // [WHEN] The list request is generated for offset 80 and limit 40 from that window start
-        RequestText := EntriaJQ.GenerateGetOrderListRequest(80, 40, FromDT);
+        // [WHEN] The list request is generated with no cursor and limit 40 from that window start
+        RequestText := EntriaJQ.GenerateGetOrderListRequest('', 40, FromDT);
 
-        // [THEN] It addresses the bc-sync endpoint and asks only for orders awaiting BC
-        _Assert.IsTrue(RequestText.StartsWith('admin/orders/bc-sync?'),
-            'The list must be fetched from the bc-sync endpoint - admin/orders/bc-sync, plural "orders".');
-        _Assert.IsTrue(RequestText.Contains('bc_status=pending'), 'The list must be narrowed to orders awaiting BC processing.');
+        // [THEN] It is exactly the first-call request, with the window start carried verbatim
+        _Assert.AreEqual(
+            'admin/orders/bc-sync?after=&bc_status=pending&bc_status_updated_at[$gte]=' + Format(FromDT, 0, 9) + '&limit=40&' + ExpectedOrderFieldsProjection(),
+            RequestText,
+            'The first-call request must match the bc-sync contract exactly.');
 
-        // [THEN] Window filter and sort key are both bc_status_updated_at, and the window start is carried
-        //        through EXACTLY as handed in - the builder must not adjust it, or the offset it is paired
-        //        with would be indexing a result set of a different shape
-        _Assert.IsTrue(RequestText.Contains('bc_status_updated_at[$gte]=' + Format(FromDT, 0, 9)),
-            'The window filter must be bc_status_updated_at carrying the window start verbatim - any adjustment here reshapes the result set the offset counts against.');
-        _Assert.IsTrue(RequestText.Contains('order=bc_status_updated_at'),
-            'The list must be sorted by bc_status_updated_at - the same field the marker is flushed from.');
-
-        // [THEN] The sort is ascending, which is what the endpoint specifies - oldest first, so the
-        //        orders that have waited longest are imported first. It is also what makes carrying the
-        //        window forward between pages safe: newest-first would put the window maximum on page 1,
-        //        so a pass that stopped early would leave the marker above every page it never read and
-        //        lose those orders for good.
-        _Assert.IsFalse(RequestText.Contains('order=-'),
-            'The sort must be ascending: oldest first, so a between-pages flush only advances past consumed rows.');
-
-        // [THEN] The mutable updated_at drives neither the window nor the sort - that was the original skip bug
-        _Assert.IsFalse(RequestText.Contains('&updated_at[$gte]'), 'updated_at must never be the window filter - it is mutable.');
-        _Assert.IsFalse(RequestText.Contains('order=updated_at'), 'updated_at must never be the sort key - it is mutable.');
-
-        // [THEN] Offset and limit are passed through verbatim
-        _Assert.IsTrue(RequestText.Contains('offset=80'), 'The offset must be passed through verbatim.');
-        _Assert.IsTrue(RequestText.Contains('limit=40'), 'The limit must be passed through verbatim.');
-
-        // [THEN] The field projection asks for the properties the importer actually reads, so a
-        //        projection that stopped requesting them cannot pass unnoticed
+        // [THEN] The field projection asks for the properties the importer actually reads
         _Assert.IsTrue(RequestText.Contains('payment_collections.payments'),
             'The projection must request payment_collections.payments - without them every non-zero order hits the missing-payments error and can never import, no matter how often it is retried.');
         _Assert.IsTrue(RequestText.Contains('currency_code'),
             'The projection must request currency_code - without it every foreign-currency order imports as if it were in LCY.');
         _Assert.IsTrue(RequestText.Contains('billing_address'),
             'The projection must request billing_address - without it every imported document loses its Sell-to name, address and phone no.');
+    end;
 
-        // [WHEN] The list request is generated for a store that has never synced (0DT marker)
-        RequestText := EntriaJQ.GenerateGetOrderListRequest(0, 40, 0DT);
+    [Test]
+    procedure CursorRequestWithTokenOmitsTimeFilterOffsetAndOrder()
+    var
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        RequestText: Text;
+    begin
+        // [SCENARIO] Once a cursor is held, Medusa ignores the time filter, so the request sends the opaque
+        // token back unchanged and carries no window, offset or sort of its own.
 
-        // [THEN] The request carries no window filter at all, so the full pending backlog is requested
-        _Assert.IsFalse(RequestText.Contains('[$gte]'),
-            'A store that has never synced (0DT marker) must request the whole pending backlog, without a window filter.');
-        _Assert.IsTrue(RequestText.Contains('bc_status=pending'),
-            'Even without a window the request must stay narrowed to orders awaiting BC processing.');
+        // [GIVEN] A stored cursor and a non-0DT window start
+        // [WHEN] The list request is generated with that cursor
+        RequestText := EntriaJQ.GenerateGetOrderListRequest('tok-AbC_-9', 40, CreateDateTime(DMY2Date(15, 6, 2024), 120000T));
+
+        // [THEN] It is exactly the continuation request, with the token unchanged
+        _Assert.AreEqual(
+            'admin/orders/bc-sync?after=tok-AbC_-9&bc_status=pending&limit=40&' + ExpectedOrderFieldsProjection(),
+            RequestText,
+            'The cursor request must match the bc-sync contract exactly.');
+        _Assert.IsFalse(RequestText.Contains('bc_status_updated_at'), 'A cursor request must not carry the time filter.');
+        _Assert.IsFalse(RequestText.Contains('offset'), 'A cursor request must not carry an offset.');
+        _Assert.IsFalse(RequestText.Contains('order='), 'A cursor request must not carry a sort.');
+    end;
+
+    [Test]
+    procedure CursorRequestForNeverSyncedStoreOmitsWindow()
+    var
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        RequestText: Text;
+    begin
+        // [SCENARIO] A store that has never synced (0DT marker) asks for the whole pending backlog.
+
+        // [GIVEN] No cursor and the 0DT window start
+        // [WHEN] The list request is generated
+        RequestText := EntriaJQ.GenerateGetOrderListRequest('', 40, 0DT);
+
+        // [THEN] It is exactly the first-call request without a window filter
+        _Assert.AreEqual(
+            'admin/orders/bc-sync?after=&bc_status=pending&limit=40&' + ExpectedOrderFieldsProjection(),
+            RequestText,
+            'A never-synced store must request the whole pending backlog, without a window filter.');
+    end;
+
+    [Test]
+    procedure ListRequestTimeoutExceedsLongPollHold()
+    var
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+    begin
+        // [SCENARIO] Medusa holds an idle list call open for up to 115 s, so a shorter client timeout
+        // turns every idle poll into a failed fetch.
+
+        // [GIVEN] [WHEN] The list request timeout is read
+        // [THEN] It exceeds the 115 s hold
+        _Assert.IsTrue(EntriaJQ.ListRequestTimeout() > 115000, 'The list request timeout must outlast Medusa''s 115 s long-poll hold.');
+    end;
+
+    local procedure ExpectedOrderFieldsProjection(): Text
+    begin
+        // Written out, not read from production, so a projection change has to be made here on purpose.
+        exit('fields=-summary,+billing_address.*,+shipping_address.*,+shipping_methods.name,+currency_code,+email,+payment_collections.payments.*');
     end;
 
     [Test]
@@ -1890,58 +2144,6 @@ codeunit 85260 "NPR Entria Tests"
         // [THEN] A future timestamp alone stops it
         _Assert.IsFalse(FutureRowIsDue,
             'A row scheduled in the future must be stopped here, or the backoff schedule is ignored once a row reaches the process step.');
-    end;
-
-    [Test]
-    procedure ForwardMarkerAdvanceDoesNotStopPaging()
-    var
-        EntriaStore: Record "NPR Entria Store";
-        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
-        ExpectedMarkerDT: DateTime;
-        ParallelSessionMarker: DateTime;
-        InitialMarker: DateTime;
-        SessionMaxSeed: DateTime;
-    begin
-        // [SCENARIO] The direction of an external marker change decides its meaning: this job's
-        // own writes are strictly monotonic, so a FORWARD move can only be a parallel session's
-        // flush (or a deliberate skip-ahead) - not a re-sync request. The pass must adopt the
-        // higher value and keep paging, instead of abandoning its progress on every cycle of a
-        // parallel session. Only a BACKWARDS move (a human rewind) stops the pass.
-
-        // [GIVEN] An enabled Entria store and a marker value from a parallel session, far ahead in 2030
-        Initialize();
-        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
-        EntriaStore.Get(_StoreCode);
-        InitialMarker := CreateDateTime(DMY2Date(10, 6, 2024), 100000T);
-        SessionMaxSeed := CreateDateTime(DMY2Date(12, 6, 2024), 100000T);
-        ParallelSessionMarker := CreateDateTime(DMY2Date(1, 1, 2030), 120000T);
-
-        // [GIVEN] A session max strictly between this pass's own window start and the parallel session's
-        //         marker, seeded through the stored marker, so it is a value that COULD regress the higher
-        //         one and the "must not regress" check below is not vacuous
-        EntriaStore.SetLastOrdersImportedAt(_StoreCode, SessionMaxSeed);
-        EntriaJQ.SeedSessionMax(_StoreCode);
-
-        // [GIVEN] This pass has snapshotted a real, non-0DT marker - the direction check is skipped
-        //         entirely for the never-synced 0DT sentinel, which would make this whole test vacuous
-        EntriaStore.SetLastOrdersImportedAt(_StoreCode, InitialMarker);
-        ExpectedMarkerDT := EntriaJQ.GetSyncStateMarker(_StoreCode);
-        _Assert.AreEqual(InitialMarker, ExpectedMarkerDT, 'Setup: the pass must snapshot a real marker, not the 0DT sentinel.');
-
-        // [WHEN] The stored marker is moved FORWARD underneath the pass, as a parallel session's flush would
-        EntriaStore.SetLastOrdersImportedAt(_StoreCode, ParallelSessionMarker);
-
-        // [THEN] The flush treats it as no re-sync request, so paging continues
-        _Assert.IsTrue(EntriaJQ.TryFlushMarker(_StoreCode, ExpectedMarkerDT),
-            'A forward marker move is not a re-sync request - paging must continue.');
-
-        // [THEN] The pass adopts the higher value as its own snapshot
-        _Assert.AreEqual(ParallelSessionMarker, ExpectedMarkerDT,
-            'The pass must adopt the higher value so the next page''s backwards-check compares against what it last saw.');
-
-        // [THEN] The stored marker is not regressed to this pass's lower session max
-        _Assert.AreEqual(ParallelSessionMarker, EntriaJQ.GetSyncStateMarker(_StoreCode),
-            'The parallel session''s higher marker must stand - this pass''s lower session max must not regress it.');
     end;
 
     [Test]
@@ -2809,6 +3011,612 @@ codeunit 85260 "NPR Entria Tests"
         _LibraryEntria.InsertOrderFailureRowWithTimestamp(_StoreCode, MedusaOrderId, 4, CurrentDateTime() - (60 * 60 * 1000), Status, OrderUpdatedAt);
     end;
 
+    #region Cursor poll through the mocked bc-sync endpoint
+
+    [Test]
+    [HandlerFunctions('MockBcSyncEndpoint')]
+    procedure CursorPassFirstCallStoresNextAndAdvancesMarker()
+    var
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+        MarkerDT: DateTime;
+        MaxOrderDT: DateTime;
+    begin
+        // [SCENARIO] A store with a marker but no cursor makes its first bc-sync call with an empty "after"
+        // and the marker minus the propagation overlap as the time filter. It then stores the returned token
+        // and moves the marker to the newest order on the page.
+
+        // [GIVEN] A marker and no stored cursor
+        ResetBcSyncMock();
+        MarkerDT := CursorTestMarker();
+        SetupCursorPass(EntriaJQ, MarkerDT, '');
+
+        // [GIVEN] A due retry row
+        SeedDueRetryRow('c1-due');
+
+        // [GIVEN] One short page of three skipped orders newer than the marker, answered with next 'tok-1'
+        MaxOrderDT := AddCheapOrders(OrdersArr, 'c1-', 3, MarkerDT + 60000);
+        EnqueueBcSync(200, BcSyncBody(OrdersArr, 'tok-1'));
+
+        // [WHEN] The store loop runs
+        EntriaJQ.ProcessEnabledStores();
+
+        // [THEN] A short page ends the pass after exactly one list call
+        _Assert.AreEqual(1, _BcSyncCallCount, 'A page shorter than the limit must end the pass after one bc-sync call.');
+        _Assert.AreEqual(0, _UnexpectedCallCount, 'The pass must make no request this test does not model.');
+
+        // [THEN] The first call carries an empty "after", the overlapped time filter, and no offset or order
+        _Assert.IsTrue(_BcSyncHasAfter.Get(1), 'The first call must send "after" even when no cursor is stored - Medusa reads its absence as a different request.');
+        _Assert.AreEqual('', _BcSyncAfter.Get(1), 'The first call must send an empty "after" when no cursor is stored.');
+        _Assert.IsTrue(_BcSyncHasWindow.Get(1), 'The first call must send the bc_status_updated_at filter - without it Medusa starts from the oldest pending order.');
+        _Assert.AreEqual(Format(MarkerDT - EntriaJQ.PropagationOverlap(), 0, 9), _BcSyncWindow.Get(1),
+            'The time filter must be the marker minus the propagation overlap - the bare marker skips orders whose status landed late.');
+        _Assert.IsFalse(_BcSyncHasOffsetOrOrder.Get(1), 'The cursor endpoint must not be called with offset or order.');
+
+        // [THEN] The token and the newest order timestamp are stored
+        _Assert.AreEqual('tok-1', _LibraryEntria.GetOrderCursor(_StoreCode), 'The pass must store the "next" token the page returned.');
+        _Assert.AreEqual(MaxOrderDT, EntriaJQ.GetSyncStateMarker(_StoreCode), 'The marker must move to the newest bc_status_updated_at on the page.');
+
+        // [THEN] The page counted as a successful fetch, so the due row was retried once
+        _Assert.AreEqual(1, _SingleOrderCallCount, 'A page with orders is a successful fetch, so the due row must be retried.');
+    end;
+
+    [Test]
+    [HandlerFunctions('MockBcSyncEndpoint')]
+    procedure CursorPassFullPageCallsAgainWithStoredToken()
+    var
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+        MarkerDT: DateTime;
+        MaxOrderDT: DateTime;
+    begin
+        // [SCENARIO] A full page makes the pass call again with the token it just stored and without the
+        // time filter, because Medusa ignores the filter once a token is sent.
+
+        // [GIVEN] A marker and no stored cursor
+        ResetBcSyncMock();
+        MarkerDT := CursorTestMarker();
+        SetupCursorPass(EntriaJQ, MarkerDT, '');
+
+        // [GIVEN] A full page of 40 skipped orders newer than the marker with next 'tok-1', then an empty page with next 'tok-2'
+        MaxOrderDT := AddCheapOrders(OrdersArr, 'c2-', 40, MarkerDT + 1000);
+        EnqueueBcSync(200, BcSyncBody(OrdersArr, 'tok-1'));
+        EnqueueBcSync(200, EmptyBcSyncBody('tok-2'));
+
+        // [WHEN] The store loop runs
+        EntriaJQ.ProcessEnabledStores();
+
+        // [THEN] The full page was followed by exactly one more call
+        _Assert.AreEqual(2, _BcSyncCallCount, 'A full page must be followed by one more call, and the empty page must end the pass.');
+        _Assert.AreEqual(0, _UnexpectedCallCount, 'The pass must make no request this test does not model.');
+
+        // [THEN] The second call sends the stored token and no time filter
+        _Assert.IsTrue(_BcSyncHasAfter.Get(2), 'The second call must send "after".');
+        _Assert.AreEqual('tok-1', _BcSyncAfter.Get(2), 'The second call must send the token the first page returned.');
+        _Assert.IsFalse(_BcSyncHasWindow.Get(2), 'A call that sends a token must not send the time filter.');
+
+        // [THEN] The last token and the newest order timestamp are stored
+        _Assert.AreEqual('tok-2', _LibraryEntria.GetOrderCursor(_StoreCode), 'The pass must store the token of the last page it read.');
+        _Assert.AreEqual(MaxOrderDT, EntriaJQ.GetSyncStateMarker(_StoreCode), 'The marker must move to the newest bc_status_updated_at the pass read.');
+    end;
+
+    [Test]
+    [HandlerFunctions('MockBcSyncEndpoint')]
+    procedure CursorPassEmptyPageStoresFirstTokenThenKeepsIt()
+    var
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        MarkerDT: DateTime;
+    begin
+        // [SCENARIO] An idle store gets an empty page. The first one gives it a token without rewinding the
+        // marker. The next pass sends that token, gets the same token back on another empty page, and treats
+        // that as a successful fetch, so the due retries still run.
+
+        // [GIVEN] A marker and no stored cursor, and an empty page answered with next 'tok'
+        ResetBcSyncMock();
+        MarkerDT := CursorTestMarker();
+        SetupCursorPass(EntriaJQ, MarkerDT, '');
+        EnqueueBcSync(200, EmptyBcSyncBody('tok'));
+
+        // [WHEN] The first pass runs
+        EntriaJQ.ProcessEnabledStores();
+
+        // [THEN] The token is stored and the marker did not fall back to the window start
+        _Assert.AreEqual('tok', _LibraryEntria.GetOrderCursor(_StoreCode), 'An empty page must still store the token it returned.');
+        _Assert.AreEqual(MarkerDT, EntriaJQ.GetSyncStateMarker(_StoreCode),
+            'An empty page must leave the marker where it was - flushing the overlapped window start rewinds it by 30 seconds on every idle pass.');
+
+        // [GIVEN] A due Pending row, and another empty page with the same token
+        SeedDueRetryRow('c4-due');
+        EnqueueBcSync(200, EmptyBcSyncBody('tok'));
+
+        // [WHEN] The second pass runs on the same job instance
+        EntriaJQ.ProcessEnabledStores();
+
+        // [THEN] The second call sent the stored token and no time filter
+        _Assert.AreEqual(2, _BcSyncCallCount, 'Each pass must make exactly one call for an empty page.');
+        _Assert.AreEqual(0, _UnexpectedCallCount, 'The passes must make no request this test does not model.');
+        _Assert.IsTrue(_BcSyncHasAfter.Get(2), 'The second pass must send "after".');
+        _Assert.AreEqual('tok', _BcSyncAfter.Get(2), 'The second pass must resume from the stored token.');
+        _Assert.IsFalse(_BcSyncHasWindow.Get(2), 'A call that sends a token must not send the time filter.');
+
+        // [THEN] The token is kept and the idle page counted as a successful fetch
+        _Assert.AreEqual('tok', _LibraryEntria.GetOrderCursor(_StoreCode), 'An idle page with the same token must keep it.');
+        _Assert.AreEqual(1, _SingleOrderCallCount,
+            'The due row must be retried once - no retry means the empty page with an unchanged token was treated as a stuck cursor.');
+    end;
+
+    [Test]
+    [HandlerFunctions('MockBcSyncEndpoint')]
+    procedure CursorPassInvalidCursorResetsThenRestartsFromMarkerAndStillRetries()
+    var
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        MarkerDT: DateTime;
+    begin
+        // [SCENARIO] Medusa rejects a stored token as invalid. The pass blanks the cursor and still runs the
+        // due retries, because Medusa did answer. The next pass starts over from the marker with the time filter.
+
+        // [GIVEN] A marker, a stored cursor 'stale' and a due Pending row
+        ResetBcSyncMock();
+        MarkerDT := CursorTestMarker();
+        SetupCursorPass(EntriaJQ, MarkerDT, 'stale');
+        SeedDueRetryRow('c5-due');
+
+        // [GIVEN] A 400 invalid-cursor answer, then an empty page with next 'tok-new' for the second pass
+        EnqueueBcSync(400, '{"message":"Invalid ''after'' cursor"}');
+        EnqueueBcSync(200, EmptyBcSyncBody('tok-new'));
+
+        // [WHEN] The first pass runs
+        EntriaJQ.ProcessEnabledStores();
+
+        // [THEN] The rejected token was sent, the cursor is blank, and the retries ran
+        _Assert.AreEqual(1, _BcSyncCallCount, 'An invalid-cursor answer must end the list fetch after one call.');
+        _Assert.AreEqual('stale', _BcSyncAfter.Get(1), 'The first pass must send the stored token.');
+        _Assert.AreEqual('', _LibraryEntria.GetOrderCursor(_StoreCode), 'An invalid-cursor answer must blank the stored cursor.');
+        _Assert.AreEqual(1, _SingleOrderCallCount,
+            'The due row must be retried after a cursor reset - Medusa answered, so skipping the retries leaves them stalled until the next list success.');
+
+        // [WHEN] The second pass runs on the same job instance
+        EntriaJQ.ProcessEnabledStores();
+
+        // [THEN] The second call starts over from the marker with an empty "after" and the overlapped filter
+        _Assert.AreEqual(2, _BcSyncCallCount, 'The second pass must make exactly one call for an empty page.');
+        _Assert.AreEqual(0, _UnexpectedCallCount, 'The passes must make no request this test does not model.');
+        _Assert.IsTrue(_BcSyncHasAfter.Get(2), 'The restarted call must send "after".');
+        _Assert.AreEqual('', _BcSyncAfter.Get(2), 'The restarted call must send an empty "after".');
+        _Assert.IsTrue(_BcSyncHasWindow.Get(2), 'The restarted call must send the time filter.');
+        _Assert.AreEqual(Format(MarkerDT - EntriaJQ.PropagationOverlap(), 0, 9), _BcSyncWindow.Get(2),
+            'The restarted call must filter from the marker minus the propagation overlap.');
+        _Assert.AreEqual('tok-new', _LibraryEntria.GetOrderCursor(_StoreCode), 'The restarted pass must store the new token.');
+    end;
+
+    [Test]
+    [HandlerFunctions('MockBcSyncEndpoint')]
+    procedure CursorPassPersistsTokenPerPageAndSkipsRetriesOnListFailure()
+    var
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+        MarkerDT: DateTime;
+        MaxOrderDT: DateTime;
+    begin
+        // [SCENARIO] The token and marker are flushed per page, so a later page that fails keeps what the
+        // earlier page earned. A list failure that is not an invalid cursor skips the due retries.
+        // A 400 is not retried by the api handler (only 429 and 5xx are), so one playlist entry is enough.
+
+        // [GIVEN] A marker, no stored cursor and a due Pending row
+        ResetBcSyncMock();
+        MarkerDT := CursorTestMarker();
+        SetupCursorPass(EntriaJQ, MarkerDT, '');
+        SeedDueRetryRow('c3-due');
+
+        // [GIVEN] A full page of 40 skipped orders with next 'tok-1', then a 400 that is not an invalid cursor
+        MaxOrderDT := AddCheapOrders(OrdersArr, 'c3-', 40, MarkerDT + 1000);
+        EnqueueBcSync(200, BcSyncBody(OrdersArr, 'tok-1'));
+        EnqueueBcSync(400, '{"message":"Upstream rejected the request"}');
+
+        // [WHEN] The store loop runs
+        EntriaJQ.ProcessEnabledStores();
+
+        // [THEN] Both pages were requested
+        _Assert.AreEqual(2, _BcSyncCallCount, 'A full page must be followed by one more call, and the 400 must not be retried.');
+        _Assert.AreEqual(0, _UnexpectedCallCount, 'The pass must make no request this test does not model.');
+
+        // [THEN] What the first page earned is kept, and the cursor was not reset
+        _Assert.AreEqual('tok-1', _LibraryEntria.GetOrderCursor(_StoreCode),
+            'The first page''s token must survive a later failure - a blank cursor means the 400 was taken for an invalid cursor, a stored older one means the flush is not per page.');
+        _Assert.AreEqual(MaxOrderDT, EntriaJQ.GetSyncStateMarker(_StoreCode), 'The first page''s marker must survive a later failure.');
+
+        // [THEN] The list failure skipped the retries
+        _Assert.AreEqual(0, _SingleOrderCallCount, 'A failed list fetch must skip the due retries.');
+    end;
+
+    [Test]
+    [HandlerFunctions('MockBcSyncEndpoint')]
+    procedure CursorPassWithoutNextProcessesNothing()
+    var
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+    begin
+        // [SCENARIO] A page without "next" is rejected before any order on it is processed.
+
+        // [GIVEN] A stored cursor 'tok-a' and a page whose one order has no registry row and no custom_display_id,
+        //         so processing it would register a failure row
+        ResetBcSyncMock();
+        SetupCursorPass(EntriaJQ, CursorTestMarker(), 'tok-a');
+        _LibraryEntria.BuildOrderArrayWithoutDisplayId(OrdersArr, 'c6-missing', CursorTestMarker() + 60000, 100);
+        EnqueueBcSync(200, BcSyncBodyWithoutNext(OrdersArr));
+
+        RunPassAndAssertPageRejected(EntriaJQ, 'c6-missing');
+    end;
+
+    [Test]
+    [HandlerFunctions('MockBcSyncEndpoint')]
+    procedure CursorPassWithEmptyNextProcessesNothing()
+    var
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+    begin
+        // [SCENARIO] A page with an empty "next" is rejected before any order on it is processed.
+
+        // [GIVEN] A stored cursor 'tok-a' and a page whose one order would register a failure row if processed
+        ResetBcSyncMock();
+        SetupCursorPass(EntriaJQ, CursorTestMarker(), 'tok-a');
+        _LibraryEntria.BuildOrderArrayWithoutDisplayId(OrdersArr, 'c6-empty', CursorTestMarker() + 60000, 100);
+        EnqueueBcSync(200, BcSyncBody(OrdersArr, ''));
+
+        RunPassAndAssertPageRejected(EntriaJQ, 'c6-empty');
+    end;
+
+    [Test]
+    [HandlerFunctions('MockBcSyncEndpoint')]
+    procedure CursorPassWithOverlongNextProcessesNothing()
+    var
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+    begin
+        // [SCENARIO] A page whose "next" does not fit the 2048-character cursor field is rejected before any
+        // order on it is processed, rather than stored truncated.
+
+        // [GIVEN] A stored cursor 'tok-a' and a page whose one order would register a failure row if processed
+        ResetBcSyncMock();
+        SetupCursorPass(EntriaJQ, CursorTestMarker(), 'tok-a');
+        _LibraryEntria.BuildOrderArrayWithoutDisplayId(OrdersArr, 'c6-long', CursorTestMarker() + 60000, 100);
+        EnqueueBcSync(200, BcSyncBody(OrdersArr, PadStr('', 2049, 'x')));
+
+        RunPassAndAssertPageRejected(EntriaJQ, 'c6-long');
+    end;
+
+    [Test]
+    [HandlerFunctions('MockBcSyncEndpoint')]
+    procedure CursorPassFullPageWithUnchangedNextStops()
+    var
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+        MarkerDT: DateTime;
+    begin
+        // [SCENARIO] A full page that returns the token it was called with would serve the same page forever,
+        // so the pass stops after one call and keeps its state.
+
+        // [GIVEN] A stored cursor 'tok-same' and a full page of 40 skipped orders answered with that same token
+        ResetBcSyncMock();
+        MarkerDT := CursorTestMarker();
+        SetupCursorPass(EntriaJQ, MarkerDT, 'tok-same');
+        AddCheapOrders(OrdersArr, 'c7-', 40, MarkerDT + 1000);
+        EnqueueBcSync(200, BcSyncBody(OrdersArr, 'tok-same'));
+
+        // [WHEN] The store loop runs
+        EntriaJQ.ProcessEnabledStores();
+
+        // [THEN] One call, and the state is untouched
+        _Assert.AreEqual(1, _BcSyncCallCount, 'A full page with an unchanged token must stop the pass - another call would fetch the same page again.');
+        _Assert.AreEqual(0, _UnexpectedCallCount, 'The pass must make no request this test does not model.');
+        _Assert.AreEqual('tok-same', _LibraryEntria.GetOrderCursor(_StoreCode), 'The stored cursor must stay as it was.');
+        _Assert.AreEqual(MarkerDT, EntriaJQ.GetSyncStateMarker(_StoreCode), 'A rejected page must not move the marker.');
+    end;
+
+    [Test]
+    [HandlerFunctions('MockBcSyncEndpoint')]
+    procedure CursorPassAppChangedMidPageKeepsToken()
+    var
+        EcomAppSetWatch: Codeunit "NPR Ecom App Set Watch";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+        StoredCursor: Text;
+        MarkerDT: DateTime;
+    begin
+        // [SCENARIO] When an extension changes while a page is being processed, the pass stops without flushing
+        // that page's token: the orders on it were not all processed, so the next session must read it again.
+
+        // [GIVEN] No stored cursor, and one page of one skipped order with next 'tok-1'. The mock raises the
+        //         app-change latch while it serves the page.
+        ResetBcSyncMock();
+        MarkerDT := CursorTestMarker();
+        SetupCursorPass(EntriaJQ, MarkerDT, '');
+        AddCheapOrders(OrdersArr, 'c8-', 1, MarkerDT + 60000);
+        EnqueueBcSync(200, BcSyncBody(OrdersArr, 'tok-1'));
+        _FlipAppChangeOnBcSync := true;
+
+        // [WHEN] The store loop runs
+        EntriaJQ.ProcessEnabledStores();
+        StoredCursor := _LibraryEntria.GetOrderCursor(_StoreCode);
+        EcomAppSetWatch.ResetForTest();
+
+        // [THEN] The page was served, so the latch went up mid-page, and its token was not stored
+        _Assert.AreEqual(1, _BcSyncCallCount, 'The page must have been served - otherwise the latch never went up and the cursor check proves nothing.');
+        _Assert.AreEqual('', StoredCursor, 'A page cut short by an app change must not flush its token - the orders after the cut would be skipped for good.');
+    end;
+
+    [Test]
+    [HandlerFunctions('MockBcSyncEndpoint')]
+    procedure CursorPassRejectedPageLeavesTokenAndMarkerUnchanged()
+    var
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        OrdersArr: JsonArray;
+        OrderObj: JsonObject;
+        MarkerDT: DateTime;
+    begin
+        // [SCENARIO] A page whose order lacks bc_status_updated_at is rejected as a whole, so neither its token
+        // nor any marker move is stored.
+
+        // [GIVEN] A marker and a stored cursor 'X'
+        ResetBcSyncMock();
+        MarkerDT := CursorTestMarker();
+        SetupCursorPass(EntriaJQ, MarkerDT, 'X');
+
+        // [GIVEN] A page whose only order has no bc_status_updated_at, answered with next 'Y'
+        OrderObj.Add('id', 'c9-no-status-time');
+        OrdersArr.Add(OrderObj);
+        EnqueueBcSync(200, BcSyncBody(OrdersArr, 'Y'));
+
+        // [WHEN] The store loop runs
+        EntriaJQ.ProcessEnabledStores();
+
+        // [THEN] One call, and the state is untouched
+        _Assert.AreEqual(1, _BcSyncCallCount, 'A rejected page must end the pass after one call.');
+        _Assert.AreEqual(0, _UnexpectedCallCount, 'The pass must make no request this test does not model.');
+        _Assert.AreEqual('X', _LibraryEntria.GetOrderCursor(_StoreCode), 'A rejected page must not store its token - the next pass would skip it.');
+        _Assert.AreEqual(MarkerDT, EntriaJQ.GetSyncStateMarker(_StoreCode), 'A rejected page must not move the marker.');
+    end;
+
+    [Test]
+    [HandlerFunctions('MockBcSyncEndpoint')]
+    procedure CursorPassInvalidCursorTextWithNon400StatusDoesNotReset()
+    var
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+    begin
+        // [SCENARIO] Only a 400 counts as an invalid cursor. A 404 carrying the same text is an ordinary list
+        // failure and must not throw away a valid stored token.
+
+        // [GIVEN] A stored cursor 'tok' and a 404 whose body carries the invalid-cursor text
+        ResetBcSyncMock();
+        SetupCursorPass(EntriaJQ, CursorTestMarker(), 'tok');
+        EnqueueBcSync(404, '{"message":"Invalid ''after'' cursor"}');
+
+        // [WHEN] The store loop runs
+        EntriaJQ.ProcessEnabledStores();
+
+        // [THEN] The token was sent once and is still stored
+        _Assert.AreEqual(1, _BcSyncCallCount, 'A 404 must end the list fetch after one call.');
+        _Assert.AreEqual(0, _UnexpectedCallCount, 'The pass must make no request this test does not model.');
+        _Assert.AreEqual('tok', _BcSyncAfter.Get(1), 'The pass must send the stored token.');
+        _Assert.AreEqual('tok', _LibraryEntria.GetOrderCursor(_StoreCode), 'A 404 must not reset the stored cursor, whatever its body says.');
+    end;
+
+    /// <summary>
+    /// Shared WHEN and THEN of the unusable-"next" tests: the page must be rejected before its order is
+    /// processed, so no registry row appears and the stored cursor stays 'tok-a'.
+    /// </summary>
+    local procedure RunPassAndAssertPageRejected(var EntriaJQ: Codeunit "NPR Entria Order Import JQ"; OrderId: Text[100])
+    var
+        EntriaOrderImpFailure: Record "NPR Entria Order Imp. Failure";
+    begin
+        // [WHEN] The store loop runs
+        EntriaJQ.ProcessEnabledStores();
+
+        // [THEN] The page was served once and its order was not processed
+        _Assert.AreEqual(1, _BcSyncCallCount, 'The page must have been served exactly once - otherwise the assertions below prove nothing.');
+        _Assert.AreEqual(0, _UnexpectedCallCount, 'The pass must make no request this test does not model.');
+        _Assert.IsFalse(EntriaOrderImpFailure.Get(_StoreCode, OrderId),
+            'An order on a page without a usable "next" must not be processed - the page is replayed from the old token, so processing it now runs it twice.');
+
+        // [THEN] The stored cursor is unchanged
+        _Assert.AreEqual('tok-a', _LibraryEntria.GetOrderCursor(_StoreCode), 'A page without a usable "next" must leave the stored cursor alone.');
+    end;
+
+    [HttpClientHandler]
+    procedure MockBcSyncEndpoint(Request: TestHttpRequestMessage; var Response: TestHttpResponseMessage): Boolean
+    var
+        EcomAppSetWatch: Codeunit "NPR Ecom App Set Watch";
+        QueryParameters: Dictionary of [Text, Text];
+        ParamKey: Text;
+        AfterValue: Text;
+        WindowValue: Text;
+        HasWindow: Boolean;
+    begin
+        // Fails closed: a request the playlist does not model, including a bc-sync call past its end, gets a 404
+        // and is counted, so an extra call shows up in the assertions instead of passing silently.
+        if Request.Path().Contains('admin/orders/bc-sync') then begin
+            if _BcSyncCallCount >= _BcSyncStatuses.Count() then begin
+                _UnexpectedCallCount += 1;
+                SetMockResponse(Response, 404, '{}');
+                exit(false);
+            end;
+
+            _BcSyncCallCount += 1;
+            QueryParameters := Request.QueryParameters();
+            _BcSyncHasAfter.Add(QueryParameters.Get('after', AfterValue));
+            _BcSyncAfter.Add(AfterValue);
+            // The key may arrive with its [$gte] suffix encoded, so it is matched by its stem.
+            foreach ParamKey in QueryParameters.Keys() do
+                if ParamKey.Contains('bc_status_updated_at') then begin
+                    HasWindow := true;
+                    WindowValue := QueryParameters.Get(ParamKey);
+                end;
+            _BcSyncHasWindow.Add(HasWindow);
+            _BcSyncWindow.Add(WindowValue);
+            _BcSyncHasOffsetOrOrder.Add(QueryParameters.ContainsKey('offset') or QueryParameters.ContainsKey('order'));
+
+            // In-memory latch only; the handler must not write to the database.
+            if _FlipAppChangeOnBcSync then
+                EcomAppSetWatch.SetChangedForTest();
+
+            SetMockResponse(Response, _BcSyncStatuses.Get(_BcSyncCallCount), _BcSyncBodies.Get(_BcSyncCallCount));
+            exit(false);
+        end;
+
+        if (_RetryOrderId <> '') and Request.Path().Contains('admin/orders/' + _RetryOrderId) then begin
+            _SingleOrderCallCount += 1;
+            SetMockResponse(Response, 200, SingleOrderBody(_RetryOrderId, _RetryOrderUpdatedAt));
+            exit(false);
+        end;
+
+        _UnexpectedCallCount += 1;
+        SetMockResponse(Response, 404, '{}');
+        exit(false);
+    end;
+
+    local procedure SetMockResponse(var Response: TestHttpResponseMessage; StatusCode: Integer; Body: Text)
+    begin
+        Response.HttpStatusCode := StatusCode;
+        case StatusCode of
+            200:
+                Response.ReasonPhrase := 'OK';
+            400:
+                Response.ReasonPhrase := 'Bad Request';
+            404:
+                Response.ReasonPhrase := 'Not Found';
+        end;
+        Response.Content.WriteFrom(Body);
+    end;
+
+    local procedure ResetBcSyncMock()
+    begin
+        Clear(_BcSyncStatuses);
+        Clear(_BcSyncBodies);
+        _BcSyncCallCount := 0;
+        Clear(_BcSyncHasAfter);
+        Clear(_BcSyncAfter);
+        Clear(_BcSyncHasWindow);
+        Clear(_BcSyncWindow);
+        Clear(_BcSyncHasOffsetOrOrder);
+        _SingleOrderCallCount := 0;
+        _UnexpectedCallCount := 0;
+        _RetryOrderId := '';
+        _RetryOrderUpdatedAt := 0DT;
+        _FlipAppChangeOnBcSync := false;
+    end;
+
+    local procedure EnqueueBcSync(StatusCode: Integer; Body: Text)
+    begin
+        _BcSyncStatuses.Add(StatusCode);
+        _BcSyncBodies.Add(Body);
+    end;
+
+    /// <summary>
+    /// Common fixture of the cursor tests: one enabled store with an api key and HttpClient requests allowed,
+    /// both Sentry emits suppressed on the given job instance, and the sync state set marker first.
+    /// </summary>
+    local procedure SetupCursorPass(var EntriaJQ: Codeunit "NPR Entria Order Import JQ"; MarkerDT: DateTime; Cursor: Text)
+    begin
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        _LibraryEntria.DisableStoresExcept(_StoreCodeLbl);
+        _LibraryEntria.SetHttpClientRequestsAllowed(true);
+        _LibraryEntria.EnsureStoreAPIKey(_StoreCodeLbl);
+        _LibraryEntria.SuppressListFetchSentryEmit(EntriaJQ, _StoreCode);
+        _LibraryEntria.SuppressCursorResetSentryEmit(EntriaJQ, _StoreCode);
+        _LibraryEntria.SetSyncStateMarkerRaw(_StoreCode, MarkerDT);
+        _LibraryEntria.SetOrderCursor(_StoreCode, Cursor);
+    end;
+
+    local procedure CursorTestMarker(): DateTime
+    begin
+        exit(CreateDateTime(DMY2Date(13, 3, 2024), 100000T));
+    end;
+
+    /// <summary>
+    /// Adds orders carrying only an id and a whole-second bc_status_updated_at, one second apart from FirstAt,
+    /// each with a Skipped registry row: they raise the session max but are never processed or retried.
+    /// Returns the newest timestamp.
+    /// </summary>
+    local procedure AddCheapOrders(var OrdersArr: JsonArray; IdPrefix: Text; OrderCount: Integer; FirstAt: DateTime) MaxAt: DateTime
+    var
+        OrderId: Text[100];
+        i: Integer;
+    begin
+        for i := 1 to OrderCount do begin
+            OrderId := CopyStr(IdPrefix + Format(i), 1, MaxStrLen(OrderId));
+            MaxAt := FirstAt + ((i - 1) * 1000);
+            OrdersArr.Add(CheapOrder(OrderId, MaxAt));
+            _LibraryEntria.InsertOrderFailureRowWithStatus(_StoreCode, OrderId, 0, 0DT, Enum::"NPR Entria Order Imp. Status"::Skipped);
+        end;
+    end;
+
+    local procedure CheapOrder(OrderId: Text[100]; BcStatusUpdatedAt: DateTime) OrderObj: JsonObject
+    begin
+        OrderObj.Add('id', OrderId);
+        OrderObj.Add('bc_status_updated_at', Format(BcStatusUpdatedAt, 0, 9));
+    end;
+
+    local procedure BcSyncEnvelope(OrdersArr: JsonArray) EnvelopeObj: JsonObject
+    begin
+        EnvelopeObj.Add('orders', OrdersArr);
+        EnvelopeObj.Add('count', OrdersArr.Count());
+        EnvelopeObj.Add('limit', 40);
+        EnvelopeObj.Add('offset', 0);
+    end;
+
+    local procedure BcSyncBody(OrdersArr: JsonArray; NextCursor: Text) BodyTxt: Text
+    var
+        EnvelopeObj: JsonObject;
+    begin
+        EnvelopeObj := BcSyncEnvelope(OrdersArr);
+        EnvelopeObj.Add('next', NextCursor);
+        EnvelopeObj.WriteTo(BodyTxt);
+    end;
+
+    local procedure BcSyncBodyWithoutNext(OrdersArr: JsonArray) BodyTxt: Text
+    begin
+        BcSyncEnvelope(OrdersArr).WriteTo(BodyTxt);
+    end;
+
+    local procedure EmptyBcSyncBody(NextCursor: Text): Text
+    var
+        OrdersArr: JsonArray;
+    begin
+        exit(BcSyncBody(OrdersArr, NextCursor));
+    end;
+
+    local procedure SingleOrderBody(OrderId: Text[100]; OrderUpdatedAt: DateTime) BodyTxt: Text
+    var
+        OrdersArr: JsonArray;
+        OrderTkn: JsonToken;
+        EnvelopeObj: JsonObject;
+    begin
+        // Same shape MockRefetchedSingleOrder serves: no custom_display_id, so the retry logs a failure and stops.
+        _LibraryEntria.BuildOrderArrayWithoutDisplayId(OrdersArr, OrderId, OrderUpdatedAt, 100);
+        OrdersArr.Get(0, OrderTkn);
+        EnvelopeObj.Add('order', OrderTkn.AsObject());
+        EnvelopeObj.WriteTo(BodyTxt);
+    end;
+
+    /// <summary>
+    /// Seeds a due Pending row the SeedRearmRow way, points the mock's single-order answer at it, and checks
+    /// it is due before any pass runs, so a test that expects a retry cannot pass on a row that never qualified.
+    /// </summary>
+    local procedure SeedDueRetryRow(OrderId: Text[100])
+    var
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        StaleDT: DateTime;
+    begin
+        StaleDT := CreateDateTime(DMY2Date(13, 3, 2024), 090000T);
+        SeedRearmRow(OrderId, Enum::"NPR Entria Order Imp. Status"::Pending, StaleDT);
+        _RetryOrderId := OrderId;
+        _RetryOrderUpdatedAt := StaleDT;
+        _Assert.IsTrue(EntriaJQ.IsOrderDueForIdBasedRetry(_StoreCode, OrderId), 'Setup: the seeded Pending row must be due, otherwise the retry count proves nothing.');
+    end;
+
+    #endregion
+
     [Test]
     procedure TwoOrdersSharingDisplayIdWithExistingHeader_SecondOrderSilentlySkippedToo()
     var
@@ -2976,55 +3784,6 @@ codeunit 85260 "NPR Entria Tests"
     end;
 
     [Test]
-    procedure PagingCursorMovesTheWindowForwardAndOnlyWalksTheOrdinalOnATie()
-    var
-        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
-        WindowStartDT: DateTime;
-        ConsumedMaxDT: DateTime;
-        Offset: Integer;
-    begin
-        // [SCENARIO] The decision the import makes after each page: how far the window moves, and where the
-        // ordinal offset goes with it. An offset only means something against an unchanged filter, so it
-        // must reset the moment the window moves, and it may only keep counting while the window stands
-        // still. Getting either half wrong loses orders silently: an offset that survives a window move
-        // lands past rows nobody read, and one that resets on a page of identical timestamps re-serves the
-        // same rows forever.
-
-        // [WHEN] A page brought orders newer than the window, from a non-zero offset
-        WindowStartDT := CreateDateTime(DMY2Date(3, 3, 2024), 100000T);
-        ConsumedMaxDT := CreateDateTime(DMY2Date(4, 3, 2024), 100000T);
-        Offset := 80;
-        EntriaJQ.AdvancePagingCursor(ConsumedMaxDT, 40, WindowStartDT, Offset);
-
-        // [THEN] The window moves up to what was consumed and the offset starts over
-        _Assert.AreEqual(ConsumedMaxDT, WindowStartDT, 'The window must move up to the highest timestamp consumed so far.');
-        _Assert.AreEqual(0, Offset,
-            'The offset must reset when the window moves - carried across a window change it counts against a result set of a different shape and lands past rows that were never read.');
-
-        // [WHEN] The next page brings nothing above the window - every row shares the window's own timestamp
-        WindowStartDT := CreateDateTime(DMY2Date(4, 3, 2024), 100000T);
-        ConsumedMaxDT := WindowStartDT;
-        Offset := 0;
-        EntriaJQ.AdvancePagingCursor(ConsumedMaxDT, 40, WindowStartDT, Offset);
-
-        // [THEN] The window stands still and the ordinal walks through the tied block instead
-        _Assert.AreEqual(CreateDateTime(DMY2Date(4, 3, 2024), 100000T), WindowStartDT,
-            'On equality the window must stand still: rewriting it with its own value and resetting the offset would serve the same tied rows forever.');
-        _Assert.AreEqual(40, Offset, 'With the window unable to move, the ordinal is what walks through a block of rows sharing one timestamp.');
-
-        // [WHEN] A page somehow reports a maximum BELOW the window - clock skew, or a stale running maximum
-        WindowStartDT := CreateDateTime(DMY2Date(4, 3, 2024), 100000T);
-        ConsumedMaxDT := CreateDateTime(DMY2Date(3, 3, 2024), 100000T);
-        Offset := 40;
-        EntriaJQ.AdvancePagingCursor(ConsumedMaxDT, 40, WindowStartDT, Offset);
-
-        // [THEN] The window is never dragged backwards
-        _Assert.AreEqual(CreateDateTime(DMY2Date(4, 3, 2024), 100000T), WindowStartDT,
-            'The window must never move backwards - a window that retreats re-serves orders already imported and can stop the pass from ever finishing.');
-        _Assert.AreEqual(80, Offset, 'A page that adds nothing above the window advances the ordinal, exactly as the tied case does.');
-    end;
-
-    [Test]
     procedure ListPathRegistryLookupSpansEveryFilterChunk()
     var
         EntriaStore: Record "NPR Entria Store";
@@ -3167,10 +3926,12 @@ codeunit 85260 "NPR Entria Tests"
         // silently desync the two.
 
         // [GIVEN] The field projection taken from the list request's own output
-        ListRequestText := EntriaJQ.GenerateGetOrderListRequest(0, 40, 0DT);
+        ListRequestText := EntriaJQ.GenerateGetOrderListRequest('', 40, 0DT);
         FieldsPos := ListRequestText.IndexOf('fields=');
         _Assert.IsTrue(FieldsPos > 0, 'The list request must contain a fields= projection.');
+        // The projection is the last parameter, so everything from fields= on is the projection alone.
         ProjectionText := CopyStr(ListRequestText, FieldsPos);
+        _Assert.IsFalse(ProjectionText.Contains('&'), 'Setup: the projection must be the last parameter of the list request, or the text compared below carries other parameters.');
 
         // [WHEN] The single-order request is generated for one Medusa order id
         SingleRequestText := EntriaJQ.GenerateGetSingleOrderRequest('medusa-single-1');
@@ -3619,48 +4380,101 @@ codeunit 85260 "NPR Entria Tests"
     end;
 
     [Test]
-    procedure SubSecondMarkerReadBackIsNotTreatedAsARewind()
+    procedure CursorFlushToleratesSubSecondReadBack()
+    begin
+        // [SCENARIO] SQL's 1/300 s datetime grid can hand the marker back a few milliseconds off what was
+        // written. Read as an external move, that would stop paging after every page, so a gap under a
+        // second in either direction must not refuse the flush.
+
+        // [GIVEN] [WHEN] [THEN] The stored marker reads back 400 ms above the pass's snapshot
+        AssertSubSecondMarkerGapIsTolerated(400);
+
+        // [GIVEN] [WHEN] [THEN] The stored marker reads back 400 ms below it, on a fresh setup
+        AssertSubSecondMarkerGapIsTolerated(-400);
+    end;
+
+    local procedure AssertSubSecondMarkerGapIsTolerated(GapMs: Integer)
     var
         EntriaStore: Record "NPR Entria Store";
         EntriaJQ: Codeunit "NPR Entria Order Import JQ";
-        MarkerDT: DateTime;
         ExpectedMarkerDT: DateTime;
-        FlushAfterSubSecondGapProceeded: Boolean;
-        FlushAfterTwoSecondGapProceeded: Boolean;
+        StoredMarkerDT: DateTime;
+        FlushProceeded: Boolean;
     begin
-        // [SCENARIO] TryFlushMarker's one-second tolerance, on both sides of the threshold: SQL's 1/300s datetime
-        // grid can hand a marker back a few milliseconds below what was written, and counting that as an
-        // administrator's rewind would abandon pagination after every page - while a gap of more than a
-        // second is a real external edit and must stop paging.
-
-        // [GIVEN] An enabled Entria store whose stored marker stands at 10:00:00 on 4 July 2024
+        // [GIVEN] An enabled Entria store whose marker stands at 10:00:00 on 4 July 2024, a pass that
+        //         snapshotted it and a session max seeded below it
         Initialize();
         _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
         EntriaStore.Get(_StoreCode);
-        MarkerDT := CreateDateTime(DMY2Date(4, 7, 2024), 100000T);
-        EntriaStore.SetLastOrdersImportedAt(_StoreCode, MarkerDT);
+        EntriaStore.SetLastOrdersImportedAt(_StoreCode, CreateDateTime(DMY2Date(4, 7, 2024), 100000T));
+        ExpectedMarkerDT := EntriaJQ.GetSyncStateMarker(_StoreCode);
         EntriaJQ.SeedSessionMax(_StoreCode);
 
-        // [WHEN] The pass flushes while its own snapshot stands 400 milliseconds above the stored marker
-        ExpectedMarkerDT := MarkerDT + 400;
-        FlushAfterSubSecondGapProceeded := EntriaJQ.TryFlushMarker(_StoreCode, ExpectedMarkerDT);
+        // [GIVEN] The stored marker sits GapMs off the snapshot, with the blank cursor left alone.
+        //         400 ms and 600 ms are both on the 1/300 s grid, so the read-back is exact.
+        StoredMarkerDT := ExpectedMarkerDT + GapMs;
+        _LibraryEntria.SetSyncStateMarkerRaw(_StoreCode, StoredMarkerDT);
 
-        // [THEN] The flush proceeds and hands the pass the value actually stored, so pagination continues
-        _Assert.IsTrue(FlushAfterSubSecondGapProceeded,
-            'A sub-second gap is the datetime grid''s rounding, not a rewind - reporting it as one stops pagination after the very first page and the store never reads past its first 40 orders.');
-        _Assert.AreEqual(MarkerDT, ExpectedMarkerDT, 'The flush must hand the pass back the marker that is really in the database.');
-        _Assert.AreEqual(MarkerDT, EntriaJQ.GetSyncStateMarker(_StoreCode), 'A session max no higher than the stored marker must leave the stored marker standing.');
+        // [WHEN] The pass flushes its first page
+        FlushProceeded := EntriaJQ.TryFlushCursorState(_StoreCode, ExpectedMarkerDT, '', 'tok-x');
 
-        // [WHEN] The pass flushes again while its snapshot stands two seconds above the stored marker
-        ExpectedMarkerDT := MarkerDT + 2000;
-        FlushAfterTwoSecondGapProceeded := EntriaJQ.TryFlushMarker(_StoreCode, ExpectedMarkerDT);
+        // [THEN] The flush proceeds, hands the pass the stored marker and leaves that marker where it was
+        _Assert.IsTrue(FlushProceeded, StrSubstNo('A %1 ms gap is datetime rounding, not a move - refusing it stops paging after the first page.', GapMs));
+        _Assert.AreEqual(EntriaJQ.GetSyncStateMarker(_StoreCode), ExpectedMarkerDT, StrSubstNo('The flush must hand the pass the marker that is really stored (gap %1 ms).', GapMs));
+        _Assert.AreEqual(StoredMarkerDT, EntriaJQ.GetSyncStateMarker(_StoreCode), StrSubstNo('A session max below the stored marker must not regress it (gap %1 ms).', GapMs));
+        _Assert.AreEqual('tok-x', _LibraryEntria.GetOrderCursor(_StoreCode), StrSubstNo('The flush must store the next cursor (gap %1 ms).', GapMs));
+    end;
 
-        // [THEN] That gap counts as a rewind, so paging stops
-        _Assert.IsFalse(FlushAfterTwoSecondGapProceeded,
-            'A two-second gap is an administrator''s re-sync point - a tolerance wide enough to swallow it lets the pass overwrite the re-sync and the orders it was meant to re-import are never fetched.');
+    [Test]
+    procedure SetLastOrdersImportedAtClearsOrderCursor()
+    var
+        EntriaStore: Record "NPR Entria Store";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        NewMarkerDT: DateTime;
+    begin
+        // [SCENARIO] The cursor encodes a position from the old marker. Setting a new marker must blank it,
+        // so the next pass restarts from the new window instead of following the old cursor.
 
-        // [THEN] The stored marker survives untouched as the next pass's window start
-        _Assert.AreEqual(MarkerDT, EntriaJQ.GetSyncStateMarker(_StoreCode), 'A flush that reports a rewind must leave the stored marker exactly as it found it.');
+        // [GIVEN] A store whose sync state holds a cursor
+        Initialize();
+        _LibraryEntria.SetOrderCursor(_StoreCode, 'tok');
+        _Assert.AreEqual('tok', _LibraryEntria.GetOrderCursor(_StoreCode), 'Setup: the cursor must be stored.');
+
+        // [WHEN] The marker is set to 10:00:00 on 11 July 2024
+        NewMarkerDT := CreateDateTime(DMY2Date(11, 7, 2024), 100000T);
+        EntriaStore.SetLastOrdersImportedAt(_StoreCode, NewMarkerDT);
+
+        // [THEN] The cursor is blank and the marker holds the new value
+        _Assert.AreEqual('', _LibraryEntria.GetOrderCursor(_StoreCode), 'Setting the marker must blank the cursor, or the next pass ignores the new marker.');
+        _Assert.AreEqual(NewMarkerDT, EntriaJQ.GetSyncStateMarker(_StoreCode), 'Setting the marker must store the new value.');
+    end;
+
+    [Test]
+    procedure CursorResetEventDedupIsHourlyPerStore()
+    var
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        NowDT: DateTime;
+    begin
+        // [SCENARIO] A cursor reset is reported at most once an hour per store, on its own key, so it
+        // neither hides nor is hidden by the list-fetch failure report.
+
+        // [GIVEN] A fresh import instance and a point in time
+        NowDT := CreateDateTime(DMY2Date(12, 7, 2024), 100000T);
+
+        // [WHEN] [THEN] The first reset is reported
+        _Assert.IsTrue(EntriaJQ.ShouldEmitCursorResetEvent(_StoreCodeLbl, NowDT), 'The first cursor reset must be reported.');
+
+        // [THEN] The list-fetch report for the same store is still open
+        _Assert.IsTrue(EntriaJQ.ShouldEmitSentryError(_StoreCodeLbl, NowDT), 'A cursor reset must not use up the list-fetch report - the two keys must be separate.');
+
+        // [WHEN] [THEN] A reset 30 minutes later is suppressed
+        _Assert.IsFalse(EntriaJQ.ShouldEmitCursorResetEvent(_StoreCodeLbl, NowDT + 30 * 60 * 1000), 'A cursor reset within the hour must be suppressed.');
+
+        // [WHEN] [THEN] Another store's reset 30 minutes later is reported
+        _Assert.IsTrue(EntriaJQ.ShouldEmitCursorResetEvent(_SecondStoreCodeLbl, NowDT + 30 * 60 * 1000), 'Another store''s reset within the same hour must still be reported.');
+
+        // [WHEN] [THEN] A reset 61 minutes after the first is reported again
+        _Assert.IsTrue(EntriaJQ.ShouldEmitCursorResetEvent(_StoreCodeLbl, NowDT + 61 * 60 * 1000), 'A cursor reset after the hour must be reported again.');
     end;
 
     [Test]
@@ -3778,6 +4592,61 @@ codeunit 85260 "NPR Entria Tests"
 
         // [THEN] It is refused instead of being stored as the store's address
         _Assert.ExpectedError('must be a valid Entria store URL');
+    end;
+
+    [Test]
+    procedure SetEntriaUrlClearsOrderCursorWhenUrlChanges()
+    var
+        EntriaStore: Record "NPR Entria Store";
+        EntriaJQ: Codeunit "NPR Entria Order Import JQ";
+        MarkerDT: DateTime;
+    begin
+        // [SCENARIO] A cursor belongs to the Entria backend that issued it. Pointing the store at another
+        // URL must blank the cursor and leave the marker, so the next pass restarts from the marker.
+
+        // [GIVEN] An enabled Entria store at 'https://entria.test' with a marker and a stored cursor
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        EntriaStore.Get(_StoreCode);
+        EntriaStore."Entria Url" := 'https://entria.test';
+        MarkerDT := CreateDateTime(DMY2Date(14, 8, 2024), 100000T);
+        EntriaStore.SetLastOrdersImportedAt(_StoreCode, MarkerDT);
+        _LibraryEntria.SetOrderCursor(_StoreCode, 'tok-x');
+        _Assert.AreEqual('tok-x', _LibraryEntria.GetOrderCursor(_StoreCode), 'Setup: the store must hold a cursor.');
+
+        // [WHEN] The store is pointed at another URL
+        EntriaStore.SetEntriaUrl('https://entria-moved.test');
+
+        // [THEN] The cursor is blank, the marker stands and the new URL is taken
+        _Assert.AreEqual('', _LibraryEntria.GetOrderCursor(_StoreCode), 'A new URL must blank the cursor the old backend issued.');
+        _Assert.AreEqual(MarkerDT, EntriaJQ.GetSyncStateMarker(_StoreCode), 'A new URL must leave the marker alone.');
+        _Assert.AreEqual('https://entria-moved.test', EntriaStore."Entria Url", 'The new URL must be taken.');
+    end;
+
+    [Test]
+    procedure SetEntriaUrlKeepsOrderCursorWhenNormalisedUrlIsUnchanged()
+    var
+        EntriaStore: Record "NPR Entria Store";
+        MarkerDT: DateTime;
+    begin
+        // [SCENARIO] A URL retyped with a trailing slash normalises to the stored URL. It is the same
+        // backend, so the cursor must not be reset.
+
+        // [GIVEN] An enabled Entria store at 'https://entria.test' with a marker and a stored cursor
+        Initialize();
+        _LibraryEntria.EnableEntriaStore(_StoreCodeLbl);
+        EntriaStore.Get(_StoreCode);
+        EntriaStore."Entria Url" := 'https://entria.test';
+        MarkerDT := CreateDateTime(DMY2Date(15, 8, 2024), 100000T);
+        EntriaStore.SetLastOrdersImportedAt(_StoreCode, MarkerDT);
+        _LibraryEntria.SetOrderCursor(_StoreCode, 'tok-x');
+        _Assert.AreEqual('tok-x', _LibraryEntria.GetOrderCursor(_StoreCode), 'Setup: the store must hold a cursor.');
+
+        // [WHEN] The stored URL is entered again with a trailing slash
+        EntriaStore.SetEntriaUrl(EntriaStore."Entria Url" + '/');
+
+        // [THEN] The cursor stands
+        _Assert.AreEqual('tok-x', _LibraryEntria.GetOrderCursor(_StoreCode), 'A URL that normalises to the stored one must keep the cursor.');
     end;
 
     [Test]
