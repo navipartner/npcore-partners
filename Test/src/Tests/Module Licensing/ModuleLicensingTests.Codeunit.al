@@ -353,6 +353,162 @@ codeunit 85301 "NPR Module Licensing Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure Rename_ActiveLicenseToOtherModule_Blocked()
+    var
+        LicenseUser: Record "NPR License User";
+        Assert: Codeunit Assert;
+        ActiveUser: Guid;
+    begin
+        // [SCENARIO] An active license cannot be moved to another module.
+        Initialize();
+
+        // [GIVEN] An active POS license
+        ActiveUser := '11111111-1111-1111-1111-111111111111';
+        SeedActiveUser(ActiveUser, TempModulePOS(), TempTermMonths12(), CreateDateTime(20260101D, 080000T));
+        LicenseUser.Get(ActiveUser, TempModulePOS());
+
+        // [WHEN] The license is renamed to the KDS module
+        asserterror LicenseUser.Rename(ActiveUser, TempModuleKDS());
+
+        // [THEN] The rename is rejected
+        Assert.ExpectedError('You cannot change the user or module of an active or automatically suspended license');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Rename_ActiveLicenseToOtherUser_Blocked()
+    var
+        LicenseUser: Record "NPR License User";
+        Assert: Codeunit Assert;
+        ActiveUser: Guid;
+        OtherUser: Guid;
+    begin
+        // [SCENARIO] An active license cannot be moved to another user, even though the page has already reset the
+        // in-memory status to Pending by the time the rename runs.
+        Initialize();
+
+        // [GIVEN] An active POS license, with the in-memory status reset as the "User Security ID" OnValidate does on the page
+        ActiveUser := '11111111-1111-1111-1111-111111111111';
+        OtherUser := '22222222-2222-2222-2222-222222222222';
+        SeedActiveUser(ActiveUser, TempModulePOS(), TempTermMonths12(), CreateDateTime(20260101D, 080000T));
+        LicenseUser.Get(ActiveUser, TempModulePOS());
+        LicenseUser.Status := LicenseUser.Status::Pending;
+
+        // [WHEN] The license is renamed to another user
+        asserterror LicenseUser.Rename(OtherUser, TempModulePOS());
+
+        // [THEN] The rename is rejected
+        Assert.ExpectedError('You cannot change the user or module of an active or automatically suspended license');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Rename_SuspendedAutomaticallyLicenseToOtherModule_Blocked()
+    var
+        LicenseUser: Record "NPR License User";
+        Assert: Codeunit Assert;
+        SuspendedUser: Guid;
+    begin
+        // [SCENARIO] An automatically suspended license cannot be moved to another module, as the license sync would
+        // reactivate it there without an activation step.
+        Initialize();
+
+        // [GIVEN] An automatically suspended POS license
+        SuspendedUser := '11111111-1111-1111-1111-111111111111';
+        SeedUserWithStatus(SuspendedUser, TempModulePOS(), TempTermMonths12(), LicenseUser.Status::SuspendedAutomatically, CreateDateTime(20260101D, 080000T));
+        LicenseUser.Get(SuspendedUser, TempModulePOS());
+
+        // [WHEN] The license is renamed to the KDS module
+        asserterror LicenseUser.Rename(SuspendedUser, TempModuleKDS());
+
+        // [THEN] The rename is rejected
+        Assert.ExpectedError('You cannot change the user or module of an active or automatically suspended license');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Rename_SuspendedAutomaticallyLicenseToOtherUser_Blocked()
+    var
+        LicenseUser: Record "NPR License User";
+        Assert: Codeunit Assert;
+        SuspendedUser: Guid;
+        OtherUser: Guid;
+    begin
+        // [SCENARIO] An automatically suspended license cannot be moved to another user, even though the page has
+        // already reset the in-memory status to Pending by the time the rename runs.
+        Initialize();
+
+        // [GIVEN] An automatically suspended POS license, with the in-memory status reset as the "User Security ID" OnValidate does on the page
+        SuspendedUser := '11111111-1111-1111-1111-111111111111';
+        OtherUser := '22222222-2222-2222-2222-222222222222';
+        SeedUserWithStatus(SuspendedUser, TempModulePOS(), TempTermMonths12(), LicenseUser.Status::SuspendedAutomatically, CreateDateTime(20260101D, 080000T));
+        LicenseUser.Get(SuspendedUser, TempModulePOS());
+        LicenseUser.Status := LicenseUser.Status::Pending;
+
+        // [WHEN] The license is renamed to another user
+        asserterror LicenseUser.Rename(OtherUser, TempModulePOS());
+
+        // [THEN] The rename is rejected
+        Assert.ExpectedError('You cannot change the user or module of an active or automatically suspended license');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ChangeTerm_SuspendedAutomaticallyLicense_Blocked()
+    var
+        LicenseUser: Record "NPR License User";
+        Assert: Codeunit Assert;
+        SuspendedUser: Guid;
+    begin
+        // [SCENARIO] An automatically suspended license cannot be moved to another license term, as the license sync
+        // would reactivate it in the new (Module, License Term) group without an activation step.
+        Initialize();
+
+        // [GIVEN] An automatically suspended POS license on the 1-year term
+        SuspendedUser := '11111111-1111-1111-1111-111111111111';
+        SeedUserWithStatus(SuspendedUser, TempModulePOS(), TempTermMonths12(), LicenseUser.Status::SuspendedAutomatically, CreateDateTime(20260101D, 080000T));
+        LicenseUser.Get(SuspendedUser, TempModulePOS());
+
+        // [WHEN] The license term is changed to 1 month
+        asserterror LicenseUser.Validate("License Term", "NPR License Term"::months01);
+
+        // [THEN] The change is rejected
+        Assert.ExpectedError('You cannot change the license term of an active or automatically suspended license');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Rename_InactiveLicense_Allowed()
+    var
+        LicenseUser: Record "NPR License User";
+        Assert: Codeunit Assert;
+        DisabledUser: Guid;
+        PendingUser: Guid;
+    begin
+        // [SCENARIO] Disabled and pending licenses are never reactivated automatically, so they can still be moved to another module.
+        Initialize();
+
+        // [GIVEN] A manually disabled and a pending POS license
+        DisabledUser := '11111111-1111-1111-1111-111111111111';
+        PendingUser := '22222222-2222-2222-2222-222222222222';
+        SeedUserWithStatus(DisabledUser, TempModulePOS(), TempTermMonths12(), LicenseUser.Status::DisabledManually, CreateDateTime(20260101D, 080000T));
+        SeedUserWithStatus(PendingUser, TempModulePOS(), TempTermMonths12(), LicenseUser.Status::Pending, CreateDateTime(20260101D, 080000T));
+
+        // [WHEN] Both licenses are renamed to the KDS module
+        LicenseUser.Get(DisabledUser, TempModulePOS());
+        LicenseUser.Rename(DisabledUser, TempModuleKDS());
+        LicenseUser.Get(PendingUser, TempModulePOS());
+        LicenseUser.Rename(PendingUser, TempModuleKDS());
+
+        // [THEN] Both licenses exist only under the new module
+        Assert.IsFalse(LicenseUser.Get(DisabledUser, TempModulePOS()), 'old key of the disabled license must be gone');
+        Assert.IsTrue(LicenseUser.Get(DisabledUser, TempModuleKDS()), 'disabled license renamed to the new module');
+        Assert.IsFalse(LicenseUser.Get(PendingUser, TempModulePOS()), 'old key of the pending license must be gone');
+        Assert.IsTrue(LicenseUser.Get(PendingUser, TempModuleKDS()), 'pending license renamed to the new module');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure Parse_ValidityDatesParsed()
     var
         LicenseMgt: Codeunit "NPR License Mgt.";

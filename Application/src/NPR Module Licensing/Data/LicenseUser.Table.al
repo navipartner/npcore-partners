@@ -150,9 +150,12 @@ table 6150659 "NPR License User"
             NotBlank = true;
 
             trigger OnValidate()
+            var
+                CannotChangeLicTermErr: Label 'You cannot change the license term of an active or automatically suspended license. Please deactivate the user first.';
             begin
-                if (Rec."License Term" <> xRec."License Term") and (Rec.Status = Rec.Status::Active) then
-                    Error(CannotChangeLicTypeWhenActiveErr);
+                // Automatically suspended licenses are blocked too, since the license sync reactivates them in the new term without an activation step.
+                if (Rec."License Term" <> xRec."License Term") and (Rec.Status in [Rec.Status::Active, Rec.Status::SuspendedAutomatically]) then
+                    Error(CannotChangeLicTermErr);
             end;
         }
         field(14; "Status Changed At"; DateTime)
@@ -184,8 +187,21 @@ table 6150659 "NPR License User"
     var
         DeleteLicenseQst: Label 'Are you sure you want to delete the %1 license for user %2?', Comment = '%1 = Module, %2 = User Name';
         ActionCanceledByUserErr: Label 'Action canceled by user.';
-        CannotChangeLicTypeWhenActiveErr: Label 'You cannot change the license term for an active user. Please deactivate the user first.';
         CannotDeleteActiveErr: Label 'You cannot delete an active license. Please deactivate the user first.';
+
+    trigger OnRename()
+    var
+        LicenseUser: Record "NPR License User";
+        CannotRenameActiveErr: Label 'You cannot change the user or module of an active or automatically suspended license. Please deactivate the user first.';
+    begin
+        // Check the stored record, as validating "User Security ID" resets Rec.Status before the rename happens.
+        // Automatically suspended licenses are blocked too, since the license sync reactivates them without an activation step.
+        if LicenseUser.Get(xRec."User Security ID", xRec.Module) then
+            if LicenseUser.Status in [LicenseUser.Status::Active, LicenseUser.Status::SuspendedAutomatically] then
+                Error(CannotRenameActiveErr);
+        if Rec.Status in [Rec.Status::Active, Rec.Status::SuspendedAutomatically] then
+            Error(CannotRenameActiveErr);
+    end;
 
     trigger OnDelete()
     var
