@@ -40,6 +40,9 @@ codeunit 6184815 "NPR Spfy Post Order" implements "NPR Nc Import List IProcess"
                 OrderMgt.SetImportEntryErrorMsg(ImportEntry, AlreadyPostedMsg);
                 exit;
             end;
+            // The order was closed and not canceled when it was downloaded, which says nothing about now.
+            if OrderMgt.IsCancelledOrder(ImportEntry, Order) then
+                exit;
             OrderMgt.InsertSalesHeader(ShopifyStoreCode, Order, SalesHeader)
         end else begin
             SalesHeader.SetHideValidationDialog(true);

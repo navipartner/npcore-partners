@@ -497,11 +497,19 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
         if EcommerceDocAlreadyProcessed(SpfyEventLogEntry, EcomSalesHeader, false) then
             exit(false);
 
+        MarkProcessedWithNote(SpfyEventLogEntry, NothingToImportMsg);
+        exit(true);
+    end;
+
+    /// <summary>
+    /// Completes an entry that needed nothing imported, keeping the reason on the entry.
+    /// </summary>
+    internal procedure MarkProcessedWithNote(var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"; Note: Text)
+    begin
         SpfyEventLogEntry."Processing Status" := SpfyEventLogEntry."Processing Status"::Processed;
         SpfyEventLogEntry."Last Error Date" := 0D;
-        SpfyEventLogEntry."Last Error Message" := CopyStr(NothingToImportMsg, 1, MaxStrLen(SpfyEventLogEntry."Last Error Message"));
+        SpfyEventLogEntry."Last Error Message" := CopyStr(Note, 1, MaxStrLen(SpfyEventLogEntry."Last Error Message"));
         SpfyEventLogEntry.Modify();
-        exit(true);
     end;
 
     local procedure DocumentAlreadyHandled(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"): Boolean
@@ -576,6 +584,36 @@ codeunit 6248599 "NPR Spfy Event Log DocProcessr"
         if SpfyOrderMgt.FindSalesOrder(SpfyEventLogEntry."Store Code", SpfyEventLogEntry."Shopify ID", SalesHeader) then
             Error(CreatedDocumentErrorLbl, SalesHeader."Document Type", SalesHeader."No.");
         Error(CreatedDocumentNoRefErrorLbl);
+    end;
+
+    /// <summary>
+    /// For an entry that is about to end without importing anything: fails when a sales document of another routine exists for the order,
+    /// so the entry does not report that there was nothing to do.
+    /// </summary>
+    internal procedure CheckNoSalesDocumentOutsideEcommerceFlow(SpfyEventLogEntry: Record "NPR Spfy Event Log Entry")
+    var
+        SalesHeader: Record "Sales Header";
+        SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
+        UnpostedExists: Boolean;
+        PostedExists: Boolean;
+        CanceledUnpostedErr: Label 'The order was canceled in Shopify, but %1 %2 was not created by the Ecommerce flow, so the flow will not delete it. Delete it manually if it is no longer needed - processing this log entry again then completes it.', Comment = '%1 = Sales document type, %2 = Sales document number';
+        CanceledUnpostedNoRefErr: Label 'The order was canceled in Shopify, but a sales document for it was not created by the Ecommerce flow, so the flow will not delete it. Delete it manually if it is no longer needed - processing this log entry again then completes it.';
+        CanceledPostedErr: Label 'The order was canceled in Shopify after a sales document for it was posted outside the Ecommerce flow. The flow cannot undo a posted document, so it has to be handled manually.';
+    begin
+        // An open or closed entry completes once the other routine's document is posted, which the existing message says.
+        if SpfyEventLogEntry."Document Status" <> SpfyEventLogEntry."Document Status"::Cancelled then begin
+            CheckIfSalesDocumentCreatedOutsideEcommerceFlow(SpfyEventLogEntry);
+            exit;
+        end;
+        // A cancelled entry never completes on a posted document, so it must not promise that.
+        GetSalesDocumentState(SpfyEventLogEntry, UnpostedExists, PostedExists);
+        if UnpostedExists then begin
+            if SpfyOrderMgt.FindSalesOrder(SpfyEventLogEntry."Store Code", SpfyEventLogEntry."Shopify ID", SalesHeader) then
+                Error(CanceledUnpostedErr, SalesHeader."Document Type", SalesHeader."No.");
+            Error(CanceledUnpostedNoRefErr);
+        end;
+        if PostedExists then
+            Error(CanceledPostedErr);
     end;
 
     internal procedure EcommerceDocCreated(var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry"): Boolean

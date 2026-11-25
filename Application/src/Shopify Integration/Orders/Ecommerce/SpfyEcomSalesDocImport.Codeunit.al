@@ -5,47 +5,65 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
     TableNo = "NPR Spfy Event Log Entry";
 
     trigger OnRun()
+    var
+        CompletionNote: Text;
     begin
         Rec.ReadIsolation := IsolationLevel::UpdLock;
         Rec.Get(Rec."Entry No.");
         if Rec."Processing Status" = Rec."Processing Status"::Processed then
             exit;
-        Rec.Postponed := false;
-        Rec.Modify();
+        if Rec.Postponed then begin
+            Rec.Postponed := false;
+            Rec.Modify();
+            // Committed now, or a failure later in this run would roll it back and be recorded as the earlier postponement.
+            Commit();
+            Rec.Get(Rec."Entry No.");
+        end;
         ClearLastError();
         if _SpfyEcomSalesDocPrcssr.MarkProcessedIfDocumentAlreadyExists(Rec) then
             exit;
-        Process(Rec);
+        CompletionNote := Process(Rec);
         Rec.Get(Rec."Entry No.");
-        _SpfyEcomSalesDocPrcssr.HandleShopifyLog(true, GetLastErrorText(), Rec);
+        if CompletionNote <> '' then begin
+            _SpfyEcomSalesDocPrcssr.CheckNoSalesDocumentOutsideEcommerceFlow(Rec);
+            _SpfyEcomSalesDocPrcssr.MarkProcessedWithNote(Rec, CompletionNote);
+        end else
+            _SpfyEcomSalesDocPrcssr.HandleShopifyLog(true, GetLastErrorText(), Rec);
     end;
 
-    local procedure Process(var LogEntry: Record "NPR Spfy Event Log Entry")
+    /// <summary>
+    /// Returns a note when the entry is done without anything having been imported, so the entry can say why.
+    /// </summary>
+    local procedure Process(var LogEntry: Record "NPR Spfy Event Log Entry") CompletionNote: Text
     begin
         case LogEntry."Document Status" of
             LogEntry."Document Status"::Open:
-                ProcessOpenLogEntry(LogEntry);
+                CompletionNote := ProcessOpenLogEntry(LogEntry);
             LogEntry."Document Status"::Closed:
-                ProcessClosedLogEntry(LogEntry);
+                CompletionNote := ProcessClosedLogEntry(LogEntry);
             LogEntry."Document Status"::Cancelled:
-                ProcessCancelledLogEntry(LogEntry);
+                CompletionNote := ProcessCancelledLogEntry(LogEntry);
         end;
     end;
 
-    local procedure ProcessOpenLogEntry(var LogEntry: Record "NPR Spfy Event Log Entry")
+    local procedure ProcessOpenLogEntry(var LogEntry: Record "NPR Spfy Event Log Entry"): Text
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache";
+        SpfyOrderCancelCheck: Codeunit "NPR Spfy Order Cancel Check";
     begin
         if _SpfyEcomSalesDocPrcssr.EcommerceDocAlreadyProcessed(LogEntry, EcomSalesHeader, true) then
             exit;
+        if OrderIsCancelledInShopify(LogEntry) then
+            exit(SpfyOrderCancelCheck.NoDocumentCreatedMsg());
         CreateDocument(LogEntry, FulfillmentCache);
     end;
 
-    local procedure ProcessClosedLogEntry(var LogEntry: Record "NPR Spfy Event Log Entry")
+    local procedure ProcessClosedLogEntry(var LogEntry: Record "NPR Spfy Event Log Entry"): Text
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache";
+        SpfyOrderCancelCheck: Codeunit "NPR Spfy Order Cancel Check";
         UnprocessedEntriesErr: Label 'Processing is postponed until all related event log entries are completed.';
         DelayProcessingErr: Label 'Processing is postponed because dependent Ecommerce processes are still running.';
     begin
@@ -54,6 +72,8 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
             exit;
         end;
         if not _SpfyEcomSalesDocPrcssr.EcommerceDocAlreadyProcessed(LogEntry, EcomSalesHeader, false) then begin
+            if OrderIsCancelledInShopify(LogEntry) then
+                exit(SpfyOrderCancelCheck.NoDocumentCreatedMsg());
             if not CreateAndProcess(LogEntry, FulfillmentCache) then
                 AddTimeForEcommerceProcessing(LogEntry, DelayProcessingErr);
             exit;
@@ -65,21 +85,34 @@ codeunit 6248587 "NPR Spfy Ecom Sales Doc Import"
         UpdateAndProcess(LogEntry, FulfillmentCache);
     end;
 
-    local procedure ProcessCancelledLogEntry(var LogEntry: Record "NPR Spfy Event Log Entry")
+    local procedure ProcessCancelledLogEntry(var LogEntry: Record "NPR Spfy Event Log Entry"): Text
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         UnprocessedEntriesErr: Label 'Processing is postponed until all related event log entries are completed.';
-        NothingToProcessErr: Label 'The order was canceled in Shopify before it was processed. There is nothing to process here.';
+        NothingToProcessMsg: Label 'The order was canceled in Shopify before it was processed. There is nothing to process here.';
     begin
         if not _SpfyEcomSalesDocPrcssr.TryCheckForUnprocessedEntry(LogEntry) then begin
             AddTimeForEcommerceProcessing(LogEntry, UnprocessedEntriesErr, SiblingWaitBackoff());
             exit;
         end;
         if not _SpfyEcomSalesDocPrcssr.EcommerceDocAlreadyProcessed(LogEntry, EcomSalesHeader, false) then
-            Error(NothingToProcessErr);
+            exit(NothingToProcessMsg);
         if not IsSalesDocumentReady(EcomSalesHeader, LogEntry) then
             exit;
         DeleteDocument(LogEntry);
+    end;
+
+    local procedure OrderIsCancelledInShopify(LogEntry: Record "NPR Spfy Event Log Entry"): Boolean
+    var
+        SpfyOrderCancelCheck: Codeunit "NPR Spfy Order Cancel Check";
+    begin
+        // A return entry carries the id of the return, not of an order.
+        if LogEntry."Document Type" <> LogEntry."Document Type"::Order then
+            exit(false);
+        // Asked separately from the order details, because those may be replayed from data stored on an earlier attempt.
+        // Committed first, so the entry's row lock is not held while Shopify answers.
+        Commit();
+        exit(SpfyOrderCancelCheck.IsCancelled(LogEntry."Store Code", LogEntry."Shopify ID"));
     end;
 
     local procedure CreateAndProcessEcommerceDocument(var LogEntry: Record "NPR Spfy Event Log Entry"; var DetailsResponse: JsonToken; var EcomSalesHeader: Record "NPR Ecom Sales Header"; var FulfillmentCache: Codeunit "NPR Spfy Fulfillment Cache"): Boolean

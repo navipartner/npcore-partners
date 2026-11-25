@@ -431,6 +431,20 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         exit(true);
     end;
 
+    /// <summary>
+    /// True when Shopify has canceled the order since it was downloaded. The import entry then says why nothing was created.
+    /// </summary>
+    internal procedure IsCancelledOrder(var ImportEntry: Record "NPR Nc Import Entry"; Order: JsonToken): Boolean
+    var
+        SpfyOrderCancelCheck: Codeunit "NPR Spfy Order Cancel Check";
+    begin
+        if not SpfyOrderCancelCheck.IsCancelled(ImportEntry."Store Code", GetOrderID(Order)) then
+            exit(false);
+
+        SetImportEntryErrorMsg(ImportEntry, SpfyOrderCancelCheck.NoDocumentCreatedMsg());
+        exit(true);
+    end;
+
     procedure SetImportEntryErrorMsg(var ImportEntry: Record "NPR Nc Import Entry"; ErrorMsg: Text)
     var
         OutStr: OutStream;

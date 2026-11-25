@@ -19,8 +19,16 @@ codeunit 85465 "NPR Library Spfy Import"
         Item: Record Item;
         SpfyStore: Record "NPR Spfy Store";
         NpEcStore: Record "NPR NpEc Store";
+        SpfyIntegrationSetup: Record "NPR Spfy Integration Setup";
     begin
         StoreCode := CopyStr(StoreCodeTok, 1, MaxStrLen(StoreCode));
+
+        // Production creates this row on its first read, and on a fresh database that read can happen inside a
+        // TryFunction (the sibling-entry check of a Cancelled entry), where a container refuses the insert.
+        if not SpfyIntegrationSetup.Get() then begin
+            SpfyIntegrationSetup.Init();
+            SpfyIntegrationSetup.Insert(true);
+        end;
         ItemNo := CopyStr(ItemNoTok, 1, MaxStrLen(ItemNo));
         Sku := ItemNo;
 

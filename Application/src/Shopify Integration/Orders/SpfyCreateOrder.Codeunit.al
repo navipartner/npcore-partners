@@ -16,18 +16,24 @@ codeunit 6184808 "NPR Spfy Create Order" implements "NPR Nc Import List IProcess
         OrderMgt.LoadOrder(ImportEntry, Order);
         if OrderMgt.IsAnonymizedCustomerOrder(ImportEntry, Order, AnonymizedCustomerOrderErr) then
             exit;
-        ImportOrder(ImportEntry."Store Code", Order);
+        ImportOrder(ImportEntry, Order);
         ClearLastError();  //Do not save error text in Import List, if order processing completed successfully
     end;
 
-    local procedure ImportOrder(ShopifyStoreCode: Code[20]; Order: JsonToken)
+    local procedure ImportOrder(var ImportEntry: Record "NPR Nc Import Entry"; Order: JsonToken)
     var
         SalesHeader: Record "Sales Header";
+        ShopifyStoreCode: Code[20];
     begin
+        ShopifyStoreCode := ImportEntry."Store Code";
         if OrderMgt.OrderExists(ShopifyStoreCode, Order) then
             exit;
 
         if OrderMgt.SkipOrderImport(ShopifyStoreCode, Order) then
+            exit;
+
+        // The stored order is as old as its download, and this entry may run long after that or be run again.
+        if OrderMgt.IsCancelledOrder(ImportEntry, Order) then
             exit;
 
         OrderMgt.InsertSalesHeader(ShopifyStoreCode, Order, SalesHeader);

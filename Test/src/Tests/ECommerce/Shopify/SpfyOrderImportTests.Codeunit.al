@@ -1227,8 +1227,9 @@ codeunit 85389 "NPR Spfy Order Import Tests"
         ItemNo: Code[20];
         ShopifyId: Text[30];
     begin
-        // [SCENARIO] An order first seen as Cancelled (no prior Open/Closed entry) must not create or post
-        // any document; ProcessCancelledLogEntry rejects it with "nothing to process". This pins the
+        // [SCENARIO] An order first seen as Cancelled (no prior Open/Closed entry) creates and posts no document, and
+        // its entry ends as Processed with a note that there was nothing to process: nothing was ever created for
+        // the order, so there is nothing to delete and nothing for anyone to act on. This also pins the
         // Closed/Cancelled separation that the first-import-Closed posting fix relies on (Closed requires
         // cancelledAt = 0D, so a cancelled order must never flow into CreateAndProcess + posting).
         ShopifyId := '900000000007';
@@ -1236,7 +1237,7 @@ codeunit 85389 "NPR Spfy Order Import Tests"
         LibrarySpfyImport.InitLogEntry(LogEntry, StoreCode, ShopifyId);
         LogEntry."Document Status" := LogEntry."Document Status"::Cancelled;
         LogEntry.Modify();
-        Commit(); // ProcessEcommerceDocument traps the "nothing to process" error via Codeunit.Run, which requires the setup writes to be committed first (in production the entry is an already-committed row picked up by the job queue).
+        Commit(); // ProcessEcommerceDocument reads the result of Codeunit.Run, which requires the setup writes to be committed first (in production the entry is an already-committed row picked up by the job queue).
 
         // [WHEN] the cancelled first-import entry is processed
         SpfyEventLogDocProcessr.ProcessLogEntry(LogEntry);
@@ -1245,9 +1246,10 @@ codeunit 85389 "NPR Spfy Order Import Tests"
         EcomSalesHeader.SetRange("External No.", ShopifyId);
         Assert.IsTrue(EcomSalesHeader.IsEmpty(), 'A cancelled first-import order must not create an Ecommerce document.');
 
-        // [THEN] the entry is not silently marked Processed (it is flagged with the failure outcome)
+        // [THEN] the entry is Processed and says why nothing was done
         LogEntry.Find();
-        Assert.AreNotEqual(LogEntry."Processing Status"::Processed, LogEntry."Processing Status", 'Cancelled first-import must not be marked Processed.');
+        Assert.AreEqual(LogEntry."Processing Status"::Processed, LogEntry."Processing Status", 'A cancelled first-import entry has nothing to do and must end as Processed.');
+        Assert.AreNotEqual('', LogEntry."Last Error Message", 'The entry must say why nothing was processed.');
 
         LibrarySpfyImport.CleanupCommittedLogEntries(StoreCode, ShopifyId);
     end;
@@ -2594,6 +2596,7 @@ codeunit 85389 "NPR Spfy Order Import Tests"
         SalesHeader: Record "Sales Header";
         LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
         SpfyEventLogDocProcessr: Codeunit "NPR Spfy Event Log DocProcessr";
+        SpfyOrderCancelStub: Codeunit "NPR Spfy Order Cancel Stub";
         SpfyOrderImportTests: Codeunit "NPR Spfy Order Import Tests";
         StoreCode: Code[20];
         Sku: Code[20];
@@ -2612,6 +2615,10 @@ codeunit 85389 "NPR Spfy Order Import Tests"
         InsertReplayableOrderEntry(ClosedEntry, StoreCode, ShopifyId, OrderLineId, Sku, "NPR SpfyAPIDocumentStatus"::Closed, CurrentDateTime() - 1000);
         Commit(); // processing reads the result of Codeunit.Run, which the platform only allows outside a write transaction
 
+        // [GIVEN] Shopify reports the order as not canceled
+        SpfyOrderCancelStub.SetOrderOpen(ShopifyId);
+        BindSubscription(SpfyOrderCancelStub);
+
         // [WHEN] the closed entry is processed
         SpfyEventLogDocProcessr.ProcessLogEntries(ClosedEntry);
 
@@ -2622,6 +2629,114 @@ codeunit 85389 "NPR Spfy Order Import Tests"
         _Assert.IsTrue(SalesHeader.Get(SalesHeader."Document Type"::Order, EcomSalesHeader."Created Doc No."), 'A closed order that posted nothing must keep its sales order.');
         _Assert.AreEqual(EcomSalesHeader."Creation Status"::Created, EcomSalesHeader."Creation Status", 'The Ecommerce document must stay Created when its sales order is kept.');
 
+        UnbindSubscription(SpfyOrderCancelStub);
+        UnbindSubscription(SpfyOrderImportTests);
+        LibrarySpfyImport.CleanupCommittedSimpleItemOrder(ShopifyId);
+    end;
+
+    [Test]
+    procedure OpenEntry_OrderCancelledInShopify_NoDocumentAndEntryIsProcessedWithNote()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        OpenEntry: Record "NPR Spfy Event Log Entry";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyEventLogDocProcessr: Codeunit "NPR Spfy Event Log DocProcessr";
+        SpfyOrderCancelCheck: Codeunit "NPR Spfy Order Cancel Check";
+        SpfyOrderCancelStub: Codeunit "NPR Spfy Order Cancel Stub";
+        SpfyOrderImportTests: Codeunit "NPR Spfy Order Import Tests";
+        SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        ShopifyId: Text[30];
+        OrderLineId: Text[30];
+    begin
+        // [SCENARIO] An open entry that still holds order data from before the order was canceled in Shopify creates no Ecommerce document or sales order, and ends as Processed with the reason on it.
+        ShopifyId := '926000000007';
+        OrderLineId := '926000000107';
+
+        // [GIVEN] a store on which this open entry would create a sales order
+        PrepareStoreThatDeletesAfterFinalPost(ShopifyId, StoreCode, Sku);
+        BindSubscription(SpfyOrderImportTests);
+
+        // [GIVEN] an open entry whose stored order data shows the order as not canceled
+        InsertReplayableOrderEntry(OpenEntry, StoreCode, ShopifyId, OrderLineId, Sku, "NPR SpfyAPIDocumentStatus"::Open, CurrentDateTime() - 1000);
+        Commit(); // processing reads the result of Codeunit.Run, which the platform only allows outside a write transaction
+
+        // [GIVEN] the order has been canceled in Shopify since
+        SpfyOrderCancelStub.SetOrderCancelled(ShopifyId);
+        BindSubscription(SpfyOrderCancelStub);
+
+        // [WHEN] the entry is processed
+        SpfyEventLogDocProcessr.ProcessLogEntries(OpenEntry);
+
+        // [THEN] no Ecommerce document was created
+        EcomSalesHeader.SetRange("External No.", ShopifyId);
+        _Assert.IsTrue(EcomSalesHeader.IsEmpty(), 'A canceled order must not get an Ecommerce document.');
+
+        // [THEN] no sales order was created
+        _Assert.IsFalse(SpfyOrderMgt.SalesOrderExists(StoreCode, ShopifyId), 'A canceled order must not get a sales order.');
+
+        // [THEN] the entry is Processed and says that the order was canceled
+        OpenEntry.Get(OpenEntry."Entry No.");
+        _Assert.AreEqual(OpenEntry."Processing Status"::Processed, OpenEntry."Processing Status", 'The entry has nothing left to do and must end as Processed.');
+        _Assert.AreEqual(SpfyOrderCancelCheck.NoDocumentCreatedMsg(), OpenEntry."Last Error Message", 'The entry must say why nothing was created.');
+
+        UnbindSubscription(SpfyOrderCancelStub);
+        UnbindSubscription(SpfyOrderImportTests);
+        LibrarySpfyImport.CleanupCommittedSimpleItemOrder(ShopifyId);
+    end;
+
+    [Test]
+    procedure ClosedEntry_FirstImportClosed_OrderCancelledInShopify_NoDocumentAndEntryIsProcessedWithNote()
+    var
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
+        ClosedEntry: Record "NPR Spfy Event Log Entry";
+        LibrarySpfyImport: Codeunit "NPR Library Spfy Import";
+        SpfyEventLogDocProcessr: Codeunit "NPR Spfy Event Log DocProcessr";
+        SpfyOrderCancelCheck: Codeunit "NPR Spfy Order Cancel Check";
+        SpfyOrderCancelStub: Codeunit "NPR Spfy Order Cancel Stub";
+        SpfyOrderImportTests: Codeunit "NPR Spfy Order Import Tests";
+        SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
+        StoreCode: Code[20];
+        Sku: Code[20];
+        ShopifyId: Text[30];
+        OrderLineId: Text[30];
+    begin
+        // [SCENARIO] A closed entry that is the first one seen for its order, processed after the order was canceled in Shopify, creates and posts nothing and ends as Processed with the reason on it.
+        ShopifyId := '926000000008';
+        OrderLineId := '926000000108';
+
+        // [GIVEN] a store on which this closed entry would create a sales order
+        PrepareStoreThatDeletesAfterFinalPost(ShopifyId, StoreCode, Sku);
+        BindSubscription(SpfyOrderImportTests);
+
+        // [GIVEN] a closed entry whose stored order data shows the order as not canceled, and no earlier entry for the order
+        InsertReplayableOrderEntry(ClosedEntry, StoreCode, ShopifyId, OrderLineId, Sku, "NPR SpfyAPIDocumentStatus"::Closed, CurrentDateTime() - 1000);
+        Commit(); // processing reads the result of Codeunit.Run, which the platform only allows outside a write transaction
+
+        // [GIVEN] the order has been canceled in Shopify since
+        SpfyOrderCancelStub.SetOrderCancelled(ShopifyId);
+        BindSubscription(SpfyOrderCancelStub);
+
+        // [WHEN] the entry is processed
+        SpfyEventLogDocProcessr.ProcessLogEntries(ClosedEntry);
+
+        // [THEN] no Ecommerce document was created
+        EcomSalesHeader.SetRange("External No.", ShopifyId);
+        _Assert.IsTrue(EcomSalesHeader.IsEmpty(), 'A canceled order must not get an Ecommerce document.');
+
+        // [THEN] no sales order was created
+        _Assert.IsFalse(SpfyOrderMgt.SalesOrderExists(StoreCode, ShopifyId), 'A canceled order must not get a sales order.');
+
+        // [THEN] no invoice was posted
+        _Assert.IsFalse(SpfyOrderMgt.PostedDocumentExists(StoreCode, ShopifyId, true), 'A canceled order must not be invoiced.');
+
+        // [THEN] the entry is Processed and says that the order was canceled
+        ClosedEntry.Get(ClosedEntry."Entry No.");
+        _Assert.AreEqual(ClosedEntry."Processing Status"::Processed, ClosedEntry."Processing Status", 'The entry has nothing left to do and must end as Processed.');
+        _Assert.AreEqual(SpfyOrderCancelCheck.NoDocumentCreatedMsg(), ClosedEntry."Last Error Message", 'The entry must say why nothing was created.');
+
+        UnbindSubscription(SpfyOrderCancelStub);
         UnbindSubscription(SpfyOrderImportTests);
         LibrarySpfyImport.CleanupCommittedSimpleItemOrder(ShopifyId);
     end;
@@ -2636,6 +2751,7 @@ codeunit 85389 "NPR Spfy Order Import Tests"
         Voucher: Record "NPR NpRv Voucher";
         VoucherEntry: Record "NPR NpRv Voucher Entry";
         SpfyEventLogDocProcessr: Codeunit "NPR Spfy Event Log DocProcessr";
+        SpfyOrderCancelStub: Codeunit "NPR Spfy Order Cancel Stub";
         StoreCode: Code[20];
         Sku: Code[20];
         RemovedSku: Code[20];
@@ -2663,6 +2779,10 @@ codeunit 85389 "NPR Spfy Order Import Tests"
         InsertOrderEntryWithData(ClosedEntry, StoreCode, ShopifyId, "NPR SpfyAPIDocumentStatus"::Closed, CreateDateTime(WorkDate(), 120000T),
             GiftCardEditedDownOrderJson(ShopifyId, ShippedLineId, Sku, RemovedLineId, RemovedSku, AuthorizationId, GiftCardSaleId, GiftCardRefundId, 83.5));
         Commit(); // processing reads the result of Codeunit.Run, which the platform only allows outside a write transaction
+
+        // [GIVEN] Shopify reports the order as not canceled
+        SpfyOrderCancelStub.SetOrderOpen(ShopifyId);
+        BindSubscription(SpfyOrderCancelStub);
 
         // [WHEN] the closed entry is processed
         SpfyEventLogDocProcessr.ProcessLogEntries(ClosedEntry);
@@ -2713,6 +2833,7 @@ codeunit 85389 "NPR Spfy Order Import Tests"
         SalesInvoiceHeader: Record "Sales Invoice Header";
         VoucherEntry: Record "NPR NpRv Voucher Entry";
         SpfyEventLogDocProcessr: Codeunit "NPR Spfy Event Log DocProcessr";
+        SpfyOrderCancelStub: Codeunit "NPR Spfy Order Cancel Stub";
         StoreCode: Code[20];
         Sku: Code[20];
         RemovedSku: Code[20];
@@ -2740,6 +2861,10 @@ codeunit 85389 "NPR Spfy Order Import Tests"
         InsertOrderEntryWithData(ClosedEntry, StoreCode, ShopifyId, "NPR SpfyAPIDocumentStatus"::Closed, CreateDateTime(WorkDate(), 120000T),
             GiftCardEditedDownOrderJson(ShopifyId, ShippedLineId, Sku, RemovedLineId, RemovedSku, AuthorizationId, GiftCardSaleId, GiftCardRefundId, 50));
         Commit(); // processing reads the result of Codeunit.Run, which the platform only allows outside a write transaction
+
+        // [GIVEN] Shopify reports the order as not canceled
+        SpfyOrderCancelStub.SetOrderOpen(ShopifyId);
+        BindSubscription(SpfyOrderCancelStub);
 
         // [WHEN] the closed entry is processed
         SpfyEventLogDocProcessr.ProcessLogEntries(ClosedEntry);
@@ -2967,10 +3092,15 @@ codeunit 85389 "NPR Spfy Order Import Tests"
         OpenEntry: Record "NPR Spfy Event Log Entry";
         SalesHeader: Record "Sales Header";
         SpfyEventLogDocProcessr: Codeunit "NPR Spfy Event Log DocProcessr";
+        SpfyOrderCancelStub: Codeunit "NPR Spfy Order Cancel Stub";
     begin
         InsertOrderEntryWithData(OpenEntry, StoreCode, ShopifyId, "NPR SpfyAPIDocumentStatus"::Open, CurrentDateTime() - 2000, OrderJson);
         Commit(); // processing reads the result of Codeunit.Run, which the platform only allows outside a write transaction
+        // The import asks Shopify whether the order is canceled before it creates a document.
+        SpfyOrderCancelStub.SetOrderOpen(ShopifyId);
+        BindSubscription(SpfyOrderCancelStub);
         SpfyEventLogDocProcessr.ProcessLogEntries(OpenEntry);
+        UnbindSubscription(SpfyOrderCancelStub);
 
         AssertEntryProcessedWithoutError(OpenEntry."Entry No.");
         FindEcomOrder(ShopifyId, EcomSalesHeader);
@@ -4052,12 +4182,11 @@ codeunit 85389 "NPR Spfy Order Import Tests"
     begin
         // [SCENARIO] The other half of the classification, and the control for the test above: a failing entry still
         // has to come back as an error. Counting postponements separately must not have turned an error into one of
-        // them. A first-import Cancelled entry has nothing to process and is the cheapest way to fail an entry.
+        // them. An open entry without stored order data has to go to Shopify, which the test store cannot reach (it
+        // has no URL or token), and is the cheapest way to fail an entry.
         ShopifyId := '920000000202';
         LibrarySpfyImport.SetupSimpleItemOrder(StoreCode, Sku, ItemNo);
         LibrarySpfyImport.InitLogEntry(LogEntry, StoreCode, ShopifyId);
-        LogEntry."Document Status" := LogEntry."Document Status"::Cancelled;
-        LogEntry.Modify();
         LogEntry.SetRecFilter();
         Commit(); // processing reads the result of Codeunit.Run, which the platform only allows outside a write transaction
 
@@ -4134,12 +4263,10 @@ codeunit 85389 "NPR Spfy Order Import Tests"
         _MessageCount := 0;
         _LastMessageText := '';
 
-        // [GIVEN] a first-import Cancelled entry, which fails because it has nothing to process
+        // [GIVEN] an open entry without stored order data, which fails because the test store cannot reach Shopify
         FailedShopifyId := '920000000204';
         LibrarySpfyImport.SetupSimpleItemOrder(FailedStoreCode, Sku, ItemNo);
         LibrarySpfyImport.InitLogEntry(FailedEntry, FailedStoreCode, FailedShopifyId);
-        FailedEntry."Document Status" := FailedEntry."Document Status"::Cancelled;
-        FailedEntry.Modify();
 
         // [GIVEN] a Closed entry with an unprocessed Open sibling, which postpones itself
         PostponedStoreCode := 'SPFYPOSTE';
@@ -4156,7 +4283,7 @@ codeunit 85389 "NPR Spfy Order Import Tests"
 
         // [THEN] both outcomes happened: one entry failed and the other postponed itself
         UpdatedEntry.Get(FailedEntry."Entry No.");
-        _Assert.AreEqual(UpdatedEntry."Processing Status"::Error, UpdatedEntry."Processing Status", 'The Cancelled entry must have failed.');
+        _Assert.AreEqual(UpdatedEntry."Processing Status"::Error, UpdatedEntry."Processing Status", 'The entry that cannot reach Shopify must have failed.');
         UpdatedEntry.Get(ClosedEntry."Entry No.");
         _Assert.AreEqual(UpdatedEntry."Processing Status"::Postponed, UpdatedEntry."Processing Status", 'The Closed entry must have postponed itself waiting for its sibling.');
 
