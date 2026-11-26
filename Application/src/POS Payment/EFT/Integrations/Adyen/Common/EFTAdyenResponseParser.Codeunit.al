@@ -314,6 +314,7 @@
         JValue: JsonValue;
         DCCObject: JsonObject;
         EFTAdyenSignatureBuffer: Codeunit "NPR EFT Adyen Signature Buffer";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         SignatureBitmap: Text;
         OutStr: OutStream;
     begin
@@ -337,6 +338,12 @@
 
         if TrySelectToken(JObject, 'PaymentResult.PaymentAcquirerData.ApprovalCode', JToken, false) then
             EFTTransactionRequest."Authorisation Number" := JToken.AsValue().AsText();
+
+        if FeatureFlagsManagement.IsEnabled('subscriptionRefundToPaymentMerchant') then
+            if TrySelectToken(JObject, 'PaymentResult.PaymentAcquirerData.MerchantID', JToken, false) then
+                if JToken.IsValue() then
+                    if not JToken.AsValue().IsNull() then
+                        EFTTransactionRequest."Merchant Account" := CopyStr(JToken.AsValue().AsText(), 1, MaxStrLen(EFTTransactionRequest."Merchant Account"));
 
         if EFTTransactionRequest.Successful then begin
             if TrySelectToken(JObject, 'PaymentResult.CurrencyConversion[0]', JToken, false) then begin

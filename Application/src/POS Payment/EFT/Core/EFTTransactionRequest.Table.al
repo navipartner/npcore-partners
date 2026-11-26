@@ -550,6 +550,11 @@
             Caption = 'PSP Reference';
             DataClassification = CustomerContent;
         }
+        field(831; "Merchant Account"; Text[80])
+        {
+            Caption = 'Merchant Account';
+            DataClassification = CustomerContent;
+        }
         field(840; "Created by Reconciliation"; Boolean)
         {
             Caption = 'Created by Reconciliation';

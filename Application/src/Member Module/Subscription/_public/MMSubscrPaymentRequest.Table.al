@@ -117,6 +117,11 @@ table 6150921 "NPR MM Subscr. Payment Request"
             Caption = 'Payment PSP Reference';
             DataClassification = CustomerContent;
         }
+        field(3; "Merchant Account"; Text[80])
+        {
+            Caption = 'Merchant Account';
+            DataClassification = CustomerContent;
+        }
         field(200; Reversed; Boolean)
         {
             Caption = 'Reversed';

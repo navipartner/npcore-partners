@@ -969,6 +969,7 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
     var
         SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
         SubsPayReqUtils: Codeunit "NPR MM Subs Pay Request Utils";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         SubscrPaymentRequest.Init();
         SubscrPaymentRequest."Entry No." := 0;
@@ -982,6 +983,8 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         SubscrPaymentRequest."Currency Code" := EFTTransactionRequest."Currency Code";
         SubscrPaymentRequest.Description := SubscriptionRequest.Description;
         SubscrPaymentRequest."PSP Reference" := EFTTransactionRequest."PSP Reference";
+        if FeatureFlagsManagement.IsEnabled('subscriptionRefundToPaymentMerchant') then
+            SubscrPaymentRequest."Merchant Account" := EFTTransactionRequest."Merchant Account";
         SubscrPaymentRequest."Subscription Payment Reference" := CopyStr(SubsPayReqUtils.GenerateSubscriptionPaymentReference(), 1, MaxStrLen(SubscrPaymentRequest."Subscription Payment Reference"));
         SubscrPaymentRequest."External Membership No." := SubsPayReqUtils.GetExternalMembershipNo(Subscription."Membership Entry No.");
         SubscrPaymentRequest."PAN Last 4 Digits" := MemberPaymentMethod."PAN Last 4 Digits";

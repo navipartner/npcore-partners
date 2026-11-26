@@ -19,6 +19,10 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         _LinkCreationCount: Integer;
         _MockTokenCharge: Boolean;
         _TokenChargeCount: Integer;
+        _MockRefund: Boolean;
+        _RefundRequest: Text;
+        _MockLinkSuccess: Boolean;
+        _LibraryFeatureFlags: Codeunit "NPR Library - Feature Flags";
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
@@ -505,7 +509,9 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         ProcessRenewal: Codeunit "NPR MM Subscr. Renew: Process";
         Mock: Codeunit "NPR MM Subscription Audit Test";
         Assert: Codeunit Assert;
+        PreviousFlagValue: Boolean;
     begin
+        PreviousFlagValue := _LibraryFeatureFlags.EnableFeatureFlag('subscriptionRefundToPaymentMerchant');
         CreateScheduledTokenFixture(Subscription, Request, Payment, true);
         Payment.Status := Payment.Status::Error;
         Payment.Modify();
@@ -517,6 +523,7 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         Assert.IsTrue(ProcessRenewal.ProcessSubscriptionRequest(Request, false, true), 'Manual processing must retry the corrected gateway setup.');
         Payment.Get(Payment.RecordId);
         Assert.AreEqual(Payment.Status::Captured, Payment.Status, 'The manual retry must actually collect the token payment.');
+        Assert.AreEqual('PBL-TEST', Payment."Merchant Account", 'The charge must keep the merchant account that took it, so a later refund can use it.');
         Membership.Get(Subscription."Membership Entry No.");
         Assert.AreEqual(Membership."Auto-Renew"::YES_INTERNAL, Membership."Auto-Renew", 'Manual recovery must not disable auto renewal.');
         Notification.SetRange("Membership Entry No.", Membership."Entry No.");
@@ -525,6 +532,7 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         Mock.AssertCreationCalls(0, 1);
         Mock.CleanupGateway();
         UnbindSubscription(Mock);
+        _LibraryFeatureFlags.SetFeatureFlag('subscriptionRefundToPaymentMerchant', PreviousFlagValue);
     end;
 
     [Test]
@@ -1767,7 +1775,7 @@ codeunit 85171 "NPR MM Subscription Audit Test"
     procedure InitializeGateway()
     begin
         if _MockGateway.Code = '' then begin
-            _MockGateway.Code := 'PBL-TEST';
+            _MockGateway.Code := 'PBL-GW';
             _MockGateway.Environment := _MockGateway.Environment::Test;
             _MockGateway."Merchant Name" := 'PBL-TEST';
             _MockGateway.SetAPIKey('mock-key');
@@ -1810,6 +1818,11 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         Assert: Codeunit Assert;
     begin
         Handled := true;
+        if _MockRefund then begin
+            _RefundRequest := Request;
+            Response := '{"status":"received","pspReference":"MOCK-REFUND","paymentPspReference":"MOCK-PAYMENT"}';
+            exit;
+        end;
         if _MockTokenCharge and Request.Contains('storedPaymentMethodId') then begin
             _TokenChargeCount += 1;
             Response := '{"resultCode":"Authorised","pspReference":"MOCK-TOKEN"}';
@@ -1840,6 +1853,27 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         _MockTokenCharge := true;
     end;
 
+    procedure ConfigureRefund()
+    begin
+        _MockRefund := true;
+    end;
+
+    procedure ConfigureLinkCreationSuccess()
+    begin
+        _MockLinkSuccess := true;
+    end;
+
+    procedure AssertRefundMerchant(ExpectedMerchant: Text)
+    var
+        RefundJson: JsonObject;
+        MerchantToken: JsonToken;
+        Assert: Codeunit Assert;
+    begin
+        Assert.IsTrue(RefundJson.ReadFrom(_RefundRequest), 'The refund must be sent to the payment provider.');
+        Assert.IsTrue(RefundJson.Get('merchantAccount', MerchantToken), 'The refund must name a merchant account.');
+        Assert.AreEqual(ExpectedMerchant, MerchantToken.AsValue().AsText(), 'The refund must go to the merchant account that took the original payment.');
+    end;
+
     procedure AssertCreationCalls(ExpectedLinks: Integer; ExpectedCharges: Integer)
     var
         Assert: Codeunit Assert;
@@ -1851,6 +1885,13 @@ codeunit 85171 "NPR MM Subscription Audit Test"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Subscr.Pmt.: Adyen", 'OnBeforeSendPayByLinkRequest', '', false, false)]
     local procedure MockLinkCreation(var Response: Text; var StatusCode: Integer; var Success: Boolean; var Handled: Boolean)
     begin
+        if _MockLinkSuccess then begin
+            Response := '{"id":"PL-MOCK","url":"https://test.adyen.link/PL-MOCK"}';
+            StatusCode := 201;
+            Success := true;
+            Handled := true;
+            exit;
+        end;
         if not _MockLinkCreation then
             exit;
         _LinkCreationCount += 1;
@@ -3058,6 +3099,266 @@ codeunit 85171 "NPR MM Subscription Audit Test"
         SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
         SubscriptionRequest.SetRange(Type, SubscriptionRequest.Type::"Initial Sale");
         Assert.IsTrue(SubscriptionRequest.FindFirst(), 'Initial Sale subscription request should be created for NEW context.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure InitialSaleRefund_POSPaymentUsesPaymentTypeMerchant()
+    begin
+        // [SCENARIO] A refund of a POS Initial Sale with no saved merchant account uses the Merchant Account from the EFT Adyen payment type setup.
+        VerifyInitialSaleRefundMerchant('', 'POS-MERCHANT', 'POS-MERCHANT');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure InitialSaleRefund_BlankPaymentTypeMerchantKeepsGatewayMerchant()
+    begin
+        // [SCENARIO] A refund of a POS Initial Sale with no saved merchant account and a blank payment type setup uses the subscription gateway's merchant account.
+        VerifyInitialSaleRefundMerchant('', '', 'PBL-TEST');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure InitialSaleRefund_UsesMerchantSavedOnPayment()
+    begin
+        // [SCENARIO] A refund of a POS Initial Sale uses the merchant account saved on the payment, even when the payment type setup names another one.
+        VerifyInitialSaleRefundMerchant('SALE-MERCHANT', 'POS-MERCHANT', 'SALE-MERCHANT');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure InitialSaleRefund_WebSaleUsesWebGatewayMerchant()
+    var
+        Subscription: Record "NPR MM Subscription";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        PaymentGateway: Record "NPR Magento Payment Gateway";
+        PGAdyenSetup: Record "NPR PG Adyen Setup";
+        PaymentLine: Record "NPR Magento Payment Line";
+        TempEFTTransactionRequest: Record "NPR EFT Transaction Request" temporary;
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+        SetupCode: Code[10];
+        PreviousFlagValue: Boolean;
+    begin
+        // [SCENARIO] A refund of a web Initial Sale uses the Merchant Name of the Adyen payment gateway on the web order's payment line.
+
+        // [GIVEN] The feature flag is on and a subscription with a payment method exists
+        PreviousFlagValue := _LibraryFeatureFlags.EnableFeatureFlag('subscriptionRefundToPaymentMerchant');
+        CreateRefundableSubscription(Subscription, MemberPaymentMethod, SetupCode);
+
+        // [GIVEN] A web payment line on an Adyen payment gateway with Merchant Name WEB-MERCHANT
+        PaymentGateway.Code := SetupCode;
+        PaymentGateway."Integration Type" := PaymentGateway."Integration Type"::Adyen;
+        PaymentGateway.Insert();
+        PGAdyenSetup.Code := SetupCode;
+        PGAdyenSetup."Merchant Name" := 'WEB-MERCHANT';
+        PGAdyenSetup.Insert();
+        PaymentLine."Document Table No." := Database::"NPR Ecom Sales Header";
+        PaymentLine."Document No." := SetupCode;
+        PaymentLine."Line No." := 10000;
+        PaymentLine."Transaction ID" := SetupCode;
+        PaymentLine."Payment Gateway Code" := SetupCode;
+        PaymentLine.Amount := 157;
+        PaymentLine.Insert();
+
+        // [GIVEN] An Initial Sale created from that web payment, with no merchant account saved
+        TempEFTTransactionRequest."PSP Reference" := SetupCode;
+        TempEFTTransactionRequest."Result Amount" := 157;
+        SubscriptionMgtImpl.CreateInitialSaleSubscriptionRequest(Subscription, MembershipEntry, MemberPaymentMethod, TempEFTTransactionRequest, TempEFTTransactionRequest."Result Amount");
+
+        // [WHEN] The Initial Sale payment is refunded
+        // [THEN] The refund request goes out under WEB-MERCHANT
+        RefundInitialSaleAndAssertMerchant(Subscription, 'WEB-MERCHANT');
+        _LibraryFeatureFlags.SetFeatureFlag('subscriptionRefundToPaymentMerchant', PreviousFlagValue);
+    end;
+
+    local procedure VerifyInitialSaleRefundMerchant(SaleMerchant: Text[80]; PaymentTypeMerchant: Text[250]; ExpectedMerchant: Text)
+    var
+        Subscription: Record "NPR MM Subscription";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTAdyenPaymTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+        SetupCode: Code[10];
+        PreviousFlagValue: Boolean;
+    begin
+        // [GIVEN] The feature flag is on and a subscription with a payment method exists
+        PreviousFlagValue := _LibraryFeatureFlags.EnableFeatureFlag('subscriptionRefundToPaymentMerchant');
+        CreateRefundableSubscription(Subscription, MemberPaymentMethod, SetupCode);
+
+        // [GIVEN] A successful POS payment with SaleMerchant saved on it, on a payment type whose setup holds PaymentTypeMerchant
+        EFTTransactionRequest."PSP Reference" := SetupCode;
+        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::PAYMENT;
+        EFTTransactionRequest.Successful := true;
+        EFTTransactionRequest."Original POS Payment Type Code" := SetupCode;
+        EFTTransactionRequest."Result Amount" := 157;
+        EFTTransactionRequest."Merchant Account" := SaleMerchant;
+        EFTTransactionRequest.Insert();
+        EFTAdyenPaymTypeSetup."Payment Type POS" := SetupCode;
+        EFTAdyenPaymTypeSetup."Merchant Account" := PaymentTypeMerchant;
+        EFTAdyenPaymTypeSetup.Insert();
+
+        // [GIVEN] An Initial Sale created from that POS payment
+        SubscriptionMgtImpl.CreateInitialSaleSubscriptionRequest(Subscription, MembershipEntry, MemberPaymentMethod, EFTTransactionRequest, EFTTransactionRequest."Result Amount");
+
+        // [WHEN] The Initial Sale payment is refunded
+        // [THEN] The refund request goes out under ExpectedMerchant
+        RefundInitialSaleAndAssertMerchant(Subscription, ExpectedMerchant);
+        _LibraryFeatureFlags.SetFeatureFlag('subscriptionRefundToPaymentMerchant', PreviousFlagValue);
+    end;
+
+    local procedure CreateRefundableSubscription(var Subscription: Record "NPR MM Subscription"; var MemberPaymentMethod: Record "NPR MM Member Payment Method"; var SetupCode: Code[10])
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        RecurSetup: Record "NPR MM Recur. Paym. Setup";
+        PaymentMap: Record "NPR MM MembershipPmtMethodMap";
+    begin
+        SetupCode := CopyStr(DelChr(Format(CreateGuid()), '=', '{}-'), 1, MaxStrLen(SetupCode));
+        RecurSetup.Code := SetupCode;
+        RecurSetup.Insert();
+        MembershipSetup.Code := SetupCode;
+        MembershipSetup."Recurring Payment Code" := SetupCode;
+        MembershipSetup.Insert();
+        Membership."Membership Code" := SetupCode;
+        Membership."External Membership No." := SetupCode;
+        Membership.Insert();
+        CreateMemberPaymentMethod(MemberPaymentMethod);
+        CreateMembershipPmtMethodMap(PaymentMap, MemberPaymentMethod, Membership);
+        Subscription."Membership Entry No." := Membership."Entry No.";
+        Subscription."Membership Code" := SetupCode;
+        Subscription."Auto-Renew" := Subscription."Auto-Renew"::YES_INTERNAL;
+        Subscription.Insert();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ChargebackReversedRefund_UsesMerchantOfReversedPayment()
+    var
+        Subscription: Record "NPR MM Subscription";
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        RenewRequest: Record "NPR MM Subscr. Request";
+        RenewPayment: Record "NPR MM Subscr. Payment Request";
+        ReversalRequest: Record "NPR MM Subscr. Request";
+        ReversedChargeback: Record "NPR MM Subscr. Payment Request";
+        ReversalMgt: Codeunit "NPR MM Subscr. Reversal Mgt.";
+        SetupCode: Code[10];
+        PreviousFlagValue: Boolean;
+    begin
+        // [SCENARIO] A refund of a ChargebackReversed row uses the merchant account copied from the payment it reverses.
+
+        // [GIVEN] The feature flag is on and a captured renewal payment saved with merchant account CHARGE-MERCHANT
+        PreviousFlagValue := _LibraryFeatureFlags.EnableFeatureFlag('subscriptionRefundToPaymentMerchant');
+        CreateRefundableSubscription(Subscription, MemberPaymentMethod, SetupCode);
+        RenewRequest.Type := RenewRequest.Type::Renew;
+        RenewRequest.Status := RenewRequest.Status::Confirmed;
+        RenewRequest."Processing Status" := RenewRequest."Processing Status"::Success;
+        RenewRequest."Subscription Entry No." := Subscription."Entry No.";
+        RenewRequest."Membership Code" := SetupCode;
+        RenewRequest.Insert();
+        RenewPayment."Subscr. Request Entry No." := RenewRequest."Entry No.";
+        RenewPayment.Type := RenewPayment.Type::Payment;
+        RenewPayment.Status := RenewPayment.Status::Captured;
+        RenewPayment.PSP := RenewPayment.PSP::Adyen;
+        RenewPayment."PSP Reference" := SetupCode;
+        RenewPayment."Merchant Account" := 'CHARGE-MERCHANT';
+        RenewPayment.Amount := 157;
+        RenewPayment.Insert();
+
+        // [GIVEN] A captured ChargebackReversed row created from that payment
+        ReversalMgt.InitReversalRequest(RenewRequest, RenewPayment, Enum::"NPR MM Payment Request Type"::ChargebackReversed, ReversalRequest, ReversedChargeback);
+        ReversedChargeback.Status := ReversedChargeback.Status::Captured;
+        ReversedChargeback."PSP Reference" := RenewPayment."PSP Reference";
+        ReversalMgt.InsertReversalRequest(RenewRequest, RenewPayment, ReversalRequest, ReversedChargeback);
+
+        // [WHEN] The ChargebackReversed row is refunded
+        // [THEN] The refund request goes out under CHARGE-MERCHANT
+        RefundPaymentAndAssertMerchant(ReversalRequest, ReversedChargeback, 'CHARGE-MERCHANT');
+        _LibraryFeatureFlags.SetFeatureFlag('subscriptionRefundToPaymentMerchant', PreviousFlagValue);
+    end;
+
+    local procedure RefundInitialSaleAndAssertMerchant(Subscription: Record "NPR MM Subscription"; ExpectedMerchant: Text)
+    var
+        SaleRequest: Record "NPR MM Subscr. Request";
+        SalePayment: Record "NPR MM Subscr. Payment Request";
+    begin
+        SaleRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
+        SaleRequest.FindFirst();
+        SalePayment.SetRange("Subscr. Request Entry No.", SaleRequest."Entry No.");
+        SalePayment.FindFirst();
+        RefundPaymentAndAssertMerchant(SaleRequest, SalePayment, ExpectedMerchant);
+    end;
+
+    local procedure RefundPaymentAndAssertMerchant(var SubscriptionRequest: Record "NPR MM Subscr. Request"; var Payment: Record "NPR MM Subscr. Payment Request"; ExpectedMerchant: Text)
+    var
+        Refund: Record "NPR MM Subscr. Payment Request";
+        ReversalMgt: Codeunit "NPR MM Subscr. Reversal Mgt.";
+        SubscrPmtAdyen: Codeunit "NPR MM Subscr.Pmt.: Adyen";
+        Mock: Codeunit "NPR MM Subscription Audit Test";
+        Assert: Codeunit Assert;
+    begin
+        // [WHEN] A refund is requested for the payment and sent to the payment provider
+        ReversalMgt.RequestRefund(SubscriptionRequest, Payment, false, Refund);
+
+        Mock.InitializeGateway();
+        Mock.ConfigureRefund();
+        BindSubscription(Mock);
+        SubscrPmtAdyen.ProcessPaymentRequest(Refund, false, false);
+
+        // [THEN] The provider accepts the refund and the request names ExpectedMerchant as the merchant account
+        Refund.Get(Refund.RecordId);
+        Assert.AreEqual(Refund.Status::Authorized, Refund.Status, 'The payment provider must accept the refund.');
+        Mock.AssertRefundMerchant(ExpectedMerchant);
+        Mock.CleanupGateway();
+        UnbindSubscription(Mock);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure PayByLink_CreatedLinkKeepsGatewayMerchant()
+    var
+        Membership: Record "NPR MM Membership";
+        Subscription: Record "NPR MM Subscription";
+        Request: Record "NPR MM Subscr. Request";
+        LinkPayment: Record "NPR MM Subscr. Payment Request";
+        SubscrPmtAdyen: Codeunit "NPR MM Subscr.Pmt.: Adyen";
+        Mock: Codeunit "NPR MM Subscription Audit Test";
+        Assert: Codeunit Assert;
+        PreviousFlagValue: Boolean;
+    begin
+        // [SCENARIO] A created pay-by-link request saves the subscription gateway's merchant account.
+
+        // [GIVEN] The feature flag is on and a new pay-by-link payment request exists
+        PreviousFlagValue := _LibraryFeatureFlags.EnableFeatureFlag('subscriptionRefundToPaymentMerchant');
+        Membership."External Membership No." := CopyStr(DelChr(Format(CreateGuid()), '=', '{}-'), 1, MaxStrLen(Membership."External Membership No."));
+        Membership.Insert();
+        Subscription."Membership Entry No." := Membership."Entry No.";
+        Subscription.Insert();
+        Request.Type := Request.Type::Renew;
+        Request."Processing Status" := Request."Processing Status"::Pending;
+        Request."Subscription Entry No." := Subscription."Entry No.";
+        Request.Insert();
+        LinkPayment."Subscr. Request Entry No." := Request."Entry No.";
+        LinkPayment.Type := LinkPayment.Type::PayByLink;
+        LinkPayment.Status := LinkPayment.Status::New;
+        LinkPayment.PSP := LinkPayment.PSP::Adyen;
+        LinkPayment.Amount := 10;
+        LinkPayment.Insert();
+
+        // [WHEN] The request is processed and the payment provider creates the link
+        Mock.InitializeGateway();
+        Mock.ConfigureLinkCreationSuccess();
+        BindSubscription(Mock);
+        SubscrPmtAdyen.ProcessPaymentRequest(LinkPayment, false, false);
+
+        // [THEN] The request is Requested and holds the gateway's merchant account
+        LinkPayment.Get(LinkPayment.RecordId);
+        Assert.AreEqual(LinkPayment.Status::Requested, LinkPayment.Status, 'The payment link must be created.');
+        Assert.AreEqual('PBL-TEST', LinkPayment."Merchant Account", 'The link must keep the merchant account it was created on, so a later refund can use it.');
+        Mock.CleanupGateway();
+        UnbindSubscription(Mock);
+        _LibraryFeatureFlags.SetFeatureFlag('subscriptionRefundToPaymentMerchant', PreviousFlagValue);
     end;
 
     // === Helper Procedures ===

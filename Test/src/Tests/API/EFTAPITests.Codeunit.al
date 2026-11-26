@@ -12,6 +12,7 @@ codeunit 85169 "NPR EFT API Tests"
         _Item: Record Item;
         _CashPaymentMethod: Record "NPR POS Payment Method";
         _EFTPaymentMethodCode: Code[10];
+        _LibraryFeatureFlags: Codeunit "NPR Library - Feature Flags";
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
@@ -705,10 +706,12 @@ codeunit 85169 "NPR EFT API Tests"
         TransactionId: Text;
         TransactionGuid: Guid;
         DocumentNo: Text;
+        PreviousFlagValue: Boolean;
     begin
         // [SCENARIO] Full E2E: prepare -> start (mocked Adyen) -> poll (completed) -> complete sale -> verify POS Entry and EFT record
         Initialize();
         InitializeAdyenPaymentTypeSetup();
+        PreviousFlagValue := _LibraryFeatureFlags.EnableFeatureFlag('subscriptionRefundToPaymentMerchant');
 
         // [GIVEN] A sale with one item line (100.00)
         SaleId := CreateTestSale();
@@ -786,6 +789,10 @@ codeunit 85169 "NPR EFT API Tests"
         Assert.IsTrue(EFTTransactionRequest.Started <> 0DT, 'EFT Started timestamp should be set');
         Assert.IsTrue(EFTTransactionRequest."External Result Known", 'External Result Known should be true');
         Assert.IsTrue(EFTTransactionRequest.Successful, 'EFT Transaction should be marked Successful');
+
+        // [THEN] The merchant account from the terminal answer is saved on the payment
+        Assert.AreEqual('TestMerchantAccount', EFTTransactionRequest."Merchant Account", 'The payment must keep the merchant account that took it, so a later refund can use it');
+        _LibraryFeatureFlags.SetFeatureFlag('subscriptionRefundToPaymentMerchant', PreviousFlagValue);
     end;
 
     [Test]
@@ -1069,6 +1076,7 @@ codeunit 85169 "NPR EFT API Tests"
         ResponseJson.Append('"PaymentAcquirerData":{');
         ResponseJson.Append('"AcquirerID":"TestAcquirer",');
         ResponseJson.Append('"ApprovalCode":"123456",');
+        ResponseJson.Append('"MerchantID":"TestMerchantAccount",');
         ResponseJson.Append('"AcquirerPOIID":"TEST"');
         ResponseJson.Append('},');
         ResponseJson.Append('"AmountsResp":{');

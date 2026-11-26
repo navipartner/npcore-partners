@@ -109,6 +109,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         RecurPaymSetup: Record "NPR MM Recur. Paym. Setup";
         SubsPayReqLogEntry: Record "NPR MM Subs Pay Req Log Entry";
         SubsPayReqLogUtils: Codeunit "NPR MM Subs Pay Req Log Utils";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         StatusCode: Integer;
         Request: Text;
         Response: Text;
@@ -359,6 +360,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         end;
 
         ErrorMessage := '';
+        if FeatureFlagsManagement.IsEnabled('subscriptionRefundToPaymentMerchant') then
+            SubscrPaymentRequest."Merchant Account" := SubsAdyenPGSetup."Merchant Name";
         ProcessResponse(SubscrPaymentRequest,
                         SubsPayReqLogEntry,
                         Request,
@@ -564,7 +567,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         end;
 
         URL := URL + '/' + SubscrPmtOriginalRequest."PSP Reference" + '/refunds';
-        if not TryGetPmtRefundRequestJsonText(SubscrPaymentRequest, Request) then begin
+        if not TryGetPmtRefundRequestJsonText(SubscrPaymentRequest, SubscrPmtOriginalRequest, Request) then begin
             ErrorMessage := GetLastErrorText();
             ProcessResponse(SubscrPaymentRequest,
                             SubsPayReqLogEntry,
@@ -673,6 +676,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         RecurPaymSetup: Record "NPR MM Recur. Paym. Setup";
         SubsPayReqLogEntry: Record "NPR MM Subs Pay Req Log Entry";
         SubsPayReqLogUtils: Codeunit "NPR MM Subs Pay Req Log Utils";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         Request: Text;
         Response: Text;
         ErrorMessage: Text;
@@ -797,6 +801,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
             Clear(PayByLinkExpiresAt);
 
         ErrorMessage := '';
+        if FeatureFlagsManagement.IsEnabled('subscriptionRefundToPaymentMerchant') then
+            SubscrPaymentRequest."Merchant Account" := SubsAdyenPGSetup."Merchant Name";
         ProcessResponse(SubscrPaymentRequest,
                         SubsPayReqLogEntry,
                         Request,
@@ -1408,19 +1414,23 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
     end;
 
     [TryFunction]
-    local procedure TryGetPmtRefundRequestJsonText(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var RequestJsonText: Text)
+    local procedure TryGetPmtRefundRequestJsonText(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; SubscrPmtOriginalRequest: Record "NPR MM Subscr. Payment Request"; var RequestJsonText: Text)
     var
         Json: Codeunit "Json Text Reader/Writer";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         CurrencyCode: Code[10];
         Reference: Text;
-        MerchantName: Text[50];
+        MerchantName: Text;
     begin
         if SubscrPaymentRequest.PSP <> SubscrPaymentRequest.PSP::Adyen then
             exit;
 
         CurrencyCode := GetCurrencyCode(SubscrPaymentRequest);
         Reference := GetReference(SubscrPaymentRequest);
-        MerchantName := GetMerchantName();
+        if FeatureFlagsManagement.IsEnabled('subscriptionRefundToPaymentMerchant') then
+            MerchantName := GetRefundMerchantName(SubscrPmtOriginalRequest)
+        else
+            MerchantName := GetMerchantName();
         //root
         Json.WriteStartObject('');
 
@@ -1516,6 +1526,77 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
     begin
         TryGetAdyenPaymentGatewaySetup(SubsAdyenPGSetup);
         MerchantName := SubsAdyenPGSetup."Merchant Name";
+    end;
+
+    local procedure GetRefundMerchantName(SubscrPmtOriginalRequest: Record "NPR MM Subscr. Payment Request") MerchantName: Text
+    var
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+    begin
+        MerchantName := SubscrPmtOriginalRequest."Merchant Account";
+        if MerchantName <> '' then
+            exit;
+
+        SubscriptionRequest.SetLoadFields(Type);
+        if SubscriptionRequest.Get(SubscrPmtOriginalRequest."Subscr. Request Entry No.") then
+            if SubscriptionRequest.Type = SubscriptionRequest.Type::"Initial Sale" then begin
+                MerchantName := GetPOSPaymentMerchantAccount(SubscrPmtOriginalRequest."PSP Reference");
+                if MerchantName = '' then
+                    MerchantName := GetWebPaymentMerchantAccount(SubscrPmtOriginalRequest."PSP Reference");
+            end;
+
+        if MerchantName = '' then
+            MerchantName := GetMerchantName();
+    end;
+
+    local procedure GetPOSPaymentMerchantAccount(PSPReference: Code[16]): Text
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTAdyenPaymTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
+    begin
+        if PSPReference = '' then
+            exit('');
+
+        EFTTransactionRequest.SetRange("PSP Reference", PSPReference);
+        EFTTransactionRequest.SetRange("Processing Type", EFTTransactionRequest."Processing Type"::PAYMENT);
+        EFTTransactionRequest.SetRange(Successful, true);
+        EFTTransactionRequest.SetLoadFields("Original POS Payment Type Code");
+        if not EFTTransactionRequest.FindFirst() then
+            exit('');
+
+        EFTAdyenPaymTypeSetup.SetLoadFields("Merchant Account");
+        if not EFTAdyenPaymTypeSetup.Get(EFTTransactionRequest."Original POS Payment Type Code") then
+            exit('');
+
+        exit(EFTAdyenPaymTypeSetup."Merchant Account");
+    end;
+
+    local procedure GetWebPaymentMerchantAccount(PSPReference: Code[16]): Text
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        PaymentGateway: Record "NPR Magento Payment Gateway";
+        PGAdyenSetup: Record "NPR PG Adyen Setup";
+    begin
+        if PSPReference = '' then
+            exit('');
+
+        PaymentLine.SetCurrentKey("Transaction ID", Posted, "Date Captured");
+        PaymentLine.SetRange("Transaction ID", PSPReference);
+        PaymentLine.SetFilter("Payment Gateway Code", '<>%1', '');
+        PaymentLine.SetLoadFields("Payment Gateway Code");
+        if not PaymentLine.FindFirst() then
+            exit('');
+
+        PaymentGateway.SetLoadFields("Integration Type");
+        if not PaymentGateway.Get(PaymentLine."Payment Gateway Code") then
+            exit('');
+        if PaymentGateway."Integration Type" <> PaymentGateway."Integration Type"::Adyen then
+            exit('');
+
+        PGAdyenSetup.SetLoadFields("Merchant Name");
+        if not PGAdyenSetup.Get(PaymentLine."Payment Gateway Code") then
+            exit('');
+
+        exit(PGAdyenSetup."Merchant Name");
     end;
 
     local procedure GetHolderNameForTestEnv(SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup"; PaymentMethodEntryNo: Integer; var HolderName: Text[100])

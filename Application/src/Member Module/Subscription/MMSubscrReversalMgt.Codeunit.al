@@ -148,6 +148,7 @@ codeunit 6248187 "NPR MM Subscr. Reversal Mgt."
     var
         DescrLbl: Label 'Reversed %1', Comment = '%1 - original subscription or payment request description';
         SubsPayRequestUtils: Codeunit "NPR MM Subs Pay Request Utils";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         SubscrReversalRequest.Init();
         SubscrReversalRequest."Entry No." := 0;
@@ -184,6 +185,8 @@ codeunit 6248187 "NPR MM Subscr. Reversal Mgt."
         SubscrPmtReversalRequest."Payment Phone No." := SubscrPaymentRequest."Payment Phone No.";
         SubscrPmtReversalRequest."PAN Last 4 Digits" := SubscrPaymentRequest."PAN Last 4 Digits";
         SubscrPmtReversalRequest."Masked PAN" := SubscrPaymentRequest."Masked PAN";
+        if FeatureFlagsManagement.IsEnabled('subscriptionRefundToPaymentMerchant') then
+            SubscrPmtReversalRequest."Merchant Account" := SubscrPaymentRequest."Merchant Account";
     end;
 
     internal procedure InsertReversalRequest(var SubscriptionRequest: Record "NPR MM Subscr. Request"; var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var SubscrReversalRequest: Record "NPR MM Subscr. Request"; var SubscrPmtReversalRequest: Record "NPR MM Subscr. Payment Request")
