@@ -25,6 +25,15 @@ codeunit 6248217 "NPR Event Billing Client"
         CustDimErrorReasonTextTok: Label 'ReasonText', Locked = true;
         CustDimensionOperationTok: Label 'Operation', Locked = true;
         NumberOfHoursToCheckInvalidErr: Label 'Number of hours without processing must be greater than 0.';
+        _HttpClientHandler: Interface "Http Client Handler";
+        _HttpClientHandlerIsSet: Boolean;
+        _MoreEntriesToSend: Boolean;
+        _RequestFailureIsLogged: Boolean;
+
+    trigger OnRun()
+    begin
+        ForwardNextBatchToBillingDatabase();
+    end;
 
     #region === Register Event in BC Database (public) ===
     /// <summary>
@@ -125,16 +134,35 @@ codeunit 6248217 "NPR Event Billing Client"
     #region === Prepare to send Data to Billing DB ===
     /// <summary>
     /// Prepares and sends data to the billing database.
-    /// This function is called to process the billing queue entries and forward them to the billing database.
+    /// This function is called to process the billing queue entries and forward them to the billing database, batch by batch, until none are pending.
     /// It is supposed to be called via Job Queue.
     /// </summary>
     procedure ForwardDataToBillingDatabase()
+    var
+        RunUntil: DateTime;
+        FailedBatchesInARow: Integer;
+        LastErrorText: Text;
     begin
-        ForwardDataToBillingDatabaseInternal();
+        RunUntil := CurrentDateTime() + GetMaxRunDuration();
+        // Each batch runs as its own transaction: a batch that fails is rolled back alone and stays pending, the batches sent before it stay done.
+        Commit();
+        repeat
+            _RequestFailureIsLogged := false;
+            if Codeunit.Run(Codeunit::"NPR Event Billing Client") then
+                FailedBatchesInARow := 0
+            else begin
+                FailedBatchesInARow += 1;
+                LastErrorText := GetLastErrorText();
+                LogFailedBatch(FailedBatchesInARow);
+            end;
+        until ((FailedBatchesInARow = 0) and (not _MoreEntriesToSend)) or (FailedBatchesInARow >= GetMaxFailedBatchesInARow()) or (CurrentDateTime() >= RunUntil);
+
+        if (FailedBatchesInARow > 0) then
+            Error(LastErrorText);
     end;
 
     [CommitBehavior(CommitBehavior::Error)]
-    local procedure ForwardDataToBillingDatabaseInternal()
+    local procedure ForwardNextBatchToBillingDatabase()
     var
         BillingQueueEntry: Record "NPR Billing Queue Entry";
         BillingQueueEntryMod: Record "NPR Billing Queue Entry";
@@ -145,6 +173,7 @@ codeunit 6248217 "NPR Event Billing Client"
         SyncDT: DateTime;
     begin
         InitSessionVars();
+        _MoreEntriesToSend := false;
 
         // Let's find the entries to process:
         BillingQueueEntry.Reset();
@@ -163,7 +192,9 @@ codeunit 6248217 "NPR Event Billing Client"
         MaxEntryCount := GetMaxNumberOfEntriesToSend();
         SyncDT := CurrentDateTime();
 
-        BillingQueueEntry.FindSet(true);
+        // Another sender can take the entries between the check above and this locking read.
+        if (not BillingQueueEntry.FindSet(true)) then
+            exit;
         repeat
             BillingQueueEntry.TestField("Billing API URL", BillingApiUrl);
 
@@ -176,6 +207,7 @@ codeunit 6248217 "NPR Event Billing Client"
 
             EntryCounter += 1;
         until ((BillingQueueEntry.Next() = 0) or (EntryCounter >= MaxEntryCount));
+        _MoreEntriesToSend := EntryCounter >= MaxEntryCount;
 
         RequestJsonToken := JsonBuilder
             .EndArray()
@@ -218,7 +250,21 @@ codeunit 6248217 "NPR Event Billing Client"
     local procedure GetMaxNumberOfEntriesToSend(): BigInteger
     begin
         // 100 corresponds to max_batch_size of the Cloudflare Queue sendBatch() function.
+        // The billing API queues a request of up to 100 events with one sendBatch() call, so it takes all of them or none.
+        // It splits a larger request into several calls: if one of them fails the request fails, and sending it again duplicates the events of the other calls.
         exit(100);
+    end;
+
+    internal procedure GetMaxRunDuration(): Duration
+    begin
+        // Has to end well before the job timeout (15 minutes), which would stop the session in the middle of a batch.
+        exit(5 * 60 * 1000);
+    end;
+
+    local procedure GetMaxFailedBatchesInARow(): Integer
+    begin
+        // One failed batch is sent again at once. Several in a row mean the API is down: the run ends with the error and the job's own retry takes over.
+        exit(3);
     end;
     #endregion
 
@@ -280,8 +326,10 @@ codeunit 6248217 "NPR Event Billing Client"
 
         SentryRegisterBillingEventSpan.Finish();
 
-        if (not RetVal) then
+        if (not RetVal) then begin
+            _RequestFailureIsLogged := true;
             Error(ErrorMessage);
+        end;
 
         exit(RetVal);
     end;
@@ -296,7 +344,10 @@ codeunit 6248217 "NPR Event Billing Client"
         Content := Content.Create(ReqJsonToken);
         AuthSecret := GetAuthSecret();
 
-        RestClient.Initialize();
+        if _HttpClientHandlerIsSet then
+            RestClient.Initialize(_HttpClientHandler)
+        else
+            RestClient.Initialize();
         RestClient.SetDefaultRequestHeader(BillingQueueSharedKeyHeaderNameTok, AuthSecret);
         // Setting 5 seconds timeout for the request:
         RestClient.SetTimeOut(5000);
@@ -313,6 +364,19 @@ codeunit 6248217 "NPR Event Billing Client"
         end;
 
         exit(BillingApiToken);
+    end;
+
+    internal procedure SetHttpClientHandler(HttpClientHandler: Interface "Http Client Handler")
+    begin
+        _HttpClientHandler := HttpClientHandler;
+        _HttpClientHandlerIsSet := true;
+    end;
+
+    internal procedure ClearHttpClientHandler()
+    begin
+        _HttpClientHandlerIsSet := false;
+        // The key was read for the handler's requests, the next request has to read its own.
+        Clear(BillingApiToken);
     end;
     #endregion
 
@@ -437,6 +501,39 @@ codeunit 6248217 "NPR Event Billing Client"
         LogCustDims.Set('SessionVarsContext', 'FromGlobalVars');
 
         exit(LogCustDims);
+    end;
+
+    local procedure LogFailedBatch(FailedBatchesInARow: Integer)
+    var
+        Sentry: Codeunit "NPR Sentry";
+        SentryErrorHandling: Codeunit "NPR Sentry Error Handling";
+        LogCustDims: Dictionary of [Text, Text];
+        ErrorCode: Text;
+        ErrorText: Text;
+        ErrorCallStack: Text;
+    begin
+        // A failed request is logged where it fails. Any other failure would leave no trace when the batch goes through at the next try.
+        if (_RequestFailureIsLogged) then
+            exit;
+
+        ErrorCode := GetLastErrorCode();
+        Sentry.GetLastErrorInEnglish(ErrorText, ErrorCallStack);
+
+        LogCustDims := SessionVarsToCustDims();
+        LogCustDims.Set(CustDimensionOperationTok, 'ForwardBatchFailure');
+        LogCustDims.Set(CustDimErrorReasonCodeTok, ErrorCode);
+        LogCustDims.Set(CustDimErrorReasonTextTok, ErrorText);
+        LogCustDims.Set('ReasonCallStack', ErrorCallStack);
+        LogCustDims.Set('FailedBatchesInARow', Format(FailedBatchesInARow));
+
+        Session.LogMessage('NPR_API_NpBilling', 'Batch failed outside the HTTP request.', Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, LogCustDims);
+
+        if (not SentryErrorHandling.IsLastErrorAProgrammingBug()) then
+            exit;
+        // The session of the job has no Sentry transaction, and an error added outside of one is never sent.
+        Sentry.InitScopeAndTransaction('Billing Data Sender', 'bc.np-billing.forward-batch');
+        Sentry.AddError(ErrorText, ErrorCallStack);
+        Sentry.FinalizeScope();
     end;
     #endregion
 

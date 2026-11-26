@@ -31,7 +31,8 @@ codeunit 6060051 "NPR Billing Data Sender JQ"
             exit(true);
 
         HourDuration := NumberOfHoursWithoutProcessing * (1000 * 60 * 60);
-        DateTimeRangeToCheck := CurrentDateTime() - HourDuration;
+        // The job is planned again from the end of its run, so its starts are up to one run further apart than its interval.
+        DateTimeRangeToCheck := CurrentDateTime() - HourDuration - BillingClient.GetMaxRunDuration();
 
         JobQueueLogEntry.ReadIsolation := JobQueueLogEntry.ReadIsolation::ReadCommitted;
         JobQueueLogEntry.Reset();
