@@ -15,6 +15,12 @@ codeunit 85596 "NPR MM CF Signup Link Tests"
         _ShortCodeTok: Label 'AbCdEfGhIjKlMnOp', Locked = true;
         _ApiKeySecretNameTok: Label 'MM-CFSignUp-ApiKey', Locked = true;
         _ForeignUrlTok: Label 'https://attacker.example.com/s/AbCdEfGhIjKlMnOp', Locked = true;
+        _WelcomeSetupCodeTok: Label 'CFWELCOME', Locked = true;
+        _SetupTemplateTok: Label 'WELCOME-FROM-SETUP', Locked = true;
+        _LegacyEmailTemplateTok: Label 'LEGACYWLC', Locked = true;
+        _NPEmailTemplateTok: Label 'NPEMAIL-WELCOME-0001', Locked = true;
+        _UpgSignupTok: Label 'UPGSIGNUP', Locked = true;
+        _UpgOtherTok: Label 'UPGOTHER', Locked = true;
         _WorkerErrorTok: Label 'Tenant or company does not match the instance', Locked = true;
         _CapturedPath: Text;
         _ResponseStatusCode: Integer;
@@ -132,6 +138,121 @@ codeunit 85596 "NPR MM CF Signup Link Tests"
         _Assert.IsTrue(GetLastErrorText().Contains(_WorkerErrorTok), StrSubstNo('The error must carry the Worker error text. Got: %1', GetLastErrorText()));
     end;
 
+    [Test]
+    [HandlerFunctions('AnswerSignupRequest')]
+    procedure WelcomeEntryKeepsSetupTemplateWithoutNPEmailTemplate()
+    var
+        AzureRegistrationSetup: Record "NPR MM AzureMemberRegSetup";
+        MembershipNotification: Record "NPR MM Membership Notific.";
+        MemberNotificationEntry: Record "NPR MM Member Notific. Entry";
+        MemberNotification: Codeunit "NPR MM Member Notification";
+        NewEmailExperienceFeature: Codeunit "NPR NewEmailExpFeature";
+        MemberEntryNo: Integer;
+    begin
+        // [SCENARIO] With the new e-mail experience on and no NP e-mail template on the registration setup, the signup entry keeps the welcome notification's template
+        // [GIVEN] The new e-mail experience is on and the registration setup has only an old e-mail template
+        Initialize();
+        PrepareResponse(201, StrSubstNo('{"url":"%1","code":"%2"}', _WorkerBaseUrlTok + '/s/' + _ShortCodeTok, _ShortCodeTok));
+        NewEmailExperienceFeature.SetFeatureEnabled(true);
+        AzureRegistrationSetup.Get(_SetupCodeTok);
+        AzureRegistrationSetup.EmailTemplate := _LegacyEmailTemplateTok;
+        AzureRegistrationSetup.Modify();
+        // [GIVEN] A member signed up on a membership item that uses the registration setup
+        CreateSignupWelcomeNotification(MembershipNotification, MemberEntryNo);
+
+        // [WHEN] The welcome notification is handled
+        MemberNotification.HandleMembershipNotification(MembershipNotification);
+
+        // [THEN] The member's notification entry carries the welcome notification's template
+        MemberNotificationEntry.Get(MembershipNotification."Entry No.", MemberEntryNo);
+        _Assert.AreEqual(_SetupTemplateTok, MemberNotificationEntry."Template Filter Value", 'A blank NP E-mail Template must not replace the template of the welcome notification.');
+    end;
+
+    [Test]
+    [HandlerFunctions('AnswerSignupRequest')]
+    procedure WelcomeEntryUsesNPEmailTemplate()
+    var
+        AzureRegistrationSetup: Record "NPR MM AzureMemberRegSetup";
+        MembershipNotification: Record "NPR MM Membership Notific.";
+        MemberNotificationEntry: Record "NPR MM Member Notific. Entry";
+        MemberNotification: Codeunit "NPR MM Member Notification";
+        NewEmailExperienceFeature: Codeunit "NPR NewEmailExpFeature";
+        MemberEntryNo: Integer;
+    begin
+        // [SCENARIO] With the new e-mail experience on, the signup entry carries the NP e-mail template of the registration setup
+        // [GIVEN] The new e-mail experience is on and the registration setup has an old e-mail template and a 20-character NP e-mail template
+        Initialize();
+        PrepareResponse(201, StrSubstNo('{"url":"%1","code":"%2"}', _WorkerBaseUrlTok + '/s/' + _ShortCodeTok, _ShortCodeTok));
+        NewEmailExperienceFeature.SetFeatureEnabled(true);
+        AzureRegistrationSetup.Get(_SetupCodeTok);
+        AzureRegistrationSetup.EmailTemplate := _LegacyEmailTemplateTok;
+        AzureRegistrationSetup.NPEmailTemplate := _NPEmailTemplateTok;
+        AzureRegistrationSetup.Modify();
+        // [GIVEN] A member signed up on a membership item that uses the registration setup
+        CreateSignupWelcomeNotification(MembershipNotification, MemberEntryNo);
+
+        // [WHEN] The welcome notification is handled
+        MemberNotification.HandleMembershipNotification(MembershipNotification);
+
+        // [THEN] The member's notification entry carries the NP e-mail template
+        MemberNotificationEntry.Get(MembershipNotification."Entry No.", MemberEntryNo);
+        _Assert.AreEqual(_NPEmailTemplateTok, MemberNotificationEntry."Template Filter Value", 'With the new e-mail experience on, the signup entry must carry the NP E-mail Template of the registration setup.');
+    end;
+
+    [Test]
+    [HandlerFunctions('AnswerSignupRequest')]
+    procedure WelcomeEntryKeepsOldTemplateWhenWalletIsSentSeparately()
+    var
+        AzureRegistrationSetup: Record "NPR MM AzureMemberRegSetup";
+        MembershipNotification: Record "NPR MM Membership Notific.";
+        MemberNotificationEntry: Record "NPR MM Member Notific. Entry";
+        MemberNotification: Codeunit "NPR MM Member Notification";
+        NewEmailExperienceFeature: Codeunit "NPR NewEmailExpFeature";
+        MemberEntryNo: Integer;
+    begin
+        // [SCENARIO] When the wallet goes out in its own welcome e-mail and no NP e-mail template is set, the signup entry keeps the old template instead of repeating the welcome template
+        // [GIVEN] The new e-mail experience is on and the registration setup allows an anonymous wallet and has only an old e-mail template
+        Initialize();
+        PrepareResponse(201, StrSubstNo('{"url":"%1","code":"%2"}', _WorkerBaseUrlTok + '/s/' + _ShortCodeTok, _ShortCodeTok));
+        NewEmailExperienceFeature.SetFeatureEnabled(true);
+        AzureRegistrationSetup.Get(_SetupCodeTok);
+        AzureRegistrationSetup.EmailTemplate := _LegacyEmailTemplateTok;
+        AzureRegistrationSetup.AllowAnonymousWallet := true;
+        AzureRegistrationSetup.Modify();
+        // [GIVEN] A member signed up on a membership item that uses the registration setup, so the welcome notification is split into a signup and a wallet notification
+        CreateSignupWelcomeNotification(MembershipNotification, MemberEntryNo);
+
+        // [WHEN] The signup welcome notification is handled
+        MemberNotification.HandleMembershipNotification(MembershipNotification);
+
+        // [THEN] The signup entry carries the old e-mail template, as before this change
+        MemberNotificationEntry.Get(MembershipNotification."Entry No.", MemberEntryNo);
+        _Assert.AreEqual(_LegacyEmailTemplateTok, MemberNotificationEntry."Template Filter Value", 'With the wallet in its own e-mail, a blank NP E-mail Template must not make the signup e-mail repeat the welcome template.');
+    end;
+
+    [Test]
+    procedure UpgradeCopiesOnlyMemberNotificationNPEmailTemplates()
+    var
+        AzureRegistrationSetup: Record "NPR MM AzureMemberRegSetup";
+        UPGMMSignupNPEmail: Codeunit "NPR UPG MM Signup NP Email";
+    begin
+        // [SCENARIO] The upgrade copies the old e-mail template into the NP e-mail template only when it names an NP member notification template
+        // [GIVEN] One setup whose old template code is an NP member notification template, and one whose code is an NP template of another data provider
+        CreateNPEmailTemplate(_UpgSignupTok, "NPR DynTemplateDataProvider"::MEMBER_NOTIFICATION);
+        CreateNPEmailTemplate(_UpgOtherTok, "NPR DynTemplateDataProvider"::TICKET_NOTIFICATION);
+        CreateSetupWithOldEmailTemplate(_UpgSignupTok);
+        CreateSetupWithOldEmailTemplate(_UpgOtherTok);
+
+        // [WHEN] The upgrade step runs
+        UPGMMSignupNPEmail.CopySignupNPEmailTemplates();
+
+        // [THEN] Only the setup that points at a member notification template gets it as NP e-mail template
+        AzureRegistrationSetup.Get(_UpgSignupTok);
+        _Assert.AreEqual(_UpgSignupTok, AzureRegistrationSetup.NPEmailTemplate, 'An old template code that is also an NP member notification template must be copied.');
+        AzureRegistrationSetup.Get(_UpgOtherTok);
+        _Assert.AreEqual('', AzureRegistrationSetup.NPEmailTemplate, 'An old template code whose NP template has another data provider must not be copied.');
+    end;
+
     [HttpClientHandler]
     procedure AnswerSignupRequest(Request: TestHttpRequestMessage; var Response: TestHttpResponseMessage): Boolean
     begin
@@ -182,6 +303,79 @@ codeunit 85596 "NPR MM CF Signup Link Tests"
         MemberNotificationEntry.DataSubjectId := _DataSubjectIdTok;
         MemberNotificationEntry."First Name" := 'Anna';
         MemberNotificationEntry."Phone No." := '+4512345678';
+    end;
+
+    local procedure CreateSignupWelcomeNotification(var MembershipNotification: Record "NPR MM Membership Notific."; var MemberEntryNo: Integer)
+    var
+        MemberItem: Record Item;
+        MemberCommunity: Record "NPR MM Member Community";
+        Membership: Record "NPR MM Membership";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        NotificationSetup: Record "NPR MM Member Notific. Setup";
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        MemberLibrary: Codeunit "NPR Library - Member Module";
+        MemberApiLibrary: Codeunit "NPR Library - Member XML API";
+        LibraryInventory: Codeunit "NPR Library - Inventory";
+        MembershipCode: Code[20];
+        LoyaltyProgramCode: Code[20];
+        MembershipEntryNo: Integer;
+        ApiStatus: Boolean;
+        ResponseMessage: Text;
+    begin
+        MemberLibrary.Initialize();
+        LibraryInventory.CreateItem(MemberItem);
+        MembershipCode := MemberLibrary.GenerateCode20();
+        MemberCommunity.Get(MemberLibrary.SetupCommunity_Simple());
+        MemberLibrary.SetupMembership_Simple(MemberCommunity.Code, MembershipCode, LoyaltyProgramCode, 'Signup welcome');
+        MemberLibrary.SetupSimpleMembershipSalesItem(MemberItem."No.", MembershipCode);
+        MemberLibrary.SetupWelcomeNotification(_WelcomeSetupCodeTok, MemberCommunity.Code, MembershipCode);
+
+        NotificationSetup.Get(_WelcomeSetupCodeTok);
+        NotificationSetup."Template Filter Value" := _SetupTemplateTok;
+        NotificationSetup.Modify();
+
+        MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberItem."No.");
+        MembershipSalesSetup.AzureMemberRegSetupCode := _SetupCodeTok;
+        MembershipSalesSetup.Modify();
+
+        ApiStatus := MemberApiLibrary.CreateMembership(MemberItem."No.", MembershipEntryNo, ResponseMessage);
+        _Assert.IsTrue(ApiStatus, ResponseMessage);
+        Membership.Get(MembershipEntryNo);
+        MemberLibrary.SetRandomMemberInfoData(MemberInfoCapture);
+        ApiStatus := MemberApiLibrary.AddMembershipMember(Membership, MemberInfoCapture, MemberEntryNo, ResponseMessage);
+        _Assert.IsTrue(ApiStatus, ResponseMessage);
+
+        MembershipNotification.SetRange("Membership Entry No.", MembershipEntryNo);
+        MembershipNotification.SetRange("Member Entry No.", MemberEntryNo);
+        MembershipNotification.SetRange("Notification Trigger", MembershipNotification."Notification Trigger"::WELCOME);
+        MembershipNotification.SetRange(AzureRegistrationSetupCode, _SetupCodeTok);
+        MembershipNotification.FindFirst();
+    end;
+
+    local procedure CreateNPEmailTemplate(TemplateId: Code[20]; DataProvider: Enum "NPR DynTemplateDataProvider")
+    var
+        NPEmailTemplate: Record "NPR NPEmailTemplate";
+    begin
+        if (NPEmailTemplate.Get(TemplateId)) then
+            NPEmailTemplate.Delete();
+
+        NPEmailTemplate.Init();
+        NPEmailTemplate.TemplateId := TemplateId;
+        NPEmailTemplate.DataProvider := DataProvider;
+        NPEmailTemplate.Insert();
+    end;
+
+    local procedure CreateSetupWithOldEmailTemplate(SetupCode: Code[10])
+    var
+        AzureRegistrationSetup: Record "NPR MM AzureMemberRegSetup";
+    begin
+        if (AzureRegistrationSetup.Get(SetupCode)) then
+            AzureRegistrationSetup.Delete();
+
+        AzureRegistrationSetup.Init();
+        AzureRegistrationSetup.AzureRegistrationSetupCode := SetupCode;
+        AzureRegistrationSetup.EmailTemplate := SetupCode;
+        AzureRegistrationSetup.Insert();
     end;
 
     local procedure GetText(Json: JsonObject; Path: Text): Text

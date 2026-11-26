@@ -90,6 +90,13 @@ page 6151109 "NPR MM AzureMemberRegSetup"
                 {
                     ApplicationArea = NPRMembershipAdvanced;
                     ToolTip = 'Specifies the E-Mail Template Code to be used with delegated member registration.';
+                    Visible = not _NewEmailExperience;
+                }
+                field(NPEmailTemplate; Rec.NPEmailTemplate)
+                {
+                    ApplicationArea = NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the NP Email template used for the signup welcome e-mail. If it is blank, the e-mail uses the template of the welcome notification. When Allow Anonymous Wallet is on, the signup e-mail needs this field, because the wallet e-mail already uses the welcome template.';
+                    Visible = _NewEmailExperience;
                 }
                 field(SMSTemplate; Rec.SMSTemplate)
                 {
@@ -276,6 +283,13 @@ page 6151109 "NPR MM AzureMemberRegSetup"
 
     }
 
+    trigger OnOpenPage()
+    var
+        NewEmailExperienceFeature: Codeunit "NPR NewEmailExpFeature";
+    begin
+        _NewEmailExperience := NewEmailExperienceFeature.IsFeatureEnabled();
+    end;
+
     trigger OnAfterGetCurrRecord()
     begin
         SetProviderVisibility();
@@ -290,4 +304,5 @@ page 6151109 "NPR MM AzureMemberRegSetup"
     var
         _IsAzureProvider: Boolean;
         _IsCloudflareProvider: Boolean;
+        _NewEmailExperience: Boolean;
 }

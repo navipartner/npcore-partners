@@ -377,6 +377,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG NpEc Store Loc. Code", 'CopyLocationCodeToCorrectLengthField'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG TM Notif Address", 'LowercaseEmailNotifAddress'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Member Chg Log GDPR"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG MM Signup NP Email"));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -1416,6 +1417,8 @@
                 end;
             Codeunit::"NPR UPG Member Chg Log GDPR":
                 exit('NPR-MemberChangeLog-GDPR-Cleanup-20260723');
+            Codeunit::"NPR UPG MM Signup NP Email":
+                exit('NPR-MM-SignupNPEmailTemplate-20261125');
         end;
     end;
 }

@@ -314,6 +314,7 @@
         AzureRegistrationSetup: Record "NPR MM AzureMemberRegSetup";
         AzureLog: Record "NPR MM AzureMemberUpdateLog";
         AzureMemberRegistration: Codeunit "NPR MM AzureMemberRegistration";
+        NewEmailExperienceFeature: Codeunit "NPR NewEmailExpFeature";
         EMailLbl: Label '%1?email=%2', Locked = true;
         RenewToItemNo: Code[20];
         AlterationSystemId: Guid;
@@ -482,7 +483,15 @@
                 MemberNotificationEntry.DataSubjectId := MembershipRole."GDPR Data Subject Id";
                 MemberNotificationEntry.AzureRegistrationSetupCode := MembershipNotification.AzureRegistrationSetupCode;
 
-                MemberNotificationEntry."Template Filter Value" := AzureRegistrationSetup.EmailTemplate;
+                if ((MemberNotificationEntry."Notification Engine" = MemberNotificationEntry."Notification Engine"::NATIVE) and
+                    (NewEmailExperienceFeature.IsFeatureEnabled())) then begin
+                    if (AzureRegistrationSetup.NPEmailTemplate <> '') then
+                        MemberNotificationEntry."Template Filter Value" := AzureRegistrationSetup.NPEmailTemplate
+                    else
+                        if ((AzureRegistrationSetup.AllowAnonymousWallet) and (NotificationSetup."Include NP Pass")) then
+                            MemberNotificationEntry."Template Filter Value" := AzureRegistrationSetup.EmailTemplate;
+                end else
+                    MemberNotificationEntry."Template Filter Value" := AzureRegistrationSetup.EmailTemplate;
 
                 if (AzureRegistrationSetup.Provider = AzureRegistrationSetup.Provider::Azure) then
                     MemberNotificationEntry.ClientSignUpUrl := CopyStr(

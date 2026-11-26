@@ -71,6 +71,13 @@ table 6060006 "NPR MM AzureMemberRegSetup"
             TableRelation = "NPR E-mail Template Header";
         }
 
+        field(1; NPEmailTemplate; Code[20])
+        {
+            Caption = 'NP E-mail Template';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPEmailTemplate".TemplateId where(DataProvider = const(MEMBER_NOTIFICATION));
+        }
+
         field(60; QueueName; Text[64])
         {
             Caption = 'Partition Key';
