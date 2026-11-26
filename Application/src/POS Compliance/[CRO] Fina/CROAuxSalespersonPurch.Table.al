@@ -51,9 +51,12 @@ table 6060038 "NPR CRO Aux Salesperson/Purch."
 
     local procedure CheckOIBValidity()
     var
-        SalespersonOIBLengthErr: Label 'Salesperson OIB must consist of 11 digits!';
+        CROAuditMgt: Codeunit "NPR CRO Audit Mgt.";
+        InvalidOIBErr: Label '%1 %2 is not a valid OIB. An OIB has 11 digits, and the last one must be its check digit.', Comment = '%1 = Salesperson OIB field caption, %2 = Salesperson OIB';
     begin
-        if (StrLen(Format("NPR CRO Salesperson OIB")) <> 11) and not ("NPR CRO Salesperson OIB" = 0) then
-            Error(SalespersonOIBLengthErr);
+        if "NPR CRO Salesperson OIB" = 0 then
+            exit;
+        if not CROAuditMgt.IsValidOIB("NPR CRO Salesperson OIB") then
+            Error(InvalidOIBErr, FieldCaption("NPR CRO Salesperson OIB"), CROAuditMgt.FormatOIB("NPR CRO Salesperson OIB"));
     end;
 }

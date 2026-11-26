@@ -127,13 +127,8 @@ page 6151213 "NPR CRO POS Aud. Log Aux. Info"
                 trigger OnAction()
                 var
                     CROAuditMgt: Codeunit "NPR CRO Audit Mgt.";
-                    CROTaxCommunicationMgt: Codeunit "NPR CRO Tax Communication Mgt.";
-                    BillAlreadyFiscalizedErr: Label 'You cannot fiscalize this receipt. It has already been fiscalized.';
                 begin
-                    if Rec."JIR Code" <> '' then
-                        Error(BillAlreadyFiscalizedErr);
-                    CROAuditMgt.CalculateZKI(Rec);
-                    CROTaxCommunicationMgt.CreateNormalSale(Rec, true);
+                    CROAuditMgt.FiscalizeSubsequently(Rec);
                 end;
             }
 

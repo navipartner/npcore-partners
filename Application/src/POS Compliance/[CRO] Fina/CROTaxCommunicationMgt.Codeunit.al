@@ -8,6 +8,11 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
 
     internal procedure CreateNormalSale(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; Subsequent: Boolean)
     begin
+        if not CROAuditMgt.EnsureValidCashierID(CROPOSAuditLogAuxInfo) then begin
+            CROAuditMgt.ReportBillNotSentForInvalidCashierID(CROPOSAuditLogAuxInfo);
+            exit;
+        end;
+
         case CROPOSAuditLogAuxInfo."Audit Entry Type" of
             "NPR CRO Audit Entry Type"::"POS Entry":
                 CreateAndFiscalizePOSSale(CROPOSAuditLogAuxInfo, Subsequent);
@@ -222,7 +227,7 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
 
     local procedure AddFooterSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; Subsequent: Boolean; var Content: XmlElement)
     begin
-        Content.Add(CreateXmlElement('OibOper', Format(CROPOSAuditLogAuxInfo."Cashier ID")));
+        Content.Add(CreateXmlElement('OibOper', CROAuditMgt.FormatOIB(CROPOSAuditLogAuxInfo."Cashier ID")));
         Content.Add(CreateXmlElement('ZastKod', CROPOSAuditLogAuxInfo."ZKI Code"));
 
         if Subsequent then

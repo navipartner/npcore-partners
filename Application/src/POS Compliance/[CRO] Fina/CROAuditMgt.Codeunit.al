@@ -439,6 +439,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         SalespersonPurchaser.Get(POSEntry."Salesperson Code");
         CROAuxSalespPurch.ReadCROAuxSalespersonFields(SalespersonPurchaser);
         CROAuxSalespPurch.TestField("NPR CRO Salesperson OIB");
+        CheckSalespersonOIB(SalespersonPurchaser, CROAuxSalespPurch);
         CROPOSAuditLogAuxInfo."Cashier ID" := CROAuxSalespPurch."NPR CRO Salesperson OIB";
         CROPOSAuditLogAuxInfo."Salesperson Code" := POSEntry."Salesperson Code";
 
@@ -486,9 +487,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         Evaluate(CROPOSAuditLogAuxInfo."Log Timestamp", Format(Time, 0, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>'));
         CROPOSAuditLogAuxInfo."Total Amount" := SalesInvoiceHeader."Amount Including VAT";
 
-        SalespersonCode := GetPOSSalespersonForSalesInvoice(SalesInvoiceHeader);
-        if SalespersonCode = '' then
-            SalespersonCode := SalesInvoiceHeader."Salesperson Code";
+        SalespersonCode := GetSalespersonForSalesInvoice(SalesInvoiceHeader);
 
         SalespersonPurchaser.Get(SalespersonCode);
         CROAuxSalespPurch.ReadCROAuxSalespersonFields(SalespersonPurchaser);
@@ -535,9 +534,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         Evaluate(CROPOSAuditLogAuxInfo."Log Timestamp", Format(Time, 0, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>'));
         CROPOSAuditLogAuxInfo."Total Amount" := SalesCrMemoHeader."Amount Including VAT";
 
-        SalespersonCode := GetPOSSalespersonForSalesCrMemo(SalesCrMemoHeader);
-        if SalespersonCode = '' then
-            SalespersonCode := SalesCrMemoHeader."Salesperson Code";
+        SalespersonCode := GetSalespersonForSalesCrMemo(SalesCrMemoHeader);
 
         SalespersonPurchaser.Get(SalespersonCode);
         CROAuxSalespPurch.ReadCROAuxSalespersonFields(SalespersonPurchaser);
@@ -556,36 +553,51 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         exit(true);
     end;
 
-    local procedure GetPOSSalespersonForSalesInvoice(SalesInvoiceHeader: Record "Sales Invoice Header"): Code[20]
+    local procedure GetSalespersonForSalesInvoice(SalesInvoiceHeader: Record "Sales Invoice Header"): Code[20]
     var
-        POSEntry: Record "NPR POS Entry";
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+        SalespersonCode: Code[20];
     begin
-        if SalesInvoiceHeader."Order No." = '' then
-            exit('');
-
-        POSEntrySalesDocLink.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::ORDER);
-        POSEntrySalesDocLink.SetRange("Sales Document No", SalesInvoiceHeader."Order No.");
-        if not POSEntrySalesDocLink.FindFirst() then
-            exit('');
-
-        POSEntry.SetLoadFields("Salesperson Code");
-        if not POSEntry.Get(POSEntrySalesDocLink."POS Entry No.") then
-            exit('');
-
-        exit(POSEntry."Salesperson Code");
+        SalespersonCode := GetPOSSalesperson(POSEntrySalesDocLink."Sales Document Type"::ORDER, SalesInvoiceHeader."Order No.");
+        if SalespersonCode = '' then
+            SalespersonCode := SalesInvoiceHeader."Salesperson Code";
+        exit(SalespersonCode);
     end;
 
-    local procedure GetPOSSalespersonForSalesCrMemo(SalesCrMemoHeader: Record "Sales Cr.Memo Header"): Code[20]
+    local procedure GetSalespersonForSalesCrMemo(SalesCrMemoHeader: Record "Sales Cr.Memo Header"): Code[20]
+    var
+        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+        SalespersonCode: Code[20];
+    begin
+        SalespersonCode := GetPOSSalesperson(POSEntrySalesDocLink."Sales Document Type"::RETURN_ORDER, SalesCrMemoHeader."Return Order No.");
+        if SalespersonCode = '' then
+            SalespersonCode := SalesCrMemoHeader."Salesperson Code";
+        exit(SalespersonCode);
+    end;
+
+    local procedure GetPOSSalespersonForSalesHeader(SalesHeader: Record "Sales Header"): Code[20]
+    var
+        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+    begin
+        case SalesHeader."Document Type" of
+            SalesHeader."Document Type"::Order:
+                exit(GetPOSSalesperson(POSEntrySalesDocLink."Sales Document Type"::ORDER, SalesHeader."No."));
+            SalesHeader."Document Type"::"Return Order":
+                exit(GetPOSSalesperson(POSEntrySalesDocLink."Sales Document Type"::RETURN_ORDER, SalesHeader."No."));
+        end;
+        exit('');
+    end;
+
+    local procedure GetPOSSalesperson(SalesDocumentType: Enum "NPR POS Sales Document Type"; SalesDocumentNo: Code[20]): Code[20]
     var
         POSEntry: Record "NPR POS Entry";
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
     begin
-        if SalesCrMemoHeader."Return Order No." = '' then
+        if SalesDocumentNo = '' then
             exit('');
 
-        POSEntrySalesDocLink.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::RETURN_ORDER);
-        POSEntrySalesDocLink.SetRange("Sales Document No", SalesCrMemoHeader."Return Order No.");
+        POSEntrySalesDocLink.SetRange("Sales Document Type", SalesDocumentType);
+        POSEntrySalesDocLink.SetRange("Sales Document No", SalesDocumentNo);
         if not POSEntrySalesDocLink.FindFirst() then
             exit('');
 
@@ -615,6 +627,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CROAuxSalespPurch.ReadCROAuxSalespersonFields(SalespersonPurchaser);
         if CROAuxSalespPurch."NPR CRO Salesperson OIB" = 0 then
             Error(MissingOIBErr);
+        CheckSalespersonOIB(SalespersonPurchaser, CROAuxSalespPurch);
     end;
 
     local procedure SetPaymentMethod(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; POSEntryNo: Integer)
@@ -825,6 +838,18 @@ codeunit 6151547 "NPR CRO Audit Mgt."
             CROFiscalThermalPrint.PrintReceipt(CROPOSAuditLogAuxInfo);
     end;
 
+    internal procedure FiscalizeSubsequently(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
+    var
+        CROTaxCommunicationMgt: Codeunit "NPR CRO Tax Communication Mgt.";
+        BillAlreadyFiscalizedErr: Label 'You cannot fiscalize this receipt. It has already been fiscalized.';
+    begin
+        if CROPOSAuditLogAuxInfo."JIR Code" <> '' then
+            Error(BillAlreadyFiscalizedErr);
+        CheckCashierID(CROPOSAuditLogAuxInfo);
+        CalculateZKI(CROPOSAuditLogAuxInfo);
+        CROTaxCommunicationMgt.CreateNormalSale(CROPOSAuditLogAuxInfo, true);
+    end;
+
     #endregion
 
     #region CRO Fiscal - Procedures/Helper Functions
@@ -885,6 +910,8 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CROPaymentMethodMapping: Record "NPR CRO Payment Method Mapping";
         POSUnit: Record "NPR POS Unit";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
+        SalespersonCode: Code[20];
+        InvoicePosting: Boolean;
         NotCROAuditProfileErr: Label 'CRO Audit Profile is not selected on POS Unit No.: %1', Comment = '%1 - POS Unit No.';
         NoSetupReadPermissionErr: Label 'You cannot post this document because it must be fiscalized and you do not have permission to read %1.', Comment = '%1 - CRO Fiscalization Setup table caption';
     begin
@@ -905,14 +932,152 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         SalesHeader.TestField("Payment Method Code");
         SalesHeader.TestField("Salesperson Code");
         CROPaymentMethodMapping.Get(SalesHeader."Payment Method Code");
-        SalespersonPurchaser.Get(SalesHeader."Salesperson Code");
+        InvoicePosting := SalesHeader.Invoice or (SalesHeader."Document Type" in [SalesHeader."Document Type"::Invoice, SalesHeader."Document Type"::"Credit Memo"]);
+        if InvoicePosting then
+            SalespersonCode := GetPOSSalespersonForSalesHeader(SalesHeader);
+        if SalespersonCode = '' then
+            SalespersonCode := SalesHeader."Salesperson Code";
+        SalespersonPurchaser.Get(SalespersonCode);
         CROAuxSalespPurch.ReadCROAuxSalespersonFields(SalespersonPurchaser);
         CROAuxSalespPurch.TestField("NPR CRO Salesperson OIB");
+        if InvoicePosting then
+            CheckSalespersonOIB(SalespersonPurchaser, CROAuxSalespPurch);
     end;
 
     internal procedure FormatDecimal(DecimalValue: Decimal): Text
     begin
         exit(Format(DecimalValue, 0, '<Precision,2:2><Standard Format,2>'));
+    end;
+
+    internal procedure FormatOIB(OIB: BigInteger): Text
+    var
+        OIBText: Text;
+    begin
+        OIBText := Format(OIB, 0, 9);
+        if (OIB > 0) and (StrLen(OIBText) < 11) then
+            OIBText := PadStr('', 11 - StrLen(OIBText), '0') + OIBText;
+        exit(OIBText);
+    end;
+
+    internal procedure IsValidOIB(OIB: BigInteger): Boolean
+    var
+        OIBText: Text;
+        Digit: Integer;
+        Remainder: Integer;
+        i: Integer;
+    begin
+        if OIB <= 0 then
+            exit(false);
+        OIBText := FormatOIB(OIB);
+        if StrLen(OIBText) <> 11 then
+            exit(false);
+
+        Remainder := 10;
+        for i := 1 to 10 do begin
+            Evaluate(Digit, CopyStr(OIBText, i, 1));
+            Remainder := (Remainder + Digit) mod 10;
+            if Remainder = 0 then
+                Remainder := 10;
+            Remainder := (Remainder * 2) mod 11;
+        end;
+        Evaluate(Digit, CopyStr(OIBText, 11, 1));
+        exit((11 - Remainder) mod 10 = Digit);
+    end;
+
+    internal procedure EnsureValidCashierID(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"): Boolean
+    var
+        CROAuxSalespPurch: Record "NPR CRO Aux Salesperson/Purch.";
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
+    begin
+        if IsValidOIB(CROPOSAuditLogAuxInfo."Cashier ID") then
+            exit(true);
+
+        if not FindBillSalesperson(CROPOSAuditLogAuxInfo, SalespersonPurchaser) then
+            exit(false);
+        CROAuxSalespPurch.ReadCROAuxSalespersonFields(SalespersonPurchaser);
+        if not IsValidOIB(CROAuxSalespPurch."NPR CRO Salesperson OIB") then
+            exit(false);
+
+        CROPOSAuditLogAuxInfo."Cashier ID" := CROAuxSalespPurch."NPR CRO Salesperson OIB";
+        CROPOSAuditLogAuxInfo."Salesperson Code" := SalespersonPurchaser.Code;
+        CROPOSAuditLogAuxInfo.Modify();
+        exit(true);
+    end;
+
+    local procedure FindBillSalesperson(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; var SalespersonPurchaser: Record "Salesperson/Purchaser"): Boolean
+    var
+        SalespersonCode: Code[20];
+    begin
+        SalespersonCode := CROPOSAuditLogAuxInfo."Salesperson Code";
+        if SalespersonCode = '' then
+            SalespersonCode := GetSourceDocumentSalesperson(CROPOSAuditLogAuxInfo);
+        if SalespersonCode = '' then
+            exit(false);
+        SalespersonPurchaser.SetLoadFields(Code);
+        exit(SalespersonPurchaser.Get(SalespersonCode));
+    end;
+
+    local procedure GetSourceDocumentSalesperson(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"): Code[20]
+    var
+        POSEntry: Record "NPR POS Entry";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+    begin
+        case CROPOSAuditLogAuxInfo."Audit Entry Type" of
+            CROPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry":
+                begin
+                    POSEntry.SetLoadFields("Salesperson Code");
+                    if POSEntry.Get(CROPOSAuditLogAuxInfo."POS Entry No.") then
+                        exit(POSEntry."Salesperson Code");
+                end;
+            CROPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Invoice":
+                if SalesInvoiceHeader.Get(CROPOSAuditLogAuxInfo."Source Document No.") then
+                    exit(GetSalespersonForSalesInvoice(SalesInvoiceHeader));
+            CROPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Credit Memo":
+                if SalesCrMemoHeader.Get(CROPOSAuditLogAuxInfo."Source Document No.") then
+                    exit(GetSalespersonForSalesCrMemo(SalesCrMemoHeader));
+        end;
+        exit('');
+    end;
+
+    local procedure CheckCashierID(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
+    var
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
+        InvalidCashierIDErr: Label '%1 %2 on %3 %4 is not a valid OIB, so the tax authority would reject the bill. Correct the OIB of %5 %6 and fiscalize the bill again.', Comment = '%1 = Cashier ID field caption, %2 = Cashier ID, %3 = CRO POS Audit Log table caption, %4 = Audit Entry No., %5 = Salesperson/Purchaser table caption, %6 = Salesperson Code';
+        NoSalespersonForCashierIDErr: Label '%1 %2 on %3 %4 is not a valid OIB, so the tax authority would reject the bill, and the bill has no %5 whose OIB could replace it.', Comment = '%1 = Cashier ID field caption, %2 = Cashier ID, %3 = CRO POS Audit Log table caption, %4 = Audit Entry No., %5 = Salesperson/Purchaser table caption';
+    begin
+        if EnsureValidCashierID(CROPOSAuditLogAuxInfo) then
+            exit;
+        if not FindBillSalesperson(CROPOSAuditLogAuxInfo, SalespersonPurchaser) then
+            Error(NoSalespersonForCashierIDErr, CROPOSAuditLogAuxInfo.FieldCaption("Cashier ID"), FormatOIB(CROPOSAuditLogAuxInfo."Cashier ID"), CROPOSAuditLogAuxInfo.TableCaption(), CROPOSAuditLogAuxInfo."Audit Entry No.", SalespersonPurchaser.TableCaption());
+        Error(InvalidCashierIDErr, CROPOSAuditLogAuxInfo.FieldCaption("Cashier ID"), FormatOIB(CROPOSAuditLogAuxInfo."Cashier ID"), CROPOSAuditLogAuxInfo.TableCaption(), CROPOSAuditLogAuxInfo."Audit Entry No.", SalespersonPurchaser.TableCaption(), SalespersonPurchaser.Code);
+    end;
+
+    internal procedure ReportBillNotSentForInvalidCashierID(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
+    var
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
+        Sentry: Codeunit "NPR Sentry";
+        OwnsTransaction: Boolean;
+        BillNotSentMsg: Label '%1 %2 on %3 %4 is not a valid OIB, so the bill was not sent to the tax authority. Correct the OIB of %5 %6 and fiscalize the bill again.', Comment = '%1 = Cashier ID field caption, %2 = Cashier ID, %3 = CRO POS Audit Log table caption, %4 = Audit Entry No., %5 = Salesperson/Purchaser table caption, %6 = Salesperson Code';
+        BillNotSentBugLbl: Label 'CRO audit entry %1 (%2, source document %3, POS entry %4, salesperson %5) was created with an operator OIB that is not valid, so it was not fiscalized. The checks at sale end and before posting should have stopped it. This is a programming bug.', Locked = true;
+        TransactionNameTok: Label 'CRO Fiscalization: audit entry %1', Locked = true;
+    begin
+        OwnsTransaction := not Sentry.HasActiveTransaction();
+        if OwnsTransaction then
+            Sentry.InitScopeAndTransaction(StrSubstNo(TransactionNameTok, CROPOSAuditLogAuxInfo."Audit Entry No."), 'bc.pos.compliance.cro.fiscalize');
+        Sentry.AddError(StrSubstNo(BillNotSentBugLbl, CROPOSAuditLogAuxInfo."Audit Entry No.", CROPOSAuditLogAuxInfo."Audit Entry Type", CROPOSAuditLogAuxInfo."Source Document No.", CROPOSAuditLogAuxInfo."POS Entry No.", CROPOSAuditLogAuxInfo."Salesperson Code"));
+        if OwnsTransaction then
+            Sentry.FinalizeScope();
+        if GuiAllowed() then
+            Message(BillNotSentMsg, CROPOSAuditLogAuxInfo.FieldCaption("Cashier ID"), FormatOIB(CROPOSAuditLogAuxInfo."Cashier ID"), CROPOSAuditLogAuxInfo.TableCaption(), CROPOSAuditLogAuxInfo."Audit Entry No.", SalespersonPurchaser.TableCaption(), CROPOSAuditLogAuxInfo."Salesperson Code");
+    end;
+
+    local procedure CheckSalespersonOIB(SalespersonPurchaser: Record "Salesperson/Purchaser"; CROAuxSalespPurch: Record "NPR CRO Aux Salesperson/Purch.")
+    var
+        InvalidSalespersonOIBErr: Label '%1 %2 of %3 %4 is not a valid OIB, so the tax authority would reject its bills. Correct it on the %3 card.', Comment = '%1 = Salesperson OIB field caption, %2 = Salesperson OIB, %3 = Salesperson/Purchaser table caption, %4 = Salesperson Code';
+    begin
+        if not IsValidOIB(CROAuxSalespPurch."NPR CRO Salesperson OIB") then
+            Error(InvalidSalespersonOIBErr, CROAuxSalespPurch.FieldCaption("NPR CRO Salesperson OIB"), FormatOIB(CROAuxSalespPurch."NPR CRO Salesperson OIB"), SalespersonPurchaser.TableCaption(), SalespersonPurchaser.Code);
     end;
 
     #endregion
@@ -945,7 +1110,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
 
-        OnBeforeSendHttpRequestForXMLSigning(ResponseText, CROPOSAuditLogAuxInfo, IsHandled);
+        OnBeforeSendHttpRequestForXMLSigning(ResponseText, CROPOSAuditLogAuxInfo, SigningContent, IsHandled);
         if IsHandled then
             exit(true);
 
@@ -1198,7 +1363,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     #endregion
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeSendHttpRequestForXMLSigning(var ResponseText: Text; var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; var IsHandled: Boolean)
+    local procedure OnBeforeSendHttpRequestForXMLSigning(var ResponseText: Text; var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; SigningContent: Text; var IsHandled: Boolean)
     begin
     end;
 
