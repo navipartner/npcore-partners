@@ -7,6 +7,7 @@ codeunit 85198 "NPR APIRestMenu VATParam"
 
     var
         _Initialized: Boolean;
+        _PostingProfileVATBusGroupCode: Code[20];
         _POSUnit: Record "NPR POS Unit";
         _POSStore: Record "NPR POS Store";
         _Item: Record Item;
@@ -123,6 +124,46 @@ codeunit 85198 "NPR APIRestMenu VATParam"
         Assert.IsTrue(StrPos(ErrorText, _Item."No.") > 0, StrSubstNo('Error text should name the offending item (%1), got: %2', _Item."No.", ErrorText));
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure NoQueryParamUsesItemPriceVatGroupNotStorePostingProfile()
+    var
+        Assert: Codeunit Assert;
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        OriginalVATBusPostingGroup: Code[20];
+        PriceNoParam: Decimal;
+        PriceItemGroup: Decimal;
+        PriceStoreGroup: Decimal;
+    begin
+        // [SCENARIO] Without ?vatBusinessPostingGroup the menu prices with the item's "VAT Bus. Posting Gr. (Price)",
+        //            not with the VAT Bus. Posting Group of the POS Store's POS Posting Profile (which a POS sale uses).
+        Initialize();
+        SetItemPriceAndAddToMenu(125.00);
+
+        _Item.Find();
+        _POSStore.Find();
+        POSPostingProfile.Get(_POSStore."POS Posting Profile");
+        OriginalVATBusPostingGroup := POSPostingProfile."VAT Bus. Posting Group";
+        Assert.AreEqual(OriginalVATBusPostingGroup, _Item."VAT Bus. Posting Gr. (Price)", 'Test setup: the item price VAT group should start out equal to the store posting profile group');
+
+        POSPostingProfile."VAT Bus. Posting Group" := _AltVATBusGroupCode;
+        POSPostingProfile.Modify();
+        Commit();
+
+        PriceNoParam := GetUnitPrice('');
+        PriceItemGroup := GetUnitPrice(OriginalVATBusPostingGroup);
+        PriceStoreGroup := GetUnitPrice(_AltVATBusGroupCode);
+
+        // Restore before asserting: the posting profile is shared by the other tests in this codeunit
+        POSPostingProfile."VAT Bus. Posting Group" := OriginalVATBusPostingGroup;
+        POSPostingProfile.Modify();
+        Commit();
+
+        Assert.AreNotEqual(PriceItemGroup, PriceStoreGroup, 'Test setup: the two VAT groups should give different prices');
+        Assert.AreEqual(PriceItemGroup, PriceNoParam, 'Without the query param the price should follow the item price VAT group');
+        Assert.AreNotEqual(PriceStoreGroup, PriceNoParam, 'Without the query param the price should not follow the store posting profile VAT group');
+    end;
+
     local procedure Initialize()
     var
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -140,8 +181,10 @@ codeunit 85198 "NPR APIRestMenu VATParam"
         AltVATPostingSetup: Record "VAT Posting Setup";
         GLSetup: Record "General Ledger Setup";
     begin
-        if _Initialized then
+        if _Initialized then begin
+            ResetPostingProfileVATBusGroup();
             exit;
+        end;
 
         LibraryNPRetailAPI.CreateAPIPermission(UserSecurityId(), CompanyName(), 'NPR API Restaurant');
 
@@ -187,7 +230,24 @@ codeunit 85198 "NPR APIRestMenu VATParam"
         LibraryRestaurant.CreateMenu(_Menu, _Restaurant.Code);
         LibraryRestaurant.CreateMenuCategory(_MenuCategory, _Restaurant.Code, _Menu.Code, 'TEST');
 
+        POSPostingProfile.Get(POSPostingProfile.Code);
+        _PostingProfileVATBusGroupCode := POSPostingProfile."VAT Bus. Posting Group";
+
         _Initialized := true;
+        Commit();
+    end;
+
+    local procedure ResetPostingProfileVATBusGroup()
+    var
+        POSPostingProfile: Record "NPR POS Posting Profile";
+    begin
+        // Tests that change the shared posting profile restore it themselves, but not when the API call fails first
+        _POSStore.Find();
+        POSPostingProfile.Get(_POSStore."POS Posting Profile");
+        if POSPostingProfile."VAT Bus. Posting Group" = _PostingProfileVATBusGroupCode then
+            exit;
+        POSPostingProfile."VAT Bus. Posting Group" := _PostingProfileVATBusGroupCode;
+        POSPostingProfile.Modify();
         Commit();
     end;
 

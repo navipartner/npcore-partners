@@ -837,6 +837,386 @@ codeunit 85222 "NPR APIPOSUnit Open"
         Assert.AreEqual(UnitRestaurant.Code, JToken.AsValue().AsText(), 'restaurantCode should come from the POS Unit profile when both the unit and the store have one');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GetCurrentPOSUnit_UnitRestaurantProfile_ReturnsTakeAwayVatAndSeatingCodes()
+    var
+        Restaurant: Record "NPR NPRE Restaurant";
+        POSRestProfile: Record "NPR POS NPRE Rest. Profile";
+        ResponseBody: JsonObject;
+    begin
+        Initialize();
+        CreateRestaurantWithProfile(Restaurant, POSRestProfile);
+        FillSelfServiceFields(POSRestProfile);
+        SetRestaurantProfiles(POSRestProfile.Code, '');
+
+        ResponseBody := GetCurrentPOSUnitBody();
+
+        AssertSelfServiceFields(ResponseBody, POSRestProfile);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GetCurrentPOSUnit_StoreRestaurantProfile_ReturnsTakeAwayVatAndSeatingCodes()
+    var
+        Restaurant: Record "NPR NPRE Restaurant";
+        POSRestProfile: Record "NPR POS NPRE Rest. Profile";
+        ResponseBody: JsonObject;
+    begin
+        Initialize();
+        CreateRestaurantWithProfile(Restaurant, POSRestProfile);
+        FillSelfServiceFields(POSRestProfile);
+        SetRestaurantProfiles('', POSRestProfile.Code);
+
+        ResponseBody := GetCurrentPOSUnitBody();
+
+        AssertSelfServiceFields(ResponseBody, POSRestProfile);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GetCurrentPOSUnit_NoRestaurantProfile_ReturnsNullVatAndSeatingCodes()
+    var
+        ResponseBody: JsonObject;
+    begin
+        Initialize();
+        SetRestaurantProfiles('', '');
+
+        ResponseBody := GetCurrentPOSUnitBody();
+
+        // Also dineInVatBusinessPostingGroup, although the store's POS Posting Profile has a VAT group
+        AssertSelfServiceFieldsAreNull(ResponseBody);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GetCurrentPOSUnit_ProfileWithBlankFields_ReturnsNullWithoutStoreFallback()
+    var
+        UnitRestaurant: Record "NPR NPRE Restaurant";
+        StoreRestaurant: Record "NPR NPRE Restaurant";
+        UnitRestProfile: Record "NPR POS NPRE Rest. Profile";
+        StoreRestProfile: Record "NPR POS NPRE Rest. Profile";
+        ResponseBody: JsonObject;
+    begin
+        Initialize();
+        CreateRestaurantWithProfile(UnitRestaurant, UnitRestProfile);
+        CreateRestaurantWithProfile(StoreRestaurant, StoreRestProfile);
+        FillSelfServiceFields(StoreRestProfile);
+        SetRestaurantProfiles(UnitRestProfile.Code, StoreRestProfile.Code);
+
+        ResponseBody := GetCurrentPOSUnitBody();
+
+        AssertSelfServiceFieldsAreNull(ResponseBody);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GetCurrentPOSUnit_DineInVatGroup_ComesFromRestaurantProfileNotPostingProfile()
+    var
+        Assert: Codeunit Assert;
+        Restaurant: Record "NPR NPRE Restaurant";
+        POSRestProfile: Record "NPR POS NPRE Rest. Profile";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        JToken: JsonToken;
+    begin
+        Initialize();
+        CreateRestaurantWithProfile(Restaurant, POSRestProfile);
+        FillSelfServiceFields(POSRestProfile);
+        SetRestaurantProfiles(POSRestProfile.Code, '');
+        _POSStore.Find();
+        POSPostingProfile.Get(_POSStore."POS Posting Profile");
+        Assert.AreNotEqual('', POSPostingProfile."VAT Bus. Posting Group", 'Test setup: the store''s POS Posting Profile should have a VAT Bus. Posting Group');
+        Assert.AreNotEqual(POSPostingProfile."VAT Bus. Posting Group", POSRestProfile."Dine-in VAT Bus. Post. Group", 'Test setup: the two VAT groups should differ');
+
+        JToken := GetProperty(GetCurrentPOSUnitBody(), 'dineInVatBusinessPostingGroup');
+
+        Assert.AreEqual(POSRestProfile."Dine-in VAT Bus. Post. Group", JToken.AsValue().AsText(), 'dineInVatBusinessPostingGroup should come from the restaurant profile, not from the POS Posting Profile');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GetCurrentPOSUnit_TakeAwayOnlyProfile_ReturnsNullDineInVatGroup()
+    var
+        Assert: Codeunit Assert;
+        Restaurant: Record "NPR NPRE Restaurant";
+        POSRestProfile: Record "NPR POS NPRE Rest. Profile";
+        ResponseBody: JsonObject;
+    begin
+        // A venue without dine-in leaves the field blank, even though the store's POS Posting Profile has a VAT group
+        Initialize();
+        CreateRestaurantWithProfile(Restaurant, POSRestProfile);
+        FillSelfServiceFields(POSRestProfile);
+        POSRestProfile.Validate("Dine-in VAT Bus. Post. Group", '');
+        POSRestProfile.Modify();
+        SetRestaurantProfiles(POSRestProfile.Code, '');
+
+        ResponseBody := GetCurrentPOSUnitBody();
+
+        Assert.IsTrue(GetProperty(ResponseBody, 'dineInVatBusinessPostingGroup').AsValue().IsNull(), 'dineInVatBusinessPostingGroup should be null when the restaurant profile has no dine-in VAT group');
+        Assert.AreEqual(POSRestProfile."Take-away VAT Bus. Post. Group", GetProperty(ResponseBody, 'takeAwayVatBusinessPostingGroup').AsValue().AsText(), 'takeAwayVatBusinessPostingGroup should still be returned');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantProfile_SeatingOfOtherRestaurant_CannotBeSet()
+    var
+        Assert: Codeunit Assert;
+        Restaurant: Record "NPR NPRE Restaurant";
+        OtherRestaurant: Record "NPR NPRE Restaurant";
+        POSRestProfile: Record "NPR POS NPRE Rest. Profile";
+        OtherPOSRestProfile: Record "NPR POS NPRE Rest. Profile";
+        Seating: Record "NPR NPRE Seating";
+        OtherDineInSeatingCode: Code[20];
+        OtherTakeAwaySeatingCode: Code[20];
+        OtherPickUpSeatingCode: Code[20];
+        SeatingOfOtherRestaurantErr: Label '%1 %2 does not belong to %3 %4.', Locked = true;
+    begin
+        CreateRestaurantWithProfile(Restaurant, POSRestProfile);
+        CreateRestaurantWithProfile(OtherRestaurant, OtherPOSRestProfile);
+        // A different seating per field, so each error can only come from that field's own check
+        OtherDineInSeatingCode := CreateSeatingOfRestaurant(OtherRestaurant.Code);
+        OtherTakeAwaySeatingCode := CreateSeatingOfRestaurant(OtherRestaurant.Code);
+        OtherPickUpSeatingCode := CreateSeatingOfRestaurant(OtherRestaurant.Code);
+        Commit(); // asserterror rolls back; keep the setup for all three checks
+
+        // asserterror does not reset the record variable, so re-read the profile before each check
+        POSRestProfile.Find();
+        asserterror POSRestProfile.Validate("Dine-in Seating Code", OtherDineInSeatingCode);
+        Assert.ExpectedError(StrSubstNo(SeatingOfOtherRestaurantErr, Seating.TableCaption(), OtherDineInSeatingCode, Restaurant.TableCaption(), Restaurant.Code));
+        POSRestProfile.Find();
+        asserterror POSRestProfile.Validate("Take-away Seating Code", OtherTakeAwaySeatingCode);
+        Assert.ExpectedError(StrSubstNo(SeatingOfOtherRestaurantErr, Seating.TableCaption(), OtherTakeAwaySeatingCode, Restaurant.TableCaption(), Restaurant.Code));
+        POSRestProfile.Find();
+        asserterror POSRestProfile.Validate("Pick-up Seating Code", OtherPickUpSeatingCode);
+        Assert.ExpectedError(StrSubstNo(SeatingOfOtherRestaurantErr, Seating.TableCaption(), OtherPickUpSeatingCode, Restaurant.TableCaption(), Restaurant.Code));
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantProfile_BlockedSeating_CannotBeSet()
+    var
+        Assert: Codeunit Assert;
+        Restaurant: Record "NPR NPRE Restaurant";
+        POSRestProfile: Record "NPR POS NPRE Rest. Profile";
+        Seating: Record "NPR NPRE Seating";
+    begin
+        CreateRestaurantWithProfile(Restaurant, POSRestProfile);
+        Seating.Get(CreateSeatingOfRestaurant(Restaurant.Code));
+        Seating.Blocked := true;
+        Seating.Modify();
+
+        asserterror POSRestProfile.Validate("Dine-in Seating Code", Seating.Code);
+        Assert.ExpectedTestFieldError(Seating.FieldCaption(Blocked), Format(false));
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantProfile_ChangeRestaurant_ClearsSeatingsOfOldRestaurant()
+    var
+        Assert: Codeunit Assert;
+        Restaurant: Record "NPR NPRE Restaurant";
+        NewRestaurant: Record "NPR NPRE Restaurant";
+        POSRestProfile: Record "NPR POS NPRE Rest. Profile";
+        NewPOSRestProfile: Record "NPR POS NPRE Rest. Profile";
+        TakeAwayVATBusPostingGroup: Code[20];
+        DineInVATBusPostingGroup: Code[20];
+    begin
+        CreateRestaurantWithProfile(Restaurant, POSRestProfile);
+        CreateRestaurantWithProfile(NewRestaurant, NewPOSRestProfile);
+        FillSelfServiceFields(POSRestProfile);
+        TakeAwayVATBusPostingGroup := POSRestProfile."Take-away VAT Bus. Post. Group";
+        DineInVATBusPostingGroup := POSRestProfile."Dine-in VAT Bus. Post. Group";
+
+        POSRestProfile.Validate("Restaurant Code", NewRestaurant.Code);
+
+        Assert.AreEqual('', POSRestProfile."Dine-in Seating Code", 'Dine-in Seating Code of the old restaurant should be cleared');
+        Assert.AreEqual('', POSRestProfile."Take-away Seating Code", 'Take-away Seating Code of the old restaurant should be cleared');
+        Assert.AreEqual('', POSRestProfile."Pick-up Seating Code", 'Pick-up Seating Code of the old restaurant should be cleared');
+        Assert.AreEqual(TakeAwayVATBusPostingGroup, POSRestProfile."Take-away VAT Bus. Post. Group", 'Changing the restaurant should not change the take-away VAT group');
+        Assert.AreEqual(DineInVATBusPostingGroup, POSRestProfile."Dine-in VAT Bus. Post. Group", 'Changing the restaurant should not change the dine-in VAT group');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantProfile_RestaurantSetAfterSeatings_KeepsSeatingsOfThatRestaurant()
+    var
+        Assert: Codeunit Assert;
+        Restaurant: Record "NPR NPRE Restaurant";
+        OtherRestaurant: Record "NPR NPRE Restaurant";
+        POSRestProfile: Record "NPR POS NPRE Rest. Profile";
+        OtherPOSRestProfile: Record "NPR POS NPRE Rest. Profile";
+        DineInSeatingCode: Code[20];
+        PickUpSeatingCode: Code[20];
+        OtherSeatingCode: Code[20];
+    begin
+        // Seatings can be set while the restaurant is blank; setting the restaurant keeps its own and clears the others
+        CreateRestaurantWithProfile(Restaurant, POSRestProfile);
+        CreateRestaurantWithProfile(OtherRestaurant, OtherPOSRestProfile);
+        DineInSeatingCode := CreateSeatingOfRestaurant(Restaurant.Code);
+        PickUpSeatingCode := CreateSeatingOfRestaurant(Restaurant.Code);
+        OtherSeatingCode := CreateSeatingOfRestaurant(OtherRestaurant.Code);
+        POSRestProfile."Restaurant Code" := '';
+        POSRestProfile.Modify();
+
+        POSRestProfile.Validate("Dine-in Seating Code", DineInSeatingCode);
+        POSRestProfile.Validate("Take-away Seating Code", OtherSeatingCode);
+        POSRestProfile.Validate("Pick-up Seating Code", PickUpSeatingCode);
+        POSRestProfile.Validate("Restaurant Code", Restaurant.Code);
+
+        Assert.AreEqual(DineInSeatingCode, POSRestProfile."Dine-in Seating Code", 'A dine-in seating of the restaurant should be kept when the restaurant is set');
+        Assert.AreEqual('', POSRestProfile."Take-away Seating Code", 'A take-away seating of another restaurant should be cleared when the restaurant is set');
+        Assert.AreEqual(PickUpSeatingCode, POSRestProfile."Pick-up Seating Code", 'A pick-up seating of the restaurant should be kept when the restaurant is set');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantProfile_RestaurantSetAfterSeatings_KeepsTakeAwayAndClearsOthers()
+    var
+        Assert: Codeunit Assert;
+        Restaurant: Record "NPR NPRE Restaurant";
+        OtherRestaurant: Record "NPR NPRE Restaurant";
+        POSRestProfile: Record "NPR POS NPRE Rest. Profile";
+        OtherPOSRestProfile: Record "NPR POS NPRE Rest. Profile";
+        TakeAwaySeatingCode: Code[20];
+        OtherDineInSeatingCode: Code[20];
+        OtherPickUpSeatingCode: Code[20];
+    begin
+        // Mirror of the test above, so the keep and the clear path are each covered for every seating field
+        CreateRestaurantWithProfile(Restaurant, POSRestProfile);
+        CreateRestaurantWithProfile(OtherRestaurant, OtherPOSRestProfile);
+        TakeAwaySeatingCode := CreateSeatingOfRestaurant(Restaurant.Code);
+        OtherDineInSeatingCode := CreateSeatingOfRestaurant(OtherRestaurant.Code);
+        OtherPickUpSeatingCode := CreateSeatingOfRestaurant(OtherRestaurant.Code);
+        POSRestProfile."Restaurant Code" := '';
+        POSRestProfile.Modify();
+
+        POSRestProfile.Validate("Dine-in Seating Code", OtherDineInSeatingCode);
+        POSRestProfile.Validate("Take-away Seating Code", TakeAwaySeatingCode);
+        POSRestProfile.Validate("Pick-up Seating Code", OtherPickUpSeatingCode);
+        POSRestProfile.Validate("Restaurant Code", Restaurant.Code);
+
+        Assert.AreEqual('', POSRestProfile."Dine-in Seating Code", 'A dine-in seating of another restaurant should be cleared when the restaurant is set');
+        Assert.AreEqual(TakeAwaySeatingCode, POSRestProfile."Take-away Seating Code", 'A take-away seating of the restaurant should be kept when the restaurant is set');
+        Assert.AreEqual('', POSRestProfile."Pick-up Seating Code", 'A pick-up seating of another restaurant should be cleared when the restaurant is set');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RestaurantProfile_ChangeRestaurantAndSeatingsInFieldOrder_Succeeds()
+    var
+        Assert: Codeunit Assert;
+        Restaurant: Record "NPR NPRE Restaurant";
+        NewRestaurant: Record "NPR NPRE Restaurant";
+        POSRestProfile: Record "NPR POS NPRE Rest. Profile";
+        NewPOSRestProfile: Record "NPR POS NPRE Rest. Profile";
+        RecRef: RecordRef;
+        FieldRef: FieldRef;
+        NewValues: Dictionary of [Integer, Code[20]];
+        FieldNumber: Integer;
+    begin
+        // An import that updates an existing profile validates the changed fields in field number order
+        CreateRestaurantWithProfile(Restaurant, POSRestProfile);
+        CreateRestaurantWithProfile(NewRestaurant, NewPOSRestProfile);
+        FillSelfServiceFields(POSRestProfile);
+        NewValues.Add(POSRestProfile.FieldNo("Restaurant Code"), NewRestaurant.Code);
+        NewValues.Add(POSRestProfile.FieldNo("Dine-in Seating Code"), CreateSeatingOfRestaurant(NewRestaurant.Code));
+        NewValues.Add(POSRestProfile.FieldNo("Take-away Seating Code"), CreateSeatingOfRestaurant(NewRestaurant.Code));
+        NewValues.Add(POSRestProfile.FieldNo("Pick-up Seating Code"), CreateSeatingOfRestaurant(NewRestaurant.Code));
+
+        RecRef.GetTable(POSRestProfile);
+        for FieldNumber := 1 to 1000 do
+            if NewValues.ContainsKey(FieldNumber) then begin
+                FieldRef := RecRef.Field(FieldNumber);
+                FieldRef.Validate(NewValues.Get(FieldNumber));
+            end;
+        RecRef.SetTable(POSRestProfile);
+
+        Assert.AreEqual(NewRestaurant.Code, POSRestProfile."Restaurant Code", 'Restaurant Code should be updated');
+        Assert.AreEqual(NewValues.Get(POSRestProfile.FieldNo("Dine-in Seating Code")), POSRestProfile."Dine-in Seating Code", 'Dine-in Seating Code should be updated to the new restaurant''s seating');
+        Assert.AreEqual(NewValues.Get(POSRestProfile.FieldNo("Take-away Seating Code")), POSRestProfile."Take-away Seating Code", 'Take-away Seating Code should be updated to the new restaurant''s seating');
+        Assert.AreEqual(NewValues.Get(POSRestProfile.FieldNo("Pick-up Seating Code")), POSRestProfile."Pick-up Seating Code", 'Pick-up Seating Code should be updated to the new restaurant''s seating');
+    end;
+
+    local procedure CreateSeatingOfRestaurant(RestaurantCode: Code[20]): Code[20]
+    var
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        SeatingLocation: Record "NPR NPRE Seating Location";
+        Seating: Record "NPR NPRE Seating";
+    begin
+        LibraryRestaurant.CreateSeatingLocation(SeatingLocation, RestaurantCode);
+        LibraryRestaurant.CreateSeating(Seating, SeatingLocation.Code);
+        exit(Seating.Code);
+    end;
+
+    local procedure FillSelfServiceFields(var POSRestProfile: Record "NPR POS NPRE Rest. Profile")
+    var
+        LibraryERM: Codeunit "Library - ERM";
+        LibraryRestaurant: Codeunit "NPR Library - Restaurant";
+        DineInVATBusPostingGroup: Record "VAT Business Posting Group";
+        VATBusPostingGroup: Record "VAT Business Posting Group";
+        SeatingLocation: Record "NPR NPRE Seating Location";
+        DineInSeating: Record "NPR NPRE Seating";
+        TakeAwaySeating: Record "NPR NPRE Seating";
+        PickUpSeating: Record "NPR NPRE Seating";
+    begin
+        LibraryERM.CreateVATBusinessPostingGroup(DineInVATBusPostingGroup);
+        LibraryERM.CreateVATBusinessPostingGroup(VATBusPostingGroup);
+        LibraryRestaurant.CreateSeatingLocation(SeatingLocation, POSRestProfile."Restaurant Code");
+        LibraryRestaurant.CreateSeating(DineInSeating, SeatingLocation.Code);
+        LibraryRestaurant.CreateSeating(TakeAwaySeating, SeatingLocation.Code);
+        LibraryRestaurant.CreateSeating(PickUpSeating, SeatingLocation.Code);
+
+        POSRestProfile.Validate("Dine-in VAT Bus. Post. Group", DineInVATBusPostingGroup.Code);
+        POSRestProfile.Validate("Take-away VAT Bus. Post. Group", VATBusPostingGroup.Code);
+        POSRestProfile.Validate("Dine-in Seating Code", DineInSeating.Code);
+        POSRestProfile.Validate("Take-away Seating Code", TakeAwaySeating.Code);
+        POSRestProfile.Validate("Pick-up Seating Code", PickUpSeating.Code);
+        POSRestProfile.Modify();
+    end;
+
+    local procedure AssertSelfServiceFields(ResponseBody: JsonObject; POSRestProfile: Record "NPR POS NPRE Rest. Profile")
+    var
+        Assert: Codeunit Assert;
+    begin
+        Assert.AreEqual(POSRestProfile."Dine-in VAT Bus. Post. Group", GetProperty(ResponseBody, 'dineInVatBusinessPostingGroup').AsValue().AsText(), 'dineInVatBusinessPostingGroup should come from the restaurant profile');
+        Assert.AreEqual(POSRestProfile."Take-away VAT Bus. Post. Group", GetProperty(ResponseBody, 'takeAwayVatBusinessPostingGroup').AsValue().AsText(), 'takeAwayVatBusinessPostingGroup should come from the restaurant profile');
+        Assert.AreEqual(POSRestProfile."Dine-in Seating Code", GetProperty(ResponseBody, 'dineInSeatingCode').AsValue().AsText(), 'dineInSeatingCode should come from the restaurant profile');
+        Assert.AreEqual(POSRestProfile."Take-away Seating Code", GetProperty(ResponseBody, 'takeAwaySeatingCode').AsValue().AsText(), 'takeAwaySeatingCode should come from the restaurant profile');
+        Assert.AreEqual(POSRestProfile."Pick-up Seating Code", GetProperty(ResponseBody, 'pickUpSeatingCode').AsValue().AsText(), 'pickUpSeatingCode should come from the restaurant profile');
+    end;
+
+    local procedure AssertSelfServiceFieldsAreNull(ResponseBody: JsonObject)
+    var
+        Assert: Codeunit Assert;
+    begin
+        Assert.IsTrue(GetProperty(ResponseBody, 'dineInVatBusinessPostingGroup').AsValue().IsNull(), 'dineInVatBusinessPostingGroup should be null');
+        Assert.IsTrue(GetProperty(ResponseBody, 'takeAwayVatBusinessPostingGroup').AsValue().IsNull(), 'takeAwayVatBusinessPostingGroup should be null');
+        Assert.IsTrue(GetProperty(ResponseBody, 'dineInSeatingCode').AsValue().IsNull(), 'dineInSeatingCode should be null');
+        Assert.IsTrue(GetProperty(ResponseBody, 'takeAwaySeatingCode').AsValue().IsNull(), 'takeAwaySeatingCode should be null');
+        Assert.IsTrue(GetProperty(ResponseBody, 'pickUpSeatingCode').AsValue().IsNull(), 'pickUpSeatingCode should be null');
+    end;
+
+    local procedure GetProperty(ResponseBody: JsonObject; PropertyName: Text) JToken: JsonToken
+    var
+        Assert: Codeunit Assert;
+    begin
+        Assert.IsTrue(ResponseBody.Get(PropertyName, JToken), StrSubstNo('Response should contain %1', PropertyName));
+    end;
+
+    local procedure GetCurrentPOSUnitBody() ResponseBody: JsonObject
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+    begin
+        Response := LibraryNPRetailAPI.CallApi('GET', '/pos/unit/me', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'GET /pos/unit/me should succeed');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+    end;
+
     local procedure CreateRestaurantWithProfile(var Restaurant: Record "NPR NPRE Restaurant"; var POSRestProfile: Record "NPR POS NPRE Rest. Profile")
     var
         LibraryRestaurant: Codeunit "NPR Library - Restaurant";
@@ -860,20 +1240,9 @@ codeunit 85222 "NPR APIPOSUnit Open"
         Commit();
     end;
 
-    local procedure GetCurrentPOSUnitRestaurantCode() JToken: JsonToken
-    var
-        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
-        Assert: Codeunit Assert;
-        Response: JsonObject;
-        Body: JsonObject;
-        QueryParams: Dictionary of [Text, Text];
-        Headers: Dictionary of [Text, Text];
-        ResponseBody: JsonObject;
+    local procedure GetCurrentPOSUnitRestaurantCode(): JsonToken
     begin
-        Response := LibraryNPRetailAPI.CallApi('GET', '/pos/unit/me', Body, QueryParams, Headers);
-        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'GET /pos/unit/me should succeed');
-        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
-        Assert.IsTrue(ResponseBody.Get('restaurantCode', JToken), 'Response should contain restaurantCode');
+        exit(GetProperty(GetCurrentPOSUnitBody(), 'restaurantCode'));
     end;
 
     local procedure Initialize()

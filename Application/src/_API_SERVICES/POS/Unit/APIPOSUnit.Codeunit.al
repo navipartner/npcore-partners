@@ -108,11 +108,11 @@ codeunit 6248434 "NPR APIPOSUnit"
 
     local procedure POSUnitToJson(POSUnit: Record "NPR POS Unit") Json: JsonObject
     var
+        POSStore: Record "NPR POS Store";
+        POSRestaurantProfile: Record "NPR POS NPRE Rest. Profile";
         SSProfile: Record "NPR SS Profile";
         SelfserviceProfileJson: JsonObject;
-        NullValue: JsonValue;
         EFTIntegrationType: Code[20];
-        RestaurantCode: Code[20];
     begin
         Json.Add('id', Format(POSUnit.SystemId, 0, 4).ToLower());
         Json.Add('code', POSUnit."No.");
@@ -120,13 +120,18 @@ codeunit 6248434 "NPR APIPOSUnit"
         Json.Add('posStoreCode', POSUnit."POS Store Code");
         Json.Add('digitalReceiptEnabled', IsDigitalReceiptEnabled(POSUnit."POS Receipt Profile"));
 
-        RestaurantCode := FindRestaurantCode(POSUnit);
-        if RestaurantCode <> '' then
-            Json.Add('restaurantCode', RestaurantCode)
-        else begin
-            NullValue.SetValueToNull();
-            Json.Add('restaurantCode', NullValue);
-        end;
+        POSStore.SetLoadFields("POS Restaurant Profile");
+        if not POSStore.Get(POSUnit."POS Store Code") then
+            Clear(POSStore);
+        if not FindRestaurantProfile(POSUnit, POSStore, POSRestaurantProfile) then
+            Clear(POSRestaurantProfile);
+
+        AddCodeOrNull(Json, 'restaurantCode', POSRestaurantProfile."Restaurant Code");
+        AddCodeOrNull(Json, 'dineInVatBusinessPostingGroup', POSRestaurantProfile."Dine-in VAT Bus. Post. Group");
+        AddCodeOrNull(Json, 'takeAwayVatBusinessPostingGroup', POSRestaurantProfile."Take-away VAT Bus. Post. Group");
+        AddCodeOrNull(Json, 'dineInSeatingCode', POSRestaurantProfile."Dine-in Seating Code");
+        AddCodeOrNull(Json, 'takeAwaySeatingCode', POSRestaurantProfile."Take-away Seating Code");
+        AddCodeOrNull(Json, 'pickUpSeatingCode', POSRestaurantProfile."Pick-up Seating Code");
 
         if (POSUnit."POS Self Service Profile" <> '') and SSProfile.Get(POSUnit."POS Self Service Profile") then begin
             SelfserviceProfileJson.Add('qrCardPaymentMethod', SSProfile."QR Card Payment Method");
@@ -139,25 +144,30 @@ codeunit 6248434 "NPR APIPOSUnit"
         end;
     end;
 
-    local procedure FindRestaurantCode(POSUnit: Record "NPR POS Unit"): Code[20]
+    local procedure FindRestaurantProfile(POSUnit: Record "NPR POS Unit"; POSStore: Record "NPR POS Store"; var POSRestaurantProfile: Record "NPR POS NPRE Rest. Profile"): Boolean
     var
-        POSStore: Record "NPR POS Store";
-        POSRestaurantProfile: Record "NPR POS NPRE Rest. Profile";
         ProfileCode: Code[20];
     begin
         ProfileCode := POSUnit."POS Restaurant Profile";
-        if ProfileCode = '' then begin
-            POSStore.SetLoadFields("POS Restaurant Profile");
-            if POSStore.Get(POSUnit."POS Store Code") then
-                ProfileCode := POSStore."POS Restaurant Profile";
-        end;
         if ProfileCode = '' then
-            exit('');
+            ProfileCode := POSStore."POS Restaurant Profile";
+        if ProfileCode = '' then
+            exit(false);
 
-        POSRestaurantProfile.SetLoadFields("Restaurant Code");
-        if not POSRestaurantProfile.Get(ProfileCode) then
-            exit('');
-        exit(POSRestaurantProfile."Restaurant Code");
+        POSRestaurantProfile.SetLoadFields("Restaurant Code", "Dine-in VAT Bus. Post. Group", "Take-away VAT Bus. Post. Group", "Dine-in Seating Code", "Take-away Seating Code", "Pick-up Seating Code");
+        exit(POSRestaurantProfile.Get(ProfileCode));
+    end;
+
+    local procedure AddCodeOrNull(var Json: JsonObject; PropertyName: Text; CodeValue: Text)
+    var
+        NullValue: JsonValue;
+    begin
+        if CodeValue <> '' then begin
+            Json.Add(PropertyName, CodeValue);
+            exit;
+        end;
+        NullValue.SetValueToNull();
+        Json.Add(PropertyName, NullValue);
     end;
 
     local procedure IsDigitalReceiptEnabled(POSReceiptProfileCode: Code[20]): Boolean

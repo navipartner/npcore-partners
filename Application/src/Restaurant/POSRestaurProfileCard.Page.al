@@ -39,6 +39,35 @@
                     ApplicationArea = NPRRetail;
                 }
             }
+            group(SelfService)
+            {
+                Caption = 'Self-Service';
+                field("Dine-in VAT Bus. Post. Group"; Rec."Dine-in VAT Bus. Post. Group")
+                {
+                    ToolTip = 'Specifies the VAT business posting group the self-service apps use for dine-in orders. Leave blank if dine-in is not offered.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Take-away VAT Bus. Post. Group"; Rec."Take-away VAT Bus. Post. Group")
+                {
+                    ToolTip = 'Specifies the VAT business posting group the self-service apps use for take-away orders. Leave blank if take-away is not offered.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Dine-in Seating Code"; Rec."Dine-in Seating Code")
+                {
+                    ToolTip = 'Specifies the seating that self-service dine-in orders are placed on when the guest does not choose a table.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Take-away Seating Code"; Rec."Take-away Seating Code")
+                {
+                    ToolTip = 'Specifies the seating that self-service take-away orders are placed on.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Pick-up Seating Code"; Rec."Pick-up Seating Code")
+                {
+                    ToolTip = 'Specifies the seating that self-service pick-up orders are placed on.';
+                    ApplicationArea = NPRRetail;
+                }
+            }
         }
     }
 }
