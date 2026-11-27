@@ -221,9 +221,10 @@ report 6014484 "NPR RS Ret. Trans. Rec. Calc."
         PriceListLine: Record "Price List Line";
         ValueEntry: Record "Value Entry";
         VATPostingSetup: Record "VAT Posting Setup";
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
         VATBreakDown: Decimal;
     begin
-        GetPriceListLine(PriceListLine);
+        RSRLocalizationMgt.GetPriceListLine(PriceListLine, ItemLedgerEntry."Item No.", TransRecHdr."Transfer-to Code", TransRecHdr."Posting Date");
         RecLineSalesPrice := PriceListLine."Unit Price";
         Item.Get(ItemLedgerEntry."Item No.");
         ItemDescription := Item.Description;
@@ -259,30 +260,6 @@ report 6014484 "NPR RS Ret. Trans. Rec. Calc."
         TotalRecLineValueExclVAT += RecLineLineWChargeAmountExclVAT;
         TotalValueWithChargeInclVAT += RecLineLineWChargeAmountInclVAT;
         TotalSalesPricePerUnit += RecLineSalesPricePerUnit;
-    end;
-
-    local procedure GetPriceListLine(var PriceListLine: Record "Price List Line")
-    var
-        PriceListHeader: Record "Price List Header";
-        EndingDateFilter: Label '>=%1|''''', Comment = '%1 = Ending Date', Locked = true;
-        PriceListNotFoundErr: Label 'Price List for the Location %1 has not been found.', Comment = '%1 - Location Code';
-        PriceNotFoundErr: Label 'Price for the Item %1 has not been found in Price List: %2 for Location %3', Comment = '%1 - Item No, %2 - Price List Code, %3 - Location Code';
-        StartingDateFilter: Label '<=%1', Comment = '%1 = Starting Date', Locked = true;
-    begin
-        PriceListHeader.SetLoadFields(Code);
-        PriceListHeader.SetRange(Status, "Price Status"::Active);
-
-        PriceListHeader.SetFilter("Starting Date", StrSubstNo(StartingDateFilter, TransRecHdr."Posting Date"));
-        PriceListHeader.SetFilter("Ending Date", StrSubstNo(EndingDateFilter, TransRecHdr."Posting Date"));
-        PriceListHeader.SetRange("NPR Location Code", TransRecHdr."Transfer-to Code");
-        if not PriceListHeader.FindFirst() then
-            Error(PriceListNotFoundErr, TransRecHdr."Transfer-to Code");
-
-        PriceListLine.SetLoadFields("Unit Price", "VAT Bus. Posting Gr. (Price)");
-        PriceListLine.SetRange("Price List Code", PriceListHeader.Code);
-        PriceListLine.SetRange("Asset No.", ItemLedgerEntry."Item No.");
-        if not PriceListLine.FindFirst() then
-            Error(PriceNotFoundErr, ItemLedgerEntry."Item No.", PriceListHeader.Code, TransRecHdr."Transfer-to Code");
     end;
 
     internal procedure SetFilters(ReceiptNo: Code[20]; TransRecDate: Date)

@@ -51,6 +51,9 @@ report 6014563 "NPR CRO Ret. Purch. Price Calc"
                     CheckForRetailLocation();
                     if "Purch. Inv. Line".Type <> "Sales Line Type"::Item then
                         CurrReport.Skip();
+                    if "Purch. Inv. Line".Quantity = 0 then
+                        CurrReport.Skip();
+                    CheckForServiceItem();
 
                     Calculation();
                     CalcTotals();
@@ -96,7 +99,7 @@ report 6014563 "NPR CRO Ret. Purch. Price Calc"
                         ApplicationArea = NPRRSRLocal;
                         Caption = 'Purchase Invoice No.';
                         ToolTip = 'Specifies the value of the Purchase Invoice No. field.';
-                        TableRelation = "Transfer Receipt Header"."No.";
+                        TableRelation = "Purch. Inv. Header"."No.";
                     }
                     field("Purch Inv. Date"; FilterPostingDate)
                     {
@@ -187,29 +190,40 @@ report 6014563 "NPR CRO Ret. Purch. Price Calc"
             CurrReport.Skip();
     end;
 
+    local procedure CheckForServiceItem()
+    var
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
+    begin
+        if RSRLocalizationMgt.IsServiceItem("Purch. Inv. Line"."No.") then
+            CurrReport.Skip();
+    end;
+
     local procedure CalculateItemCharge(var LineItemChargeAmount: Decimal)
     var
-        ItemLedgerEntry: Record "Item Ledger Entry";
+        ItemChargeValueEntry: Record "Value Entry";
         ValueEntry: Record "Value Entry";
     begin
-        ValueEntry.SetCurrentKey("Document No.", "Document Line No.", "Document Type");
-        ValueEntry.SetLoadFields("Item No.", "Document No.", "Location Code", "Document Line No.", "Item Ledger Entry No.", "Cost Amount (Actual)");
-        ValueEntry.SetRange("Item No.", "Purch. Inv. Line"."No.");
-        ValueEntry.SetRange("Document No.", "Purch. Inv. Line"."Document No.");
-        ValueEntry.SetRange("Location Code", "Purch. Inv. Line"."Location Code");
-        ValueEntry.SetRange("Document Line No.", "Purch. Inv. Line"."Line No.");
-        ValueEntry.CalcSums("Cost Amount (Actual)");
+        LineItemChargeAmount := 0;
 
-        ItemLedgerEntry.SetCurrentKey("Entry No.");
-        ItemLedgerEntry.SetLoadFields("Entry No.", "Item No.", "Cost Amount (Actual)");
-        ItemLedgerEntry.SetAutoCalcFields("Cost Amount (Actual)");
-        ItemLedgerEntry.SetRange("Entry No.", ValueEntry."Item Ledger Entry No.");
-        ItemLedgerEntry.SetRange("Item No.", ValueEntry."Item No.");
-        ItemLedgerEntry.SetAutoCalcFields("Cost Amount (Actual)");
-        if not ItemLedgerEntry.FindFirst() then
+        ValueEntry.SetCurrentKey("Document No.", "Document Line No.", "Document Type");
+        ValueEntry.SetLoadFields("Item Ledger Entry No.", "Invoiced Quantity");
+        ValueEntry.SetRange("Document No.", "Purch. Inv. Line"."Document No.");
+        ValueEntry.SetRange("Document Line No.", "Purch. Inv. Line"."Line No.");
+        ValueEntry.SetRange("Item No.", "Purch. Inv. Line"."No.");
+        ValueEntry.SetRange("Entry Type", ValueEntry."Entry Type"::"Direct Cost");
+        ValueEntry.SetRange("Item Charge No.", '');
+        ValueEntry.SetRange(Adjustment, false);
+        if not ValueEntry.FindSet() then
             exit;
-        if ItemLedgerEntry."Cost Amount (Actual)" <> Abs(ValueEntry."Cost Amount (Actual)") then
-            LineItemChargeAmount := ItemLedgerEntry."Cost Amount (Actual)" - Abs(ValueEntry."Cost Amount (Actual)");
+
+        ItemChargeValueEntry.SetRange("Document No.", "Purch. Inv. Line"."Document No.");
+        ItemChargeValueEntry.SetFilter("Item Charge No.", '<>%1', '');
+        ItemChargeValueEntry.SetRange(Adjustment, false);
+        repeat
+            ItemChargeValueEntry.SetRange("Item Ledger Entry No.", ValueEntry."Item Ledger Entry No.");
+            ItemChargeValueEntry.CalcSums("Cost per Unit");
+            LineItemChargeAmount += ItemChargeValueEntry."Cost per Unit" * Abs(ValueEntry."Invoiced Quantity");
+        until ValueEntry.Next() = 0;
     end;
 
     local procedure SetupReportPrintOrderNo()
@@ -243,17 +257,10 @@ report 6014563 "NPR CRO Ret. Purch. Price Calc"
         Item: Record Item;
         PriceListLine: Record "Price List Line";
         VATPostingSetup: Record "VAT Posting Setup";
-        EndingDateFilter: Label '>=%1|''''', Comment = '%1 = Ending Date', Locked = true;
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
         VATBreakDown: Decimal;
-        StartingDateFilter: Label '<=%1', Comment = '%1 = Starting Date', Locked = true;
     begin
-        PriceListLine.SetRange("Price Type", "Price Type"::Sale);
-        PriceListLine.SetRange(Status, "Price Status"::Active);
-        PriceListLine.SetFilter("Starting Date", StrSubstNo(StartingDateFilter, PurchInvHeader."Posting Date"));
-        PriceListLine.SetFilter("Ending Date", StrSubstNo(EndingDateFilter, PurchInvHeader."Posting Date"));
-        PriceListLine.SetRange("Asset No.", "Purch. Inv. Line"."No.");
-        if not PriceListLine.FindFirst() then
-            exit;
+        RSRLocalizationMgt.GetPriceListLine(PriceListLine, "Purch. Inv. Line"."No.", "Purch. Inv. Line"."Location Code", PurchInvHeader."Posting Date");
         InvLineSalesPrice := PriceListLine."Unit Price";
         Item.Get("Purch. Inv. Line"."No.");
         if VATPostingSetup.Get(PriceListLine."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then

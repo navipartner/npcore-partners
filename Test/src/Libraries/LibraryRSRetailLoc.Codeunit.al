@@ -91,6 +91,9 @@
         RSSetup."RS Ret. Localization Country" := RSSetup."RS Ret. Localization Country"::Serbia;
         RSSetup."RS Nivelation Hdr No. Series" := LibraryERM.CreateNoSeriesCode();
         RSSetup."RS Posted Niv. No. Series" := LibraryERM.CreateNoSeriesCode();
+        // The calculation reports draw their print no. from these series.
+        RSSetup."RS Ret. Purch. Report Ord." := LibraryERM.CreateNoSeriesCode();
+        RSSetup."RS Ret. Transfer Report Ord." := LibraryERM.CreateNoSeriesCode();
         RSSetup.Modify();
 
         // Match production: inventory cost posts to G/L automatically so retail accounts reflect the full retail value.
@@ -277,6 +280,15 @@
         PriceListHeader.Modify();
     end;
 
+    // A service item (e.g. freight invoiced together with the goods). RS posting skips service items, so it carries no retail price.
+    internal procedure CreateServiceItem(var Item: Record Item)
+    begin
+        LibraryInventory.CreateServiceTypeItem(Item);
+        Item.Validate("Gen. Prod. Posting Group", _GenProdPostGrp);
+        Item.Validate("VAT Prod. Posting Group", _STDVATProdGrp);
+        Item.Modify(true);
+    end;
+
     internal procedure RemoveRetailPrice(ItemNo: Code[20]; LocationCode: Code[10])
     var
         PriceListHeader: Record "Price List Header";
@@ -345,6 +357,32 @@
         PostedNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
     end;
 
+    // Posts a purchase order with Receive and Invoice where the second line has Qty. to Receive 0, so BC copies it into the posted invoice with quantity 0.
+    internal procedure PostRetailPurchaseOrderWithUnreceivedLine(ReceivedItemNo: Code[20]; UnreceivedItemNo: Code[20]; LocationCode: Code[10]; Qty: Decimal; DirectUnitCost: Decimal) PostedNo: Code[20]
+    var
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        Vendor: Record Vendor;
+    begin
+        LibraryPurchase.CreateVendor(Vendor);
+        Vendor.Validate("Gen. Bus. Posting Group", _GenBusPostGrp);
+        Vendor.Validate("VAT Bus. Posting Group", _VATBusPostGrp);
+        Vendor.Modify(true);
+
+        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Order, Vendor."No.");
+        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, ReceivedItemNo, Qty);
+        PurchaseLine.Validate("Location Code", LocationCode);
+        PurchaseLine.Validate("Direct Unit Cost", DirectUnitCost);
+        PurchaseLine.Modify(true);
+        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, UnreceivedItemNo, Qty);
+        PurchaseLine.Validate("Location Code", LocationCode);
+        PurchaseLine.Validate("Direct Unit Cost", DirectUnitCost);
+        PurchaseLine.Validate("Qty. to Receive", 0);
+        PurchaseLine.Modify(true);
+
+        PostedNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
+    end;
+
     internal procedure PostRetailPurchaseWithItemCharge(ItemNo: Code[20]; LocationCode: Code[10]; Qty: Decimal; DirectUnitCost: Decimal; ChargeAmount: Decimal) PostedNo: Code[20]
     var
         PurchaseHeader: Record "Purchase Header";
@@ -379,6 +417,52 @@
 
         LibraryPurchase.CreateItemChargeAssignment(ItemChargeAssignmentPurch, ChargeLine, ItemCharge,
             "Purchase Applies-to Document Type"::Invoice, PurchaseHeader."No.", ItemLine."Line No.", ItemNo, 1, ChargeAmount);
+        ItemChargeAssignmentPurch.Insert(true);
+
+        PostedNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
+    end;
+
+    /// <summary>
+    /// Posts one invoice with two item lines of the same quantity and cost, and an item charge assigned
+    /// only to the first line, so the second line has no dependent costs of its own.
+    /// </summary>
+    internal procedure PostRetailPurchase2ItemsWithItemChargeOnFirst(ChargedItemNo: Code[20]; UnchargedItemNo: Code[20]; LocationCode: Code[10]; Qty: Decimal; DirectUnitCost: Decimal; ChargeAmount: Decimal) PostedNo: Code[20]
+    var
+        ChargedLine: Record "Purchase Line";
+        ChargeLine: Record "Purchase Line";
+        PurchaseHeader: Record "Purchase Header";
+        UnchargedLine: Record "Purchase Line";
+        ItemCharge: Record "Item Charge";
+        ItemChargeAssignmentPurch: Record "Item Charge Assignment (Purch)";
+        Vendor: Record Vendor;
+    begin
+        LibraryPurchase.CreateVendor(Vendor);
+        Vendor.Validate("Gen. Bus. Posting Group", _GenBusPostGrp);
+        Vendor.Validate("VAT Bus. Posting Group", _VATBusPostGrp);
+        Vendor.Modify(true);
+
+        LibraryInventory.CreateItemCharge(ItemCharge);
+        ItemCharge.Validate("Gen. Prod. Posting Group", _GenProdPostGrp);
+        ItemCharge.Validate("VAT Prod. Posting Group", _STDVATProdGrp);
+        ItemCharge.Modify(true);
+
+        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Invoice, Vendor."No.");
+        LibraryPurchase.CreatePurchaseLine(ChargedLine, PurchaseHeader, ChargedLine.Type::Item, ChargedItemNo, Qty);
+        ChargedLine.Validate("Location Code", LocationCode);
+        ChargedLine.Validate("Direct Unit Cost", DirectUnitCost);
+        ChargedLine.Modify(true);
+        LibraryPurchase.CreatePurchaseLine(UnchargedLine, PurchaseHeader, UnchargedLine.Type::Item, UnchargedItemNo, Qty);
+        UnchargedLine.Validate("Location Code", LocationCode);
+        UnchargedLine.Validate("Direct Unit Cost", DirectUnitCost);
+        UnchargedLine.Modify(true);
+
+        LibraryPurchase.CreatePurchaseLine(ChargeLine, PurchaseHeader, ChargeLine.Type::"Charge (Item)", ItemCharge."No.", 1);
+        ChargeLine.Validate("Location Code", LocationCode);
+        ChargeLine.Validate("Direct Unit Cost", ChargeAmount);
+        ChargeLine.Modify(true);
+
+        LibraryPurchase.CreateItemChargeAssignment(ItemChargeAssignmentPurch, ChargeLine, ItemCharge,
+            "Purchase Applies-to Document Type"::Invoice, PurchaseHeader."No.", ChargedLine."Line No.", ChargedItemNo, 1, ChargeAmount);
         ItemChargeAssignmentPurch.Insert(true);
 
         PostedNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
@@ -911,6 +995,52 @@
         PurchaseLine.Modify(true);
 
         LibraryPurchase.PostPurchaseDocument(PurchaseHeader, false, true);
+    end;
+
+    /// <summary>
+    /// Invoices only part of a received purchase order on a separate invoice that also carries an item
+    /// charge assigned to the whole receipt line. The charge then covers more units than the invoice does.
+    /// </summary>
+    internal procedure InvoicePartOfReceiptWithItemCharge(OrderNo: Code[20]; InvoiceQty: Decimal; ChargeAmount: Decimal) PostedNo: Code[20]
+    var
+        ChargeLine: Record "Purchase Line";
+        InvoiceHeader: Record "Purchase Header";
+        InvoiceLine: Record "Purchase Line";
+        ItemCharge: Record "Item Charge";
+        ItemChargeAssignmentPurch: Record "Item Charge Assignment (Purch)";
+        PurchRcptLine: Record "Purch. Rcpt. Line";
+        PurchGetReceipt: Codeunit "Purch.-Get Receipt";
+    begin
+        PurchRcptLine.SetRange("Order No.", OrderNo);
+        PurchRcptLine.SetRange(Type, PurchRcptLine.Type::Item);
+        PurchRcptLine.FindFirst();
+
+        LibraryPurchase.CreatePurchHeader(InvoiceHeader, InvoiceHeader."Document Type"::Invoice, PurchRcptLine."Buy-from Vendor No.");
+        PurchGetReceipt.SetPurchHeader(InvoiceHeader);
+        PurchGetReceipt.CreateInvLines(PurchRcptLine);
+
+        InvoiceLine.SetRange("Document Type", InvoiceHeader."Document Type");
+        InvoiceLine.SetRange("Document No.", InvoiceHeader."No.");
+        InvoiceLine.SetRange(Type, InvoiceLine.Type::Item);
+        InvoiceLine.FindFirst();
+        InvoiceLine.Validate(Quantity, InvoiceQty);
+        InvoiceLine.Modify(true);
+
+        LibraryInventory.CreateItemCharge(ItemCharge);
+        ItemCharge.Validate("Gen. Prod. Posting Group", _GenProdPostGrp);
+        ItemCharge.Validate("VAT Prod. Posting Group", _STDVATProdGrp);
+        ItemCharge.Modify(true);
+
+        LibraryPurchase.CreatePurchaseLine(ChargeLine, InvoiceHeader, ChargeLine.Type::"Charge (Item)", ItemCharge."No.", 1);
+        ChargeLine.Validate("Location Code", PurchRcptLine."Location Code");
+        ChargeLine.Validate("Direct Unit Cost", ChargeAmount);
+        ChargeLine.Modify(true);
+
+        LibraryPurchase.CreateItemChargeAssignment(ItemChargeAssignmentPurch, ChargeLine, ItemCharge,
+            "Purchase Applies-to Document Type"::Receipt, PurchRcptLine."Document No.", PurchRcptLine."Line No.", PurchRcptLine."No.", 1, ChargeAmount);
+        ItemChargeAssignmentPurch.Insert(true);
+
+        PostedNo := LibraryPurchase.PostPurchaseDocument(InvoiceHeader, false, true);
     end;
 
     /// <summary>
