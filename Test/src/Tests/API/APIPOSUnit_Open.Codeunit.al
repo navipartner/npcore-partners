@@ -601,6 +601,67 @@ codeunit 85222 "NPR APIPOSUnit Open"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure GetCurrentPOSUnit_ReturnsSelfserviceCardEftFlowPerIntegrationType()
+    var
+        Assert: Codeunit Assert;
+        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
+        EFTNETSCloudIntegration: Codeunit "NPR EFT NETSCloud Integrat.";
+        JToken: JsonToken;
+    begin
+        Initialize();
+
+        SetSelfserviceEFTIntegrationType(EFTAdyenIntegration.CloudIntegrationType());
+        JToken := GetCurrentPOSUnitSelfserviceCardEftFlow();
+        Assert.AreEqual('cloud', JToken.AsValue().AsText(), 'Adyen Cloud should report the cloud flow');
+
+        SetSelfserviceEFTIntegrationType(EFTNETSCloudIntegration.IntegrationType());
+        JToken := GetCurrentPOSUnitSelfserviceCardEftFlow();
+        Assert.AreEqual('cloud', JToken.AsValue().AsText(), 'NETS Cloud should report the cloud flow');
+
+        SetSelfserviceEFTIntegrationType(EFTAdyenIntegration.MposTapToPayIntegrationType());
+        JToken := GetCurrentPOSUnitSelfserviceCardEftFlow();
+        Assert.AreEqual('local', JToken.AsValue().AsText(), 'Adyen Tap to Pay should report the local flow');
+
+        SetSelfserviceEFTIntegrationType('NETS_BAXI_NET');
+        JToken := GetCurrentPOSUnitSelfserviceCardEftFlow();
+        Assert.IsTrue(JToken.AsValue().IsNull(), 'An integration type without self-service API support should report a null flow');
+
+        SetSelfserviceEFTIntegrationType(EFTAdyenIntegration.CloudIntegrationType());
+    end;
+
+    local procedure GetCurrentPOSUnitSelfserviceCardEftFlow() JToken: JsonToken
+    var
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        Assert: Codeunit Assert;
+        Response: JsonObject;
+        Body: JsonObject;
+        QueryParams: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        ResponseBody: JsonObject;
+        SelfserviceProfileJson: JsonObject;
+    begin
+        Response := LibraryNPRetailAPI.CallApi('GET', '/pos/unit/me', Body, QueryParams, Headers);
+        Assert.IsTrue(LibraryNPRetailAPI.IsSuccessStatusCode(Response), 'GET /pos/unit/me should succeed');
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        Assert.IsTrue(ResponseBody.Get('selfserviceProfile', JToken), 'Response should contain selfserviceProfile');
+        SelfserviceProfileJson := JToken.AsObject();
+        Assert.IsTrue(SelfserviceProfileJson.Get('selfserviceCardEftFlow', JToken), 'selfserviceProfile should always contain selfserviceCardEftFlow');
+    end;
+
+    local procedure SetSelfserviceEFTIntegrationType(IntegrationType: Code[20])
+    var
+        SSProfile: Record "NPR SS Profile";
+        EFTSetup: Record "NPR EFT Setup";
+    begin
+        SSProfile.Get(_POSUnit."POS Self Service Profile");
+        EFTSetup.Get(SSProfile."Selfservice Card Payment Meth.", _POSUnit."No.");
+        EFTSetup."EFT Integration Type" := IntegrationType;
+        EFTSetup.Modify();
+        Commit();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure GetCurrentPOSUnit_GlobalDigitalReceiptDisabled_ReturnsFalse()
     var
         LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
@@ -824,9 +885,12 @@ codeunit 85222 "NPR APIPOSUnit Open"
         UserSetup: Record "User Setup";
         DigitalRcptSetup: Record "NPR Digital Rcpt. Setup";
         POSReceiptProfile: Record "NPR POS Receipt Profile";
+        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
     begin
-        if _Initialized then
+        if _Initialized then begin
+            SetSelfserviceEFTIntegrationType(EFTAdyenIntegration.CloudIntegrationType());
             exit;
+        end;
 
         LibraryNPRetailAPI.CreateAPIPermission(UserSecurityId(), CompanyName(), 'NPR API POS');
 

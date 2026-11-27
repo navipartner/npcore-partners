@@ -550,6 +550,65 @@
                     //+NPR5.46 [290734]
                 end;
             }
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+            group("Self-Service Payment")
+            {
+                Caption = 'Self-Service Payment';
+                Image = CreditCard;
+
+                action("Look Up Result")
+                {
+                    Caption = 'Look Up Result';
+                    Enabled = Rec."Self Service";
+                    Image = Refresh;
+                    ToolTip = 'Asks NETS Cloud for the result of a card payment that got no answer. An approved payment on an unfinished self-service sale can be voided right away so the customer can pay again.';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    var
+                        APIEFTNETSResolve: Codeunit "NPR API EFT NETS Resolve";
+                    begin
+                        Message(APIEFTNETSResolve.LookUp(Rec));
+                        CurrPage.Update(false);
+                    end;
+                }
+                action("Void Payment")
+                {
+                    Caption = 'Void Payment';
+                    Enabled = Rec."Self Service";
+                    Image = VoidCheck;
+                    ToolTip = 'Voids an approved NETS Cloud card payment on a self-service sale that was never completed, so the customer gets the money back.';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    var
+                        APIEFTNETSResolve: Codeunit "NPR API EFT NETS Resolve";
+                    begin
+                        Message(APIEFTNETSResolve.VoidPayment(Rec));
+                        CurrPage.Update(false);
+                    end;
+                }
+                action("Mark as Resolved")
+                {
+                    Caption = 'Mark as Resolved';
+                    Enabled = Rec."Self Service";
+                    Image = Approve;
+                    ToolTip = 'Records that a NETS Cloud card payment without a result has been checked by staff, so the self-service terminal accepts new payments again. Do this only after confirming in the NETS portal that the customer was not charged, or that the charge has been refunded.';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    var
+                        APIEFTNETSResolve: Codeunit "NPR API EFT NETS Resolve";
+                        MarkResolvedQst: Label 'Mark transaction %1 as resolved without a result from NETS Cloud? Do this only after checking in the NETS portal that the customer was not charged, or that the charge has been refunded. The terminal accepts new payments afterwards.', Comment = '%1 = Entry No.';
+                    begin
+                        if not Confirm(MarkResolvedQst, false, Rec."Entry No.") then
+                            exit;
+                        APIEFTNETSResolve.MarkResolved(Rec);
+                        CurrPage.Update(false);
+                    end;
+                }
+            }
+#endif
         }
     }
 

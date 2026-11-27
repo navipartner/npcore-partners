@@ -1,10 +1,12 @@
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
-codeunit 6151089 "NPR API POS EFT Adyen Cloud"
+codeunit 6151089 "NPR API POS EFT"
 {
     Access = Internal;
 
     var
         _Sentry: Codeunit "NPR Sentry";
+        _UnsupportedIntegrationTypeLbl: Label '%1 ''%2'' is not supported by the self-service EFT API', Comment = '%1 = EFT Integration Type field caption, %2 = EFT Integration Type';
+        _NotCloudFlowLbl: Label '%1 ''%2'' does not use the cloud EFT flow', Comment = '%1 = EFT Integration Type field caption, %2 = EFT Integration Type';
 
     internal procedure PrepareEFTPayment(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
@@ -13,13 +15,14 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
         EFTSetup: Record "NPR EFT Setup";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
         APIPOSSale: Codeunit "NPR API POS Sale";
+        Provider: Interface "NPR API EFT Provider";
         POSAgeCheck: Codeunit "NPR POS Age Check";
         Body: JsonToken;
         IntegrationRequest: JsonObject;
         Mechanism: Enum "NPR EFT Request Mechanism";
         Workflow: Text;
+        ErrorMessage: Text;
         SaleId: Guid;
         Amount: Decimal;
         HasAmount: Boolean;
@@ -32,11 +35,10 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
         if not TryResolveSelfServiceEFTContext(Request, POSSale, EFTSetup, POSUnitNo, SaleId, Response) then
             exit(Response);
 
-        if not (EFTSetup."EFT Integration Type" in [
-                EFTAdyenIntegration.CloudIntegrationType(),
-                EFTAdyenIntegration.MposTapToPayIntegrationType()])
-        then
-            exit(Response.RespondBadRequest('EFT Setup is not configured for an Adyen integration (Cloud or TTP)'));
+        if not TryResolveProvider(EFTSetup, Provider, Response) then
+            exit(Response);
+        if not Provider.ValidateSetup(EFTSetup, POSUnitNo, ErrorMessage) then
+            exit(Response.RespondBadRequest(ErrorMessage));
 
         Body := Request.BodyJson();
         HasAmount := GetJsonDecimal(Body, 'amount', Amount);
@@ -51,7 +53,6 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
         // Reconstruct POS session - required by EFT framework (e.g. CalculateCashback needs active session)
         APIPOSSale.ReconstructSession(SaleId);
 
-        // Create EFT Transaction Request via helper
         EntryNo := EFTTransactionMgt.PreparePayment(
             EFTSetup,
             Amount,
@@ -63,7 +64,6 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
         );
 
         EFTTransactionRequest.Get(EntryNo);
-        // Clear timestamps so lifecycle is clean
         Clear(EFTTransactionRequest.Started);
         Clear(EFTTransactionRequest.Finished);
         EFTTransactionRequest.Modify();
@@ -153,12 +153,7 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
         SaleId: Guid;
         TransactionId: Guid;
         ResponseText: Text;
-        FieldName: Text;
         JsonResponse: JsonObject;
-        SaleJson: JsonObject;
-        EFTPaymentLineIds: List of [Text];
-        EmptySaleLineIds: List of [Text];
-        Token: JsonToken;
     begin
         if not TryLoadExistingTransaction(Request, POSSale, EFTTransactionRequest, SaleId, TransactionId, Response) then
             exit(Response);
@@ -188,23 +183,8 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
         JsonResponse.Add('cardName', EFTTransactionRequest."Card Name");
         JsonResponse.Add('authorizationNumber', EFTTransactionRequest."Authorisation Number");
 
-        if EFTTransactionRequest.Successful then begin
-            EFTPaymentLineIds.Add(Format(EFTTransactionRequest."Sales Line ID", 0, 4).ToLower());
-
-            SaleJson := APIPOSSale.POSSaleAsJson(POSSale, true, true, EmptySaleLineIds, EFTPaymentLineIds).Build();
-            SaleJson.Remove('saleId');
-            SaleJson.Remove('receiptNo');
-            SaleJson.Remove('posUnit');
-            SaleJson.Remove('posStore');
-            SaleJson.Remove('date');
-            SaleJson.Remove('startTime');
-            SaleJson.Remove('customerNo');
-            SaleJson.Remove('salespersonCode');
-            SaleJson.Remove('vatBusinessPostingGroup');
-            foreach FieldName in SaleJson.Keys() do
-                if SaleJson.Get(FieldName, Token) then
-                    JsonResponse.Add(FieldName, Token);
-        end;
+        if EFTTransactionRequest.Successful then
+            AddSaleDelta(JsonResponse, POSSale, EFTTransactionRequest);
 
         exit(Response.RespondOK(JsonResponse));
     end;
@@ -268,20 +248,12 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
         POSSale: Record "NPR POS Sale";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTSetup: Record "NPR EFT Setup";
-        EFTAdyenTrxRequest: Codeunit "NPR EFT Adyen Trx Request";
-        EFTAdyenCloudProtocol: Codeunit "NPR EFT Adyen Cloud Protocol";
-        EFTAdyenResponseHandler: Codeunit "NPR EFT Adyen Response Handler";
-        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
         APIPOSSale: Codeunit "NPR API POS Sale";
+        Provider: Interface "NPR API EFT Provider";
         POSAgeCheck: Codeunit "NPR POS Age Check";
         SaleId: Guid;
         TransactionId: Guid;
-        RequestJson: Text;
-        ResponseText: Text;
-        Logs: Text;
-        ResponseStatusCode: Integer;
-        URL: Text;
-        ErrorText: Text;
+        ErrorMessage: Text;
         JsonResponse: JsonObject;
     begin
         Request.SkipCacheIfNonStickyRequest(APIPOSSaleLine.POSSaleTableIds());
@@ -291,6 +263,10 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
 
         if EFTTransactionRequest."External Result Known" and EFTTransactionRequest.Successful then
             exit(Response.RespondBadRequest('Transaction already completed successfully'));
+        if (EFTTransactionRequest.Started <> 0DT) and not EFTTransactionRequest."External Result Known" then
+            exit(Response.RespondBadRequest('Transaction result is unknown and it cannot be started again. Staff must look it up or void it in Business Central'));
+        if EFTTransactionRequest.Started <> 0DT then
+            exit(Response.RespondBadRequest('Transaction has already been started and cannot be started again. Prepare a new transaction'));
 
         if not APIPOSSale.AssertPOSUnitOpenForSale(POSSale."Register No.") then
             exit(Response.RespondBadRequest(StrSubstNo('POS Unit ''%1'' is not open for sales.', POSSale."Register No.")));
@@ -299,40 +275,18 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
             exit(Response.RespondBadRequest("NPR API Error Code"::age_check_required, POSAgeCheck.RequiredErrorMessage()));
 
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
-        if EFTSetup."EFT Integration Type" <> EFTAdyenIntegration.CloudIntegrationType() then
-            exit(Response.RespondBadRequest('EFT Setup is not configured for Adyen Cloud integration'));
+        if not TryResolveCloudProvider(EFTSetup, Provider, Response) then
+            exit(Response);
+        if not Provider.ValidateStart(EFTTransactionRequest, EFTSetup, ErrorMessage) then
+            exit(Response.RespondBadRequest(ErrorMessage));
 
-        // Reconstruct POS session - required for ProcessResponse chain which inserts payment lines via EFT framework
         APIPOSSale.ReconstructSession(SaleId);
 
-        // Build request JSON
-        RequestJson := EFTAdyenTrxRequest.GetRequestJson(EFTTransactionRequest, EFTSetup);
-
-        // Set Started timestamp and commit before sending
         EFTTransactionRequest.Started := CurrentDateTime;
         EFTTransactionRequest.Modify();
         Commit();
 
-        // Get terminal URL
-        URL := EFTAdyenCloudProtocol.GetTerminalURL(EFTTransactionRequest);
-
-        // Synchronous call to Adyen (5 min timeout for BC SaaS max)
-        if not EFTAdyenCloudProtocol.InvokeAPI(RequestJson, GetApiKeyForSetup(EFTSetup), URL, 300000, ResponseText, ResponseStatusCode) then begin
-            Logs := EFTAdyenCloudProtocol.GetLogBuffer();
-            ErrorText := GetLastErrorText();
-            EFTAdyenResponseHandler.ProcessResponse(EFTTransactionRequest."Entry No.", ResponseText, false, true, ErrorText);
-            EFTAdyenIntegration.WriteLogEntry(EFTTransactionRequest, true, 'API Start (Error)', Logs);
-            Commit();
-            JsonResponse.Add('transactionId', Format(TransactionId, 0, 4).ToLower());
-            JsonResponse.Add('processed', true);
-            exit(Response.RespondOK(JsonResponse));
-        end;
-
-        Logs := EFTAdyenCloudProtocol.GetLogBuffer();
-
-        // Process successful response
-        EFTAdyenResponseHandler.ProcessResponse(EFTTransactionRequest."Entry No.", ResponseText, ResponseStatusCode in [0, 200], true, '');
-        EFTAdyenIntegration.WriteLogEntry(EFTTransactionRequest, false, 'API Start (Complete)', Logs);
+        Provider.StartCloudPayment(EFTTransactionRequest, EFTSetup, POSSale);
         Commit();
 
         JsonResponse.Add('transactionId', Format(TransactionId, 0, 4).ToLower());
@@ -344,50 +298,33 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
     var
         POSSale: Record "NPR POS Sale";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        APIPOSSale: Codeunit "NPR API POS Sale";
         SaleId: Guid;
         TransactionId: Guid;
         Status: Text;
-        FieldName: Text;
+        Successful: Boolean;
         JsonResponse: JsonObject;
-        SaleJson: JsonObject;
-        EFTPaymentLineIds: List of [Text];
-        EmptySaleLineIds: List of [Text];
-        Token: JsonToken;
     begin
         if not TryLoadExistingTransaction(Request, POSSale, EFTTransactionRequest, SaleId, TransactionId, Response) then
             exit(Response);
 
         Status := GetTransactionStatus(EFTTransactionRequest);
+        Successful := IsPaymentStanding(EFTTransactionRequest);
 
         JsonResponse.Add('transactionId', Format(TransactionId, 0, 4).ToLower());
         JsonResponse.Add('status', Status);
-        JsonResponse.Add('successful', EFTTransactionRequest.Successful);
+        JsonResponse.Add('successful', Successful);
+        if EFTTransactionRequest."Selfservice Reversal Status" <> EFTTransactionRequest."Selfservice Reversal Status"::" " then
+            JsonResponse.Add('reversalStatus', ReversalStatusName(EFTTransactionRequest));
 
-        if EFTTransactionRequest."External Result Known" then begin
+        if EFTTransactionRequest."External Result Known" and (Status <> 'Initiated') then begin
             JsonResponse.Add('resultCode', Format(EFTTransactionRequest."Result Code"));
             JsonResponse.Add('cardNumber', EFTTransactionRequest."Card Number");
             JsonResponse.Add('cardName', EFTTransactionRequest."Card Name");
             JsonResponse.Add('authorizationNumber', EFTTransactionRequest."Authorisation Number");
             JsonResponse.Add('resultMessage', EFTTransactionRequest."Result Display Text");
 
-            if EFTTransactionRequest.Successful then begin
-                EFTPaymentLineIds.Add(Format(EFTTransactionRequest."Sales Line ID", 0, 4).ToLower());
-
-                SaleJson := APIPOSSale.POSSaleAsJson(POSSale, true, true, EmptySaleLineIds, EFTPaymentLineIds).Build();
-                SaleJson.Remove('saleId');
-                SaleJson.Remove('receiptNo');
-                SaleJson.Remove('posUnit');
-                SaleJson.Remove('posStore');
-                SaleJson.Remove('date');
-                SaleJson.Remove('startTime');
-                SaleJson.Remove('customerNo');
-                SaleJson.Remove('salespersonCode');
-                SaleJson.Remove('vatBusinessPostingGroup');
-                foreach FieldName in SaleJson.Keys() do
-                    if SaleJson.Get(FieldName, Token) then
-                        JsonResponse.Add(FieldName, Token);
-            end;
+            if Successful then
+                AddSaleDelta(JsonResponse, POSSale, EFTTransactionRequest);
         end;
 
         exit(Response.RespondOK(JsonResponse));
@@ -397,44 +334,122 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
     var
         POSSale: Record "NPR POS Sale";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        AbortEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTSetup: Record "NPR EFT Setup";
-        EFTAdyenAbortMgmt: Codeunit "NPR EFT Adyen Abort Mgmt";
-        EFTAdyenAbortTrxReq: Codeunit "NPR EFT Adyen AbortTrx Req";
-        EFTAdyenCloudProtocol: Codeunit "NPR EFT Adyen Cloud Protocol";
+        Provider: Interface "NPR API EFT Provider";
         SaleId: Guid;
         TransactionId: Guid;
-        AbortEntryNo: Integer;
-        AbortRequestJson: Text;
-        AbortResponseText: Text;
-        AbortResponseStatusCode: Integer;
-        URL: Text;
         JsonResponse: JsonObject;
     begin
         if not TryLoadExistingTransaction(Request, POSSale, EFTTransactionRequest, SaleId, TransactionId, Response) then
             exit(Response);
 
-        // Create abort request
-        AbortEntryNo := EFTAdyenAbortMgmt.CreateAbortTransactionRequest(EFTTransactionRequest);
-        AbortEFTTransactionRequest.Get(AbortEntryNo);
+        if EFTTransactionRequest.Started = 0DT then
+            exit(Response.RespondBadRequest('Transaction has not been started'));
+        if EFTTransactionRequest."Selfservice Reversal Status" = EFTTransactionRequest."Selfservice Reversal Status"::Pending then
+            exit(Response.RespondBadRequest('Transaction is waiting for its signature void and cannot be cancelled'));
+        if EFTTransactionRequest.Finished <> 0DT then
+            exit(Response.RespondBadRequest('Transaction has already finished'));
 
-        // Build abort JSON
-        AbortRequestJson := EFTAdyenAbortTrxReq.GetRequestJson(AbortEFTTransactionRequest, EFTTransactionRequest);
-
-        // Get API key + URL
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
-        URL := EFTAdyenCloudProtocol.GetTerminalURL(EFTTransactionRequest);
+        if not TryResolveCloudProvider(EFTSetup, Provider, Response) then
+            exit(Response);
 
-        // Abort is quick, 30s timeout
-        if not EFTAdyenCloudProtocol.InvokeAPI(AbortRequestJson, GetApiKeyForSetup(EFTSetup), URL, 30000, AbortResponseText, AbortResponseStatusCode) then begin
-            _Sentry.AddLastErrorIfProgrammingBug();
-        end;
-
+        Provider.CancelCloudPayment(EFTTransactionRequest, EFTSetup);
         Commit();
 
         JsonResponse.Add('transactionId', Format(TransactionId, 0, 4).ToLower());
         JsonResponse.Add('cancelRequested', true);
         exit(Response.RespondOK(JsonResponse));
+    end;
+
+    internal procedure HasUnsettledReversal(POSSale: Record "NPR POS Sale"): Boolean
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+    begin
+        EFTTransactionRequest.SetRange("Register No.", POSSale."Register No.");
+        EFTTransactionRequest.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        EFTTransactionRequest.SetFilter("Selfservice Reversal Status", '%1|%2',
+            EFTTransactionRequest."Selfservice Reversal Status"::Pending,
+            EFTTransactionRequest."Selfservice Reversal Status"::Unknown);
+        exit(not EFTTransactionRequest.IsEmpty());
+    end;
+
+    internal procedure TryFindProvider(IntegrationType: Code[20]; var Provider: Enum "NPR API EFT Provider"): Boolean
+    var
+        Candidate: Interface "NPR API EFT Provider";
+        Ordinal: Integer;
+    begin
+        foreach Ordinal in Provider.Ordinals() do begin
+            Provider := Enum::"NPR API EFT Provider".FromInteger(Ordinal);
+            Candidate := Provider;
+            if Candidate.IntegrationType() = IntegrationType then
+                exit(true);
+        end;
+        exit(false);
+    end;
+
+    internal procedure GetFlowName(Provider: Enum "NPR API EFT Provider"): Text
+    var
+        ProviderImplementation: Interface "NPR API EFT Provider";
+        Flow: Enum "NPR API EFT Flow";
+    begin
+        ProviderImplementation := Provider;
+        Flow := ProviderImplementation.Flow();
+        case Flow of
+            Flow::Cloud:
+                exit('cloud');
+            Flow::Local:
+                exit('local');
+        end;
+    end;
+
+    local procedure TryResolveProvider(EFTSetup: Record "NPR EFT Setup"; var Provider: Interface "NPR API EFT Provider"; var Response: Codeunit "NPR API Response"): Boolean
+    var
+        ProviderEnum: Enum "NPR API EFT Provider";
+    begin
+        if not TryFindProvider(EFTSetup."EFT Integration Type", ProviderEnum) then begin
+            Response := Response.RespondBadRequest(StrSubstNo(_UnsupportedIntegrationTypeLbl, EFTSetup.FieldCaption("EFT Integration Type"), EFTSetup."EFT Integration Type"));
+            exit(false);
+        end;
+        Provider := ProviderEnum;
+        exit(true);
+    end;
+
+    local procedure TryResolveCloudProvider(EFTSetup: Record "NPR EFT Setup"; var Provider: Interface "NPR API EFT Provider"; var Response: Codeunit "NPR API Response"): Boolean
+    begin
+        if not TryResolveProvider(EFTSetup, Provider, Response) then
+            exit(false);
+        if Provider.Flow() <> Enum::"NPR API EFT Flow"::Cloud then begin
+            Response := Response.RespondBadRequest(StrSubstNo(_NotCloudFlowLbl, EFTSetup.FieldCaption("EFT Integration Type"), EFTSetup."EFT Integration Type"));
+            exit(false);
+        end;
+        exit(true);
+    end;
+
+    local procedure AddSaleDelta(var JsonResponse: JsonObject; POSSale: Record "NPR POS Sale"; EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    var
+        APIPOSSale: Codeunit "NPR API POS Sale";
+        SaleJson: JsonObject;
+        EFTPaymentLineIds: List of [Text];
+        EmptySaleLineIds: List of [Text];
+        Token: JsonToken;
+        FieldName: Text;
+    begin
+        EFTPaymentLineIds.Add(Format(EFTTransactionRequest."Sales Line ID", 0, 4).ToLower());
+
+        SaleJson := APIPOSSale.POSSaleAsJson(POSSale, true, true, EmptySaleLineIds, EFTPaymentLineIds).Build();
+        SaleJson.Remove('saleId');
+        SaleJson.Remove('receiptNo');
+        SaleJson.Remove('posUnit');
+        SaleJson.Remove('posStore');
+        SaleJson.Remove('date');
+        SaleJson.Remove('startTime');
+        SaleJson.Remove('customerNo');
+        SaleJson.Remove('salespersonCode');
+        SaleJson.Remove('vatBusinessPostingGroup');
+        foreach FieldName in SaleJson.Keys() do
+            if SaleJson.Get(FieldName, Token) then
+                JsonResponse.Add(FieldName, Token);
     end;
 
     local procedure TryLoadExistingTransaction(var Request: Codeunit "NPR API Request"; var POSSale: Record "NPR POS Sale"; var EFTTransactionRequest: Record "NPR EFT Transaction Request"; var SaleId: Guid; var TransactionId: Guid; var Response: Codeunit "NPR API Response"): Boolean
@@ -539,10 +554,37 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
             exit('Initiated');
         end;
 
+        if EFTTransactionRequest."Selfservice Reversal Status" = EFTTransactionRequest."Selfservice Reversal Status"::Pending then
+            exit('Initiated');
+
         if EFTTransactionRequest."External Result Known" then
             exit('Completed');
 
         exit('Failed');
+    end;
+
+    local procedure ReversalStatusName(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
+    begin
+        case EFTTransactionRequest."Selfservice Reversal Status" of
+            EFTTransactionRequest."Selfservice Reversal Status"::Pending:
+                exit('pending');
+            EFTTransactionRequest."Selfservice Reversal Status"::Reversed:
+                exit('reversed');
+            EFTTransactionRequest."Selfservice Reversal Status"::Failed:
+                exit('failed');
+            EFTTransactionRequest."Selfservice Reversal Status"::Unknown:
+                exit('unknown');
+        end;
+    end;
+
+    local procedure IsPaymentStanding(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
+    begin
+        if not EFTTransactionRequest.Successful or EFTTransactionRequest.Reversed then
+            exit(false);
+        exit(not (EFTTransactionRequest."Selfservice Reversal Status" in [
+            EFTTransactionRequest."Selfservice Reversal Status"::Pending,
+            EFTTransactionRequest."Selfservice Reversal Status"::Reversed,
+            EFTTransactionRequest."Selfservice Reversal Status"::Unknown]));
     end;
 
     local procedure GetRemainingBalance(POSSale: Record "NPR POS Sale"): Decimal
@@ -574,16 +616,6 @@ codeunit 6151089 "NPR API POS EFT Adyen Cloud"
         if not UserSetup.Get(UserId) then
             exit('');
         exit(UserSetup."NPR POS Unit No.");
-    end;
-
-    [NonDebuggable]
-    local procedure GetApiKeyForSetup(var EFTSetup: Record "NPR EFT Setup"): Text
-    var
-        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
-        EFTAdyenPaymTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
-    begin
-        EFTAdyenIntegration.GetPaymentTypeParameters(EFTSetup, EFTAdyenPaymTypeSetup);
-        exit(EFTAdyenPaymTypeSetup.GetApiKey());
     end;
 
     local procedure GetJsonDecimal(Body: JsonToken; PropertyName: Text; var Value: Decimal): Boolean

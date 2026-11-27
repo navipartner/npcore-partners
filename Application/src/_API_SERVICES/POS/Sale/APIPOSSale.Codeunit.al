@@ -258,6 +258,7 @@ codeunit 6248632 "NPR API POS Sale"
         POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
+        APIPOSEFT: Codeunit "NPR API POS EFT";
         POSAgeCheck: Codeunit "NPR POS Age Check";
         KitchenOrder: JsonToken;
         HasKitchenRequest: Boolean;
@@ -278,6 +279,9 @@ codeunit 6248632 "NPR API POS Sale"
 
         if not AssertPOSUnitOpenForSale(POSSaleRec."Register No.") then
             exit(Response.RespondBadRequest(StrSubstNo('POS Unit ''%1'' is not open for sales.', POSSaleRec."Register No.")));
+
+        if APIPOSEFT.HasUnsettledReversal(POSSaleRec) then
+            exit(Response.RespondBadRequest('A card payment on the sale is waiting for its signature void or has an unknown void result. Staff must settle it in Business Central before the sale can be completed'));
 
         if POSAgeCheck.NeedsApproval(POSSaleRec) then
             exit(Response.RespondBadRequest("NPR API Error Code"::age_check_required, POSAgeCheck.RequiredErrorMessage()));

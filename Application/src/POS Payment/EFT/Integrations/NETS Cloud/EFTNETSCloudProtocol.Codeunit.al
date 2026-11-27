@@ -12,11 +12,16 @@
     procedure ProcessRequestSynchronously(EftTransactionRequest: Record "NPR EFT Transaction Request")
     var
         EFTSetup: Record "NPR EFT Setup";
+        LoggedIn: Boolean;
     begin
         // These requests are fully processed with normal blocking AL, without a POS workflow or POS dialog.
         // The transaction (purchase/refund) and abort requests are invoked from a background task from a POS workflow.
 
         EFTSetup.FindSetup(EftTransactionRequest."Register No.", EftTransactionRequest."Original POS Payment Type Code");
+
+        GetToken(EFTSetup, LoggedIn);
+        if LoggedIn then
+            Commit();
 
         case EftTransactionRequest."Processing Type" of
             EftTransactionRequest."Processing Type"::CLOSE:
@@ -553,6 +558,7 @@
 
     local procedure InvokeAPI(Body: Text; Token: Text; URL: Text; Method: Text; Endpoint: Text; TimeoutMs: Integer; AllowBadRequest: Boolean): Text
     var
+        EFTNETSCloudToken: Codeunit "NPR EFT NETSCloud Token";
         Http: HttpClient;
         Request: HttpRequestMessage;
         Response: HttpResponseMessage;
@@ -582,6 +588,8 @@
         _ResponseStatusCodeBuffer := Response.HttpStatusCode;
 
         if not (Response.IsSuccessStatusCode) then begin
+            if (Response.HttpStatusCode = 401) and (CurrentClientType <> ClientType::Background) then
+                EFTNETSCloudToken.InvalidateCurrent();
             if not ((Response.HttpStatusCode = 400) and AllowBadRequest) then begin
                 Error(ErrorInvokeLbl, URL, Format(_ResponseStatusCodeBuffer));
             end;
@@ -594,13 +602,21 @@
 
     procedure GetToken(EFTSetup: Record "NPR EFT Setup"): Text
     var
+        LoggedIn: Boolean;
+    begin
+        exit(GetToken(EFTSetup, LoggedIn));
+    end;
+
+    procedure GetToken(EFTSetup: Record "NPR EFT Setup"; var LoggedIn: Boolean): Text
+    var
         EFTNETSCloudToken: Codeunit "NPR EFT NETSCloud Token";
         Token: Text;
         JSON: Text;
         JObject: JsonObject;
         JToken: JsonToken;
     begin
-        if EFTNETSCloudToken.TryGetToken(Token) then
+        LoggedIn := false;
+        if EFTNETSCloudToken.TryGetToken(EFTSetup, Token) then
             exit(Token);
 
         JSON := LoginAndGetToken(EFTSetup);
@@ -608,8 +624,14 @@
         JObject.Get('token', JToken);
         Token := JToken.AsValue().AsText();
 
-        EFTNETSCloudToken.SetToken(Token);
+        EFTNETSCloudToken.SetToken(EFTSetup, Token);
+        LoggedIn := true;
         exit(Token);
+    end;
+
+    procedure LastResponseWasUnauthorized(): Boolean
+    begin
+        exit(_ResponseStatusCodeBuffer = 401);
     end;
 
     local procedure GetServiceURL(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text

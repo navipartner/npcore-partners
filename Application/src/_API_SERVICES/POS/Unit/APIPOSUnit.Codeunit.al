@@ -134,6 +134,7 @@ codeunit 6248434 "NPR APIPOSUnit"
             SelfserviceProfileJson.Add('kioskModeUnlockPin', SSProfile."Kiosk Mode Unlock PIN");
             if FindEFTIntegrationType(POSUnit."No.", SSProfile."Selfservice Card Payment Meth.", EFTIntegrationType) then
                 SelfserviceProfileJson.Add('selfserviceCardEftIntegrationType', EFTIntegrationType);
+            AddSelfserviceCardEftFlow(SelfserviceProfileJson, EFTIntegrationType);
             Json.Add('selfserviceProfile', SelfserviceProfileJson);
         end;
     end;
@@ -178,6 +179,20 @@ codeunit 6248434 "NPR APIPOSUnit"
             exit(false);
 
         exit(DigitalRcptSetup."Enable");
+    end;
+
+    local procedure AddSelfserviceCardEftFlow(var SelfserviceProfileJson: JsonObject; EFTIntegrationType: Code[20])
+    var
+        APIPOSEFT: Codeunit "NPR API POS EFT";
+        Provider: Enum "NPR API EFT Provider";
+        NullValue: JsonValue;
+    begin
+        if (EFTIntegrationType <> '') and APIPOSEFT.TryFindProvider(EFTIntegrationType, Provider) then begin
+            SelfserviceProfileJson.Add('selfserviceCardEftFlow', APIPOSEFT.GetFlowName(Provider));
+            exit;
+        end;
+        NullValue.SetValueToNull();
+        SelfserviceProfileJson.Add('selfserviceCardEftFlow', NullValue);
     end;
 
     local procedure FindEFTIntegrationType(POSUnitNo: Code[10]; PaymentMethodCode: Code[10]; var EFTIntegrationType: Code[20]): Boolean

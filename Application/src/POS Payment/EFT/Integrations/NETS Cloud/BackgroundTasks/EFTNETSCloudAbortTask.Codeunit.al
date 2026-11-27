@@ -5,6 +5,7 @@ codeunit 6059907 "NPR EFT NETS Cloud Abort Task" implements "NPR POS Background 
     procedure ExecuteBackgroundTask(TaskId: Integer; Parameters: Dictionary of [Text, Text]; var Result: Dictionary of [Text, Text]);
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTSetup: Record "NPR EFT Setup";
         EFTNETSCloudProtocol: Codeunit "NPR EFT NETSCloud Protocol";
         Completed: Boolean;
         APIToken: Text;
@@ -14,11 +15,13 @@ codeunit 6059907 "NPR EFT NETS Cloud Abort Task" implements "NPR POS Background 
     begin
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
         EFTTransactionRequest.Get(EntryNo);
+        EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
         APIToken := Parameters.Get('APIToken');
-        EFTNETSCloudToken.SetToken(APIToken);
+        EFTNETSCloudToken.SetSessionToken(EFTSetup, APIToken);
         Completed := EFTNETSCloudProtocol.InvokeCancelAction(EFTTransactionRequest, APIToken, Response);
 
         Result.Add('Completed', Format(Completed, 0, 9));
+        EFTNETSCloudToken.AddTaskResult(Result, EFTNETSCloudProtocol.LastResponseWasUnauthorized());
         Result.Add('Response', Response);
         if not (Completed) then begin
             Result.Add('Error', GetLastErrorText());
@@ -28,6 +31,7 @@ codeunit 6059907 "NPR EFT NETS Cloud Abort Task" implements "NPR POS Background 
 
     procedure BackgroundTaskSuccessContinuation(TaskId: Integer; Parameters: Dictionary of [Text, Text]; Results: Dictionary of [Text, Text]);
     var
+        EFTNETSCloudToken: Codeunit "NPR EFT NETSCloud Token";
         POSActionNetsCloudTrx: Codeunit "NPR POS Action: NetsCloud Trx";
         EntryNo: Integer;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -39,6 +43,7 @@ codeunit 6059907 "NPR EFT NETS Cloud Abort Task" implements "NPR POS Background 
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
         Evaluate(Completed, Results.Get('Completed'), 9);
         EFTTransactionRequest.Get(EntryNo);
+        EFTNETSCloudToken.InvalidateIfRejectedByTask(EFTTransactionRequest, Results);
 
         if Completed then begin
             EFTNETSCloudProtocol.WriteLogEntry(EFTTransactionRequest, false, 'AbortTrxTaskDone (Complete)', '');

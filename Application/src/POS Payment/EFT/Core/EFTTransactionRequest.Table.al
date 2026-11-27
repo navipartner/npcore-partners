@@ -581,6 +581,13 @@
             Caption = 'Created From Data Colletion';
             DataClassification = CustomerContent;
         }
+        field(890; "Selfservice Reversal Status"; Option)
+        {
+            Caption = 'Selfservice Reversal Status';
+            OptionMembers = " ",Pending,Reversed,Failed,Unknown;
+            OptionCaption = ' ,Pending,Reversed,Failed,Unknown';
+            DataClassification = CustomerContent;
+        }
         field(10000; "FF Moved to POS Entry"; Boolean)
         {
             CalcFormula = Exist("NPR POS Entry" WHERE("Document No." = FIELD("Sales Ticket No.")));

@@ -56,5 +56,25 @@
     fieldgroups
     {
     }
+
+    trigger OnModify()
+    var
+        StoredSetup: Record "NPR EFT NETS Cloud Paym. Setup";
+        EFTNETSCloudToken: Codeunit "NPR EFT NETSCloud Token";
+    begin
+        if not StoredSetup.Get("Payment Type POS") then
+            exit;
+        if ("API Username" = StoredSetup."API Username") and ("API Password" = StoredSetup."API Password") and (Environment = StoredSetup.Environment) then
+            exit;
+        EFTNETSCloudToken.Invalidate(StoredSetup);
+        EFTNETSCloudToken.Invalidate(Rec);
+    end;
+
+    trigger OnDelete()
+    var
+        EFTNETSCloudToken: Codeunit "NPR EFT NETSCloud Token";
+    begin
+        EFTNETSCloudToken.Invalidate(Rec);
+    end;
 }
 

@@ -19,7 +19,7 @@ codeunit 6185056 "NPR API POS Handler" implements "NPR API Request Handler"
         APIPOSUnit: Codeunit "NPR APIPOSUnit";
         APIPOSStore: Codeunit "NPR APIPOSStore";
         APIPOSEntry: Codeunit "NPR API POS Entry";
-        APIPOSEFTAdyen: Codeunit "NPR API POS EFT Adyen Cloud";
+        APIPOSEFT: Codeunit "NPR API POS EFT";
     begin
         case true of
             Request.Match('POST', '/pos/sale/:saleId'):
@@ -67,21 +67,20 @@ codeunit 6185056 "NPR API POS Handler" implements "NPR API Request Handler"
             Request.Match('DELETE', '/pos/sale/:saleId/paymentline/:paymentLineId'):
                 exit(APIPOSPaymentLine.DeletePaymentLine(Request));
 
-            // EFT (Adyen Cloud) endpoints
             Request.Match('POST', '/pos/sale/:saleId/eft/prepare'):
-                exit(APIPOSEFTAdyen.PrepareEFTPayment(Request));
+                exit(APIPOSEFT.PrepareEFTPayment(Request));
             Request.Match('GET', '/pos/sale/:saleId/eft/:transactionId/local/buildRequest'):
-                exit(APIPOSEFTAdyen.BuildEFTRequest(Request));
+                exit(APIPOSEFT.BuildEFTRequest(Request));
             Request.Match('POST', '/pos/sale/:saleId/eft/:transactionId/local/parseResponse'):
-                exit(APIPOSEFTAdyen.ParseEFTResponse(Request));
+                exit(APIPOSEFT.ParseEFTResponse(Request));
             Request.Match('POST', '/pos/sale/:saleId/eft/local/generateBoardingToken'):
-                exit(APIPOSEFTAdyen.GenerateBoardingToken(Request));
+                exit(APIPOSEFT.GenerateBoardingToken(Request));
             Request.Match('POST', '/pos/sale/:saleId/eft/:transactionId/cloud/start'):
-                exit(APIPOSEFTAdyen.StartEFTPayment(Request));
+                exit(APIPOSEFT.StartEFTPayment(Request));
             Request.Match('GET', '/pos/sale/:saleId/eft/:transactionId/cloud/status'):
-                exit(APIPOSEFTAdyen.PollEFTStatus(Request));
+                exit(APIPOSEFT.PollEFTStatus(Request));
             Request.Match('POST', '/pos/sale/:saleId/eft/:transactionId/cloud/cancel'):
-                exit(APIPOSEFTAdyen.CancelEFTTransaction(Request));
+                exit(APIPOSEFT.CancelEFTTransaction(Request));
 
             Request.Match('GET', '/pos/sale/search'):
                 exit(APIPOSSale.SearchSale(Request));

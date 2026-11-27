@@ -547,6 +547,7 @@
             TempRetailList.Insert();
         end;
 
+        Commit();
         if (PAGE.RunModal(0, TempRetailList) <> ACTION::LookupOK) then
             exit(false);
 
@@ -575,6 +576,7 @@
 
         EFTTransactionRequest.SetRange("Hardware ID", EFTTransactionRequestIn."Hardware ID");
         EFTTransactionRequest.SetRange("Integration Type", EFTTransactionRequestIn."Integration Type");
+        EFTTransactionRequest.SetFilter(Started, '<>%1', 0DT);
         if IncludeVoids then begin
             EFTTransactionRequest.SetFilter("Processing Type", '%1|%2|%3|%4',
               EFTTransactionRequest."Processing Type"::PAYMENT,

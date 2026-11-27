@@ -17,13 +17,14 @@ codeunit 6059893 "NPR EFT NETS Cloud Trx Task" implements "NPR POS Background Ta
         EFTTransactionRequest.Get(EntryNo);
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
         APIToken := Parameters.Get('APIToken');
-        EFTNETSCloudToken.SetToken(APIToken);
+        EFTNETSCloudToken.SetSessionToken(EFTSetup, APIToken);
 
         ClearLastError();
         Completed := EFTNETSCloudProtocol.InvokeTransaction(EFTTransactionRequest, EFTSetup, APIToken, Response);
         Logs := EFTNETSCloudProtocol.GetLogBuffer();
 
         Result.Add('Completed', Format(Completed, 0, 9));
+        EFTNETSCloudToken.AddTaskResult(Result, EFTNETSCloudProtocol.LastResponseWasUnauthorized());
         Result.Add('Response', Response);
         Result.Add('Logs', Logs);
         if not (Completed) then begin
@@ -34,6 +35,7 @@ codeunit 6059893 "NPR EFT NETS Cloud Trx Task" implements "NPR POS Background Ta
 
     procedure BackgroundTaskSuccessContinuation(TaskId: Integer; Parameters: Dictionary of [Text, Text]; Results: Dictionary of [Text, Text]);
     var
+        EFTNETSCloudToken: Codeunit "NPR EFT NETSCloud Token";
         EFTNETSCloudProtocol: Codeunit "NPR EFT NETSCloud Protocol";
         POSActionNetsCloudTrx: Codeunit "NPR POS Action: NetsCloud Trx";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -48,6 +50,7 @@ codeunit 6059893 "NPR EFT NETS Cloud Trx Task" implements "NPR POS Background Ta
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
         EFTTransactionRequest.Get(EntryNo);
         Evaluate(Completed, Results.Get('Completed'), 9);
+        EFTNETSCloudToken.InvalidateIfRejectedByTask(EFTTransactionRequest, Results);
 
         if Completed then begin
             Response := Results.Get('Response');
